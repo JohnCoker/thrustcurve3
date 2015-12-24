@@ -1,0 +1,15 @@
+{
+  "name": "units",
+  "version": "1.0.0",
+  "description": "unit identification and conversion",
+  "main": "units.js",
+  "scripts": {
+    "test": "jasmine-node spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/lib/units"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC"
+}

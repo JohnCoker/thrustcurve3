@@ -65,3 +65,7 @@ Initially, I was looking at [AngularJS](https://angularjs.org/), but their appro
 radically client-side, plus 2.0 is still immature.
 [React](https://facebook.github.io/react/) seemed like a better choice for my needs,
 providing a good abstraction without sacrificing server-side rendering.
+
+## License
+
+This software is licensed under the [ISC license](https://opensource.org/licenses/ISC); see [LICENSE](LICENSE) for more info.

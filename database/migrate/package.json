@@ -1,0 +1,20 @@
+{
+  "name": "migrate",
+  "version": "1.0.0",
+  "description": "migrate ThrustCurve.org from MySQL to MongoDB",
+  "main": "migrate.js",
+  "dependencies": {
+    "async": "^1.5.0",
+    "mongoose": "^4.3.3",
+    "mysql": "^2.10.0"
+  },
+  "devDependencies": {
+    "../schema": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/database/migrate"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "OSI"
+}

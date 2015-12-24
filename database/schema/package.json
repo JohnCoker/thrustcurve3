@@ -1,0 +1,18 @@
+{
+  "name": "schema",
+  "version": "1.0.0",
+  "description": "MongoDB schema for ThrustCurve.org",
+  "main": "schema.js",
+  "scripts": {
+    "test": "jasmine-node spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/database/schema"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^4.3.3"
+  }
+}

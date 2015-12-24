@@ -1,0 +1,8 @@
+// http://www.jshint.com/docs/
+{
+  "node": true,
+  "eqnull": true,
+  "strict": false,
+  "undef": true,
+  "unused": "vars"
+}

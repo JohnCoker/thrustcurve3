@@ -354,7 +354,7 @@ var tableCount = 0,
 function migrateTable(table, rows, fields, cb) {
   var mappings = [], migrated = [],
       model = table.model(mongoose),
-      column, mapping, output, found, inputs,
+      column, mapping, field, output, found, inputs,
       r, v, m, i, j;
 
   console.log('* starting ' + table.name + '...');
@@ -383,14 +383,21 @@ function migrateTable(table, rows, fields, cb) {
 
     // create a mapping if necessary
     if (mapping == null) {
+      if (column == 'created')
+        field = 'createdAt';
+      else if (column == 'updated')
+        field = 'updatedAt';
+      else {
+        field = column.replace(/_([a-z])/g, function(l) { return l.toUpperCase(); }).replace(/_/g, '');
+        if (field == 'id')
+          field = '_id';
+        else if (/Id$/.test(field))
+          field = '_' + field.replace(/Id$/, '');
+      }
       mapping = {
         name: column,
-        field: column.replace(/_([a-z])/g, function(l) { return l.toUpperCase(); }).replace(/_/g, '')
+        field: field
       };
-      if (mapping.field == 'id')
-        mapping.field = '_id';
-      else if (/Id$/.test(mapping.field))
-        mapping.field = '_' + mapping.field.replace(/Id$/, '');
     }
 
     // make sure the target field exists
@@ -477,7 +484,7 @@ function migrateTable(table, rows, fields, cb) {
       output[m.output] = v;
     }
 
-    migrated.push(new model(output));
+    migrated.push(model(output));
   }
   if (migrated.length != rows.length) {
     console.error('! ' + table.name + ' has ' + rows.length + ' rows, but ' + migrated.length + ' were migrated');

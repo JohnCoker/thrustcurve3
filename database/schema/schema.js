@@ -14,37 +14,49 @@ var MotorNameRegex = /^1\/[248]A(0\.)[1-9]|[A-Z][1-9][0-9]*$/;
 
 var units = require('../../lib/units');
 
+function schemaOptions(schema) {
+  // touch updatedAt timestamp
+  schema.pre('save', function(next) {
+    if (!this.isNew && this.isModified())
+      this.updatedAt = new Date();
+    next();
+  });
+}
+
 function makeManufacturerModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     name: { type: String, required: true, unique: true },
     abbrev: { type: String, required: true, unique: true },
     aliases: [{ type: String, required: true }],
     website: { type: String, match: UrlRegex },
-    active: { type: Boolean, required: true }
+    active: { type: Boolean, required: true, default: true }
   });
+  schemaOptions(schema);
   return mongoose.model('Manufacturer', schema);
-};
+}
 
 function makeCertOrgModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     name: { type: String, required: true, unique: true },
     abbrev: { type: String, required: true, unique: true },
     aliases: [{ type: String, required: true }],
-    website: { type: String, match: UrlRegex }
+    website: { type: String, match: UrlRegex },
+    active: { type: Boolean, required: true, default: true }
   });
+  schemaOptions(schema);
   return mongoose.model('CertOrg', schema);
-};
+}
 
 function makeMotorModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     _manufacturer: { type: mongoose.Schema.Types.ObjectId, ref: 'Manufacturer', required: true },
     _relatedMfr: { type: mongoose.Schema.Types.ObjectId, ref: 'Manufacturer' },
@@ -73,13 +85,14 @@ function makeMotorModel(mongoose) {
     availability: { type: String, required: true, enum: ['regular', 'occasional', 'OOP' ] }
   });
   schema.index({ _manufacturer: 1, designation: 1 }, { unique: true });
+  schemaOptions(schema);
   return mongoose.model('Motor', schema);
-};
+}
 
 function makeContributorModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     email: { type: String, required: true, match: EmailRegex, unique: true },
     password: { type: String },
@@ -106,26 +119,28 @@ function makeContributorModel(mongoose) {
       editRockets: Boolean
     }
   });
+  schemaOptions(schema);
   return mongoose.model('Contributor', schema);
-};
+}
 
 function makeMotorNoteModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
     subject: { type: String, required: true },
     content: { type: String, required: true }
   });
+  schemaOptions(schema);
   return mongoose.model('MotorNote', schema);
-};
+}
 
 function makeSimFileModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
@@ -134,26 +149,28 @@ function makeSimFileModel(mongoose) {
     license: { type: String, enum: [ 'PD', 'free', 'other' ] },
     data: { type: String, required: true }
   });
+  schemaOptions(schema);
   return mongoose.model('SimFile', schema);
-};
+}
 
 function makeSimFileNoteModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     _simFile: { type: mongoose.Schema.Types.ObjectId, ref: 'SimFile', required: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
     subject: { type: String, required: true },
     content: { type: String, required: true }
   });
+  schemaOptions(schema);
   return mongoose.model('SimFileNote', schema);
-};
+}
 
 function makeRocketModel(mongoose) {
   var schema = new mongoose.Schema({
-    created: { type: Date, default: Date.now, required: true },
-    updated: { type: Date, default: Date.now, required: true },
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
     migratedId: Number,
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', required: true },
     name: { type: String, required: true },
@@ -172,8 +189,9 @@ function makeRocketModel(mongoose) {
     website: { type: String, match: UrlRegex },
     comments: String
   });
+  schemaOptions(schema);
   return mongoose.model('Rocket', schema);
-};
+}
 
 module.exports = {
   UrlRegex: UrlRegex,

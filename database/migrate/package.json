@@ -8,6 +8,9 @@
     "mongoose": "^4.3.3",
     "mysql": "^2.10.0"
   },
+  "scripts": {
+    "lint": "jshint *.js"
+  },
   "devDependencies": {
     "../schema": "^1.0.0"
   },

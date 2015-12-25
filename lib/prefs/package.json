@@ -4,7 +4,8 @@
   "description": "user preferences",
   "main": "prefs.js",
   "scripts": {
-    "test": "jasmine-node spec"
+    "test": "jasmine-node spec",
+    "lint": "jshint *.js"
   },
   "repository": {
     "type": "git",

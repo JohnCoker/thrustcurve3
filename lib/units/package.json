@@ -4,7 +4,8 @@
   "description": "unit identification and conversion",
   "main": "units.js",
   "scripts": {
-    "test": "jasmine-node spec"
+    "test": "jasmine-node spec",
+    "lint": "jshint *.js"
   },
   "repository": {
     "type": "git",

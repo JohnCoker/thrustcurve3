@@ -85,7 +85,7 @@ function mapWebsite(value) {
 var tables = [
   {
     name: 'manufacturer',
-    model: schema.Manufacturer,
+    model: schema.ManufacturerModel,
     columns: [
       {
         name: /^alias[1-6]$/,
@@ -106,7 +106,7 @@ var tables = [
   },
   {
     name: 'cert_org',
-    model: schema.CertOrg,
+    model: schema.CertOrgModel,
     columns: [
       {
         name: 'org_name',
@@ -128,7 +128,7 @@ var tables = [
   },
   {
     name: 'motor',
-    model: schema.Motor,
+    model: schema.MotorModel,
     columns: [
       {
         name: 'mfr_desig',
@@ -200,7 +200,7 @@ var tables = [
   },
   {
     name: 'contributor',
-    model: schema.Contributor,
+    model: schema.ContributorModel,
     filter: "exists(select * from simfile where contributor_id = id) or exists(select * from rocket where contributor_id = id)",
     columns: [
       {
@@ -261,12 +261,12 @@ var tables = [
   },
   {
     name: 'motor_note',
-    model: schema.MotorNote,
+    model: schema.MotorNoteModel,
   },
   {
     name: 'simfile',
     filter: "format in ('RASP', 'RockSim')",
-    model: schema.SimFile,
+    model: schema.SimFileModel,
     columns: [
       {
         name: 'sim_data',
@@ -276,7 +276,7 @@ var tables = [
   },
   {
     name: 'simfile_note',
-    model: schema.SimFileNote,
+    model: schema.SimFileNoteModel,
     columns: [
       {
         name: 'simfile_id',
@@ -286,7 +286,7 @@ var tables = [
   },
   {
     name: 'rocket',
-    model: schema.Rocket,
+    model: schema.RocketModel,
     columns: [
       {
         name: 'body_diam_u',
@@ -351,8 +351,9 @@ var tables = [
 var tableCount = 0,
     successCount = 0;
 
-function migrateTable(table, rows, fields) {
+function migrateTable(table, rows, fields, cb) {
   var mappings = [], migrated = [],
+      model = table.model(mongoose),
       column, mapping, output, found, inputs,
       r, v, m, i, j;
 
@@ -393,7 +394,7 @@ function migrateTable(table, rows, fields) {
     }
 
     // make sure the target field exists
-    if (!table.model.schema.paths.hasOwnProperty(mapping.field)) {
+    if (!model.schema.paths.hasOwnProperty(mapping.field)) {
         console.error('! column "' + table.name + '.' + column + '" maps to invalid schema field ' + mapping.field);
         return false;
     }
@@ -468,14 +469,15 @@ function migrateTable(table, rows, fields) {
         continue;
 
       // perform any necessary coercion
-      if (table.model.schema.paths[m.output].instance == 'ObjectID') {
+      if (model.schema.paths[m.output].instance == 'ObjectID') {
         if (!(v instanceof mongoose.Types.ObjectId))
           v = toObjectId(table.name, v);
       }
 
       output[m.output] = v;
     }
-    migrated.push(table.model(output));
+
+    migrated.push(new model(output));
   }
   if (migrated.length != rows.length) {
     console.error('! ' + table.name + ' has ' + rows.length + ' rows, but ' + migrated.length + ' were migrated');
@@ -483,9 +485,9 @@ function migrateTable(table, rows, fields) {
   }
 
   // save the documents
-  console.log('* creating ' + migrated.length + ' ' + table.model.modelName + ' documents...');
-  table.model.create(migrated, function(err, results) {
-    console.log('created');
+  console.log('* creating ' + migrated.length + ' ' + model.modelName + ' documents...');
+  model.create(migrated, function(err, results) {
+    console.log('create callback');
     if (err) {
       var fields;
       if (err.errors && (fields = Object.keys(err.errors)).length > 0) {
@@ -495,52 +497,83 @@ function migrateTable(table, rows, fields) {
         console.error('! ' + err.message || err);
       }
       console.log('* failed ' + table.name);
-      return;
+    } else {
+      console.log('* finished ' + table.name + ': saved ' + results.length + ' documents.');
+      successCount++;
     }
-    console.log('* finished ' + table.name + ': saved ' + results.length + ' documents.');
-    successCount++;
+    cb(err, 'migrate ' + table.name);
   });
 
   return true;
 }
 
-mongoose.connect('mongodb://localhost/thrustcurve', function(err) {
-  if (err) {
-    console.error('! unable to connect to MongoDB');
-    process.exit(1);
+var mysqlConn;
+
+// open DBs
+var steps = [
+  function(cb) {
+    mongoose.connect('mongodb://localhost/thrustcurve', {
+    }, function(err) {
+      if (err) {
+        console.error('! unable to connect to MongoDB');
+      } else {
+        console.log('* connected to MongoDB');
+      }
+      cb(err, 'connect to MongoDB');
+    });
+  },
+  function(cb) {
+    mysqlConn = mysql.createConnection({
+      host     : 'localhost',
+      user     : process.env.USER,
+      database : 'thrustcurve'
+    });
+    mysqlConn.connect(function(err) {
+      if (err) {
+        console.error('! unable to connect to MySQL');
+      } else {
+        console.log('* connected to MySQL');
+      }
+      cb(err, 'connect to MySQL');
+    });
   }
-});
+];
 
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : process.env.USER,
-  database : 'thrustcurve'
-});
-connection.connect();
-
-var queries = [];
+// migrate each table
 tables.forEach(function(table) {
-  queries.push(function(cb) {
+  steps.push(function(cb) {
     var select = 'select * from ' + table.name;
     if (table.filter)
       select += ' where ' + table.filter;
-    connection.query(select, function(err, rows, fields) {
-      if (err)
+    mysqlConn.query(select, function(err, rows, fields) {
+      if (err) {
         console.error('! error querying ' + table.name + ': ' + err.stack);
-      else if (rows.length < 1)
+      } else if (rows.length < 1) {
         console.error('! no rows in table ' + table.name + '!');
-      else
-        migrateTable(table, rows, fields);
-      cb(err, null);
+        err = true;
+      } else {
+        if (!migrateTable(table, rows, fields, cb))
+          err = true;
+      }
+      if (err)
+        cb(err, 'migrate ' + table.name);
     });
   });
 });
-async.series(queries, function(err, result) {
+
+// close DBs
+steps.push(function(cb) {
+  mysqlConn.end();
+  mongoose.disconnect();
+  cb(null, 'closed databases');
+});
+
+async.series(steps, function(err, result) {
   if (err) {
-    console.error('! ' + err.message || err);
+    if (err !== true)
+      console.error('! ' + err.message || err);
   } else {
     console.log('* all finished');
   }
-  mongoose.disconnect();
-  connection.end();
 });
+

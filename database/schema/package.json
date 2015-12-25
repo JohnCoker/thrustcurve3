@@ -13,6 +13,7 @@
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
   "license": "ISC",
   "dependencies": {
+    "mongodb": "^2.1.2",
     "mongoose": "^4.3.3"
   }
 }

@@ -12,7 +12,7 @@ At that time, the goal was to provide accurate simulator files converted directl
 from the data obtained at the motor test stand.
 I was able to get data for most TRA-certified motors,
 but the [National Association of Rocketry](http://www.nar.org) (NAR)
-was never willing to make any data available.
+was not willing to make their data available.
 
 Subsequently, TRA stopped making data available and the site languished.
 There was still the original set of generated files, but it quickly became outdated
@@ -40,7 +40,7 @@ organizations to fill in the details.
  * [C.A.R. Motor Certification Committee](http://www.canadianrocketry.org/mcc_about.php)
 
 This repository contains the source for the third iteration of the site.
-The v2 implementation was in Java/JSP, which by 2015 had become dated, it was getting hard
+The v2 implementation was in Java/JSP, which by 2015 had become dated, was getting hard
 to maintain, and my hosting options were limited.
 So, I decided to re-implement it using current web technologies.
 
@@ -65,6 +65,29 @@ Initially, I was looking at [AngularJS](https://angularjs.org/), but their appro
 radically client-side, plus 2.0 is still immature.
 [React](https://facebook.github.io/react/) seemed like a better choice for my needs,
 providing a good abstraction without sacrificing server-side rendering.
+This decision has not been finalized yet, and I'll either end up with a MEAN or MERN stack.
+
+
+## Source Organization
+
+This repository is organized into multiple Node.js modules, one per directory.
+Most modules are quite small (with a single file being typical).
+
+### Database
+
+The database directory contains the Mongoose schema definition for MongoDB database in the __schema__ project
+and the code that migrates data from the v2 MySQL database to MongoDB in __migrate__.
+
+### Simulate
+
+This directory contains modules for parsing data files and running simulations.
+Parsing data files is necessary for validating user submissions and for generating graphs and extracting stats.
+Simulations are use for the Motor Guide feature.
+
+### Lib
+
+The lib directory contains low-level modules that provide shared functionality such as unit conversion.
+
 
 ## License
 

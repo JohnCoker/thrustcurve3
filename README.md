@@ -35,8 +35,8 @@ mosty from the [NAR comprehensive list](http://nar.org/SandT/pdf/CombinedList.pd
 Additional information is pulled from the web sites of the three certification
 organizations to fill in the details.
 
- * [N.A.R. Standards & Testing](http://nar.org/SandT/NARenglist.shtml)
- * [Tripoli Motor Testing](http://www.tripoli.org/tmt/Motor_Testing.shtml)
+ * [N.A.R. Standards & Testing](http://www.nar.org/standards-and-testing-committee/)
+ * [Tripoli Motor Testing](http://www.tripoli.org/)
  * [C.A.R. Motor Certification Committee](http://www.canadianrocketry.org/mcc_about.php)
 
 This repository contains the source for the third iteration of the site.

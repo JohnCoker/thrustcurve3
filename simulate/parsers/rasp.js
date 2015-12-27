@@ -4,11 +4,13 @@
  */
 'use strict';
 
+var errors = require('../../lib/errors');
+
 function parse(data, error) {
   var lines, fields, info, points, line, point, i;
 
   if (data == null || typeof data != 'string' || data === '') {
-    error('missing data', true);
+    error(errors.DATA_FILE_EMPTY, 'missing data');
     return;
   }
   lines = data.trim().split('\n');
@@ -20,18 +22,18 @@ function parse(data, error) {
       break;
   }
   if (i >= lines.length) {
-    error('missing motor info line', true);
+    error(errors.RASP_INFO_LINE, 'missing motor info line');
     return;
   }
 
   // parse motor info
   fields = line.split(/\s+/);
   if (fields.length < 7) {
-    error('invalid motor info line; expected seven fields', true);
+    error(errors.RASP_INFO_LINE, 'invalid motor info line; expected seven fields');
     return;
   }
   if (fields.length > 7)
-    error('extra stuff after motor info line; expected seven fields', false);
+    error(errors.RASP_INFO_LINE, 'extra stuff after motor info line; expected seven fields');
 
   info = {
     name: fields[0],
@@ -44,19 +46,19 @@ function parse(data, error) {
   };
 
   if (isNaN(info.diameter) || info.diameter < 1)
-    error('invalid motor diameter "' + fields[1] + '"; expected millimeters', false);
+    error(errors.INVALID_INFO, 'invalid motor diameter "{1}"; expected millimeters', fields[1]);
   else
     info.diameter /= 1000;
 
   if (isNaN(info.length) || info.length < 1)
-    error('invalid motor length "' + fields[2] + '"; expected millimeters', false);
+    error(errors.INVALID_INFO, 'invalid motor length "{1}"; expected millimeters', fields[2]);
   else
     info.length /= 1000;
 
   if (isNaN(info.propellantWeight) || info.propellantWeight < 0.001)
-    error('invalid motor propellantWeight "' + fields[4] + '"; expected kilograms', false);
+    error(errors.INVALID_INFO, 'invalid motor propellantWeight "{1}"; expected kilograms', fields[4]);
   if (isNaN(info.totalWeight) || info.totalWeight < 0.001)
-    error('invalid motor totalWeight "' + fields[5] + '"; expected kilograms', false);
+    error(errors.INVALID_INFO, 'invalid motor totalWeight "{1}"; expected kilograms', fields[5]);
 
   // parse data points
   points = [];
@@ -66,7 +68,7 @@ function parse(data, error) {
       break;
     fields = line.split(/\s+/);
     if (fields.length != 2) {
-      error('invalid thrust data at line ' + (i + 1) + '; expected two fields', true);
+      error(errors.INVALID_POINTS, 'invalid thrust data at line {1}; expected two fields', i + 1);
       return;
     }
     point = {
@@ -74,20 +76,20 @@ function parse(data, error) {
       thrust: parseFloat(fields[1])
     };
     if (isNaN(point.time) || point.time < 0) {
-      error('invalid time "' + fields[0] + '" at line ' + (i + 1) + '; expected seconds', true);
+      error(errors.INVALID_POINTS, 'invalid time "{1}" at line {2}; expected seconds', fields[0], i + 1);
       return;
     }
     if (isNaN(point.thrust) || point.thrust < 0) {
-      error('invalid thrust "' + fields[1] + '" at line ' + (i + 1) + '; expected Newtons', true);
+      error(errors.INVALID_POINTS, 'invalid thrust "{1}" at line {2}; expected seconds', fields[1], i + 1);
       return;
     }
     points.push(point);
   }
   if (points.length < 2) {
     if (points.length < 1)
-      error('no data points; expected at least two', true);
+      error(errors.MISSING_POINTS, 'no data points; expected at least two');
     else
-      error('too few data points (' + points.length + '); expected at least two', true);
+      error(errors.MISSING_POINTS, 'too few data points ({1}); expected at least two', points.length);
     return;
   }
   parse.points = points;
@@ -95,10 +97,10 @@ function parse(data, error) {
   // additional data warnings
   for (i = 0; i < points.length - 1; i++) {
     if (points[i] < 0.0001)
-      error('zero thrust data point before final point', false);
+      error(errors.INVALID_POINTS, 'zero thrust data point before final point');
   }
   if (points[points.length - 1] > 0.0001)
-    error('missing final data point with 0 thrust', false);
+    error(errors.MISSING_POINTS, 'missing final data point with zero thrust');
 
   return {
     format: 'RASP',

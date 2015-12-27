@@ -4,31 +4,34 @@
  */
 'use strict';
 
-var xmlparser = require("xml-parser");
+var xmlparser = require("xml-parser"),
+    errors = require('../../lib/errors');
 
 function parse(data, error) {
-  var xml, engine, info, data, points, point, elt, attrs, attr, value, i, j, n;
+  var xml, engine, info, dataElt, points, point, elt, attrs, attr, value, i, j, n;
 
   if (data == null || typeof data != 'string' || data === '') {
-    error('missing data', true);
+    error(errors.DATA_FILE_EMPTY, 'missing data');
     return;
   }
   xml = xmlparser(data);
   if (xml == null || xml.root == null) {
-    error('invalid XML for RockSim data file', true);
+    error(errors.ROCKSIM_BAD_XML, 'invalid XML for RockSim data file');
     return;
   }
 
   // find the engine element
-  if (xml.root.name = 'engine-database') {
+  if (xml.root.name == 'engine-database') {
     if (xml.root.children.length != 1 || xml.root.children[0].name != 'engine-list' ||
         xml.root.children[0].children.length != 1 || xml.root.children[0].children[0].name != 'engine') {
-      error('expected single engine element in engine-database', true);
+      error(errors.ROCKSIM_WRONG_DOC, 'expected single engine element in engine-database');
       return;
     }
     engine = xml.root.children[0].children[0];
   } else if (xml.root.name == 'engine') {
     engine = xml.root;
+  } else {
+    error(errors.ROCKSIM_WRONG_DOC, 'wrong root element "{1}" in RockSim data file', xml.root.name);
   }
 
   // read info from the attributes
@@ -46,13 +49,13 @@ function parse(data, error) {
     } else if (attr == 'dia') {
       n = parseFloat(value);
       if (isNaN(n) || n < 1)
-        error('invalid dia value "' + value + '"; expected millimeters', false);
+        error(errors.INVALID_INFO, 'invalid dia value "{1}"; expected millimeters', value);
       else
         info.diameter = n / 1000;
     } else if (attr == 'len') {
       n = parseFloat(value);
       if (isNaN(n) || n < 1)
-        error('invalid len value "' + value + '"; expected millimeters', false);
+        error(errors.INVALID_INFO, 'invalid len value "{1}"; expected millimeters', value);
       else
         info.length = n / 1000;
     } else if (attr == 'Type') {
@@ -63,53 +66,53 @@ function parse(data, error) {
       else if (/^single/i.test(value))
         info.type = 'SU';
       else
-        error('invalid Type value "' + value + '"; expected single-use, reloadable or hybrid', false);
+        error(errors.INVALID_INFO, 'invalid Type value "{1}"; expected single-use, reloadable or hybrid', value);
     } else if (attr == 'initWt') {
       n = parseFloat(value);
       if (isNaN(n) || n < 1)
-        error('invalid initWt value "' + value + '"; expected grams', false);
+        error(errors.INVALID_INFO, 'invalid initWt value "{1}"; expected grams', value);
       else
         info.totalWeight = n / 1000;
     } else if (attr == 'propWt') {
       n = parseFloat(value);
       if (isNaN(n) || n < 1)
-        error('invalid propWt value "' + value + '"; expected grams', false);
+        error(errors.INVALID_INFO, 'invalid propWt value "{1}"; expected grams', value);
       else
         info.propellantWeight = n / 1000;
     } else if (attr == 'Itot') {
       n = parseFloat(value);
       if (isNaN(n) || n < 0.1)
-        error('invalid Itot value "' + value + '"; expected Newton-seconds', false);
+        error(errors.INVALID_INFO, 'invalid Itot value "{1}"; expected Newton-seconds', value);
       else
         info.totalImpulse = n;
     } else if (attr == 'avgThrust') {
       n = parseFloat(value);
       if (isNaN(n) || n < 0.001)
-        error('invalid avgThrust value "' + value + '"; expected Newtons', false);
+        error(errors.INVALID_INFO, 'invalid avgThrust value "{1}"; expected Newtons', value);
       else
         info.avgThrust = n;
     } else if (attr == 'peakThrust') {
       n = parseFloat(value);
       if (isNaN(n) || n < 0.01)
-        error('invalid peakThrust value "' + value + '"; expected Newtons', false);
+        error(errors.INVALID_INFO, 'invalid peakThrust value "{1}"; expected Newtons', value);
       else
         info.maxThrust = n;
     } else if (attr == 'burn-time') {
       n = parseFloat(value);
       if (isNaN(n) || n < 0.01)
-        error('invalid time value "' + value + '"; expected seconds', false);
+        error(errors.INVALID_INFO, 'invalid time value "{1}"; expected seconds', value);
       else
         info.burnTime = n;
     } else if (attr == 'massFrac') {
       n = parseFloat(value);
       if (isNaN(n) || n < 1)
-        error('invalid massFrac value "' + value + '"; expected ratio', false);
+        error(errors.INVALID_INFO, 'invalid massFrac value "{1}"; expected ratio', value);
       else
         info.massFraction = n;
     } else if (attr == 'Isp') {
       n = parseFloat(value);
       if (isNaN(n) || n < 1)
-        error('invalid Isp value "' + value + '"; expected seconds', false);
+        error(errors.INVALID_INFO, 'invalid Isp value "{1}"; expected seconds', value);
       else
         info.isp = n;
     }
@@ -118,12 +121,12 @@ function parse(data, error) {
   // read data points from grandchild elements
   points = [];
   if (engine.children.length != 1 || engine.children[0].name != 'data') {
-    error('expected single data element in engine', true);
+    error(errors.MISSING_POINTS, 'expected single data element in engine');
     return;
   }
-  data = engine.children[0];
-  for (i = 0; i < data.children.length; i++) {
-    elt = data.children[i];
+  dataElt = engine.children[0];
+  for (i = 0; i < dataElt.children.length; i++) {
+    elt = dataElt.children[i];
     if (elt.name == 'eng-data') {
       point = {};
       attrs = Object.keys(elt.attributes);
@@ -133,14 +136,14 @@ function parse(data, error) {
         if (attr == 't') {
           n = parseFloat(value);
           if (isNaN(n) || n < 0) {
-            error('invalid eng-data/t value "' + value + '"; expected seconds', true);
+            error(errors.INVALID_POINTS, 'invalid eng-data/t value "{1}"; expected seconds', value);
             return;
           }
           point.time = n;
         } else if (attr == 'f') {
           n = parseFloat(value);
           if (isNaN(n) || n < 0) {
-            error('invalid eng-data/f value "' + value + '"; expected Newtons', true);
+            error(errors.INVALID_POINTS, 'invalid eng-data/f value "{1}"; expected Newtons', value);
             return;
           }
           point.thrust = n;
@@ -151,11 +154,11 @@ function parse(data, error) {
         }
       }
       if (!point.hasOwnProperty('time')) {
-        error('missing eng-data/t value; expected seconds', true);
+        error(errors.INVALID_POINTS, 'missing eng-data/t value; expected seconds');
         return;
       }
       if (!point.hasOwnProperty('thrust')) {
-        error('missing eng-data/f value; expected Newtons', true);
+        error(errors.INVALID_POINTS, 'missing eng-data/f value; expected Newtons');
         return;
       }
       points.push(point);
@@ -163,9 +166,9 @@ function parse(data, error) {
   }
   if (points.length < 2) {
     if (points.length < 1)
-      error('no data points; expected at least two', true);
+      error(errors.MISSING_POINTS, 'no data points; expected at least two');
     else
-      error('too few data points (' + points.length + '); expected at least two', true);
+      error(errors.MISSING_POINTS, 'too few data points ({1}); expected at least two', points.length);
     return;
   }
 

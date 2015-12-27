@@ -4,28 +4,17 @@
  */
 'use strict';
 
-var rasp = require('./rasp.js'),
+var errors = require('../../lib/errors'),
+    rasp = require('./rasp.js'),
     rocksim = require('./rocksim.js');
 
 function parse(format, data, error) {
-  if (arguments.length < 2 || arguments.length > 3) {
-    console.error('wrong number of arguments to parsers.parse (expected 3, got ' + arguments.length + ')');
-    return;
-  }
-  if (typeof error != 'function') {
-    error = function(msg, err) {
-      if (err)
-        console.error(msg);
-      else
-        console.warn(msg);
-    };
-  }
   if (format == null || typeof format != 'string' || format === '') {
-    error('missing data file format to parse', true);
+    error(errors.DATA_FILE_FORMAT, 'missing data file format to parse');
     return;
   }
   if (data == null || typeof data != 'string' || data === '') {
-    error('missing data file data to parse', true);
+    error(errors.DATA_FILE_EMPTY, 'missing data file data to parse');
     return;
   }
   if (format.toLowerCase() == 'rasp')
@@ -33,7 +22,7 @@ function parse(format, data, error) {
   else if (format.toLowerCase() == 'rocksim')
     return rocksim.parse(data, error);
   else {
-    error('unknown data file format "' + format + '" to parse', true);
+    error(errors.DATA_FILE_FORMAT, 'unknown data file format "{1}" to parse', format);
     return;
   }
 }
@@ -41,7 +30,7 @@ function parse(format, data, error) {
 function guessFormat(data) {
   var s, line;
 
-  if (data == null || typeof data != 'string' || data === '')
+  if (typeof data != 'string' || data === '')
     return;
   s = data.toLowerCase().trim();
 

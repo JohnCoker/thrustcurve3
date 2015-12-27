@@ -1,4 +1,5 @@
-var parsers = require("../parsers.js");
+var errors = require("../../../lib/errors"),
+    parsers = require("../parsers.js");
 
 describe("parsers", function() {
   describe("parseData", function() {
@@ -14,7 +15,7 @@ describe("parsers", function() {
           '   3.356 0.000\n',
           parsed;
       expect(function() {
-        parsed = parsers.parseData('RASP', data);
+        parsed = parsers.parseData('RASP', data, errors.print);
       }).not.toThrow();
       expect(parsed).toBeDefined();
       expect(typeof parsed).toBe('object');
@@ -37,7 +38,7 @@ describe("parsers", function() {
           '</engine-database>\n',
           parsed;
       expect(function() {
-        parsed = parsers.parseData('RockSim', data);
+        parsed = parsers.parseData('RockSim', data, errors.print);
       }).not.toThrow();
       expect(parsed).toBeDefined();
       expect(typeof parsed).toBe('object');
@@ -103,7 +104,7 @@ describe("parsers", function() {
           '   0.065 604.264\n' +
           '   3.356 0.000\n';
       expect(function() {
-        parsed = parsers.parseData('RASP', data);
+        parsed = parsers.parseData('RASP', data, errors.print);
       }).not.toThrow();
       expect(parsed).toBeDefined();
       expect(typeof parsed).toBe('object');
@@ -149,7 +150,7 @@ describe("parsers", function() {
           ' </engine-list>\n' +
           '</engine-database>\n';
       expect(function() {
-        parsed = parsers.parseData('RockSim', data);
+        parsed = parsers.parseData('RockSim', data, errors.print);
       }).not.toThrow();
       expect(parsed).toBeDefined();
       expect(typeof parsed).toBe('object');

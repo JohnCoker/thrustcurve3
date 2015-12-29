@@ -93,7 +93,7 @@ function normalize(input, params, error) {
 }
 
 function stats(data, params, error) {
-  var points, maxTime, maxThrust, burnTime, totalImpulse,
+  var points, maxTime, maxThrust, burnStart, burnEnd, burnTime, totalImpulse,
       cutoff, lastPoint, nextPoint, i, x, y;
 
   // optional arguments
@@ -131,11 +131,28 @@ function stats(data, params, error) {
   }
 
   // find the standard burn time
-  burnTime = maxTime;
+  burnStart = 0;
+  burnEnd = maxTime;
   if (params.burnTimeCutoff > 0 && points.length > 2) {
     cutoff = maxThrust * params.burnTimeCutoff;
 
-    // find the next point below the cut-off
+    // find the last point below the cut-off from start
+    lastPoint = undefined;
+    for (i = 0; i < points.length && points[i].thrust < cutoff; i--)
+      lastPoint = points[i];
+
+    if (i < points.length) {
+      if (lastPoint == null)
+	lastPoint = { time: 0, thrust: 0 };
+      nextPoint = points[i];
+
+      // standard burn time end is where the thrust dropped below the cut-off
+      burnStart = (lastPoint.time +
+		   (nextPoint.time - lastPoint.time) *
+		   (lastPoint.thrust - cutoff) / (lastPoint.thrust - nextPoint.thrust));
+    }
+
+    // find the next point below the cut-off from end
     nextPoint = undefined;
     for (i = points.length - 1; i > 1 && points[i].thrust < cutoff; i--)
       nextPoint = points[i];
@@ -144,12 +161,13 @@ function stats(data, params, error) {
       // get the last point above the cut-off
       lastPoint = points[i];
 
-      // standard burn time is where the thrust dropped below the cut-off
-      burnTime = (lastPoint.time +
-		  (nextPoint.time - lastPoint.time) *
-		  (lastPoint.thrust - cutoff) / (lastPoint.thrust - nextPoint.thrust));
+      // standard burn time end is where the thrust dropped below the cut-off
+      burnEnd = (lastPoint.time +
+		 (nextPoint.time - lastPoint.time) *
+		 (cutoff - lastPoint.thrust) / (nextPoint.thrust - lastPoint.thrust));
     }
   }
+  burnTime = burnEnd - burnStart;
 
   // integrate total impulse
   totalImpulse = 0;
@@ -169,6 +187,8 @@ function stats(data, params, error) {
     maxThrust: maxThrust,
     maxTime: maxTime,
     avgThrust: totalImpulse / burnTime,
+    burnStart: burnStart,
+    burnEnd: burnEnd,
     burnTime: burnTime,
     totalImpulse: totalImpulse,
   };

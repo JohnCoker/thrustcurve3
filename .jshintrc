@@ -4,5 +4,6 @@
   "eqnull": true,
   "strict": false,
   "undef": true,
-  "unused": "vars"
+  "unused": "vars",
+  "evil": "true"
 }

@@ -7,8 +7,10 @@
 var xmlparser = require("xml-parser"),
     errors = require('../../lib/errors');
 
+var tEpsilon = 0.00005;
+
 function parse(data, error) {
-  var xml, engine, info, dataElt, points, point, elt, attrs, attr, value, i, j, n;
+  var xml, engine, info, dataElt, points, point, lastTime, elt, attrs, attr, value, i, j, n;
 
   if (data == null || typeof data != 'string' || data === '') {
     error(errors.DATA_FILE_EMPTY, 'missing data');
@@ -125,6 +127,7 @@ function parse(data, error) {
     return;
   }
   dataElt = engine.children[0];
+  lastTime = 0;
   for (i = 0; i < dataElt.children.length; i++) {
     elt = dataElt.children[i];
     if (elt.name == 'eng-data') {
@@ -161,6 +164,11 @@ function parse(data, error) {
         error(errors.INVALID_POINTS, 'missing eng-data/f value; expected Newtons');
         return;
       }
+
+      // time should be increasing
+      if (points.length > 0 && point.time < lastTime + tEpsilon)
+	error(errors.INVALID_POINTS, 'eng-data/t value "{1}" not after previous point', point.time);
+
       points.push(point);
     }
   }

@@ -1,0 +1,16 @@
+{
+  "name": "analyze",
+  "version": "1.0.0",
+  "description": "analyze simulator file data points",
+  "main": "analyze.js",
+  "scripts": {
+    "test": "jasmine-node spec",
+    "lint": "jshint *.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/simulate/analyze"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC"
+}

@@ -6,8 +6,10 @@
 
 var errors = require('../../lib/errors');
 
+var tEpsilon = 0.0005;
+
 function parse(data, error) {
-  var lines, fields, info, points, line, point, i;
+  var lines, fields, info, points, line, point, lastTime, i;
 
   if (data == null || typeof data != 'string' || data === '') {
     error(errors.DATA_FILE_EMPTY, 'missing data');
@@ -45,16 +47,17 @@ function parse(data, error) {
     manufacturer: fields[6]
   };
 
+  // diameter and length must be at least 1mm
   if (isNaN(info.diameter) || info.diameter < 1)
     error(errors.INVALID_INFO, 'invalid motor diameter "{1}"; expected millimeters', fields[1]);
   else
     info.diameter /= 1000;
-
   if (isNaN(info.length) || info.length < 1)
     error(errors.INVALID_INFO, 'invalid motor length "{1}"; expected millimeters', fields[2]);
   else
     info.length /= 1000;
 
+  // propellant and total weights must be at least 1g
   if (isNaN(info.propellantWeight) || info.propellantWeight < 0.001)
     error(errors.INVALID_INFO, 'invalid motor propellantWeight "{1}"; expected kilograms', fields[4]);
   if (isNaN(info.totalWeight) || info.totalWeight < 0.001)
@@ -62,6 +65,7 @@ function parse(data, error) {
 
   // parse data points
   points = [];
+  lastTime = 0;
   for (++i; i < lines.length; i++) {
     line = lines[i].trim();
     if (line === '' || line.charAt(0) == ';')
@@ -75,15 +79,25 @@ function parse(data, error) {
       time: parseFloat(fields[0]),
       thrust: parseFloat(fields[1])
     };
+
+    // time must be positive and should be increasing
     if (isNaN(point.time) || point.time < 0) {
       error(errors.INVALID_POINTS, 'invalid time "{1}" at line {2}; expected seconds', fields[0], i + 1);
       return;
     }
+    if (points.length === 0 && point.time < tEpsilon)
+      error(errors.INVALID_POINTS, 'first time "{1}" at line {2} not positive', fields[0], i + 1);
+    if (points.length > 0 && point.time < lastTime + tEpsilon)
+      error(errors.INVALID_POINTS, 'time "{1}" at line {2} not after previous point', fields[0], i + 1);
+
+    // thrust must be non-negative
     if (isNaN(point.thrust) || point.thrust < 0) {
       error(errors.INVALID_POINTS, 'invalid thrust "{1}" at line {2}; expected seconds', fields[1], i + 1);
       return;
     }
+
     points.push(point);
+    lastTime = point.time;
   }
   if (points.length < 2) {
     if (points.length < 1)

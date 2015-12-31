@@ -8,7 +8,7 @@ var errors = require('../../lib/errors'),
     rasp = require('./rasp.js'),
     rocksim = require('./rocksim.js');
 
-function parse(format, data, error) {
+function parseData(format, data, error) {
   if (format == null || typeof format != 'string' || format === '') {
     error(errors.DATA_FILE_FORMAT, 'missing data file format to parse');
     return;
@@ -48,7 +48,7 @@ function guessFormat(data) {
 }
 
 module.exports = {
-  parseData: parse,
+  parseData: parseData,
   guessFormat: guessFormat,
   parseRASP: rasp.parse,
   parseRockSim: rocksim.parse,

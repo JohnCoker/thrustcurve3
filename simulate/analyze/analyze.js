@@ -16,11 +16,9 @@ function normalize(input, params, error) {
   var output, lastTime, dropped, merged, i, x, y;
 
   // optional arguments
-  if (arguments.length == 2) {
-    if (typeof arguments[1] == 'function')
-      error = arguments[1];
-    else
-      params = arguments[1];
+  if (arguments.length == 2 && typeof arguments[1] == 'function') {
+    error = arguments[1];
+    params = undefined;
   }
   if (params == null)
     params = StdParams;
@@ -97,11 +95,9 @@ function stats(data, params, error) {
       cutoff, lastPoint, nextPoint, i, x, y;
 
   // optional arguments
-  if (arguments.length == 2) {
-    if (typeof arguments[1] == 'function')
-      error = arguments[1];
-    else
-      params = arguments[1];
+  if (arguments.length == 2 && typeof arguments[1] == 'function') {
+    error = arguments[1];
+    params = undefined;
   }
   if (params == null)
     params = StdParams;
@@ -138,7 +134,7 @@ function stats(data, params, error) {
 
     // find the last point below the cut-off from start
     lastPoint = undefined;
-    for (i = 0; i < points.length && points[i].thrust < cutoff; i--)
+    for (i = 0; i < points.length && points[i].thrust < cutoff; i++)
       lastPoint = points[i];
 
     if (i < points.length) {
@@ -147,9 +143,9 @@ function stats(data, params, error) {
       nextPoint = points[i];
 
       // standard burn time end is where the thrust dropped below the cut-off
-      burnStart = (lastPoint.time +
+      burnStart = (nextPoint.time +
 		   (nextPoint.time - lastPoint.time) *
-		   (lastPoint.thrust - cutoff) / (lastPoint.thrust - nextPoint.thrust));
+		   (nextPoint.thrust - cutoff) / (lastPoint.thrust - nextPoint.thrust));
     }
 
     // find the next point below the cut-off from end
@@ -198,11 +194,9 @@ function fit(data, params, error) {
   var points, source, i;
 
   // optional arguments
-  if (arguments.length == 2) {
-    if (typeof arguments[1] == 'function')
-      error = arguments[1];
-    else
-      params = arguments[1];
+  if (arguments.length == 2 && typeof arguments[1] == 'function') {
+    error = arguments[1];
+    params = undefined;
   }
   if (params == null)
     params = StdParams;

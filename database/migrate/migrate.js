@@ -167,12 +167,12 @@ var tables = [
       {
         name: 'diameter',
         field: 'diameter',
-        mapping: mapMMGStoMKS
+        mapper: mapMMGStoMKS
       },
       {
         name: 'length',
         field: 'length',
-        mapping: mapMMGStoMKS
+        mapper: mapMMGStoMKS
       },
       {
         name: 'tot_imp',
@@ -181,12 +181,12 @@ var tables = [
       {
         name: 'total_wgt',
         field: 'totalWeight',
-        mapping: mapMMGStoMKS
+        mapper: mapMMGStoMKS
       },
       {
         name: 'prop_wgt',
         field: 'propellantWeight',
-        mapping: mapMMGStoMKS
+        mapper: mapMMGStoMKS
       },
       {
         name: 'prop_info',

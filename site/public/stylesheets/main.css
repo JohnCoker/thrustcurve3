@@ -1,0 +1,16 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  padding-top: 35px;
+  padding-bottom: 50px;
+}
+
+img.navbar-brand {
+  padding: 0;
+  padding-right: 15px;
+}
+#footer-nav {
+  margin-botttom: 0;
+}

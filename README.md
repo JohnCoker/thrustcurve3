@@ -65,7 +65,10 @@ Initially, I was looking at [AngularJS](https://angularjs.org/), but their appro
 radically client-side, plus 2.0 is still immature.
 [React](https://facebook.github.io/react/) seemed like a better choice for my needs,
 providing a good abstraction without sacrificing server-side rendering.
-This decision has not been finalized yet, and I'll either end up with a MEAN or MERN stack.
+
+In the end, all of the full-featured frameworks just felt too complex and cumbersome and I
+went back to a simpler structure of [Express](http://expressjs.com/) with
+Handlebars as the template engine.
 
 
 ## Source Organization
@@ -87,6 +90,11 @@ Simulations are use for the Motor Guide feature.
 ### Lib
 
 The lib directory contains low-level modules that provide shared functionality such as unit conversion.
+
+### Site
+
+The site directory contains the web application that powers the site, using the
+[standard Express layout](http://expressjs.com/en/starter/generator.html).
 
 
 ## License

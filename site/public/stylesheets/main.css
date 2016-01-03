@@ -3,8 +3,11 @@ html {
   min-height: 100%;
 }
 body {
-  padding-top: 35px;
+  padding-top: 55px;
   padding-bottom: 50px;
+}
+h1:first-child {
+  margin-top: 0;
 }
 
 img.navbar-brand {
@@ -13,4 +16,36 @@ img.navbar-brand {
 }
 #footer-nav {
   margin-botttom: 0;
+}
+
+.sidebar {
+  position: relative;
+  top: 2em;
+}
+.sidebar-right {
+  border-left: 4px solid #9e1a20;
+}
+.sidebar h2:first-child {
+  margin-top: 0;
+}
+.sidebar h2,
+.sidebar h3 {
+  color: #777;
+  font-weight: normal;
+}
+.sidebar h2 {
+  font-size: 20px;
+}
+.sidebar h3 {
+  font-size: 16px;
+}
+
+ul.hanging {
+  list-style: none outside none;
+  margin-left: 0;
+  padding-left: 3em;
+  text-indent: -2.5em;
+}
+ul.hanging li {
+  padding-left: 1em;
 }

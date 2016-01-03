@@ -2,7 +2,7 @@ var express = require('express'),
     router = express.Router();
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'ThrustCurve' });
+  res.render('index', { title: 'ThrustCurve Home', layout: 'default' });
 });
 router.get(['/index.html', '/index.shtml'], function(req, res, next) {
   res.redirect(301, '/');

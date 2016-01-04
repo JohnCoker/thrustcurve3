@@ -1,0 +1,38 @@
+<h1>{{title}}</h1>
+
+<p>
+The link you followed doesn't exist; sorry about that!
+<br/>
+If the link was from another page on this site, please
+<a href="mailto:john@jcsw.com">let me know</a>
+so I can fix it.
+</p>
+
+<pre>
+{{path}}
+</pre>
+
+<p>
+Perhaps one of the common pages on the right will get you back on track,
+or try searching for the desired page below.
+</p>
+
+<script type="text/javascript">
+var GOOG_FIXURL_LANG = 'en';
+var GOOG_FIXURL_SITE = 'http://www.thrustcurve.org/';
+</script>
+<script type="text/javascript" src="http://linkhelp.clients.google.com/tbproxy/lh/wm/fixurl.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  var fixurl = $('#goog-fixurl'),
+      ul = fixurl.find('ul'),
+      form = fixurl.find('form');
+  fixurl.find('h3').hide();
+  ul.css('list-style', 'none').css('padding', '0');
+
+  form.addClass('form form-inline');
+  form.find('input[type=text]').addClass('form-control');
+  form.find('input[type=submit]').addClass('btn btn-default');
+});
+</script>

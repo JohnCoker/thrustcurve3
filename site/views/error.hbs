@@ -1,3 +1,16 @@
-<h1>{{message}}</h1>
-<h2>{{error.status}}</h2>
-<pre>{{error.stack}}</pre>
+<h1>{{title}}</h1>
+
+<p>
+Whoops, something went wrong with the site when processing your request;
+sorry about that!
+<br/>
+Please
+<a href="mailto:john@jcsw.com">let me know</a>
+what you were doing and include the error below so I can fix it.
+</p>
+
+<pre>
+{{url}}
+
+{{error.stack}}
+</pre>

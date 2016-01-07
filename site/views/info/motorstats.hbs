@@ -1,1 +1,125 @@
 <h1>{{title}}</h1>
+
+<p>
+Several important characteristics of the performance of a motor are used commonly when
+describing it, both on these pages and in general hobby parlance.
+For illustration purposes, here is the thrust curve of an AeroTech G80
+(original graph from the NAR data sheet).
+</p>
+
+<p class="img">
+<img width="460" height="190" src="/images/info/motorstats/G80stats.gif" alt="AeroTech G80">
+</p>
+
+<p>
+<b>Total impulse</b> is the product of thrust times duration over the motor burn time,
+and is measured in Newton-seconds (Ns).
+This measures the total amount of momentum imparted to the rocket by the motor.
+The total impulse (along with such factors as rocket mass and air drag)
+determines how high the motor can propel your rocket.
+(Thanks to Greg Lyzenga for this description.)
+</p>
+
+<p>
+The <b>impulse class</b> is a letter code assigned to a range of total impulse with
+each letter being twice as powerful as the previous.
+For example, the "AeroTech G80" shown above has a total impulse of 120Ns
+making it a 'G' class motor.
+</p>
+
+<p>
+<b>Average thrust</b> is the average instantanous force the motor produces
+during its burn and is measured in Newtons (N).
+Note that because most thrust curves are not flat, most of the time the
+motor is not producing the average thrust.
+The average thrust tells you how heavy a rocket the motor can lift,
+although since different motors produce different shaped thrust curves, it can be misleading.
+(Average thrust is determined by dividing the total thrust over the normalized
+burn time&mdash;within the 5% threshold.)
+</p>
+
+<p>
+<b>Maximum thrust</b> is the maximum amount of force produced by the motor
+during its burn.  Like average thrust, this is measured in Newtons (N).
+Generally, there is a small spike near the beginning which has the highest thrust, although
+the shape of the curve varies with the motor design and propellant mixture.
+</p>
+
+<p>
+<b>Burn time</b> is the number of seconds for which the motor produces thrust.
+This tells you how long the motor will keep pushing your rocket.
+Burn time is determined by chopping off the ends of the curve when the
+thrust is below 5% of the maximum; see <a href="#burn-time">Burn Time Normalization</a> below.
+</p>
+
+
+<H2>Other Information</H2>
+
+<p>
+The <b>common name</b> of the motor is formed from the total impulse,
+represented by the impulse class, and the average thrust.
+For example, the "AeroTech G80" shown above
+is a 'G' class motor and has an average thrust of 77.5N
+(rounded to 80 in this case).
+</p>
+
+<p>
+Another interesting number is the <b>specific impulse</b>, 
+or <b>I<small><sub>SP</sub></small></b>.
+This number is the total impulse over the weight of the propellant,
+which gives you a measure of the motors efficiency for lifting since the higher
+this number is, the more impulse you get for the propellant's weight.
+Think of this number as the quality measure of the propellant formulation.
+Isp may be expressed in "seconds" and intuitively, it means something like
+"how many seconds this propellant can accelerate its initial mass at 1 gee".
+<br/>
+(Thanks to Robert J. Kelley for this description.)
+</p>
+
+<p>
+The mechanical properties of the motor are also interesting for motor selection.
+Of course, the <b>diameter</b> tells you whether it will fit in your motor mount tube.
+The <b>length</b> gives you an idea of how much space you need in the rocket for the
+motor casing.
+The <b>total weight</b> is very helpful when testing your rocket's stability.
+When measuring the center of gravity, if you don't have the motor and casing yet,
+you can make up a dummy of the same weight using shot, dirt or whatever you have handy.
+</p>
+
+<p>
+Note that on this site, all statistics listed on the motor page are from the certification
+organization (as published on their web sites).
+For more information on these organizations, see the
+<a href="/info/certification.html">Certification page</a>.
+</p>
+
+<p>
+The <a href="/info/glossary.html">glossary page</a> has information on many terms used
+on this site and elsewhere.
+</p>
+
+
+<a name="burn-time"></a>
+<H2>Burn Time Normalization</H2>
+
+<p>
+Based on NFPA 1125:
+</p>
+<ul>
+  <li>The burn time is from 5% of peak thrust, at both the beginning and end of the curve.</li>
+  <li>Average thrust is the total impulse during the 5%-defined burn time, divided by the burn time.</li>
+  <li>The total impulse is measured over the whole thrust curve (not the 5%-defined burn time).</li>
+</ul>
+
+<p>
+This means that the letter for the motor class is based on the area under the whole curve,
+but the value after the letter is based on the average thrust during the truncated burn time.
+</p>
+
+<p>
+A common error is to measure average thrust by dividing Total Impulse by the "last action" burn time.
+This gives a different value than the correct NFPA 1125 method.
+For motors with long tails, the correct method gives a better indication of the useful average thrust.
+<br/>
+(Thanks to John DeMar for this succinct explanation.)
+</p>

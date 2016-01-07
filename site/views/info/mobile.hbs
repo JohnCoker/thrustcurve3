@@ -1,1 +1,184 @@
+{{#extend "sidebar-extra"}}
+  <h2>App Stores</h2>
+  <ul class="links">
+    <li><a href="https://itunes.apple.com/us/app/thrustcurve-to-go/id954182252?ls=1&mt=8">iOS</a></li>
+    <li><a href="https://play.google.com/store/apps/details?id=org.thrustcurve.tctg">Android</a></li>
+  </ul>
+{{/extend}}
+
 <h1>{{title}}</h1>
+
+<p>
+The "ThrustCurve to-go" phone application (for iOS and Android) provides a phone-friendly interface
+to searching for motors and using the Motor Guide.
+Now you can take it with you, out to the launch site, even if that site is Black Rock desert!
+</p>
+
+<p class="img">
+<a href="https://itunes.apple.com/us/app/thrustcurve-to-go/id954182252?ls=1&mt=8"><img SRC="/images/info/mobile/ios-app-store.svg" height="44"></a>
+<a href="https://play.google.com/store/apps/details?id=org.thrustcurve.tctg"><img alt="Get it on Google Play" src="/images/info/mobile/google-play-store.png"></a>
+</p>
+
+<p>
+It is possible to use the app for limited motor browsing, but the focus has been on collecting enough
+information locally to be used at the launch site.
+The app stores the info about your favorite motors and the results of running the motor guide
+on your phone so that you can refer to them when out of cell phone coverage.
+</p>
+
+<p>
+The goal is to have enough information at your fingertips to pick a motor for that one extra flight
+you hadn't planned on making.
+If you have an idea of the performance you will get from a variety of motors, it makes it easier to
+choose from what the on-site motor vendor has available.
+</p>
+
+<p>
+The app is built using
+<a href="http://phonegap.com/" target="_blank">PhoneGap</a> (Cordova)
+so that one code base works on both major smart phone platforms
+(iOS 7+ and Android Jelly Bean and later).
+All access to the ThrustCurve.org server is done through the
+<a href="/info/api.html">XML APIs</a>.
+</p>
+
+<style type="text/css">
+table.screenshots {
+   margin-left: auto;
+   margin-right: auto;
+   border: 1px solid #999;
+}
+table.screenshots th,
+table.screenshots td {
+  text-align: center;
+  padding: 1em;
+  border-left: 1px solid #999;
+}
+</style>
+<table class="screenshots">
+  <tr>
+    <th>Motor Details (Android)</th>
+    <th>Thrust Curve (iOS)</th>
+  </tr>
+  <tr>
+    <td><img src="/images/info/mobile/tctg_motor_android.png"></td>
+    <td><img src="/images/info/mobile/tctg_curve_ios.png"></td>
+  </tr>
+</table>
+
+
+<a name="help"></A>
+<H2>App Organization</H2>
+
+<p>
+The app has three sections: Motors, Rockets and Settings.
+<a href="#motors">Motors</a>
+allows you to search for motors directly and mark your favorites for local storage.
+<a href="#motors">Rockets</a>
+allows you to enter key info on your rockets and run the motor guide.
+</p>
+
+<a name="settings"></a>
+<h3>Settings</h3>
+
+<p>
+Settings is where you can adjust the behavior of the app.
+You might want to visit this first to at least pick your preferred units.
+The default is millimeters and grams ("NAR units"), so those who prefer Imperial units
+will want to change this.
+</p>
+
+<p>
+The <B>Units</B> page is where you choose your units.
+You can pick them individually or choose one of the presets.
+US users probably want to choose either "in/oz" for model rockets or "in/lb" for HPR.
+</p>
+
+<p>
+Motor diameters are always expressed in millimeters, regardless of the length unit selected.
+</p>
+
+<p>
+If you have created a ThrustCurve.org account, you can enter it into the app on the <b>Account</b> page.
+This will allow you to download the rockets entered on the web site to your phone.
+Otherwise, it's quick and easy to define rockets on the phone,
+so this is not critical.
+</p>
+
+
+<a name="motors"></a>
+<h3>Motors</h3>
+
+<p>
+The motors section is all about finding motors directly and marking your favorites.
+You use the Search page to find motors and the ones you mark as favorites are available offline.
+</p>
+
+<p>
+The <b>Motor Search</b> page is a form that allows you to specify parameters of the motors
+you are interested in locating.
+These search criteria are the sames ones you would use on this web site.
+You must be online to use the search feature.
+</p>
+
+<p>
+The results from the last few searches within a single session are available on the
+<b>Recent Motors</b> page.
+Here you will see a list with basic info on the motors you've viewed recently.
+You can select them to see more details about the motor and mark it as a favorite.
+<p>
+
+<p>
+Your favorite motors will be saved on the phone for reference out at the launch site.
+The <b>Favorite Motors</b> page has a list of the ones you've marked and selecting one
+brings up more details on it.
+</p>
+
+<a name="rockets"></a>
+<h3>Rockets</h3>
+
+<p>
+The Rockets section has a list of the rockets you've entered.
+When you first start the app, you won't have any rockets defined, so you can either
+enter them on the phone or download them from your ThrustCurve.org account.
+</p>
+
+<p>
+To download rockets from your ThrustCurve.org account, you need to have entered your
+account info in Settings / Account.
+A final option is to select Sample Rockets, which will enter data for three example
+rockets that you can play with.
+</p>
+
+<p>
+Once you have one or more rockets defined, selecting one will let you view and edit
+the details of that rocket.
+The two other pages allow you to view motors found previously, and run the motor guide.
+</p>
+
+<p>
+The <b>Motor Guide</b> page allows you to enter some simulation parameters and motor
+selection criteria for the rocket and have ThrustCurve.org find motors for you.
+You must be online to use the motor guide.
+</p>
+
+<p>
+The results from prior runs of the guide are available on the <b>Good Motors</b> page
+and stored locally.
+This means you can refer to the motors that work for your rocket out at the launch site.
+</p>
+
+<a name="storage"></a>
+<h3>Local Storage</h3>
+
+<p>
+The app stores settings, favorite motors and the results of recent runs of the motor guide
+for each of your defined rockets locally.
+</p>
+
+<p>
+Because of the method used (web browser local storage), this cannot exceed 10Mb so this should
+not consume too much of your phone's memory.
+This also means there is a relatively low limit on the amount that the app can store locally
+for offline access.
+</p>

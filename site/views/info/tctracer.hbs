@@ -1,1 +1,291 @@
+{{#extend "sidebar-extra"}}
+  <h2>Download</h2>
+  <ul class="links">
+    <li><a href="/download/tctracer-1_0.exe">Windows</a></li>
+    <li><a href="/download/tctracer-1_0.dmg">Mac OS X</a></li>
+    <li><a href="/download/tctracer-1_0.jar">Pure Java</a></li>
+  </ul>
+{{/extend}}
+
 <h1>{{title}}</h1>
+
+<p>
+<b>TCTracer</b>
+is a freely available Java application that makes creation
+of rocket motor data files quick and easy.
+If you have an image of the thrust curve graph of a motor
+plus some standard information about it,
+you can use it to create a motor file simply and accurately.
+</p>
+
+<p>
+In simplest terms, TCtracer opens an image file of the motor's thrust
+curve and lets you draw right on that image.
+After drawing the thrust curve, you input some standard data on the
+motor and it will write out a <A HREF="raspformat.shtml">RASP format</a>
+motor data file.
+TCTracer is written as a Java application and should run on all modern
+operating systems.
+(I have tested it on Windows&nbsp;XP, Mac&nbsp;OS&nbsp;X and Linux.)
+</>
+
+<p>
+See the <A HREF="#Download">download options</a> at the bottom of this page.
+</p>
+
+<p>
+There are five steps in using TCtracer to make a motor data file:
+</p>
+<ol>
+  <li>
+  <a href="#OpenImage">Open Image</a>
+  loads an image file of the thrust curve to be traced.
+  </li>
+  <li><a href="#SetupGrid">Setup Grid</a>
+  allows you to specify the grid values and drag the edges.
+  </li>
+  <li><a href="#DrawPoints">Draw Points</a>
+  is used to draw the data points directly on the graph image.
+  </li>
+  <li><a href="#MotorInfo">Motor Info</a>
+  brings up a dialog to enter basic information on the motor.
+  </li>
+  <li><a href="#SaveData">Save Data</a>
+  saves the resulting RASP format simulator file.
+  </li>
+</ol>
+
+<p>
+<a href="http://www.apogeerockets.com/downloads/video/Tripoli_Motor_data.mov" TARGET=_blank><IMG class="dropcap" src="/images/video.png"></a>
+Tim Van Milligan of
+<a href="http://www.apogeerockets.com/" target="_blank">Apogee Rockets</a>
+made a 
+<a href="http://www.apogeerockets.com/downloads/video/Tripoli_Motor_data.mov" target="_blank">video demonstration</a>
+of tracing the thrust curve from a Tripoli certification document.
+Check out the Apogee site for other
+<a href="http://www.apogeerockets.com/RockSim_tutorials.asp" target="_blank">related tutorials</a>
+(including one on extracting data from a NAR certification document).
+</p>
+
+
+<a name="OpenImage"></a>
+<h3>1. Open Image</h3>
+
+<p>
+The first step is to load the original graph image which you will be tracing.
+This can be any of the standard image formats supported by Java (GIF, JPEG, PNG or BMP).
+Clicking the <b>Open Image</b> toolbar button or menu item.
+</p>
+
+<p>
+The image will be displayed in the background of the editing area so you can draw
+directly on top of it.
+Ideally the image file will contain just the graph with its legends.
+If necessary, you can crop the image to just the area of interest,
+but as long as there isn't too much extra space around the sides,
+the exact layout won't matter.
+</p>
+
+
+<a name="SetupGrid"></a>
+<h3>2. Setup Grid</h3>
+
+<p>
+The next step is to set up the grid.
+The grid is drawn overlaying the image and is used to scale the data points.
+Clicking the <b>Setup Grid</b> toolbar button or menu item brings up a dialog
+where you enter basic information.
+</p>
+
+<p><b>X axis</b>
+These two fields specify the minimum and maximum values for the time range
+displayed by the graph.
+The minimum value is generally zero seconds, but the maximum must be specified
+to match the value at the right edge of the graph.
+</p>
+
+<p><b>X sub-subdivisions</b>
+This field specifies the number of vertical grid lines between the left and right edges
+displayed by the graph.
+Leaving this value at zero is fine, but you can also enter a value to make the overlay
+grid match the image more closely.
+</p>
+
+<p><b>Y axis</b>
+These two fields specify the minimum and maximum values for the thrust range
+displayed by the graph.
+The minimum value is generally zero, but the maximum must be specified
+to match the value at the top edge of the graph.
+Note that you must also specify which units are used by the graph image using
+the combo box on right.
+(Thrust is measured in Newtons or pounds-force.)
+</p>
+
+<p><b>Y sub-subdivisions</b>
+This field specifies the number of horizontal grid lines between the bottom and top edges
+displayed by the graph.
+Leaving this value at zero is fine, but you can also enter a value to make the overlay
+grid match the image more closely.
+</p>
+
+<p>
+When you hit OK, the grid is drawn as per your settings.  If the range, units or
+sub-divisions are not correct, just open the dialog again and adjust as necessary.
+Once the overlaid grid has the same structure as the background image,
+drag the edges of the grid to match the edges of the graph image.
+The goal is for the drawn graph to overlap the image graph as exactly as possible.
+</p>
+
+<p>
+You can go back and forth between dragging the overlay grid edges and using the dialog
+until everything looks right.
+Note that you can also resize the window larger to get more precision.
+The grid overlay will resize as well, but you will notice small errors,
+which are the result of rounding, as the window gets larger.
+</p>
+
+
+<a name="DrawPoints"></a>
+<h3>3. Draw Points</h3>
+
+<p>
+Next, it's time to draw the thrust curve.
+Clicking the <b>Draw Points</b> toolbar button or menu item puts you into drawing
+mode and clicking on the area of the grid overlay will add, remove and adjust points.
+</p>
+
+<p>
+Click at various points along the thrust curve on the image to start tracing out the line.
+Note that the points will be connected by a line showing you the resulting curve.
+Clicking on an existing point will erase it and dragging a point will move it.
+</p>
+
+<p>
+You can draw points in any order and they will be automatically arranged in time.
+Start by picking the major inflection points on the thrust curve.
+(Note that no point is needed at zero time since an initial point at zero thrust,
+zero time is assumed by the RASP format.)
+If the straight lines between them deviate too much,
+you can put another line between any two points.
+</p>
+
+<p>
+While drawing points, you can see how close to the published specifications
+you've come by looking at the statistics in the panel below the drawing area.
+As you draw points, the curve is updated and the summary statistics displayed.
+Matching the official information exactly is not critical
+(since motors can vary quite a bit from firing to firing),
+but this gives you a way to check your progress.
+If the numbers are way off, check that you've chosen the correct ranges,
+and particularly the thrust units,
+using the <b>Setup Grid</b> dialog.
+</p>
+
+<p>
+The status icon (below the drawing area) will be a yellow warning sign if
+there are any errors.
+Clicking on this icon will bring up a dialog listing the errors found.
+</p>
+
+<p>
+The thrust curve must end with a point at zero thrust.
+This point is created by placing a point on the X axis where the thrust curve
+reaches zero.
+Once you have placed this point (and no other errors are found),
+the icon below the drawing area will turn into a green check,
+indicating that the thrust curve is done.
+</p>
+
+
+<a name="MotorInfo"></a>
+<h3>4. Motor Info</h3>
+
+<p>
+The thrust curve is the most interesting part of the process,
+but there is some other information on the motor necessary to create the
+RASP file.
+This info is entered using the <b>Motor Info</b> toolbar button or menu item,
+which brings up a dialog.
+</p>
+
+<p>
+You should be able to find this information on the motor manufacturer's web site
+or on printed instructions that came with the motor.
+For more detail on these pieces of information,
+see the <a href="/info/raspformat.html">RASP format</a> page.
+</p>
+
+
+<a name="SaveData"></a>
+<h3>5. Save Data</h3>
+
+<p>
+Once a valid thrust curve has been drawn and the motor information is
+complete, the resulting RASP data file can be saved using the
+<b>Save Data</b> toolbar button or menu item and you're done!
+</p>
+
+
+<a name="Download"></a>
+<h2>Download</h2>
+
+<p>
+TCtracer is written in
+<a href="http://en.wikipedia.org/wiki/Java_%28programming_language%29" target="_blank">Java</a>
+(specifically using the Java 1.5 JDK).
+This means that it should run on any modern operating system.
+<br/>
+If you don't have Java installed, or are not sure you have the latest version,
+please see <a href="http://www.java.com/" target="_blank">the official Java site</a>.
+</p>
+
+<style type="text/css">
+table.downloads {
+  margin-left: 5%;
+  margin-right: 15%;
+}
+table.downloads tr:not(:first-child) {
+  border-top: 1px solid #9e1a20;
+}
+table.downloads th {
+  text-align: left;
+  width: 50px;
+}
+table.downloads td {
+  padding: 0.5em;
+}
+</style>
+<table class="downloads">
+  <tr>
+    <th><img src="/images/windows.png"></th>
+    <td>
+    Download this executable for Windows. 
+    This has been tested on Windows Vista, but should also work on anything from Windows NT on.
+    <br/>
+    <big><a href="/download/tctracer-1_0.exe">tctracer-1_0.exe</a></big>
+    </td>
+  </tr>
+  <tr>
+    <th><img src="/images/os_x.png"></th>
+    <td>
+    Download this universal binary application bundle for Mac OS X.
+    This has been tested on 10.5, but should work on any version of OS X.
+    <br/>
+    <big><a href="/download/tctracer-1_0.dmg">tctracer-1_0.dmg</a></big>
+    </td>
+  </tr>
+  <tr>
+    <th><img class="dropcap" src="/images/java.png"></th>
+    <td>
+    Download this pure Java installer for any platform.
+    (This is an executable jar file, created using IzPack.)
+    <br/>
+    <big><a href="/download/tctracer-1_0.jar">tctracer-1_0.jar</a></big>
+    </td>
+  </tr>
+</table>
+
+<p>
+The current version of TCtracer is <b>1.0</b> of March 2008.
+To see what version you have, open the About dialog from within the program.
+</p>

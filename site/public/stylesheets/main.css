@@ -49,3 +49,24 @@ ul.hanging {
 ul.hanging li {
   padding-left: 1em;
 }
+ul.hanging li .tag {
+  color: black;
+  font-weight: bolder;
+}
+ul.hanging li .tag:after {
+  content: ":";
+}
+
+dd {
+  margin-left: 2em;
+}
+
+p.img {
+  text-align: center;
+}
+
+img.dropcap {
+  float: left;
+  margin-right: 1em;
+  margin-top: 0.3em;
+}

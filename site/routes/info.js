@@ -97,7 +97,7 @@ router.get('/simulators.shtml', function(req, res, next) {
 });
 
 router.get('/info/tctracer.html', function(req, res, next) {
-  res.render('info/tctracer', simpleLocals('TCTracer'));
+  res.render('info/tctracer', simpleLocals('Thrust Curve Tracer'));
 });
 router.get('/tctracer.shtml', function(req, res, next) {
   res.redirect(301, '/info/tctracer.html');

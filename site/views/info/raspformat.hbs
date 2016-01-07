@@ -1,1 +1,195 @@
 <h1>{{title}}</h1>
+
+<p>
+RASP was the original rocket flight simulator,
+started by the model rocket pioneer G. Harry Stine.
+This format, named "RASP" or "ENG", has become the standard for
+motor data interchange and most modern flight simulators can use these files directly
+or import them into their own proprietary formats.
+</p>
+
+<p>
+RASP was a very simple program and had relatively strict requirements for the
+format and data values.
+Modern simulators are generally more forgiving,
+but it's still preferable to make your files comply to the original standard
+to allow them to work with as many programs as possible.
+</p>
+
+<p>
+For the hard-core, the 
+<a href="http://www.ibiblio.org/pub/archives/rec.models.rockets/RASP/MRASP/mac_raspinfo.c" target="_blank">source code</a>
+for the RASP engine database listing program is the ultimate authority.
+The built-in help for the wRASP program
+also contains a simple description of the format.
+</p>
+
+<p>
+This page gives you enough information to create and edit these files by hand.
+There is also a tool you can use to trace the thrust curve from a graph image
+and produce RASP data files automatically.
+See the <a href="tctracer.shtml">TCtracer</a> page for more info.
+</p>
+
+
+<h2>The Header Line</h2>
+
+<p>
+Blank lines and lines beginning with semicolons are ignored at the begnning
+of the entry.
+The first line interpreted is the "header line",
+which contains info on the motor itself.
+The header contains seven pieces of info, separated by spaces.
+All seven must be present for the entry to be read successfully.
+</p>
+
+<p>
+Here's a sample fragment, with a few comments and the header line:
+</p>
+
+<p class="img">
+<img width="400" height="160" src="/images/info/raspformat/raspheader.png" alt="RASP header">
+</p>
+
+<ol>
+  <li>
+  The common name of the motor; just the impulse class and average thrust.
+  </li>
+  <li>
+  The casing diameter in millimeters (mm).
+  </li>
+  <li>
+  The casing length, also in millimeters.
+  </li>
+  <li>
+  The list of available delays, separated by dashes.
+  If the motor has an ejection charge but no delay use "0" and
+  if it has no ejection charge at all use "P" (plugged).
+  </li>
+  <li>
+  The weight of all consumables in the motor.
+  For solid motors this is simply the propellant itself,
+  but for hybrids it is the fuel grain(s) plus the 
+  oxidizer (such as N<SMALL><SUB>2</SUB></SMALL>O).
+  This weight is expressed in kilograms (Kg).
+  </li>
+  <li>
+  The weight of the motor loaded and ready for flight,
+  also in kilograms.
+  </li>
+  <li>
+  The motor manufacturer abbreviated to a few letters.
+  NAR maintains a list of manufacturer abbreviations in the
+  <a href="http://nar.org/SandT/pdf/CombinedList.pdf" target="_blank">combined master list</a>.
+  </li>
+</ol>
+
+
+<h2>Data Points</h2>
+
+<p>
+Starting immediately after the header line,
+the remaining lines contain sample data points.
+Each sample specifies a time (seconds) and a thrust (Newtons)
+as two floating-point numbers,
+usually preceded by a few spaces for readability.
+</p>
+
+<p>
+An implicit first point at 0,0 is assumed and should not be specified explicitly.
+The final point must have a thrust of zero and it indicates the motor's
+burn time.
+The points should be in increasing order of time and the thrusts should trace
+out the thrust curve as representatively as possible.
+</p>
+
+<p>
+After the final data point, the entry may end or contain comments and blank lines,
+but nothing else.
+</p>
+
+<p>
+RASP supported a maximum of 32 data points,
+including the final (zero) point.
+This site does not enforce that limitation since modern simulator programs don't either.
+However, files with more than 32 data points will not work with wRASP.
+</p>
+
+<p>
+It is common to put a single line containing just a semicolon after the sample data.
+This is not interpreted by the software, but it does prevent two entries from running
+together if multiple entries are present in the same file.
+Here's the first example we created on the
+<a href="/info/contribute.html">contribute page</a>:
+</p>
+
+<pre>
+; Rocketvision F32
+; from NAR data sheet updated 11/2000
+; created by John Coker 5/2006
+F32 24 124 5-10-15 .0377 .0695 RV
+   0.01 50
+   0.05 56
+   0.10 48
+   2.00 24
+   2.20 19
+   2.24  5
+   2.72  0
+;
+</pre>
+
+
+<h2>Common Problems</h2>
+
+<p>
+One common problem with RASP data floating around is that the thrust drops to
+zero before the end of the data.
+However, a sample with zero thrust represents the end of the data.
+Note that a point at zero time is not required.
+(It is a common mistake to create an initial point at zero time, zero thrust.)
+This site will detect this problem and reject an entry with zero thrust at other
+than the last point.
+</p>
+
+<p>
+The burn always starts at zero time and thus the burn time is simply the time at
+the final (zero thrust) point.
+The final point must have zero thrust and this site will detect this problem
+and reject an entry without it.
+</p>
+
+<p>
+The data points need not be spaced evenly apart, but they must be in order
+of time.
+This site will detect this problem and reject an entry where a data point occurs
+before the previous point (or where the first point occurs in negative time).
+</p>
+
+<p>
+The original RASP would only read a motor descriptions from a single file (RASP.ENG).
+All motor entries were located in this file, separated by comment lines
+(beginning with a semicolon).
+When maintaining multiple motor entries in a single file, make sure that each entry is
+separated by at least one comment line.
+Since this site is database-oriented, each entry is stored in a separate record.
+This site will parse these multi-motor files and attempt to pick out the correct motor.
+</p>
+
+<p>
+Finally, a perennial problem is with the manufacturer name.
+Originally, only a few manufacturers existed and each had
+a single-letter code (E=Estes, A=AeroTech, K=Kosdon, and so on).
+With the rapid increase in the number of manufacturers, this has
+become impractical.
+NAR maintains a list of manufacturer abbreviations in the
+<a href="http://nar.org/SandT/pdf/CombinedList.pdf" target="_blank">combined master list</a>,
+but unfortunately they aren't used consistently.
+</p>
+
+<p>
+This site has collected the abbreviations from the NAR master list and those used by various
+simulator programs and listed them as aliases along with the other manufacturer info
+(See the <a href="/info/manufacturers.html">Manufacturers page</a>).
+When scanning simulator files, it checks against the full name, abbreviation and the set
+of aliases to match the manufacturer.
+</p>

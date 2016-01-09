@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 John Coker for ThrustCurve.org
+ * Copyright 2016 John Coker for ThrustCurve.org
  * Licensed under the ISC License, https://opensource.org/licenses/ISC
  */
 'use strict';
@@ -8,13 +8,23 @@ var errors = require('../../lib/errors'),
     units = require('../../lib/units'),
     analyze = require('../analyze');
 
-var G = 9.80665;
+var STP = {
+  G: 9.80665,
+  rho: 1.225
+};
+Object.freeze(STP);
 
-function simulate(rocket, motor, data, error) {
+function simulate(rocket, motor, data, params, error) {
   var inputs, stats, curve,
       tLiftoff, tBurnout, tApogee, velGuide, accMax, velMax, altBurnout, altMax, impulse,
       t, dt, mass, dm, acc, vel, alt, liftoff, fDrag, fThrust;
 
+  if (arguments.length == 4 && typeof params == 'function') {
+    error = params;
+    params = undefined;
+  }
+  if (params == null)
+    params = STP;
   if (error == null)
     error = function() {};
 
@@ -78,7 +88,7 @@ function simulate(rocket, motor, data, error) {
   inputs.loadedInitialMass = mass;
 
   // calculate drag at STP
-  inputs.standardDrag = standardDrag(inputs.bodyDiameter, inputs.cd);
+  inputs.standardDrag = standardDrag(inputs.bodyDiameter, inputs.cd, params);
 
   // simulate through motor burn
   acc = vel = alt = 0;
@@ -94,7 +104,7 @@ function simulate(rocket, motor, data, error) {
     impulse += fThrust * dt;
 
     // calculate acceleration, velocity and altitude
-    acc = ((fThrust - fDrag) / mass) - G;
+    acc = ((fThrust - fDrag) / mass) - params.G;
     if (!liftoff) {
       // detect liftoff with first positive acceleration
       if (acc <= 0) {
@@ -139,7 +149,7 @@ function simulate(rocket, motor, data, error) {
     fDrag = (vel * vel) * inputs.standardDrag;
 
     // calculate acceleration, velocity and altitude
-    acc = (-fDrag / mass) - G;
+    acc = (-fDrag / mass) - params.G;
     vel += acc * dt;
     alt += vel * dt;
 
@@ -182,14 +192,12 @@ function motorBurnoutMass(motor) {
   return 0;
 }
 
-var Rho = 1.225;
-
-function standardDrag(diameter, cd) {
+function standardDrag(diameter, cd, params) {
   // drag multiplier:
   // 1/2 * air-density * area (sq. m) * Cd
   var radius = diameter / 2.0;
   return (0.5 *
-          Rho *
+          params.rho *
           Math.PI * (radius * radius) *
           cd);
 }
@@ -200,12 +208,22 @@ function standardDrag(diameter, cd) {
  * The intention is not to replace full flight simulation products, but to perform
  * quick simulations to ensure that a motor can safely be used in a rocket.</p>
  *
- * <p>The parameters to the simulation are:</p>
+ * <p>The arguments to the <em>simulate</em> function are:</p>
  * <ul>
  * <li>key rocket measurements (loaded from <em>rockets</em>)</li>
  * <li>official motor information (loaded from <em>motors</em>)</li>
  * <li>parsed motor data (parsed from <em>simfiles</em>)</li>
+ * <li>simulation parameters (optional)</li>
+ * <li>error reporter (optional)</li>
  * </ul>
+ *
+ * <p>The simulation parameters reflect varying launch conditions:<p>
+ * <ul>
+ * <li>G: acceleration due to gravity (m/s²)</li>
+ * <li>rho: air density (kg/m³)</li>
+ * </ul>
+ *
+ * <p>All input and output measurements are in MKS units.</p>
  *
  * <p>The output from a simulation run is an object containing calculated input values and
  * statistics:</p>
@@ -262,16 +280,10 @@ function standardDrag(diameter, cd) {
  */
 module.exports = {
   /**
-   * The acceleration due to Earth's gravity at STP.
-   * @member {number}
+   * <p>The simulation parameters for standard temperature and pressure.</p>
+   * @member {object} STP
    */
-  G: G,
-
-  /**
-   * The density of air at STP.
-   * @member {number}
-   */
-  Rho: Rho,
+  STP: STP,
 
   /**
    * Run a single flight simulation.
@@ -279,6 +291,7 @@ module.exports = {
    * @param {object} rocket information on the rocket
    * @param {object} motor information on the motor
    * @param {object} data parsed thrust curve
+   * @param {object} [params] simulation parameters
    * @param {function} [error] error reporter
    * @return {object} simulation results
    */

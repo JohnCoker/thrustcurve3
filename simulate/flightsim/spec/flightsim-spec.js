@@ -4,6 +4,14 @@ var errors = require("../../../lib/errors"),
     flightsim = require("..");
 
 describe("flightsim", function() {
+  describe("params", function() {
+    it("STP", function() {
+      var params = flightsim.STP;
+      expect(params).toBeDefined();
+      expect(params.G).toBeCloseTo(9.807, 3);
+      expect(params.rho).toBeCloseTo(1.225, 3);
+    });
+  });
   describe("Generic Rocket on M1939", function() {
     var rocket, motor, data, result;
     it("rocket", function() {

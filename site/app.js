@@ -19,8 +19,13 @@ mongoose.connect(config.mongoUrl, function(err) {
   }
 });
 
-var index = require('./routes/index');
-var info = require('./routes/info');
+// site routes grouped by area
+var index = require('./routes/index'),
+    info = require('./routes/info'),
+    motors = require('./routes/motors'),
+    manufacturers = require('./routes/manufacturers'),
+    contributors = require('./routes/contributors'),
+    mystuff = require('./routes/mystuff');
 
 var app = express();
 
@@ -41,6 +46,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // the defined routes
 app.use('/', index);
 app.use('/', info);
+app.use('/', motors);
+app.use('/', manufacturers);
+app.use('/', contributors);
+app.use('/', mystuff);
 
 // handle other routes as 404
 app.use(function(req, res, next) {

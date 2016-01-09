@@ -75,26 +75,45 @@ Handlebars as the template engine.
 
 This repository is organized into multiple Node.js modules, one per directory.
 Most modules are quite small (with a single file being typical).
-
-### Database
-
-The database directory contains the Mongoose schema definition for MongoDB database in the __schema__ project
-and the code that migrates data from the v2 MySQL database to MongoDB in __migrate__.
-
-### Simulate
-
-This directory contains modules for parsing data files and running simulations.
-Parsing data files is necessary for validating user submissions and for generating graphs and extracting stats.
-Simulations are use for the Motor Guide feature.
-
-### Lib
-
-The lib directory contains low-level modules that provide shared functionality such as unit conversion.
-
-### Site
-
-The site directory contains the web application that powers the site, using the
+The __site__ directory contains the web application that powers the site, using the
 [standard Express layout](http://expressjs.com/en/starter/generator.html).
+
+```
+thrustcurve3
+│
+├── database
+│   ├── migrate
+│   └── schema
+│
+├── lib
+│   ├── errors
+│   ├── prefs
+│   └── units
+│
+├── simulate
+│   ├── analyze
+│   ├── flightsim
+│   └── parsers
+│
+└── site
+    ├── artwork
+    ├── bin
+    ├── config
+    ├── logs
+    ├── public
+    │   ├── download
+    │   ├── images
+    │   ├── javascripts
+    │   └── stylesheets
+    ├── routes
+    └── views
+        ├── contributors
+        ├── info
+        ├── layouts
+        ├── manufacturers
+        ├── motors
+        └── mystuff
+```
 
 
 ## License

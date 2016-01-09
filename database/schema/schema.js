@@ -202,17 +202,98 @@ function makeRocketModel(mongoose) {
   return mongoose.model('Rocket', schema);
 }
 
+/**
+ * <p>The <b>schema</b> module contains the Mongoose schema used by the site.
+ * This is largely a copy of the previous MySQL schema, taking some advantage
+ * of nested structure available in MongoDB documents.</p>
+ *
+ * <p>Aside from a few convenienct regular expressions for matching valid content,
+ * this module contains functions and produce Mongoose models.  Note that these
+ * are produced on a connected Mongoose instance, so all take the <b>mongoose</b>
+ * module instance as an argument.</p>
+ *
+ * @module schema
+ */
 module.exports = {
+  /**
+   * A regex that matches valid HTTP URLs (web sites).
+   * @member {regex}
+   */
   UrlRegex: UrlRegex,
+
+  /**
+   * A regex that matches valid email addresses.
+   * @member {regex}
+   */
   EmailRegex: EmailRegex,
+
+  /**
+   * A regex that matches valid motor common names (C6, M1939, etc).
+   * @member {regex}
+   */
   MotorNameRegex: MotorNameRegex,
 
+  /**
+   * Produce a Mongoose model for the <em>manufacturers</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   ManufacturerModel: makeManufacturerModel,
+
+  /**
+   * Produce a Mongoose model for the <em>certorgs</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   CertOrgModel: makeCertOrgModel,
+
+  /**
+   * Produce a Mongoose model for the <em>motors</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   MotorModel: makeMotorModel,
+
+  /**
+   * Produce a Mongoose model for the <em>contributors</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   ContributorModel: makeContributorModel,
+
+  /**
+   * Produce a Mongoose model for the <em>motornotes</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   MotorNoteModel: makeMotorNoteModel,
+
+  /**
+   * Produce a Mongoose model for the <em>simfiles</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   SimFileModel: makeSimFileModel,
+
+  /**
+   * Produce a Mongoose model for the <em>simfilenotes</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   SimFileNoteModel: makeSimFileNoteModel,
+
+  /**
+   * Produce a Mongoose model for the <em>rockets</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
   RocketModel: makeRocketModel,
 };

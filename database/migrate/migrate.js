@@ -10,6 +10,29 @@ var process = require('process'),
     mongoose = require('mongoose'),
     schema = require('../schema');
 
+/**
+ * <p>The <b>migrate</b> module is a main program for transferring the ThrustCurve.org
+ * database contents from MySQL to MongoDB via Mongoose.
+ * It assumes both database servers are running locally.</p>
+ *
+ * <p>All configuration is static here in this file, but it depends on the
+ * Mongoose schema defined in the <b>schema</b> module next door.</p>
+ *
+ * <p>The schema doesn't change drastically from MySQL to Mongoose, although some
+ * use is made of nested structure, some obsolete fields are dropped and
+ * some measurements are converted to MKS.</p>
+ *
+ * <p>For each SQL source table, there is a destination MongoDB collection.
+ * Mostly, values are just copied over as-is, and those are not listed in
+ * the configuration for each table (the <code>tables</code> array).<p>
+ *
+ * <p>What is listed are columns that need transformation or go into a
+ * Mongoose field with a different name.  For those fields, the <code>columns</code>
+ * array lists the target field and optional transformation.
+ * If the field is <code>false</code>, that column is dropped.</p>
+ *
+ * @module migrate
+ */
 module.exports = {};
 
 // https://docs.mongodb.org/v3.0/reference/object-id/

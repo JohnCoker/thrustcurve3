@@ -7,10 +7,11 @@
 var errors = require('../../lib/errors');
 
 var StdParams = {
-  burnTimeCutoff: 0.05,
-  timeEpsilon: 0.00005,
-  thrustEpsilon: 0.0005,
+  burnTimeCutoff: 0.05,  // percent
+  timeEpsilon: 0.00005,  // seconds
+  thrustEpsilon: 0.0005, // Newtons
 };
+Object.freeze(StdParams);
 
 function normalize(input, params, error) {
   var output, lastTime, dropped, merged, i, x, y;
@@ -86,8 +87,11 @@ function normalize(input, params, error) {
       i++;
     }
   }
+  if (dropped > 0)
+    error(errors.DUPLICATE_POINTS, "merged {1} duplicate time data points", dropped);
 
-  return output;
+  if (output.length > 0)
+    return output;
 }
 
 function stats(data, params, error) {
@@ -237,10 +241,123 @@ function fit(data, params, error) {
   return new Function('time', source);
 }
 
+/**
+ * <p>The <b>analyze</b> module produces meta-information from parsed motor data.
+ * First the simulator files must be parsed using the <b>parsers</b> module, then they
+ * can be examined with functions in this module.</p>
+ *
+ * <p>These functions all accept the output from the parsing functions in {@link module:parsers}.</p>
+ *
+ * <p>They also take a set of parameters used for analysis:</p>
+ * <ul>
+ * <li>burnTimeCutoff: the fraction of maximum thrust used as the start/end burn threshold (5%)</li>
+ * <li>timeEpsilon: the smallest amount of time considered distinct when normalizing data points (50µs)</li>
+ * <li>thrustEpsilon: the smallest amount of thrust considered positive when normalizing data points (500µN)</li>
+ * </ul>
+ *
+ * <p>The final argument is an error reporter, from the {@link module:errors} module.
+ * If no error reporter is provided, errors are sliently discarded.</p>
+ *
+ * <p>Data points are objects that have two key values: <code>time</code> and <code>thrust</code>,
+ * plus other values that may be included from the original data file.
+ * As always, internally values are in MKS so thrust is in Newtons.</p>
+ *
+ * @module analyze
+ */
 module.exports = {
+
+  /**
+   * <p>Default values of parameters needed for analysis.  If not specified as the
+   * second argument to any of the functions in this module, these values are used:</p>
+   *
+   * <ul>
+   * <li>burnTimeCutoff: 5% (<code>0.05</code>)</li>
+   * <li>timeEpsilon: 50µs (<code>0.00005</code>)</li>
+   * <li>thrustEpsilon: 500µN (<code>0.0005</code>)</li>
+   * </ul>
+   *
+   * @member {object}
+   */
   StdParams: StdParams,
+
+  /**
+   * <p>Build a more regular set of time/thrust data points from the
+   * parsed file data that is more consistent and easier to process.</p>
+   *
+   * <p>Unless there are no valid points at all, an array of output points is returned.
+   * However if the data is completely bad, undefined is returned.</p>
+   *
+   * <p>The transformations applied:</p>
+   * <ul>
+   * <li>points with invalid values are discarded</li>
+   * <li>points are sorted by time</li>
+   * <li>initial points with zero thrust are discarded</li>
+   * <li>points with duplicate times are merged</li>
+   * </ul>
+   *
+   * <p>Note that data point merging is dependent on the <code>timeEpsilon</code>
+   * value in the analysis parameters and
+   * leading-zero dropping is dependent on <code>thrustEpsilon</code>.
+   * The default values are tiny (50µs and 500µN respectively).
+   * </p>
+   *
+   * @function
+   * @param {object} data a parsed data file
+   * @param {object} [params] analysis parameters
+   * @param {function} [error] error reporter
+   * @return {object[]} normalized data points
+   */
   normalize: normalize,
+
+  /**
+   * <p>Produced a set of statistics from the original thrust curve data points.
+   * These allow comparision of the thrust curve with the published statistics
+   * for a motor, as well as the statistics present in the data file itself.</p>
+   *
+   * <p>The returned object includes these statistics (MKS units):</p>
+   * <ul>
+   * <li>pointCount: number of (normalized) data points</li>
+   * <li>params: the input analysis parameters</li>
+   * <li>maxThrust: the maximum instantaneous thrust</li>
+   * <li>maxTime: the maximum time of any data point</li>
+   * <li>avgThrust: the total impululse over the standard burn time</li>
+   * <li>burnStart: the time at which the thrust exceeds the cut-off</li>
+   * <li>burnEnd: the time at which the thrust drops below the cut-off</li>
+   * <li>burnTime: the standardized burn time based on the cut-off</li>
+   * <li>totalImpulse: integration of the area under the thrust curve</li>
+   * </ul>
+   *
+   * <p>Note that the burn time and average thrust are dependent on the
+   * <code>burnTimeCutoff</code> value in the analysis parameters.
+   * The default value is <code>0.05</code> to produce the 5% NFPA threshold.<p>
+   *
+   * @function
+   * @param {object} data a parsed data file
+   * @param {object} [params] analysis parameters
+   * @param {function} [error] error reporter
+   * @return {object} statistics object
+   */
   stats: stats,
+
+  /**
+   * <p>Produce a function that maps arbitrary time values to thrust values that
+   * match the thrust curve.  This is useful for sampling the thrust curve at
+   * a high frequency, as is needed for flight simulation.</p>
+   *
+   * <p>The returned function takes a single argument, the time in seconds,
+   * and returns the instantaneous thrust in Newtones. Time values below zero and
+   * after the end of the burn return zero thrust.</p>
+   *
+   * <p>This function uses linear interpolation between the original data points
+   * so that the simple integration of any curve produced by higher-frequency
+   * sampling will closely match that produced from the original data.</p>
+   *
+   * @function
+   * @param {object} data a parsed data file
+   * @param {object} [params] analysis parameters
+   * @param {function} [error] error reporter
+   * @return {function} a function mapping time to thrust
+   */
   fit: fit,
 };
 

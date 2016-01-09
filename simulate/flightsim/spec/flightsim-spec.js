@@ -82,12 +82,12 @@ describe("flightsim", function() {
     it("result", function() {
       expect(result.liftoffTime).toBeCloseTo(0.0, 1);
       expect(result.burnoutTime).toBeCloseTo(7.0, 1);
-      expect(result.apogeeTime).toBeCloseTo(27.1, 1);
+      expect(result.apogeeTime).toBeCloseTo(27.0, 1);
       expect(result.guideVelocity).toBeCloseTo(23.3, 1);
       expect(result.maxAcceleration).toBeCloseTo(76.8, 1);
-      expect(result.maxVelocity).toBeCloseTo(311.0, 1);
-      expect(result.burnoutAltitude).toBeCloseTo(1475.6, 1);
-      expect(result.maxAltitude).toBeCloseTo(3825.4, 1);
+      expect(result.maxVelocity).toBeCloseTo(310.2, 1);
+      expect(result.burnoutAltitude).toBeCloseTo(1473.0, 1);
+      expect(result.maxAltitude).toBeCloseTo(3798.5, 1);
       expect(result.integratedImpulse).toBeCloseTo(result.inputs.motorTotalImpulse, 1);
     });
   });

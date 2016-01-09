@@ -15,6 +15,9 @@ function simulate(rocket, motor, data, error) {
       tLiftoff, tBurnout, tApogee, velGuide, accMax, velMax, altBurnout, altMax, impulse,
       t, dt, mass, dm, acc, vel, alt, liftoff, fDrag, fThrust;
 
+  if (error == null)
+    error = function() {};
+
   inputs = {
     rocketMass: units.convertUnitToMKS(rocket.weight, 'mass', rocket.weightUnit),
     bodyDiameter: units.convertUnitToMKS(rocket.bodyDiameter, 'length', rocket.bodyDiameterUnit),
@@ -179,17 +182,105 @@ function motorBurnoutMass(motor) {
   return 0;
 }
 
+var Rho = 1.225;
+
 function standardDrag(diameter, cd) {
   // drag multiplier:
   // 1/2 * air-density * area (sq. m) * Cd
   var radius = diameter / 2.0;
-  return (0.5 * 
-          1.2062 * 
+  return (0.5 *
+          Rho *
           Math.PI * (radius * radius) *
           cd);
 }
 
+/**
+ * <p>The <b>flightsim</b> module implements a quick-and-dirty rocket flight simulator based on
+ * simple assumptions, notably sub-Mach flight near mean sea level.
+ * The intention is not to replace full flight simulation products, but to perform
+ * quick simulations to ensure that a motor can safely be used in a rocket.</p>
+ *
+ * <p>The parameters to the simulation are:</p>
+ * <ul>
+ * <li>key rocket measurements (loaded from <em>rockets</em>)</li>
+ * <li>official motor information (loaded from <em>motors</em>)</li>
+ * <li>parsed motor data (parsed from <em>simfiles</em>)</li>
+ * </ul>
+ *
+ * <p>The output from a simulation run is an object containing calculated input values and
+ * statistics:</p>
+ * <ul>
+ * <li>inputs: calculated values (see below)</li>
+ * <li>liftoffTime: time to first movement</li>
+ * <li>burnoutTime: time to complete motor burnout</li>
+ * <li>apogeeTime: time to apogee</li>
+ * <li>guideVelocity: velocity at end of launch guide</li>
+ * <li>maxAcceleration: maximum accleration</li>
+ * <li>maxVelocity: maximum velocity</li>
+ * <li>burnoutAltitude: altitude at burnout</li>
+ * <li>maxAltitude: altitude of apogee</li>
+ * <li>integratedImpulse: total impulse as seen by simulation</li>
+ * </ul>
+ *
+ * <p>The <i>inputs</i> object contains values calculated for the simulation:</p>
+ * <ul>
+ * <li>rocketMass: total lift-off weight (rocket and motor)</li>
+ * <li>bodyDiameter: nominal rocket body diameter</li>
+ * <li>cd: declared rocket coefficient of drag</li>
+ * <li>guideLength: length of launch guide</li>
+ * <li>motorInitialMass: loaded weight of motor</li>
+ * <li>motorBurnoutMass: weight of motor at burnout</li>
+ * </ul>
+ *
+ * <p>Simulation of a 6" HPR rocket on an AeroTech M1939 might produce:</p>
+ * <pre>
+ * {
+ *   inputs: {
+ *     rocketMass: 12.246984,
+ *     bodyDiameter: 0.15748,
+ *     cd: 0.5,
+ *     guideLength: 3.6576000000000004,
+ *     motorInitialMass: 8.988,
+ *     motorBurnoutMass: 3.2689999999999992,
+ *     motorTotalImpulse: 10339.815,
+ *     loadedInitialMass: 21.234983999999997,
+ *     standardDrag: 0.005965087120805519
+ *   },
+ *   liftoffTime: 0.02,
+ *   burnoutTime: 7,
+ *   apogeeTime: 26.96000000000016,
+ *   guideVelocity: 23.313125598256043,
+ *   maxAcceleration: 76.81186949540442,
+ *   maxVelocity: 310.2119118361769,
+ *   burnoutAltitude: 1472.999637516778,
+ *   maxAltitude: 3798.4749725549436,
+ *   integratedImpulse: 10339.808350000132
+ * }
+ * </pre>
+ *
+ * @module flightsim
+ */
 module.exports = {
+  /**
+   * The acceleration due to Earth's gravity at STP.
+   * @member {number}
+   */
   G: G,
+
+  /**
+   * The density of air at STP.
+   * @member {number}
+   */
+  Rho: Rho,
+
+  /**
+   * Run a single flight simulation.
+   * @function
+   * @param {object} rocket information on the rocket
+   * @param {object} motor information on the motor
+   * @param {object} data parsed thrust curve
+   * @param {function} [error] error reporter
+   * @return {object} simulation results
+   */
   simulate: simulate,
 };

@@ -7,7 +7,8 @@ var process = require('process'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
-    morgan = require('morgan');
+    morgan = require('morgan'),
+    favicon = require('serve-favicon');
 
 // fail if initial connection is impossible
 mongoose.connect(config.mongoUrl, function(err) {
@@ -34,6 +35,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(morgan('combined'));
+app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // the defined routes

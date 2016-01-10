@@ -73,46 +73,41 @@ Handlebars as the template engine.
 
 ## Source Organization
 
-This repository is organized into multiple Node.js modules, one per directory.
-Most modules are quite small (with a single file being typical).
-The __site__ directory contains the web application that powers the site, using the
+The top-level directory is the web application that powers the site, using the
 [standard Express layout](http://expressjs.com/en/starter/generator.html).
+
+Other directories contain small Node.js modules that implement the logic behind the routes.
+Most modules are quite small (with a single file being typical).
 
 ```
 thrustcurve3
-│
+├── artwork
+├── bin
+├── config
 ├── database
 │   ├── migrate
 │   └── schema
-│
 ├── lib
 │   ├── errors
 │   ├── prefs
 │   └── units
-│
+├── public
+│   ├── download
+│   ├── images
+│   ├── javascripts
+│   └── stylesheets
+├── routes
 ├── simulate
 │   ├── analyze
 │   ├── flightsim
 │   └── parsers
-│
-└── site
-    ├── artwork
-    ├── bin
-    ├── config
-    ├── logs
-    ├── public
-    │   ├── download
-    │   ├── images
-    │   ├── javascripts
-    │   └── stylesheets
-    ├── routes
-    └── views
-        ├── contributors
-        ├── info
-        ├── layouts
-        ├── manufacturers
-        ├── motors
-        └── mystuff
+└── views
+    ├── contributors
+    ├── info
+    ├── layouts
+    ├── manufacturers
+    ├── motors
+    └── mystuff
 ```
 
 

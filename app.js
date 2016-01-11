@@ -11,6 +11,7 @@ var process = require('process'),
     favicon = require('serve-favicon');
 
 // fail if initial connection is impossible
+/*
 mongoose.connect(config.mongoUrl, function(err) {
   if (err) {
     console.error('unable to connect to MongoDB');
@@ -18,6 +19,7 @@ mongoose.connect(config.mongoUrl, function(err) {
     process.exit(1);
   }
 });
+*/
 
 // site routes grouped by area
 var index = require('./routes/index'),

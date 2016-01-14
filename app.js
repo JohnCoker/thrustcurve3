@@ -80,6 +80,11 @@ var db = Object.create(null, {
   } },
   Rocket: { get: function() {
     return this._rocket || (this._rocket = schema.RocketModel(mongoose));
+  } },
+  isId: { value: function(v) {
+    if (v == null)
+      return false;
+    return schema.IdRegex.test(v);
   } }
 });
 app.use(function(req, res, next) {

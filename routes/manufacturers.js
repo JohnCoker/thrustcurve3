@@ -29,9 +29,9 @@ router.get('/manufacturers/list.html', function(req, res, next) {
 
 router.get('/manufacturers/motors.html', function(req, res, next) {
   var id = req.query.id;
-  if (id) {
+  if (req.db.isId(id)) {
     req.db.Manufacturer.findOne({ _id: id }, req.success(function(manufacturer) {
-      var query;
+      var query, unavailable = false;
       if (!manufacturer) {
         res.redirect(303, '/manufacturers/list.html');
       } else {
@@ -40,11 +40,14 @@ router.get('/manufacturers/motors.html', function(req, res, next) {
         };
         if (req.query.unavailable !== '' && req.query.unavailable !== 'true')
           query.availability = { $in: req.db.schema.MotorAvailableEnum };
+        else
+          unavailable = true;
         req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } }, req.success(function(motors) {
           res.render('manufacturers/motors', locals(defaults, {
             title: 'Motors by ' + manufacturer.abbrev,
             manufacturer: manufacturer,
             motors: motors,
+            unavailable: unavailable
           }));
         }));
       }
@@ -56,7 +59,7 @@ router.get('/manufacturers/motors.html', function(req, res, next) {
 
 router.get('/manufacturers/edit.html', function(req, res, next) {
   var id = req.query.id;
-  if (id) {
+  if (req.db.isId(id)) {
     req.db.Manufacturer.findOne({ _id: id }, req.success(function(result) {
       if (result) {
         res.render('manufacturers/edit', locals(defaults, {

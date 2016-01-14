@@ -523,7 +523,6 @@ function migrateTable(table, rows, fields, cb) {
   // save the documents
   console.log('* creating ' + migrated.length + ' ' + model.modelName + ' documents...');
   model.create(migrated, function(err, results) {
-    console.log('create callback');
     if (err) {
       var fields;
       if (err.errors && (fields = Object.keys(err.errors)).length > 0) {

@@ -1,0 +1,30 @@
+<h1>{{title}}</h1>
+
+<table id="motor-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Type</th>
+     <th>Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Burn</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motors}}
+    <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
+      <td><a href="/motors/details.html?id={{_id}}">{{designation}}</td>
+      <td>{{type}}</td>
+      <td>{{formatMMT diameter}}</td>
+      <td class="number">{{formatImpulse totalImpulse}}</td>
+      <td class="number hidden-xs">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs">{{formatTime burnTime}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+
+<script type="text/javascript">
+setupTable('#motor-list');
+</script>

@@ -1,14 +1,22 @@
+/*
+ * Copyright 2016 John Coker for ThrustCurve.org
+ * Licensed under the ISC License, https://opensource.org/licenses/ISC
+ */
+'use strict';
+
 var process = require('process'),
-    config = require('./config/server.js'),
     mongoose = require('mongoose'),
     express = require('express'),
+    exphbs = require('exphbs'),
     path = require('path'),
     favicon = require('serve-favicon'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
     morgan = require('morgan'),
-    favicon = require('serve-favicon');
+    favicon = require('serve-favicon'),
+    config = require('./config/server.js'),
+    schema = require('./database/schema');
 
 // fail if initial connection is impossible
 mongoose.connect(config.mongoUrl, function(err) {
@@ -30,8 +38,10 @@ var index = require('./routes/index'),
 var app = express();
 
 // view engine setup using Handlebars
+require('handlebars-helper').help(exphbs.handlebars);
+require('./helpers').help(exphbs.handlebars);
 app.set('views', path.join(__dirname, 'views'));
-app.engine('hbs', require('exphbs'));
+app.engine('hbs', exphbs);
 app.set('view engine', 'hbs');
 
 // other Express configuration
@@ -42,6 +52,57 @@ app.use(cookieParser());
 app.use(morgan('combined'));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// wire in database access to routes
+var db = Object.create(null, {
+  mongoose: { value: mongoose },
+  schema: { value: schema },
+  Manufacturer: { get: function() {
+    return this._manufacturer || (this._manufacturer = schema.ManufacturerModel(mongoose));
+  } },
+  CertOrg: { get: function() {
+    return this._certOrg || (this._certOrg = schema.CertOrgModel(mongoose));
+  } },
+  Motor: { get: function() {
+    return this._motor || (this._motor = schema.MotorModel(mongoose));
+  } },
+  Contributor: { get: function() {
+    return this._contributor || (this._contributor = schema.ContributorModel(mongoose));
+  } },
+  MotorNote: { get: function() {
+    return this._motorNote || (this._motorNote = schema.MotorNoteModel(mongoose));
+  } },
+  SimFile: { get: function() {
+    return this._simFile || (this._simFile = schema.SimFileModel(mongoose));
+  } },
+  SimFileNote: { get: function() {
+    return this._simFileNote || (this._simFileNote = schema.SimFileNoteModel(mongoose));
+  } },
+  Rocket: { get: function() {
+    return this._rocket || (this._rocket = schema.RocketModel(mongoose));
+  } }
+});
+app.use(function(req, res, next) {
+  req.db = db;
+  req.success = function(cb) {
+    return function(err, result) {
+      if (err) {
+        res.status(err.status || 500);
+        res.render('error', {
+          title: 'Database Error',
+          layout: 'home',
+          url: req.url,
+          status: err.status,
+          message: err.message,
+          error: err
+        });
+      } else {
+        cb(result);
+      }
+    }
+  };
+  next();
+});
 
 // the defined routes
 app.use('/', index);

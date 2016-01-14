@@ -1,0 +1,54 @@
+<h1>{{title}}</h1>
+
+<form class="form-horizontal" name="edit" action="/manufacturers/details.html" method="post">
+  <div class="form-group">
+    <label for="name" class="col-sm-2 control-label">Company</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="name" placeholder="company name" value="{{{manufacturer.name}}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="abbrev" class="col-sm-2 control-label">Abbreviation</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="abbrev" placeholder="CN" value="{{{manufacturer.abbrev}}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="aliases" class="col-sm-2 control-label">Aliases</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="aliases" placeholder="a1, a2, ...", value="{{{manufacturer.aliases}}}">
+    </div>
+  </div>
+  <div class="form-group website">
+    <label for="website" class="col-sm-2 control-label">Web Site</label>
+    <div class="col-sm-10">
+      <div class="input-group">
+        <input type="text" class="form-control" name="website" placeholder="http://..." value="{{{manufacturer.website}}}">
+        <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <input type="checkbox" name="active" {{#if manufacturer.active}}checked{{/if}}> Active
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+$('.website .test').click(function(e) {
+  var site, a;
+
+  e.preventDefault();
+
+  site = $.trim($(this).closest('div.input-group').find('input').val());
+  if (site)
+    window.open(site, "_blank");
+});
+</script>

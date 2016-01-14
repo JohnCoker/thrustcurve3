@@ -1,3 +1,9 @@
+/*
+ * Copyright 2016 John Coker for ThrustCurve.org
+ * Licensed under the ISC License, https://opensource.org/licenses/ISC
+ */
+'use strict';
+
 var express = require('express'),
     router = express.Router();
 

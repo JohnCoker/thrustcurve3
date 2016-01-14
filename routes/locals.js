@@ -1,3 +1,9 @@
+/*
+ * Copyright 2016 John Coker for ThrustCurve.org
+ * Licensed under the ISC License, https://opensource.org/licenses/ISC
+ */
+'use strict';
+
 /**
  * Produce a new object with the default and custom locals merged.
  * @param {object} defaults object with defaults for a set of routes

@@ -1,1 +1,66 @@
 <h1>{{title}}</h1>
+
+<p>
+Here are the manufacturers of rocket motors.
+Sadly, many of them are no longer in business
+(<a id="hideshow", href="#">show</a> the inactive ones).
+Click on the company name to show all the motors they produce.
+</p>
+
+<style type="text/css">
+th.status,
+td.status {
+  display: none;
+  text-align: center;
+}
+tr.inactive {
+  display: none;
+  color-color:
+}
+</style>
+
+<table id="manufacturer-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Company Name</th>
+     <th>Abbrev</th>
+     <th class="status">Status</th>
+     <th>Web Site</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each manufacturers}}
+    <tr class="{{#unless active}}inactive{{/unless}}" data-id="{{_id}}">
+      <td><a href="/manufacturers/motors.html?id={{_id}}">{{name}}</td>
+      <td>{{abbrev}}</td>
+      <td class="status">{{#if active}}active{{else}}&mdash;{{/if}}</td>
+      <td>{{#if website}}<a href="{{website}}" target=_blank>{{websiteAnchor website}}</a>{{/if}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+
+<p>
+<a href="/manufacturers/edit.html">Add a new manufacturer</a>.
+</p>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  var shown = false;
+  $('a#hideshow').click(function(e) {
+    e.preventDefault();
+
+    var a = $(this),
+        table = $('#manufacturer-list');
+
+    if (shown) {
+      table.find('th.status, td.status, tr.inactive').hide();
+      a.text('show');
+    } else {
+      table.find('th.status, td.status, tr.inactive').show();
+      a.text('hide');
+    }
+    shown = !shown;
+  });
+});
+</script>

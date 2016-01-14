@@ -14,6 +14,20 @@ var MotorNameRegex = /^1\/[248]A(0\.)[1-9]|[A-Z][1-9][0-9]*$/;
 
 var units = require('../../lib/units');
 
+var MotorTypeEnum = ['SU', 'reload', 'hybrid'];
+var MotorAvailabilityEnum = ['regular', 'occasional', 'OOP'];
+var MotorAvailableEnum = MotorAvailabilityEnum.splice(2, 1);
+Object.freeze(MotorTypeEnum);
+Object.freeze(MotorAvailabilityEnum);
+Object.freeze(MotorAvailableEnum);
+
+var SimFileFormatEnum = ['RASP', 'RockSim', 'ALT4', 'CompuRoc'];
+var SimFileDataSourceEnum = ['cert', 'mfr', 'user'];
+var SimFileLicenseEnum = ['PD', 'free', 'other'];
+Object.freeze(SimFileFormatEnum);
+Object.freeze(SimFileDataSourceEnum);
+Object.freeze(SimFileLicenseEnum);
+
 function schemaOptions(schema) {
   // touch updatedAt timestamp
   schema.pre('save', function(next) {
@@ -66,7 +80,7 @@ function makeMotorModel(mongoose) {
     commonName: { type: String, required: true, match: MotorNameRegex },
     altName: String,
     impulseClass: { type: String, match: /^[A-O]$/ },
-    type: { type: String, required: true, enum: ['SU', 'reload', 'hybrid'] },
+    type: { type: String, required: true, enum: MotorTypeEnum },
     delays: String,
     certDate: Date,
     certDesignation: String,
@@ -82,9 +96,21 @@ function makeMotorModel(mongoose) {
     caseInfo: String,
     propellantInfo: String,
     dataSheet: { type: String, match: UrlRegex },
-    availability: { type: String, required: true, enum: ['regular', 'occasional', 'OOP' ] }
+    availability: { type: String, required: true, enum: MotorAvailabilityEnum }
+  }, {
+    toObject: {
+      virtuals: true
+    },
+    toJSON: {
+      virtuals: true
+    }
   });
   schema.index({ _manufacturer: 1, designation: 1 }, { unique: true });
+
+  schema.virtual('isAvailable').get(function() {
+    return this.availability != null && MotorAvailableEnum.indexOf(this.availability) >= 0;
+  });
+
   schemaOptions(schema);
   return mongoose.model('Motor', schema);
 }
@@ -144,9 +170,9 @@ function makeSimFileModel(mongoose) {
     migratedId: Number,
     _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
-    format: { type: String, required: true, enum: ['RASP', 'RockSim', 'ALT4', 'CompuRoc'] },
-    dataSource: { type: String, required: true, enum: ['cert', 'mfr', 'user'] },
-    license: { type: String, enum: [ 'PD', 'free', 'other' ] },
+    format: { type: String, required: true, enum: SimFileFormatEnum },
+    dataSource: { type: String, required: true, enum: SimFileDataSourceEnum },
+    license: { type: String, enum: SimFileLicenseEnum },
     data: { type: String, required: true }
   });
   schemaOptions(schema);
@@ -296,4 +322,41 @@ module.exports = {
    * @return {object} Mongoose model
    */
   RocketModel: makeRocketModel,
+
+  /**
+   * The legal values for Motor.type.
+   * @member {string[]}
+   */
+  MotorTypeEnum: MotorTypeEnum,
+
+  /**
+   * The legal values for Motor.availability.
+   * @member {string[]}
+   */
+  MotorAvailabilityEnum: MotorAvailabilityEnum,
+
+  /**
+   * The values for Motor.availability that indicate available.
+   * @member {string[]}
+   */
+  MotorAvailableEnum: MotorAvailableEnum,
+
+  /**
+   * The legal values for SimFile.format.
+   * @member {string[]}
+   */
+  SimFileFormatEnum: SimFileFormatEnum,
+
+  /**
+   * The legal values for SimFile.dataSource
+   * @member {string[]}
+   */
+  SimFileDataSourceEnum: SimFileDataSourceEnum,
+
+  /**
+   * The legal values for SimFile.license.
+   * @member {string[]}
+   */
+  SimFileLicenseEnum: SimFileLicenseEnum,
+
 };

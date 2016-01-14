@@ -70,3 +70,11 @@ img.dropcap {
   margin-right: 1em;
   margin-top: 0.3em;
 }
+
+th.number,
+td.number {
+  text-align: right;
+}
+table.dataTable thead th.sorting:after {
+  color: black;
+}

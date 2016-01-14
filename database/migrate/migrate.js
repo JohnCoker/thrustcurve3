@@ -46,6 +46,9 @@ function toObjectId(table, id) {
   if (id == null)
     return;
 
+  table = table.toLowerCase();
+  table = table.replace(/_/g, '');
+
   // 3-byte machine identifier
   h = 0;
   for (i = 0; i < table.length; i++)
@@ -499,9 +502,12 @@ function migrateTable(table, rows, fields, cb) {
         continue;
 
       // perform any necessary coercion
-      if (model.schema.paths[m.output].instance == 'ObjectID') {
+      if (m.output == '_id') {
         if (!(v instanceof mongoose.Types.ObjectId))
           v = toObjectId(table.name, v);
+      } else if (model.schema.paths[m.output].instance == 'ObjectID') {
+        if (!(v instanceof mongoose.Types.ObjectId))
+          v = toObjectId(model.schema.paths[m.output].options.ref, v);
       }
 
       output[m.output] = v;

@@ -2,6 +2,8 @@
 
 This repository contains the code that will soon power the [ThrustCurve.org](http://thrustcurve.org/) site.
 
+[![Build Status](https://travis-ci.org/JohnCoker/thrustcurve3.svg?branch=master)](https://travis-ci.org/JohnCoker/thrustcurve3)
+
 ## Background
 
 [ThrustCurve.org](http://thrustcurve.org/)

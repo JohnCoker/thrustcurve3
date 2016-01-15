@@ -5,3 +5,4 @@ services:
  - mongodb
 before_script:
  - npm install -g jasmine-node
+ - find . -name node_modules -prune -o -name spec -execdir npm install \;

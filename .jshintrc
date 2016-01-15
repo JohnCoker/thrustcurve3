@@ -1,6 +1,7 @@
 // http://www.jshint.com/docs/
 {
   "node": true,
+  "jasmine": true,
   "eqnull": true,
   "strict": false,
   "undef": true,

@@ -103,7 +103,7 @@ router.post('/manufacturers/:id/edit.html', function(req, res, next) {
 
     ['name', 'abbrev', 'website'].forEach(function(p) {
       if (req.body.hasOwnProperty(p) && req.body[p] != manufacturer[p]) {
-        manufacturer[p] = req.body[p]
+        manufacturer[p] = req.body[p];
         isChanged = true;
       }
     });

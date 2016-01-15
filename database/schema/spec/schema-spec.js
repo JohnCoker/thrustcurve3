@@ -1,5 +1,4 @@
-var mongodb = require('mongodb'),
-    mongoose = require('mongoose'),
+var mongoose = require('mongoose'),
     schema = require('..');
 
 describe('schema', function() {

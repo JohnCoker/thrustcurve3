@@ -1,0 +1,6 @@
+// http://www.jshint.com/docs/
+{
+  "node": false,
+  "jasmine": false,
+  "browser": "true"
+}

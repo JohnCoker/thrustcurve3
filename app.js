@@ -105,7 +105,7 @@ app.use(function(req, res, next) {
       } else {
         cb(result);
       }
-    }
+    };
   };
   next();
 });

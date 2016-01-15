@@ -1,31 +1,66 @@
 <h1>{{title}}</h1>
 
-<form class="form-horizontal" name="edit" action="/manufacturers/details.html" method="post">
+{{#if isSaved}}
+<div class="alert alert-success" role="alert">
+Changes to manufacturer saved.
+</div>
+{{/if}}
+{{#if isCreated}}
+<div class="alert alert-success" role="alert">
+New manufacturer created.
+</div>
+{{/if}}
+{{#if isUnchanged}}
+<div class="alert alert-success" role="alert">
+No changes to save.
+</div>
+{{/if}}
+
+<form role="form" class="form-horizontal" name="edit" action="{{submitLink}}" method="post" data-toggle="validator">
+  {{#unless isNew}}
+  <div class="form-group">
+    <label for="id" class="col-sm-2 control-label">ID</label>
+    <div class="col-sm-10">
+      <p class="id form-control-static">{{{manufacturer._id}}}</p>
+    </div>
+  </div>
+  {{/unless}}
   <div class="form-group">
     <label for="name" class="col-sm-2 control-label">Company</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" name="name" placeholder="company name" value="{{{manufacturer.name}}}">
+      <input type="text" class="form-control" name="name"
+             pattern="^[A-Z][A-Za-z0-9/,. -]+$" required data-error="full name, no special characters"
+             placeholder="company name" value="{{{manufacturer.name}}}">
+      <span class="help-block with-errors"></span>
     </div>
   </div>
   <div class="form-group">
     <label for="abbrev" class="col-sm-2 control-label">Abbreviation</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" name="abbrev" placeholder="CN" value="{{{manufacturer.abbrev}}}">
+      <input type="text" class="form-control" name="abbrev"
+             pattern="^[A-Z][A-Za-z0-9/-]+$" required data-error="single word, no special characters"
+             placeholder="CN" value="{{{manufacturer.abbrev}}}">
+      <span class="help-block with-errors"></span>
     </div>
   </div>
   <div class="form-group">
     <label for="aliases" class="col-sm-2 control-label">Aliases</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" name="aliases" placeholder="a1, a2, ...", value="{{{manufacturer.aliases}}}">
+      <input type="text" class="form-control" name="aliases"
+             pattern="^[A-Z][A-Za-z0-9/ -]*( *, *[A-Z][A-Za-z0-9/ -]*)*$" required data-error="letters or words, separated by commas"
+             placeholder="a1, a2, ...", value="{{{manufacturer.aliases}}}">
+      <span class="help-block with-errors"></span>
     </div>
   </div>
   <div class="form-group website">
     <label for="website" class="col-sm-2 control-label">Web Site</label>
     <div class="col-sm-10">
       <div class="input-group">
-        <input type="text" class="form-control" name="website" placeholder="http://..." value="{{{manufacturer.website}}}">
+        <input type="url" class="form-control" name="website"
+               placeholder="http://..." value="{{{manufacturer.website}}}">
         <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
       </div>
+      <span class="help-block with-errors"></span>
     </div>
   </div>
   <div class="form-group">

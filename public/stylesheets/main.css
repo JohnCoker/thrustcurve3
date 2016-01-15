@@ -78,3 +78,10 @@ td.number {
 table.dataTable thead th.sorting:after {
   color: black;
 }
+
+form button[type=submit] {
+  margin-right: 0.3em;
+}
+form p.form-control-static.id {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}

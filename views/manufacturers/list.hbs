@@ -26,23 +26,30 @@ tr.inactive {
      <th>Abbrev</th>
      <th class="status">Status</th>
      <th>Web Site</th>
+     <th>More</th>
     </tr>
   </thead>
   <tbody>
   {{#each manufacturers}}
     <tr class="{{#unless active}}inactive{{/unless}}" data-id="{{_id}}">
-      <td><a href="/manufacturers/motors.html?id={{_id}}">{{name}}</td>
+      <td><a href="{{motorsLink}}">{{name}}</a></td>
       <td>{{abbrev}}</td>
       <td class="status">{{#if active}}active{{else}}&mdash;{{/if}}</td>
       <td>{{#if website}}<a href="{{website}}" target=_blank>{{websiteAnchor website}}</a>{{/if}}</td>
+      <td>
+      <a href="{{motorsLink}}">motors</a>
+      {{#if editLink}}&bullet; <a href="{{editLink}}">edit</a>{{/if}}
+      </td>
     </tr>
   {{/each}}
   </tbody>
 </table>
 
+{{#if newLink}}
 <p>
-<a href="/manufacturers/edit.html">Add a new manufacturer</a>.
+<a href="{{newLink}}">Add a new manufacturer</a>.
 </p>
+{{/if}}
 
 <script type="text/javascript">
 $(document).ready(function() {

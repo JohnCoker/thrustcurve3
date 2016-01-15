@@ -16,7 +16,8 @@ var process = require('process'),
     morgan = require('morgan'),
     favicon = require('serve-favicon'),
     config = require('./config/server.js'),
-    schema = require('./database/schema');
+    schema = require('./database/schema'),
+    helpers = require('./lib/helpers');
 
 // fail if initial connection is impossible
 mongoose.connect(config.mongoUrl, function(err) {
@@ -39,7 +40,7 @@ var app = express();
 
 // view engine setup using Handlebars
 require('handlebars-helper').help(exphbs.handlebars);
-require('./helpers').help(exphbs.handlebars);
+helpers.help(exphbs.handlebars);
 app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', exphbs);
 app.set('view engine', 'hbs');

@@ -89,6 +89,7 @@ thrustcurve3
 │   └── schema
 ├── lib
 │   ├── errors
+│   ├── helpers
 │   ├── prefs
 │   └── units
 ├── public

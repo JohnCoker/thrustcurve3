@@ -5,7 +5,7 @@
   "main": "flightsim.js",
   "scripts": {
     "test": "jasmine-node spec",
-    "lint": "jshint *.js"
+    "lint": "jshint *.js spec/*.js"
   },
   "repository": {
     "type": "git",

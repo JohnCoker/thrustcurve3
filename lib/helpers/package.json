@@ -5,7 +5,7 @@
   "main": "helpers.js",
   "scripts": {
     "test": "jasmine-node spec",
-    "lint": "jshint *.js spec/*.js"
+    "lint": "jshint *.js spec/*.js spec/*.js"
   },
   "repository": {
     "type": "git",

@@ -14,12 +14,12 @@
   <tbody>
   {{#each motors}}
     <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
-      <td><a href="/motors/details.html?id={{_id}}">{{designation}}</td>
+      <td><a href="{{motorLink ../manufacturer this}}">{{designation}}</td>
       <td>{{type}}</td>
       <td>{{formatMMT diameter}}</td>
       <td class="number">{{formatImpulse totalImpulse}}</td>
       <td class="number hidden-xs">{{formatForce avgThrust}}</td>
-      <td class="number hidden-xs">{{formatTime burnTime}}</td>
+      <td class="number hidden-xs">{{formatDuration burnTime}}</td>
     </tr>
   {{/each}}
   </tbody>
@@ -32,6 +32,12 @@ These are only those currently available;
 to include motors now out of production.
 </p>
 {{/unless}}
+
+{{#if editLink}}
+<p>
+<a href="{{editLink}}">Edit this manufacturer.</a>
+</p>
+{{/if}}
 
 <script type="text/javascript">
 setupTable('#motor-list');

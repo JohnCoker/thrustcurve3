@@ -1,0 +1,256 @@
+<h1>{{title}}</h1>
+
+<div role="form" class="form-horizontal form-condensed">
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Manufacturer</label>
+    <div class="col-sm-9">
+      <p class="form-control-static"><a href="{{manufacturerLink manufacturer}}">{{manufacturer.name}}</a></p>
+    </div>
+  </div>
+
+  {{#if motor._relatedMfr}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Related Mfr.</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor._relatedMfr.name}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Designation</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.designation}}</p>
+    </div>
+  </div>
+
+  {{#if motor.altDesignation}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Alt. Designation</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.altDesignation}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Common Name</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.commonName}}</p>
+    </div>
+  </div>
+
+  {{#if motor.altName}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Alt. Name</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.altName}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Motor Type</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.type}}</p>
+    </div>
+  </div>
+
+  {{#if motor.delays}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Delays</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.delays}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Diameter</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatMMT motor.diameter}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Length</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatLength motor.length}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Total Weight</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatMass motor.totalWeight}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Prop. Weight</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatMass motor.propellantWeight}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Avg. Thrust</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatForce motor.avgThrust}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Max. Thrust</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatForce motor.maxThrust}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Total Impulse</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatImpulse motor.totalImpulse}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Burn Time</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatDuration motor.burnTime}}</p>
+    </div>
+  </div>
+
+  {{#if motor.isp}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Isp</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatIsp motor.isp}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if motor.caseInfo}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Case Info</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.caseInfo}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if motor.propellantInfo}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Propellant Info</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.propellantInfo}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Cert. Org.</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor._certOrg.abbrev}}</p>
+    </div>
+  </div>
+
+  {{#if motor.certDate}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Cert. Date</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatDate motor.certDate}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if motor.certDesignation}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Cert. Designation</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.certDesignation}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if motor.dataSheet}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Data Sheet</label>
+    <div class="col-sm-9">
+      <p class="form-control-static"><a href="{{motor.dataSheet}}" target="_blank">{{websiteAnchor motor.dataSheet}}</a></p>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Availability</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{motor.availability}}</p>
+    </div>
+  </div>
+
+</div>
+
+{{#if editLink}}
+<p>
+<a href="{{editLink}}">Edit this motor.</a>
+</p>
+{{/if}}
+
+<a name="simfiles"></a>
+<h2>Simulator Files</h2>
+
+{{#if simfiles}}
+<table id="simfile-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Format</th>
+     <th>Source</th>
+     <th>Updated</th>
+     <th>Contributor</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each simfiles}}
+    <tr data-id="{{_id}}">
+      <td><a href="{{simfileLink this}}">{{format}}</a></td>
+      <td>{{dataSource}}</td>
+      <td>{{formatDate updatedAt}}</td>
+      <td><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+{{/if}}
+
+<p>
+{{#unless simfiles}}
+Sadly, no files exist for this motor.
+{{/unless}}
+Do you have a data file?
+Please <a href="/simfile/contribute.html">contribute it</a>.
+</p>
+
+<a name="notes"></a>
+<h2>Motor Notes</h2>
+
+{{#if notes}}
+<table id="note-list" class="table table-bordered notes">
+  {{#each notes}}
+    <tr data-id="{{_id}}">
+      <th class="subject">{{subject}}</a></td>
+      <th><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>
+      <th>{{formatDate updatedAt}}</td>
+    </tr>
+    <tr class="content">
+      <td colspan="3">{{content}}</td>
+    </tr>
+  {{/each}}
+</table>
+{{/if}}
+
+<p>
+Do you have other info on this motor?
+Please <a href="/simfile/notes/contribute.html">add a note</a>.
+</p>
+

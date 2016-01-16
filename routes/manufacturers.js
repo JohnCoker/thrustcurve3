@@ -15,7 +15,7 @@ var defaults = {
 router.get(['/manufacturers/', '/manufacturers/list.html'], function(req, res, next) {
   req.db.Manufacturer.find({}, undefined, { sort: { name: 1 } }, req.success(function(results) {
     for (var i = 0; i < results.length; i++) {
-      results[i].motorsLink = '/manufacturers/' + results[i].abbrev + '/motors.html';
+      results[i].motorsLink = req.helpers.manufacturerLink(results[i]);
       results[i].editLink = '/manufacturers/' + results[i]._id + '/edit.html';
     }
     res.render('manufacturers/list', locals(defaults, {
@@ -58,7 +58,8 @@ router.get('/manufacturers/:name/motors.html', function(req, res, next) {
           manufacturer: manufacturer,
           motors: motors,
           unavailable: unavailable,
-          unavailableLink: '/manufacturers/' + manufacturer.abbrev + '/motors.html?unavailable'
+          unavailableLink: req.helpers.manufacturerLink(manufacturer) + '?unavailable',
+          editLink: '/manufacturers/' + manufacturer._id + '/edit.html'
         }));
       }));
     }
@@ -149,7 +150,7 @@ router.get(['/manufacturers.shtml'], function(req, res, next) {
     // old-style MySQL row ID; go to motor list
     req.db.Manufacturer.findOne({ migratedId: id }, req.success(function(result) {
       if (result)
-        res.redirect(301, '/manufacturers/' + result._abbrev + '/motors.html');
+        res.redirect(301, req.helpers.manufacturerLink(result));
       else
         res.redirect(303, '/manufacturers/');
     }));

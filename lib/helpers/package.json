@@ -5,12 +5,15 @@
   "main": "helpers.js",
   "scripts": {
     "test": "jasmine-node spec",
-    "lint": "jshint *.js"
+    "lint": "jshint *.js spec/*.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/JohnCoker/thrustcurve3/lib/helpers"
   },
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "strftime": "^0.9.2"
+  }
 }

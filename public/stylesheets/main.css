@@ -85,3 +85,14 @@ form button[type=submit] {
 form p.form-control-static.id {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
 }
+.form-condensed .form-group {
+  margin-bottom: 0;
+}
+.form-condensed .control-label {
+  padding-top: 2px;
+}
+.form-condensed .form-control,
+.form-condensed .form-control-static {
+  padding-top: 2px;
+  min-height: 0;
+}

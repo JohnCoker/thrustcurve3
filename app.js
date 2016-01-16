@@ -58,30 +58,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 var db = Object.create(null, {
   mongoose: { value: mongoose },
   schema: { value: schema },
-  Manufacturer: { get: function() {
-    return this._manufacturer || (this._manufacturer = schema.ManufacturerModel(mongoose));
-  } },
-  CertOrg: { get: function() {
-    return this._certOrg || (this._certOrg = schema.CertOrgModel(mongoose));
-  } },
-  Motor: { get: function() {
-    return this._motor || (this._motor = schema.MotorModel(mongoose));
-  } },
-  Contributor: { get: function() {
-    return this._contributor || (this._contributor = schema.ContributorModel(mongoose));
-  } },
-  MotorNote: { get: function() {
-    return this._motorNote || (this._motorNote = schema.MotorNoteModel(mongoose));
-  } },
-  SimFile: { get: function() {
-    return this._simFile || (this._simFile = schema.SimFileModel(mongoose));
-  } },
-  SimFileNote: { get: function() {
-    return this._simFileNote || (this._simFileNote = schema.SimFileNoteModel(mongoose));
-  } },
-  Rocket: { get: function() {
-    return this._rocket || (this._rocket = schema.RocketModel(mongoose));
-  } },
+  Manufacturer: { value: schema.ManufacturerModel(mongoose) },
+  CertOrg: { value: schema.CertOrgModel(mongoose) },
+  Motor: { value: schema.MotorModel(mongoose) },
+  Contributor: { value: schema.ContributorModel(mongoose) },
+  MotorNote: { value: schema.MotorNoteModel(mongoose) },
+  SimFile: { value: schema.SimFileModel(mongoose) },
+  SimFileNote: { value: schema.SimFileNoteModel(mongoose) },
+  Rocket: { value: schema.RocketModel(mongoose) },
   isId: { value: function(v) {
     if (v == null)
       return false;
@@ -107,6 +91,7 @@ app.use(function(req, res, next) {
       }
     };
   };
+  req.helpers = helpers;
   next();
 });
 

@@ -6,14 +6,20 @@
 
 var express = require('express'),
     router = express.Router(),
+    metadata = require('./metadata.js'),
     locals = require('./locals.js');
 
 var defaults = {
-  layout: 'info',
+  layout: 'motors',
 };
 
 var searchLink = '/motors/search.html';
 
+
+/*
+ * /motors/:mfr/:desig/
+ * Specific motor details, renders with motors/details.hbs template.
+ */
 var classCounts = {};
 
 function getClassCount(req, cls, cb) {
@@ -69,6 +75,7 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           notes: notes,
           classCount: classCount,
           isCompare: classCount >= 5,
+          isReloadCase: motor.type == 'reload' && motor.caseInfo,
           editLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html'
         }));
       }));
@@ -212,13 +219,155 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
   });
 });
 
+
+/*
+ * /motors/search.html
+ * General motor search, renders with motors/search.hbs template.
+ */
+function doSearch(req, res, params) {
+  metadata.getMotors(req, function(all, available) {
+    var query = {},
+        hasParams, failed, isFresh,
+        keys, k, v, m, i;
+
+    hasParams = false;
+    failed = false;
+    isFresh = true;
+    if (params) {
+      keys = Object.keys(params);
+      if (keys.length > 0)
+        isFresh = false;
+      for (i = 0; i < keys.length; i++) {
+        k = keys[i];
+        v = params[k];
+        if (v == null)
+          continue;
+        v = v.toString().trim();
+        if (v === '')
+          continue;
+
+        if (k == 'manufacturer' || k == 'mfr') {
+          m = all.manufacturers.byName(v);
+          if (m != null)
+            query._manufacturer = m._id;
+          else
+            failed = true;
+
+        } else if (k == 'certOrg' || k == 'cert') {
+          m = all.certOrgs.byName(v);
+          if (m != null)
+            query._certOrg = m._id;
+          else
+            failed = true;
+
+        } else if (k == 'name') {
+          query.$or = [
+            { designation: v.toUpperCase() },
+            { altDesignation: v.toUpperCase() },
+            { commonName: v.toUpperCase() },
+            { altName: v.toUpperCase() },
+          ];
+
+        } else if (k == 'diameter') {
+          v = parseFloat(v);
+          if (v > 0) {
+            if (v > 1)
+              v /= 1000;
+            query.diameter = { $gt: v - 0.0015, $lt: v + 0.0015 };
+          } else
+            failed = true;
+
+        } else if (k == 'availability') {
+          if (v == null || v == 'available')
+            query.availability = { $in: req.db.schema.MotorAvailableEnum };
+          else if (v == 'all')
+            ; // no restriction
+          else
+            query.availability = v;
+
+        } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
+          if (req.db.Motor.schema.paths[k].instance == 'Number') {
+            v = parseFloat(v);
+            if (v > 0) {
+              query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
+            } else
+              failed = true;
+          } else {
+            query[k] = v;
+          }
+        }
+      }
+
+      // see if we have any selective query parameters
+      keys = Object.keys(query);
+      if (keys.length > 1 || (keys.length == 1 && keys[0] != 'availability'))
+        hasParams = true;
+    } else {
+      params = {};
+    }
+
+    // always create an availability parameter
+    if (!params.hasOwnProperty('availability'))
+      params.availability = 'available';
+
+    if (failed) {
+      res.render('motors/search', locals(defaults, {
+        title: 'Search Results',
+        allMotors: all,
+        availableMotors: available,
+        params: params,
+        results: [],
+        isFresh: isFresh,
+        isSearchDone: true,
+        isNoneFound: true
+      }));
+    } else if (hasParams) {
+      // perform search
+      req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } }).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
+        if (results.length == 1) {
+          res.redirect(303, req.helpers.motorLink(results[0]));
+        } else {
+          res.render('motors/search', locals(defaults, {
+            title: 'Search Results',
+            allMotors: all,
+            availableMotors: available,
+            params: params,
+            results: results,
+            isFresh: isFresh,
+            isSearchDone: true,
+            isNoneFound: results.length < 1
+          }));
+        }
+      }));
+    } else {
+      // render search page without doing query
+      res.render('motors/search', locals(defaults, {
+        title: 'Attribute Search',
+        allMotors: all,
+        availableMotors: available,
+        params: params,
+        isFresh: isFresh,
+        isSearchDone: false
+      }));
+    }
+  });
+}
+
 router.get(searchLink, function(req, res, next) {
-  res.render('motors/search', locals(defaults, 'Motor Search'));
+  doSearch(req, res, req.query);
 });
 router.get('/searchpage.jsp', function(req, res, next) {
   res.redirect(301, searchLink);
 });
 
+router.post(searchLink, function(req, res, next) {
+  doSearch(req, res, req.body);
+});
+
+/*
+ * /motors/guide.html
+ * General motor guide, renders with motors/guide.hbs template.
+ */
 router.get('/motors/guide.html', function(req, res, next) {
   res.render('motors/guide', locals(defaults, 'Motor Guide'));
 });
@@ -226,6 +375,11 @@ router.get(['/guidepage.jsp', '/motorguide.jsp'], function(req, res, next) {
   res.redirect(301, '/motors/guide.html');
 });
 
+
+/*
+ * /motors/browser.html
+ * Motor browser, renders with motors/browser.hbs template.
+ */
 router.get('/motors/browser.html', function(req, res, next) {
   res.render('motors/browser', locals(defaults, 'Motor Browser'));
 });
@@ -233,6 +387,11 @@ router.get(['/browser.shtml', '/browser.jsp'], function(req, res, next) {
   res.redirect(301, '/motors/browser.html');
 });
 
+
+/*
+ * /motors/missingdata.html
+ * Motors without data, renders with motors/missingdata.hbs template.
+ */
 router.get('/motors/missingdata.html', function(req, res, next) {
   res.render('motors/missingdata', locals(defaults, 'Motor Without Data'));
 });
@@ -240,10 +399,20 @@ router.get(['/missingdata.jsp'], function(req, res, next) {
   res.redirect(301, '/motors/missingdata.html');
 });
 
+
+/*
+ * /motors/popular.html
+ * Most popular motors, renders with motors/popular.hbs template.
+ */
 router.get('/motors/popular.html', function(req, res, next) {
   res.render('motors/popular', locals(defaults, 'Popular Motors'));
 });
 
+
+/*
+ * /motors/updates.html
+ * Recent motor updates, renders with motors/updates.hbs template.
+ */
 router.get('/motors/updates.html', function(req, res, next) {
   res.render('motors/updates', locals(defaults, 'Recent Updates'));
 });

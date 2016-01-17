@@ -1,3 +1,18 @@
+{{#extend "sidebar-extra"}}
+  <h2>Similar Motors</h2>
+  <ul class="links">
+    <li><a href="/motors/search.html?manufacturer={{encode manufacturer.abbrev}}">From <b>{{manufacturer.abbrev}}</b></a></li>
+    <li><a href="/motors/search.html?impulseClass={{encode motor.impulseClass}}"><b>{{motor.impulseClass}}</b> Impulse Class</a></li>
+    <li><a href="/motors/search.html?diameter={{encode motor.diameter}}"><b>{{formatMMT motor.diameter}}</b> Diameter</a></li>
+    {{#if isReloadCase}}
+    <li><a href="/motors/search.html?caseInfo={{encode motor.caseInfo}}"><b>{{motor.caseInfo}}</b> Case</a></li>
+    {{/if}}
+    {{#if motor.propellantInfo}}
+    <li><a href="/motors/search.html?propellantInfo={{encode motor.propellantInfo}}"><b>{{motor.propellantInfo}}</b></a></li>
+    {{/if}}
+  </ul>
+{{/extend}}
+
 <h1>{{title}}</h1>
 
 <div class="row">
@@ -15,7 +30,7 @@
       <div class="form-group">
         <label class="col-sm-4 control-label">Related Mfr.</label>
         <div class="col-sm-8">
-          <p class="form-control-static">{{motor._relatedMfr.name}}</p>
+          <p class="form-control-static"><a href="{{manufacturerLink motor._relatedMfr}}">{{motor._relatedMfr.name}}</a></p>
         </div>
       </div>
       {{/if}}
@@ -200,7 +215,7 @@
     <style type="text/css">
     img.compare {
       width: 100%;
-      height: 100px;
+      height: 90px;
     }
     p.legend {
       margin-top: 0;
@@ -208,7 +223,7 @@
     }
     </style>
     {{#if isCompare}}
-    <p>Compared with all {{classCount}} {{motor.impulseClass}} motors:</p>
+    <p>Compared with all {{classCount}} <b>{{motor.impulseClass}}</b> motors:</p>
 
     {{#if motor.totalImpulse}}
     <img class="compare" src="{{motorLink manufacturer motor}}compare.svg?stat=totalImpulse"/>

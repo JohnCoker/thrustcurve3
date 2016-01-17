@@ -1,1 +1,181 @@
 <h1>{{title}}</h1>
+
+{{#if isNoneFound}}
+<div class="alert alert-warning" role="alert">
+No motors matched the search criteria.
+</div>
+{{/if}}
+
+{{#if isFresh}}
+<p>
+Search the database of motor data here.
+You can use the quick search in the title bar to search by motor name or use the
+advanced search below to search by various attributes.
+</p>
+{{/if}}
+
+{{#unless results}}
+<form role="form" class="form-horizontal" name="edit" action="{{submitLink}}" method="post" data-toggle="validator">
+  <div class="form-group">
+    <label for="manufacturer" class="col-sm-3 control-label">Manufacturer</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="manufacturer">
+        <option value="">(all)</option>
+        {{#each allMotors.manufacturers}}
+        <option {{#equal ../params.manufacturer abbrev}}selected{{/equal}} value="{{abbrev}}">{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="designation" class="col-sm-3 control-label">Mfr Designation</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="designation"
+             placeholder="110-G250-14A" value="{{params.designation}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="commonName" class="col-sm-3 control-label">Common Name</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="commonName"
+             pattern="^[A-O][0-9]+$" data-error="letter and average thrust"
+             placeholder="G250" value="{{params.commonName}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="type" class="col-sm-3 control-label">Motor Type</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="type">
+        <option value="">(all)</option>
+        <option value="SU" {{#equal params.type 'SU'}}selected{{/equal}}>single-use</option>
+        <option value="reload" {{#equal params.type 'reload'}}selected{{/equal}}>reload</option>
+        <option value="hybrid" {{#equal params.type 'hybrid'}}selected{{/equal}}>hybrid</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="impulseClass" class="col-sm-3 control-label">Impulse Class</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="impulseClass">
+        <option value="">(all)</option>
+        {{#each allMotors.impulseClasses}}
+        <option {{#equal ../params.impulseClass this}}selected{{/equal}}>{{this}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="diameter" class="col-sm-3 control-label">Diameter</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="diameter">
+        <option value="">(all)</option>
+        {{#each allMotors.diameters}}
+        <option value="{{this}}" {{#equal ../params.diameter this}}selected{{/equal}}>{{formatMMT this}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="propellantInfo" class="col-sm-3 control-label">Propellant</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="propellantInfo">
+        <option value="">(all)</option>
+        {{#each allMotors.propellants}}
+        <option {{#equal ../params.propellantInfo this}}selected{{/equal}}>{{this}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="availability" class="col-sm-3 control-label">Availability</label>
+    <div class="col-sm-9">
+      <label class="checkbox-inline">
+        <input type="checkbox" name="availability" value="regular" {{#equal params.availability 'regular'}}checked{{/equal}}> regular
+      </label>
+      <label class="checkbox-inline">
+        <input type="checkbox" name="availability" value="available" {{#equal params.availability 'available'}}checked{{/equal}}> available
+      </label>
+      <label class="checkbox-inline">
+        <input type="checkbox" name="availability" value="all" {{#equal params.availability 'all'}}checked{{/equal}}> all
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+      {{#if isNoneFound}}<a class="btn btn-default" href="/motors/search.html?restart">Start Over</a>{{/if}}
+    </div>
+  </div>
+</form>
+{{/unless}}
+
+{{#if results}}
+<table id="result-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th>Type</th>
+     <th>Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Burn</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each results}}
+    <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
+      <td><a href="{{motorLink _manufacturer this}}">{{designation}}</td>
+      <td>{{_manufacturer.abbrev}}</td>
+      <td>{{type}}</td>
+      <td>{{formatMMT diameter}}</td>
+      <td class="number">{{formatImpulse totalImpulse}}</td>
+      <td class="number hidden-xs">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs">{{formatDuration burnTime}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#result-list');
+</script>
+{{/if}}
+
+{{#if isFresh}}
+<a name="linking"></a>
+<h2>Search from Your Site</h2>
+<p>
+Want to put our search engine on your site?
+Copy the HTML code below and paste it into your web page wherever you want.
+Note that the result behaves like the title bar search,
+plus a logo that links to this page.
+</p>
+
+<div id="linksearch-live" style="padding-left: 4em; padding-bottom: 1em;">
+<form method="get" action="http://www.thrustcurve.org/motors/search.html">
+  <label for="name">
+    <a href="http://www.thrustcurve.org/motors/search.html" style="font-family: Helvetica, Arial, sans-serif; font-size: larger; font-weight: normal; color: #9e1a20; text-decoration: none;"><b>thrust</b>curve.org</a>
+  </label>
+  <input type="text" name="name" placeholder="G80">
+  <input type="submit" value="Search">
+</form>
+</div>
+
+<pre id="linksearch-code"></pre>
+<script type="text/javascript">
+$('#linksearch-code').text($.trim($('#linksearch-live').html()));
+</script>
+
+<p>
+This assumes your site doesn't have global styles for forms.
+If the result looks bad, you may have to apply some of your site's styles to improve the appearance.
+See the example above for how it should look.
+</p>
+<p>
+Of course, you're also free to incorporate searching on ThrustCurve.org into your site.
+Please just make sure the logo appears in your form and links to this page.
+</p>
+{{/if}}

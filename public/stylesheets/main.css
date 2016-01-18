@@ -1,3 +1,7 @@
+/*
+ * header:    #2e448c (@brand-primary)
+ * highlight: #9e1a20
+ */
 html {
   position: relative;
   min-height: 100%;
@@ -23,7 +27,7 @@ img.navbar-brand {
   top: 2em;
 }
 .sidebar-right {
-  border-left: 4px solid #9e1a20;
+  border-left: 4px solid #2e448c;
 }
 .sidebar h2:first-child {
   margin-top: 0;

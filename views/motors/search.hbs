@@ -39,7 +39,7 @@ advanced search below to search by various attributes.
     <label for="commonName" class="col-sm-3 control-label">Common Name</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="commonName"
-             pattern="^[A-O][0-9]+$" data-error="letter and average thrust"
+             pattern="^[A-Oa-o][0-9]+$" data-error="letter and average thrust"
              placeholder="G250" value="{{params.commonName}}">
       <span class="help-block with-errors"></span>
     </div>
@@ -110,9 +110,22 @@ advanced search below to search by various attributes.
     </div>
   </div>
 </form>
+<script type="text/javascript">
+$('form input[type=text]').blur(function(e) {
+  this.value = $.trim(this.value).toUpperCase();
+});
+</script>
 {{/unless}}
 
 {{#if results}}
+<!--
+query parameters:
+  {{#each params}}
+  {{@key}}={{this}}
+{{/each}}
+results: {{length results}}
+-->
+
 <table id="result-list" class="table table-bordered">
   <thead>
     <tr>

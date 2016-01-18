@@ -54,7 +54,25 @@ app.use(morgan('combined'));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// wire in database access to routes
+/*
+ * Many of the routes need access to the database, so we add
+ * some properties to the req instance.
+ *
+ * db: this object includes the Mongoose handle and various
+ * instantiated models plus a few convenience functions.
+ *
+ * success: this a function used as the callback to all
+ * Mongoose functions.  It handles database errors by
+ * rendering a standard error page and only makes the
+ * callback on success.
+ *
+ * The success function also provides a chance to catch exceptions
+ * during production of the resulting page.  Otherwise, the
+ * Node.js instance prints an error and exits, which isn't good
+ * error handling for a server.
+ *
+ * helpers: the helpers module with useful formatting functions.
+ */
 var db = Object.create(null, {
   mongoose: { value: mongoose },
   schema: { value: schema },
@@ -87,7 +105,19 @@ app.use(function(req, res, next) {
           error: err
         });
       } else {
-        cb(result);
+        try {
+          cb(result);
+        } catch (e) {
+          res.status(500);
+          res.render('error', {
+            title: 'Server Error',
+            layout: 'home',
+            url: req.url,
+            status: 500,
+            message: e.message,
+            error: e
+          });
+        }
       }
     };
   };

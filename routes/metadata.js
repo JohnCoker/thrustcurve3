@@ -65,20 +65,22 @@ MetadataCache.prototype.organize = function() {
 
   // sort manufacturers by name
   this.manufacturers.sort(function(a, b) {
-    return a.name - b.name;
+    return a.name.localeCompare(b.name);
   });
   this.manufacturers.byId = manufacturerCache.byId;
   this.manufacturers.byName = manufacturerCache.byName;
 
   // sort cert orgs by name
   this.certOrgs.sort(function(a, b) {
-    return a.name - b.name;
+    return a.name.localeCompare(b.name);
   });
   this.certOrgs.byId = certOrgCache.byId;
   this.certOrgs.byName = certOrgCache.byName;
 
   // sort diameters and remove off-by-one values
-  this.diameters.sort();
+  this.diameters.sort(function(a, b) {
+    return a - b;
+  });
   i = 1;
   while (i < this.diameters.length) {
     if (this.diameters[i] < this.diameters[i - 1] + 0.0015)

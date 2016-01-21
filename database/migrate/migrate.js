@@ -108,6 +108,23 @@ function mapWebsite(value) {
     return value;
 }
 
+function mapDesignation(value) {
+  if (value == null || value === '')
+    return;
+
+  value = value.toUpperCase();
+  value = value.replace(/^([0-9]+)\s+([A-Z])/i, '$1$2');
+  value = value.replace(/([0-9])[- ]JET/i, '$1JET');
+  value = value.replace(/\s+-\s+/g, '-');
+  value = value.replace(/([^A-Z])\s+([A-Z]+)$/gi, '$1$2');
+  value = value.replace(/\s+[^A-Z0-9._-]+/gi, '-');
+  value = value.replace(/\s+/g, '_');
+  value = value.replace(/[^A-Z0-9_./]+/gi, '-');
+  value = value.replace(/^[^A-Z0-9]+/, '');
+  value = value.replace(/[^A-Z0-9]+$/, '');
+  return value;
+}
+
 var tables = [
   {
     name: 'manufacturer',
@@ -158,11 +175,13 @@ var tables = [
     columns: [
       {
         name: 'mfr_desig',
-        field: 'designation'
+        field: 'designation',
+        mapper: mapDesignation
       },
       {
         name: 'alt_desig',
-        field: 'altDesignation'
+        field: 'altDesignation',
+        mapper: mapDesignation
       },
       {
         name: 'master_name',

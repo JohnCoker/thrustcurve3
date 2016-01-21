@@ -13,6 +13,7 @@ var UrlRegex = /^(?:(?:https?):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,
 var EmailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 var MotorNameRegex = /^1\/[248]A(0\.)[1-9]|[A-Z][1-9][0-9]*$/;
+var MotorDesignationRegex = /^[A-Z0-9_./-]+$/;
 
 var units = require('../../lib/units');
 
@@ -78,8 +79,8 @@ function makeMotorModel(mongoose) {
     _manufacturer: { type: mongoose.Schema.Types.ObjectId, ref: 'Manufacturer', required: true },
     _relatedMfr: { type: mongoose.Schema.Types.ObjectId, ref: 'Manufacturer' },
     _certOrg: { type: mongoose.Schema.Types.ObjectId, ref: 'CertOrg' },
-    designation: { type: String, required: true },
-    altDesignation: String,
+    designation: { type: String, required: true, uppercase: true, match: MotorDesignationRegex },
+    altDesignation: { type: String, uppercase: true, match: MotorDesignationRegex },
     commonName: { type: String, required: true, uppercase: true, match: MotorNameRegex },
     altName: { type: String, uppercase: true, match: MotorNameRegex },
     impulseClass: { type: String, required: true, uppercase: true, match: /^[A-O]$/ },
@@ -263,10 +264,16 @@ module.exports = {
   EmailRegex: EmailRegex,
 
   /**
-   * A regex that matches valid motor common names (C6, M1939, etc).
+   * A regex that matches valid motor common names (G100, M1939, etc).
    * @member {regex}
    */
   MotorNameRegex: MotorNameRegex,
+
+  /**
+   * A regex that matches valid motor designations (HP114G100-14A, M1939W, etc).
+   * @member {regex}
+   */
+  MotorDesignationRegex: MotorDesignationRegex,
 
   /**
    * Produce a Mongoose model for the <em>manufacturers</em> collection.

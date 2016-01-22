@@ -43,7 +43,7 @@ function getMotor(req, res, parents, redirect, cb) {
         res.status(404).send('unknown manufacturer abbreviation ' + req.params.mfr);
     }
     else {
-      var q = req.db.Motor.findOne({ designation: req.params.desig });
+      var q = req.db.Motor.findOne({ _manufacturer: manufacturer._id, designation: req.params.desig });
       if (parents)
         q = q.populate('_relatedMfr _certOrg');
       q.exec(req.success(function(motor) {
@@ -418,6 +418,69 @@ router.get('/motors/updates.html', function(req, res, next) {
 });
 router.get(['/updates.jsp'], function(req, res, next) {
   res.redirect(301, '/motors/updates.html');
+});
+
+
+/*
+ * /motors/:mfr/:desig/edit.html
+ * Edit motor info, renders with motors/edit.hbs template.
+ */
+router.get('/motors/:mfr/:desig/edit.html', function(req, res, next) {
+  metadata.get(req, function(caches) {
+    if (!req.params.mfr || req.params.mfr == '-') {
+      res.render('motors/edit', locals(defaults, {
+        title: 'New Motor',
+        motor: { availability: 'regular' },
+        isNew: true,
+        submitLink: '/motors/-/new/edit.html',
+        manufacturers: caches.manufacturers,
+        certOrgs: caches.certOrgs,
+        allMotors: caches.allMotors,
+        schema: req.db.schema
+      }));
+      return;
+    }
+
+    req.db.Manufacturer.findOne({ abbrev: req.params.mfr }, req.success(function(manufacturer) {
+      if (manufacturer != null) {
+        req.db.Motor.findOne({ _manufacturer: manufacturer._id, designation: req.params.desig }, req.success(function(motor) {
+          if (motor) {
+            res.render('motors/edit', locals(defaults, {
+              title: 'Edit ' + motor.designation,
+              manufacturer: manufacturer,
+              motor: motor,
+              isEdit: true,
+              submitLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html',
+              isCreated: req.query.results == 'created',
+              isSaved: req.query.results == 'saved',
+              isUnchanged: req.query.results == 'unchanged',
+              manufacturers: caches.manufacturers,
+              certOrgs: caches.certOrgs,
+              allMotors: caches.allMotors,
+              schema: req.db.schema
+            }));
+          } else {
+            res.render('motors/edit', locals(defaults, {
+              title: 'New Motor',
+              manufacturer: manufacturer,
+              motor: { availability: 'regular' },
+              isNew: true,
+              submitLink: '/motors/' + encodeURIComponent(manufacturer.abbrev) + '/new/edit.html',
+              manufacturers: caches.manufacturers,
+              certOrgs: caches.certOrgs,
+              allMotors: caches.allMotors,
+              schema: req.db.schema
+            }));
+          }
+        }));
+      } else {
+        res.redirect(303, '/manufacturers/');
+      }
+    }));
+  });
+});
+
+router.post('/motors/:mfr/:desig/edit.html', function(req, res, next) {
 });
 
 module.exports = router;

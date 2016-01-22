@@ -12,7 +12,7 @@ var UrlRegex = /^(?:(?:https?):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,
 // http://www.regular-expressions.info/email.html
 var EmailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
-var MotorNameRegex = /^1\/[248]A(0\.)[1-9]|[A-Z][1-9][0-9]*$/;
+var MotorNameRegex = /^1\/[248]A(0\.)?[1-9]|[A-Z][1-9][0-9]*$/;
 var MotorDesignationRegex = /^[A-Z0-9_./-]+$/;
 
 var units = require('../../lib/units');

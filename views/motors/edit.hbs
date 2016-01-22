@@ -1,0 +1,170 @@
+<h1>{{title}}</h1>
+
+{{#if isSaved}}
+<div class="alert alert-success" role="alert">
+Changes to motor saved.
+</div>
+{{/if}}
+{{#if isCreated}}
+<div class="alert alert-success" role="alert">
+New motor created.
+</div>
+{{/if}}
+{{#if isUnchanged}}
+<div class="alert alert-success" role="alert">
+No changes to save.
+</div>
+{{/if}}
+
+<form role="form" class="form-horizontal" name="edit-motor" action="{{submitLink}}" method="post" data-toggle="validator">
+  {{#unless isNew}}
+  <div class="form-group">
+    <label for="id" class="col-sm-3 control-label">ID</label>
+    <div class="col-sm-9">
+      <p class="id form-control-static">{{motor._id}} {{#if motor.migratedId}}(migrated {{motor.migratedId}}){{/if}}</p>
+    </div>
+  </div>
+  {{/unless}}
+  <div class="form-group">
+    <label for="_manufacturer" class="col-sm-3 control-label">Manufacturer</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="_manufacturer" required>
+      <option></option>
+      {{#each manufacturers}}
+        <option value="{{_id}}" {{#sameId ../motor._manufacturer _id}}selected{{/sameId}}>{{name}}</option>
+      {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="_relatedMfr" class="col-sm-3 control-label">Related Mfr.</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="_relatedMfr" required>
+      <option></option>
+      {{#each manufacturers}}
+        <option value="{{_id}}" {{#sameId ../motor._relatedMfr _id}}selected{{/sameId}}>{{name}}</option>
+      {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="designation" class="col-sm-3 control-label">Designation</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="designation"
+             pattern="^[A-Za-z0-9_./-]+$" required data-error="letters and digits, plus /._-"
+             placeholder="G80T" value="{{{motor.designation}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="altDesignation" class="col-sm-3 control-label">Alt. Designation</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="altDesignation"
+             pattern="^[A-Za-z0-9_./-]+$" data-error="letters and digits, plus /._- (optional)"
+             value="{{{motor.altDesignation}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="commonName" class="col-sm-3 control-label">Common Name</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="commonName"
+             pattern="^1/[248][Aa](0\.)?[1-9]|[A-Za-z][1-9][0-9]*$" required data-error="impulse class plus avg. thrust"
+             placeholder="G10" value="{{{motor.commonName}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="altName" class="col-sm-3 control-label">Alt. Name</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="altName"
+             pattern="^1\/[248][Aa](0\.)?[1-9]|[A-Za-z][1-9][0-9]*$" data-error="impulse class plus avg. thrust (optional)"
+             value="{{{motor.altName}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="type" class="col-sm-3 control-label">Motor Type</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="type" required>
+        <option></option>
+        {{#each schema.MotorTypeEnum}}
+        <option {{#equal ../motor.type this}}selected{{/equal}}>{{this}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="delays" class="col-sm-3 control-label">Delays</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="delays"
+             pattern="^P|[0-9,-]*$" data-error="seconds, separated by dash or comma (optional)"
+             placeholder="4,7,10" value="{{{motor.delays}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="_certOrg" class="col-sm-3 control-label">Certified By</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="_certOrg" required>
+      <option></option>
+      {{#each certOrgs}}
+        <option value="{{_id}}" {{#sameId ../motor._certOrg _id}}selected{{/sameId}}>{{name}}</option>
+      {{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="certDate" class="col-sm-3 control-label">Cert. Date</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="certDate"
+             value="{{{motor.certDate}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="certDesignation" class="col-sm-3 control-label">Cert. Designation</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="certDesignation"
+             value="{{{motor.certDesignation}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+
+  <div class="form-group website">
+    <label for="dataSheet" class="col-sm-3 control-label">Data Sheet</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="url" class="form-control" name="dataSheet"
+               placeholder="http://..." value="{{motor.dataSheet}}">
+        <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+$('form input[name=commonName], form input[name=altName]').blur(function(e) {
+  this.value = $.trim(this.value).toUpperCase();
+});
+$('form input[name=designation], form input[name=altDesignation]').blur(function(e) {
+  this.value = $.trim(this.value).toUpperCase().replace(/\s+/g, '_');
+});
+$('.website .test').click(function(e) {
+  var site, a;
+
+  e.preventDefault();
+
+  site = $.trim($(this).closest('div.input-group').find('input').val());
+  if (site)
+    window.open(site, "_blank");
+});
+</script>

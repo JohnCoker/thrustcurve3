@@ -13,6 +13,8 @@ var defaults = {
   layout: 'info',
 };
 
+var listLink = '/manufacturers/';
+
 function mfrQuery(req) {
   if (req.db.isId(req.query.id))
     return { _id: req.query.id };
@@ -31,7 +33,7 @@ function mfrQuery(req) {
  * /manufacturers/
  * Manufacturer list, renders with manufacturers/list.hbs template.
  */
-router.get(['/manufacturers/', '/manufacturers/list.html'], function(req, res, next) {
+router.get([listLink, '/manufacturers/list.html'], function(req, res, next) {
   req.db.Manufacturer.find({}, undefined, { sort: { name: 1 } }, req.success(function(results) {
     for (var i = 0; i < results.length; i++) {
       results[i].motorsLink = req.helpers.manufacturerLink(results[i]);
@@ -54,7 +56,7 @@ router.get('/manufacturers/:name/motors.html', function(req, res, next) {
   req.db.Manufacturer.findOne(mfrQuery(req), req.success(function(manufacturer) {
     var motorsQuery, unavailable = false;
     if (!manufacturer) {
-      res.redirect(303, '/manufacturers/');
+      res.redirect(303, listLink);
     } else {
       motorsQuery = {
         $or: [ { _manufacturer: manufacturer._id }, { _relatedMfr: manufacturer._id } ]
@@ -176,10 +178,10 @@ router.get(['/manufacturers.shtml'], function(req, res, next) {
       if (result)
         res.redirect(301, req.helpers.manufacturerLink(result));
       else
-        res.redirect(303, '/manufacturers/');
+        res.redirect(303, listLink);
     }));
   } else {
-    res.redirect(301, '/manufacturers/');
+    res.redirect(301, listLink);
   }
 });
 

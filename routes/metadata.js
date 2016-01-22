@@ -220,6 +220,17 @@ function getMotors(req, cb) {
   }
 }
 
+function get(req, cb) {
+  getMotors(req, function() {
+    cb({
+      manufacturers: manufacturerCache,
+      certOrgs: certOrgCache,
+      allMotors: allMotorCache,
+      availableMotors: availableMotorCache
+    });
+  });
+}
+
 function flush() {
   manufacturerCache = undefined;
   allMotorCache = undefined;
@@ -287,6 +298,11 @@ module.exports = {
    * @return {object} metadata cache for available motors
    */
   getMotors: getMotors,
+
+  /**
+   * Load all caches and return an object with each one as a property.
+   */
+  get: get,
 
   /**
    * Flush the cache, such as when motors or manufacturers are edited.

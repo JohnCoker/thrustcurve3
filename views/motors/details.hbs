@@ -20,129 +20,129 @@
   <div class="col-md-8">
     <div role="form" class="form-horizontal form-condensed">
       <div class="form-group">
-        <label class="col-sm-4 control-label">Manufacturer</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Manufacturer</label>
+        <div class="col-sm-6">
           <p class="form-control-static"><a href="{{manufacturerLink manufacturer}}">{{manufacturer.name}}</a></p>
         </div>
       </div>
     
       {{#if motor._relatedMfr}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Related Mfr.</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Related Mfr.</label>
+        <div class="col-sm-6">
           <p class="form-control-static"><a href="{{manufacturerLink motor._relatedMfr}}">{{motor._relatedMfr.name}}</a></p>
         </div>
       </div>
       {{/if}}
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Designation</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Designation</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.designation}}</p>
         </div>
       </div>
     
       {{#if motor.altDesignation}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Alt. Designation</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Alt. Designation</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.altDesignation}}</p>
         </div>
       </div>
       {{/if}}
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Common Name</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Common Name</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.commonName}}</p>
         </div>
       </div>
     
       {{#if motor.altName}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Alt. Name</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Alt. Name</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.altName}}</p>
         </div>
       </div>
       {{/if}}
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Motor Type</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Motor Type</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.type}}</p>
         </div>
       </div>
     
       {{#if motor.delays}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Delays</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Delays</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.delays}}</p>
         </div>
       </div>
       {{/if}}
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Diameter</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Diameter</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatMMT motor.diameter}}</p>
         </div>
       </div>
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Length</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Length</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatLength motor.length}}</p>
         </div>
       </div>
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Total Weight</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Total Weight</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatMass motor.totalWeight}}</p>
         </div>
       </div>
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Prop. Weight</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Prop. Weight</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatMass motor.propellantWeight}}</p>
         </div>
       </div>
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Avg. Thrust</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Avg. Thrust</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatForce motor.avgThrust}}</p>
         </div>
       </div>
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Max. Thrust</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Max. Thrust</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatForce motor.maxThrust}}</p>
         </div>
       </div>
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Total Impulse</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Total Impulse</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatImpulse motor.totalImpulse}}</p>
         </div>
       </div>
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Burn Time</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Burn Time</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatDuration motor.burnTime}}</p>
         </div>
       </div>
     
       {{#if motor.isp}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Isp</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Isp</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatIsp motor.isp}}</p>
         </div>
       </div>
@@ -150,8 +150,8 @@
     
       {{#if motor.caseInfo}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Case Info</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Case Info</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.caseInfo}}</p>
         </div>
       </div>
@@ -159,24 +159,24 @@
     
       {{#if motor.propellantInfo}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Propellant Info</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Propellant Info</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.propellantInfo}}</p>
         </div>
       </div>
       {{/if}}
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Cert. Org.</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Cert. Org.</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor._certOrg.abbrev}}</p>
         </div>
       </div>
     
       {{#if motor.certDate}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Cert. Date</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Cert. Date</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{formatDate motor.certDate}}</p>
         </div>
       </div>
@@ -184,8 +184,8 @@
     
       {{#if motor.certDesignation}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Cert. Designation</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Cert. Designation</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.certDesignation}}</p>
         </div>
       </div>
@@ -193,16 +193,16 @@
     
       {{#if motor.dataSheet}}
       <div class="form-group">
-        <label class="col-sm-4 control-label">Data Sheet</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Data Sheet</label>
+        <div class="col-sm-6">
           <p class="form-control-static"><a href="{{motor.dataSheet}}" target="_blank">{{websiteAnchor motor.dataSheet}}</a></p>
         </div>
       </div>
       {{/if}}
     
       <div class="form-group">
-        <label class="col-sm-4 control-label">Availability</label>
-        <div class="col-sm-8">
+        <label class="col-sm-6 control-label">Availability</label>
+        <div class="col-sm-6">
           <p class="form-control-static">{{motor.availability}}</p>
         </div>
       </div>

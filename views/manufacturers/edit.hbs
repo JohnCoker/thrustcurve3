@@ -16,12 +16,12 @@ No changes to save.
 </div>
 {{/if}}
 
-<form role="form" class="form-horizontal" name="edit" action="{{submitLink}}" method="post" data-toggle="validator">
+<form role="form" class="form-horizontal" name="edit-manufacturer" action="{{submitLink}}" method="post" data-toggle="validator">
   {{#unless isNew}}
   <div class="form-group">
     <label for="id" class="col-sm-3 control-label">ID</label>
     <div class="col-sm-9">
-      <p class="id form-control-static">{{{manufacturer._id}}}</p>
+      <p class="id form-control-static">{{manufacturer._id}} {{#if manufacturer.migratedId}}(migrated {{manufacturer.migratedId}}){{/if}}</p>
     </div>
   </div>
   {{/unless}}
@@ -57,7 +57,7 @@ No changes to save.
     <div class="col-sm-9">
       <div class="input-group">
         <input type="url" class="form-control" name="website"
-               placeholder="http://..." value="{{{manufacturer.website}}}">
+               placeholder="http://..." value="{{manufacturer.website}}">
         <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
       </div>
       <span class="help-block with-errors"></span>

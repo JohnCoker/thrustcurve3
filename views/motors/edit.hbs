@@ -19,9 +19,10 @@ No changes to save.
 <form role="form" class="form-horizontal" name="edit-motor" action="{{submitLink}}" method="post" data-toggle="validator">
   {{#unless isNew}}
   <div class="form-group">
-    <label for="id" class="col-sm-3 control-label">ID</label>
+    <label for="_id" class="col-sm-3 control-label">ID</label>
     <div class="col-sm-9">
       <p class="id form-control-static">{{motor._id}} {{#if motor.migratedId}}(migrated {{motor.migratedId}}){{/if}}</p>
+      <input type="hidden" name="_id" value="{{motor._id}}">
     </div>
   </div>
   {{/unless}}
@@ -39,7 +40,7 @@ No changes to save.
   <div class="form-group">
     <label for="_relatedMfr" class="col-sm-3 control-label">Related Mfr.</label>
     <div class="col-sm-9">
-      <select class="form-control" name="_relatedMfr" required>
+      <select class="form-control" name="_relatedMfr">
       <option></option>
       {{#each manufacturers}}
         <option value="{{_id}}" {{#sameId ../motor._relatedMfr _id}}selected{{/sameId}}>{{name}}</option>
@@ -118,8 +119,8 @@ No changes to save.
   <div class="form-group">
     <label for="certDate" class="col-sm-3 control-label">Cert. Date</label>
     <div class="col-sm-9">
-      <input type="text" class="form-control" name="certDate"
-             value="{{{motor.certDate}}}">
+      <input type="date" class="form-control" name="certDate"
+             value="{{{formatDate motor.certDate 'iso'}}}">
       <span class="help-block with-errors"></span>
     </div>
   </div>
@@ -132,6 +133,119 @@ No changes to save.
     </div>
   </div>
 
+  <div class="form-group">
+    <label for="diameter" class="col-sm-3 control-label">Diameter</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="diameter"
+               step="0.1" min="6" required
+               value="{{{motor.diameter}}}">
+        <span class="input-group-addon">mm</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="length" class="col-sm-3 control-label">Length</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="length"
+               min="10" required
+               value="{{{motor.length}}}">
+        <span class="input-group-addon">mm</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="avgThrust" class="col-sm-3 control-label">Avg. Thrust</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="avgThrust"
+               step="0.01" min="0.01" required
+               value="{{{motor.avgThrust}}}">
+        <span class="input-group-addon">N</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="maxThrust" class="col-sm-3 control-label">Max. Thrust</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="maxThrust"
+               step="0.01" min="0.1"
+               value="{{{motor.maxThrust}}}">
+        <span class="input-group-addon">N</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="totalImpulse" class="col-sm-3 control-label">Total Impulse</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="totalImpulse"
+               step="0.01" min="0.1" required
+               value="{{{motor.totalImpulse}}}">
+        <span class="input-group-addon">Ns</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="burnTime" class="col-sm-3 control-label">Burn Time</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="burnTime"
+               step="0.01" min="0.1" required
+               value="{{{motor.burnTime}}}">
+        <span class="input-group-addon">s</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="totalWeight" class="col-sm-3 control-label">Total Weight</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="totalWeight"
+               min="1"
+               value="{{{motor.totalWeight}}}">
+        <span class="input-group-addon">g</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="propellantWeight" class="col-sm-3 control-label">Propellant Weight</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="number" class="form-control" name="propellantWeight"
+               min="1"
+               value="{{{motor.propellantWeight}}}">
+        <span class="input-group-addon">g</span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="caseInfo" class="col-sm-3 control-label">Case Info</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="caseInfo"
+             value="{{{motor.caseInfo}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="propellantInfo" class="col-sm-3 control-label">Propellant Info</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="propellantInfo"
+             value="{{{motor.propellantInfo}}}">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
   <div class="form-group website">
     <label for="dataSheet" class="col-sm-3 control-label">Data Sheet</label>
     <div class="col-sm-9">
@@ -143,6 +257,19 @@ No changes to save.
       <span class="help-block with-errors"></span>
     </div>
   </div>
+
+  <div class="form-group">
+    <label for="availability" class="col-sm-3 control-label">Availability</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="availability" required>
+        <option></option>
+        {{#each schema.MotorAvailabilityEnum}}
+        <option {{#equal ../motor.availability this}}selected{{/equal}}>{{this}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 form-submit">
       <button type="submit" class="btn btn-primary">Submit</button>

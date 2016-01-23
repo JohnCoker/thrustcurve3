@@ -425,9 +425,17 @@ router.get(['/updates.jsp'], function(req, res, next) {
  * /motors/:mfr/:desig/edit.html
  * Edit motor info, renders with motors/edit.hbs template.
  */
+function toMMGS(v) {
+  if (v == null || typeof v != 'number' || isNaN(v))
+    return;
+  else
+    return v * 1000;
+}
+
 router.get('/motors/:mfr/:desig/edit.html', function(req, res, next) {
   metadata.get(req, function(caches) {
     if (!req.params.mfr || req.params.mfr == '-') {
+      // create a new motor without a manufacturer
       res.render('motors/edit', locals(defaults, {
         title: 'New Motor',
         motor: { availability: 'regular' },
@@ -445,21 +453,29 @@ router.get('/motors/:mfr/:desig/edit.html', function(req, res, next) {
       if (manufacturer != null) {
         req.db.Motor.findOne({ _manufacturer: manufacturer._id, designation: req.params.desig }, req.success(function(motor) {
           if (motor) {
+            // convert to mm/g/s
+            motor.diameter = toMMGS(motor.diameter);
+            motor.length = toMMGS(motor.length);
+            motor.totalWeight = toMMGS(motor.totalWeight);
+            motor.propellantWeight = toMMGS(motor.propellantWeight);
+
+            // edit this data
             res.render('motors/edit', locals(defaults, {
               title: 'Edit ' + motor.designation,
               manufacturer: manufacturer,
               motor: motor,
               isEdit: true,
               submitLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html',
-              isCreated: req.query.results == 'created',
-              isSaved: req.query.results == 'saved',
-              isUnchanged: req.query.results == 'unchanged',
+              isCreated: req.query.result == 'created',
+              isSaved: req.query.result == 'saved',
+              isUnchanged: req.query.result == 'unchanged',
               manufacturers: caches.manufacturers,
               certOrgs: caches.certOrgs,
               allMotors: caches.allMotors,
               schema: req.db.schema
             }));
           } else {
+            // create a new motor for this manufacturer
             res.render('motors/edit', locals(defaults, {
               title: 'New Motor',
               manufacturer: manufacturer,
@@ -480,7 +496,184 @@ router.get('/motors/:mfr/:desig/edit.html', function(req, res, next) {
   });
 });
 
+function parseValue(s) {
+  var n;
+  if (s == null)
+    return;
+  s = s.trim();
+  if (s === '')
+    return;
+
+  n = parseFloat(s);
+  if (isNaN(n) || n <= 0)
+    return;
+  else
+    return Math.round(n * 100) / 100;
+}
+
+function parseMMGS(s) {
+  var n;
+  if (s == null)
+    return;
+  s = s.trim();
+  if (s === '')
+    return;
+
+  n = parseFloat(s);
+  if (isNaN(n) || n <= 0)
+    return;
+  else
+    return Math.round(n * 10) / 10000;
+}
+
+function doSubmit(req, res, motor) {
+  var isNew = false, isChanged = false;
+
+  if (motor == null) {
+    motor = {};
+    isNew = true;
+  }
+
+  // non-numeric values
+  [ '_manufacturer',
+    '_relatedMfr',
+    '_certOrg',
+    'designation',
+    'altDesignation',
+    'commonName',
+    'altName',
+    'impulseClass',
+    'type',
+    'delays',
+    'certDesignation',
+    'caseInfo',
+    'propellantInfo',
+    'dataSheet',
+    'availability',
+  ].forEach(function(p) {
+    var s;
+    if (req.body.hasOwnProperty(p)) {
+      s = req.body[p].trim();
+      if (s === '') {
+        if (motor[p] != null) {
+          motor[p] = undefined;
+          isChanged = true;
+        }
+      } else {
+        if (motor[p] == null || req.body[p] != motor[p].toString()) {
+          motor[p] = req.body[p];
+          isChanged = true;
+        }
+      }
+    }
+  });
+
+  // date values
+  [ 'certDate',
+  ].forEach(function(p) {
+    var s, d;
+    if (req.body.hasOwnProperty(p)) {
+      s = req.body[p].trim();
+      if (s === '') {
+        if (motor[p] != null) {
+          motor[p] = undefined;
+          isChanged = true;
+        }
+      } else {
+        d = new Date(s);
+        if (motor[p] == null || d.toISOString() != d.toISOString()) {
+          motor[p] = d;
+          isChanged = true;
+        }
+      }
+    }
+  });
+
+  // numeric values
+  [ 'avgThrust',
+    'maxThrust',
+    'totalImpulse',
+    'burnTime',
+    'isp',
+  ].forEach(function(p) {
+    var s, n;
+    if (req.body.hasOwnProperty(p)) {
+      s = req.body[p].trim();
+      if (s === '') {
+        if (motor[p] != null) {
+          motor[p] = undefined;
+          isChanged = true;
+        }
+      } else {
+        n = parseValue(s);
+        if (n != motor[p]) {
+          motor[p] = n;
+          isChanged = true;
+        }
+      }
+    }
+  });
+
+  // numeric values, convert mm/g/s
+  [ 'diameter',
+    'length',
+    'totalWeight',
+    'propellantWeight',
+  ].forEach(function(p) {
+    var s, n;
+    if (req.body.hasOwnProperty(p)) {
+      s = req.body[p].trim();
+      if (s === '') {
+        if (motor[p] != null) {
+          motor[p] = undefined;
+          isChanged = true;
+        }
+      } else {
+        n = parseMMGS(s);
+        if (n != motor[p]) {
+          motor[p] = n;
+          isChanged = true;
+        }
+      }
+    }
+  });
+
+  req.db.Manufacturer.findOne({ _id: motor._manufacturer }, req.success(function(manufacturer) {
+    var url;
+    if (manufacturer)
+      url = '/motors/' + encodeURIComponent(manufacturer.abbrev) + '/' + encodeURIComponent(motor.designation) + '/edit.html';
+    else
+      url = '/motors/-/' + encodeURIComponent(motor.designation) + '/edit.html';
+    if (isNew) {
+      req.db.Motor.create(new req.db.Motor(motor), req.success(function(updated) {
+        res.redirect(303, url + '?result=created');
+      }));
+    } else {
+      if (isChanged) {
+        motor.save(req.success(function(updated) {
+          res.redirect(303, url + '?result=saved');
+        }));
+      } else {
+        res.redirect(303, url + '?result=unchanged');
+      }
+    }
+  }));
+}
+
 router.post('/motors/:mfr/:desig/edit.html', function(req, res, next) {
+  console.log(req.body);
+  if (req.db.isId(req.body._id)) {
+    // edit existing motor
+    req.db.Motor.findOne({ _id: req.body._id }, req.success(function(motor) {
+      if (motor == null)
+        res.redirect(303, searchLink);
+      else
+        doSubmit(req, res, motor);
+    }));
+  } else {
+    // add new motor
+    doSubmit(req, res);
+  }
 });
 
 module.exports = router;

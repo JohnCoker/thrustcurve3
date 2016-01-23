@@ -246,7 +246,7 @@ var tables = [
   {
     name: 'contributor',
     model: schema.ContributorModel,
-    filter: "exists(select * from simfile where contributor_id = id) or exists(select * from rocket where contributor_id = id)",
+    filter: "exists(select * from simfile where contributor_id = contributor.id) or exists(select * from rocket where contributor_id = contributor.id)",
     columns: [
       {
         name: 'rep_mfr_id',

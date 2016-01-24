@@ -63,10 +63,63 @@ function getMotor(req, res, parents, redirect, cb) {
   }));
 }
 
+function recordView(req, motor, source) {
+  // don't record bot views
+  if (req.isBot())
+    return;
+
+  // don't record multiple views in same session
+  if (req.session.motorsViewed == null)
+    req.session.motorsViewed = [];
+  else if (req.session.motorsViewed.indexOf(motor._id.toString()) >= 0)
+    return;
+  req.session.motorsViewed.push(motor._id.toString());
+  req.session.touch();
+
+  // guess source if possible
+  if (source == null) {
+    if (req.query && req.query.source && req.db.schema.MotorViewSourceEnum.indexOf(req.query.source) >= 0)
+      // check query parameter (from redirect)
+      source = req.query.source;
+    else {
+      // check referring page to determine source
+      var ref = req.header('Referer');
+      if (ref) {
+        if (/manufacturers\/.*motors\.html/.test(ref))
+          source = 'manufacturer';
+        else if (/motors\/search\.html/.test(ref))
+          source = 'search';
+        else if (/motors\/guide\.html/.test(ref))
+          source = 'guide';
+        else if (/motors\/browser\.html/.test(ref))
+          source = 'browser';
+        else if (/motors\/popular\.html/.test(ref))
+          source = 'popular';
+        else if (/mystuff\/favorites\.html/.test(ref))
+          source = 'favorite';
+        else if (/updates\.html/.test(ref))
+          source = 'updates';
+      }
+    }
+  }
+
+  // record this view
+  var view = new req.db.MotorView({
+    _motor: motor._id,
+    _contributor: req.session.contributorId,
+    source: source
+  });
+  req.db.MotorView.create(view);
+}
+
 router.get('/motors/:mfr/:desig/', function(req, res, next) {
   getMotor(req, res, true, true, function(motor, manufacturer, classCount) {
     req.db.SimFile.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).populate('_contributor').exec(req.success(function(simfiles) {
       req.db.MotorNote.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).populate('_contributor').exec(req.success(function(notes) {
+        // record the motor view
+        recordView(req, motor);
+
+        // render the motor details
         res.render('motors/details', locals(defaults, {
           title: manufacturer.abbrev + ' ' + motor.designation,
           manufacturer: manufacturer,
@@ -307,8 +360,11 @@ function doSearch(req, res, params) {
     }
 
     // always create an availability parameter
-    if (!params.hasOwnProperty('availability'))
+    if (!params.hasOwnProperty('availability')) {
       params.availability = 'available';
+      if (hasParams)
+        query.availability = { $in: req.db.schema.MotorAvailableEnum };
+    }
 
     if (failed) {
       res.render('motors/search', locals(defaults, {
@@ -325,8 +381,13 @@ function doSearch(req, res, params) {
       // perform search
       req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } }).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
         if (results.length == 1) {
+          // record this as a search view
+          recordView(req, results[0], 'search');
+
+          // redirect to single result
           res.redirect(303, req.helpers.motorLink(results[0]));
         } else {
+          // show multiple search results
           res.render('motors/search', locals(defaults, {
             title: 'Search Results',
             allMotors: all,

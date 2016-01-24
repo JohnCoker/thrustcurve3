@@ -32,6 +32,9 @@ Object.freeze(SimFileFormatEnum);
 Object.freeze(SimFileDataSourceEnum);
 Object.freeze(SimFileLicenseEnum);
 
+var MotorViewSourceEnum = ['manufacturer', 'search', 'guide', 'browser', 'popular', 'favorite', 'updates'];
+Object.freeze(MotorViewSourceEnum);
+
 function schemaOptions(schema) {
   // touch updatedAt timestamp
   schema.pre('save', function(next) {
@@ -232,6 +235,18 @@ function makeRocketModel(mongoose) {
   return mongoose.model('Rocket', schema);
 }
 
+function makeMotorViewModel(mongoose) {
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
+    _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true, index: true },
+    _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', index: true },
+    source: { type: String, enum: MotorViewSourceEnum }
+  });
+  schemaOptions(schema);
+  return mongoose.model('MotorView', schema);
+}
+
 /**
  * <p>The <b>schema</b> module contains the Mongoose schema used by the site.
  * This is largely a copy of the previous MySQL schema, taking some advantage
@@ -340,6 +355,14 @@ module.exports = {
   RocketModel: makeRocketModel,
 
   /**
+   * Produce a Mongoose model for the <em>motorViews</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
+  MotorViewModel: makeMotorViewModel,
+
+  /**
    * The legal values for Motor.type.
    * @member {string[]}
    */
@@ -375,4 +398,9 @@ module.exports = {
    */
   SimFileLicenseEnum: SimFileLicenseEnum,
 
+  /**
+   * The legal values for MotorView.source.
+   * @member {string[]}
+   */
+  MotorViewSourceEnum: MotorViewSourceEnum,
 };

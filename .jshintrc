@@ -6,5 +6,6 @@
   "strict": false,
   "undef": true,
   "unused": "vars",
-  "evil": "true"
+  "evil": "true",
+  "esnext": "true"
 }

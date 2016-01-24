@@ -87,9 +87,11 @@ thrustcurve3
 ├── bin
 ├── config
 ├── database
+│   ├── accesslog
 │   ├── migrate
 │   └── schema
 ├── lib
+│   ├── crawlers
 │   ├── errors
 │   ├── helpers
 │   ├── prefs

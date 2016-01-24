@@ -1,0 +1,19 @@
+{
+  "name": "crawlers",
+  "version": "1.0.0",
+  "description": "detect web robot user agents",
+  "main": "crawlers.js",
+  "scripts": {
+    "test": "jasmine-node spec",
+    "lint": "jshint *.js spec/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/lib/crawlers"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "0.0.2"
+  }
+}

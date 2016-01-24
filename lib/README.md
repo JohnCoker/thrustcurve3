@@ -2,6 +2,11 @@
 
 This directory contains shared utility code used by various other modules.
 
+## Crawlers
+
+The __crawlers__ module contains a small database of robot user agents which is
+consulted to determine if the current request is from a crawler/robot/spider.
+
 ## Errors
 
 The __errors__ module contains methods for formatting and reporting errors.

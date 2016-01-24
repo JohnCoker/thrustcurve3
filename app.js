@@ -4,20 +4,22 @@
  */
 'use strict';
 
-var process = require('process'),
-    mongoose = require('mongoose'),
-    express = require('express'),
-    exphbs = require('exphbs'),
-    path = require('path'),
-    favicon = require('serve-favicon'),
-    logger = require('morgan'),
-    cookieParser = require('cookie-parser'),
-    bodyParser = require('body-parser'),
-    morgan = require('morgan'),
-    favicon = require('serve-favicon'),
-    config = require('./config/server.js'),
-    schema = require('./database/schema'),
-    helpers = require('./lib/helpers');
+const process = require('process'),
+      mongoose = require('mongoose'),
+      express = require('express'),
+      exphbs = require('exphbs'),
+      path = require('path'),
+      favicon = require('serve-favicon'),
+      logger = require('morgan'),
+      cookieParser = require('cookie-parser'),
+      bodyParser = require('body-parser'),
+      morgan = require('morgan'),
+      session = require('express-session'),
+      SessionMongoStore = require('connect-mongo')(session),
+      config = require('./config/server.js'),
+      schema = require('./database/schema'),
+      crawlers = require('./lib/crawlers'),
+      helpers = require('./lib/helpers');
 
 // fail if initial connection is impossible
 mongoose.connect(config.mongoUrl, function(err) {
@@ -53,10 +55,20 @@ app.use(cookieParser());
 app.use(morgan('combined'));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: 'ThrustCurve.org',
+  resave: false,
+  saveUninitialized: true,
+  store: new SessionMongoStore({
+    mongooseConnection: mongoose.connection
+  })
+}));
 
 /*
- * Many of the routes need access to the database, so we add
- * some properties to the req instance.
+ * Many of the routes need access to the database and other stuff,
+ * so we add some properties to the req instance.
+ *
+ * isBot: test if this session is a known robot user agent.
  *
  * db: this object includes the Mongoose handle and various
  * instantiated models plus a few convenience functions.
@@ -84,6 +96,7 @@ var db = Object.create(null, {
   SimFile: { value: schema.SimFileModel(mongoose) },
   SimFileNote: { value: schema.SimFileNoteModel(mongoose) },
   Rocket: { value: schema.RocketModel(mongoose) },
+  MotorView: { value: schema.MotorViewModel(mongoose) },
   isId: { value: function(v) {
     if (v == null)
       return false;
@@ -91,6 +104,19 @@ var db = Object.create(null, {
   } }
 });
 app.use(function(req, res, next) {
+  // determine if this is a robot/crawler/spider
+  req.isBot = function() {
+    if (req.session.contributorId)
+      return false;
+
+    if (!req.session.hasOwnProperty("bot")) {
+      req.session.bot = crawlers.match(req.header('User-Agent'));
+      req.session.touch();
+    }
+    return req.session.bot;
+  };
+
+  // easy access to database state
   req.db = db;
   req.success = function(cb) {
     return function(err, result) {
@@ -121,7 +147,10 @@ app.use(function(req, res, next) {
       }
     };
   };
+
+  // add helpers directly
   req.helpers = helpers;
+
   next();
 });
 

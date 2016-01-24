@@ -3,6 +3,11 @@
 This directory contains the code that interfaces with the back-end database that stores all the
 data that powers the site.
 
+## Access Log
+
+The __accesslog__ module is a main program for loading Apache access logs from the old
+web site as entries in the MotorView model, which is used to track popular motors.
+
 ## Migrate
 
 The __migrate__ module is a main program for transferring the ThrustCurve.org

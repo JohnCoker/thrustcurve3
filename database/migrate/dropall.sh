@@ -10,4 +10,6 @@ db.motornotes.drop()
 db.simfiles.drop()
 db.simfilenotes.drop()
 db.rockets.drop()
+db.motorviews.drop()
+db.motorrankings.drop()
 _EOF_

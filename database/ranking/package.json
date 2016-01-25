@@ -1,21 +1,20 @@
 {
-  "name": "schema",
+  "name": "ranking",
   "version": "1.0.0",
-  "description": "MongoDB schema for ThrustCurve.org",
-  "main": "schema.js",
+  "description": "motor popularity ranking calculation",
+  "main": "ranking.js",
   "scripts": {
     "test": "jasmine-node spec",
     "lint": "jshint *.js spec/*.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JohnCoker/thrustcurve3/database/schema"
+    "url": "https://github.com/JohnCoker/thrustcurve3/database/ranking"
   },
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^2.1.2",
-    "mongoose": "^4.3.3",
+    "mongoose": "^4.3.7",
     "mongoose-dateonly": "^1.0.3"
   }
 }

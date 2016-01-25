@@ -6,6 +6,7 @@
 
 var express = require('express'),
     router = express.Router(),
+    ranking = require('../database/ranking'),
     metadata = require('./metadata.js'),
     locals = require('./locals.js');
 
@@ -466,7 +467,56 @@ router.get(['/missingdata.jsp'], function(req, res, next) {
  * Most popular motors, renders with motors/popular.hbs template.
  */
 router.get('/motors/popular.html', function(req, res, next) {
-  res.render('motors/popular', locals(defaults, 'Popular Motors'));
+  ranking.build(req.db, req.success(function(ranking) {
+    var motorIds = [],
+        p, i, j;
+
+    // collect all motors needed
+    p = ranking.overall;
+    for (i = 0; i < p.motors.length; i++) {
+      if (motorIds.indexOf(p.motors[i]._motor) < 0)
+        motorIds.push(p.motors[i]._motor);
+    }
+    ranking.categories.forEach(function(p) {
+      for (i = 0; i < p.motors.length; i++) {
+        if (motorIds.indexOf(p.motors[i]._motor) < 0)
+          motorIds.push(p.motors[i]._motor);
+      }
+    });
+
+    // get all the motors in one query
+    req.db.Motor.find({ _id: { $in: motorIds } }).populate('_manufacturer').exec(req.success(function(motors) {
+      // populate motors manually
+      var get = function(id) {
+        if (id == null)
+          return;
+        id = id.toString();
+        for (var k = 0; k < motors.length; k++) {
+          if (motors[k]._id.toString() == id)
+            return motors[k];
+        }
+        return id;
+      };
+      p = ranking.overall;
+      for (i = 0; i < p.motors.length; i++) {
+        p.motors[i].motor = get(p.motors[i]._motor);
+        p.motors[i].rank = i + 1;
+      }
+      ranking.categories.forEach(function(p) {
+        for (i = 0; i < p.motors.length; i++) {
+          p.motors[i].motor = get(p.motors[i]._motor);
+          p.motors[i].rank = i + 1;
+        }
+      });
+
+      res.render('motors/popular', locals(defaults, {
+        title: 'Popular Motors',
+        asOf: ranking.asOf,
+        overall: ranking.overall,
+        categories: ranking.categories,
+      }));
+    }));
+  }));
 });
 
 

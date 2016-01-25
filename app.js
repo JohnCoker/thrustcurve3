@@ -97,6 +97,7 @@ var db = Object.create(null, {
   SimFileNote: { value: schema.SimFileNoteModel(mongoose) },
   Rocket: { value: schema.RocketModel(mongoose) },
   MotorView: { value: schema.MotorViewModel(mongoose) },
+  MotorRanking: { value: schema.MotorRankingModel(mongoose) },
   isId: { value: function(v) {
     if (v == null)
       return false;

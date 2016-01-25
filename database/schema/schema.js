@@ -6,6 +6,8 @@
 
 var IdRegex = /^[0-9a-f]{24}$/i;
 
+var DateOnly;
+
 // https://gist.github.com/dperini/729294
 var UrlRegex = /^(?:(?:https?):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i;
 
@@ -34,6 +36,12 @@ Object.freeze(SimFileLicenseEnum);
 
 var MotorViewSourceEnum = ['manufacturer', 'search', 'guide', 'browser', 'popular', 'favorite', 'updates'];
 Object.freeze(MotorViewSourceEnum);
+
+function dateOnly(mongoose) {
+  if (DateOnly == null)
+    DateOnly = require('mongoose-dateonly')(mongoose);
+  return DateOnly;
+}
 
 function schemaOptions(schema) {
   // touch updatedAt timestamp
@@ -89,7 +97,7 @@ function makeMotorModel(mongoose) {
     impulseClass: { type: String, required: true, uppercase: true, match: /^[A-O]$/ },
     type: { type: String, required: true, enum: MotorTypeEnum },
     delays: String,
-    certDate: Date,
+    certDate: dateOnly(mongoose),
     certDesignation: String,
     diameter: { type: Number, required: true, min: 0.006 },
     length: { type: Number, required: true, min: 0.010 },
@@ -247,6 +255,38 @@ function makeMotorViewModel(mongoose) {
   return mongoose.model('MotorView', schema);
 }
 
+function makeMotorRankingModel(mongoose) {
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
+    asOf: { type: dateOnly(mongoose), required: true, unique: true },
+    overall: {
+      trendAvg: { type: Number, required: true },
+      trendSD: { type: Number, required: true },
+      motors: [ {
+        _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true, index: true },
+        views: { type: Number, required: true, min: 1 },
+        trendRatio: { type: Number, required: true },
+        trendSigma: { type: Number, required: true }
+      } ]
+    },
+    categories: [ {
+      label: { type: String, required: true },
+      classes: { type: String, required: true, match: /^[A-O]+$/ },
+      trendAvg: { type: Number, required: true },
+      trendSD: { type: Number, required: true },
+      motors: [ {
+        _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true, index: true },
+        views: { type: Number, required: true, min: 1 },
+        trendRatio: { type: Number, required: true },
+        trendSigma: { type: Number, required: true }
+      } ],
+    } ]
+  });
+  schemaOptions(schema);
+  return mongoose.model('MotorRanking', schema);
+}
+
 /**
  * <p>The <b>schema</b> module contains the Mongoose schema used by the site.
  * This is largely a copy of the previous MySQL schema, taking some advantage
@@ -361,6 +401,14 @@ module.exports = {
    * @return {object} Mongoose model
    */
   MotorViewModel: makeMotorViewModel,
+
+  /**
+   * Produce a Mongoose model for the <em>motorRankings</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
+  MotorRankingModel: makeMotorRankingModel,
 
   /**
    * The legal values for Motor.type.

@@ -1,1 +1,67 @@
 <h1>{{title}}</h1>
+
+<p>
+What motors are hot?
+These top lists show you what other rocketeers are viewing over the last couple of months,
+especially during the last few weeks.
+First off, here are the top motors across the board and below that check out the top motors in each impulse group.
+</p>
+
+<table id="overall-list" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Motor</th>
+      <th>Type</th>
+      <th>Diameter</th>
+      <th>Views</th>
+      <th>Trend</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each overall.motors}}
+    <tr>
+      <td>{{rank}}</td>
+      <td><a href="{{motorLink motor._manufacturer motor}}">{{motor._manufacturer.abbrev}} {{motor.designation}}</td>
+      <td>{{motor.type}}</td>
+      <td>{{formatMMT motor.diameter}}</td>
+      <td>{{views}}</td>
+      <td>{{formatTrend trendSigma}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#overall-list');
+</script>
+
+{{#each categories}}
+<h2>Top {{capitalize label}} ({{classes}})</h2>
+<table id="{{label}}-list" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Motor</th>
+      <th>Type</th>
+      <th>Diameter</th>
+      <th>Views</th>
+      <th>Trend</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motors}}
+    <tr>
+      <td>{{rank}}</td>
+      <td><a href="{{motorLink motor._manufacturer motor}}">{{motor._manufacturer.abbrev}} {{motor.designation}}</td>
+      <td>{{motor.type}}</td>
+      <td>{{formatMMT motor.diameter}}</td>
+      <td>{{views}}</td>
+      <td>{{formatTrend trendSigma}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#{{label}}-list');
+</script>
+{{/each}}

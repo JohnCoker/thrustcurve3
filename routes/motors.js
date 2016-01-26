@@ -469,7 +469,7 @@ router.get(['/missingdata.jsp'], function(req, res, next) {
 router.get('/motors/popular.html', function(req, res, next) {
   ranking.build(req.db, req.success(function(ranking) {
     var motorIds = [],
-        p, i, j;
+        p, i;
 
     // collect all motors needed
     p = ranking.overall;

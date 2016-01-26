@@ -82,6 +82,10 @@ td.number {
 table.dataTable thead th.sorting:after {
   color: black;
 }
+table td img.trend {
+  width: 16px;
+  height: 16px;
+}
 
 form button,
 form a.btn {

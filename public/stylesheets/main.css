@@ -79,6 +79,9 @@ th.number,
 td.number {
   text-align: right;
 }
+.dataTable td.number {
+  padding-right: 1.25em;
+}
 table.dataTable thead th.sorting:after {
   color: black;
 }

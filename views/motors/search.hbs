@@ -132,7 +132,7 @@ results: {{length results}}
      <th>Designation</th>
      <th>Manufacturer</th>
      <th>Type</th>
-     <th>Diam</th>
+     <th class="number">Diam</th>
      <th class="number">Impulse</th>
      <th class="number hidden-xs">Avg Thr</th>
      <th class="number hidden-xs">Burn</th>
@@ -144,16 +144,16 @@ results: {{length results}}
       <td><a href="{{motorLink _manufacturer this}}">{{designation}}</td>
       <td>{{_manufacturer.abbrev}}</td>
       <td>{{type}}</td>
-      <td>{{formatMMT diameter}}</td>
-      <td class="number">{{formatImpulse totalImpulse}}</td>
-      <td class="number hidden-xs">{{formatForce avgThrust}}</td>
-      <td class="number hidden-xs">{{formatDuration burnTime}}</td>
+      <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+      <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
     </tr>
   {{/each}}
   </tbody>
 </table>
 <script type="text/javascript">
-setupTable('#result-list');
+setupTable('#result-list', true, [[4, 'asc']]);
 </script>
 {{/if}}
 

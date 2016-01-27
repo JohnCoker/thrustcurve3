@@ -12,9 +12,9 @@ First off, here are the top motors across the board and below that check out the
     <tr>
       <th>Rank</th>
       <th>Motor</th>
-      <th>Type</th>
-      <th>Diameter</th>
-      <th>Views</th>
+      <th class="hidden-xs">Type</th>
+      <th class="number hidden-xs">Diam</th>
+      <th class="number">Views</th>
       <th>Trend</th>
     </tr>
   </thead>
@@ -23,16 +23,16 @@ First off, here are the top motors across the board and below that check out the
     <tr>
       <td>{{rank}}</td>
       <td><a href="{{motorLink motor._manufacturer motor}}">{{motor._manufacturer.abbrev}} {{motor.designation}}</td>
-      <td>{{motor.type}}</td>
-      <td>{{formatMMT motor.diameter}}</td>
-      <td>{{views}}</td>
-      <td>{{formatTrend trendSigma}}</td>
+      <td class="hidden-xs">{{motor.type}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort diameter}}">{{formatMMT motor.diameter}}</td>
+      <td class="number">{{views}}</td>
+      <td data-sort="{{formatSort trendSigma}}">{{formatTrend trendSigma}}</td>
     </tr>
   {{/each}}
   </tbody>
 </table>
 <script type="text/javascript">
-setupTable('#overall-list');
+setupTable('#overall-list', [[0,'asc']]);
 </script>
 
 {{#each categories}}
@@ -42,9 +42,9 @@ setupTable('#overall-list');
     <tr>
       <th>Rank</th>
       <th>Motor</th>
-      <th>Type</th>
-      <th>Diameter</th>
-      <th>Views</th>
+      <th class="hidden-xs">Type</th>
+      <th class="number hidden-xs">Diam</th>
+      <th class="number">Views</th>
       <th>Trend</th>
     </tr>
   </thead>
@@ -53,15 +53,15 @@ setupTable('#overall-list');
     <tr>
       <td>{{rank}}</td>
       <td><a href="{{motorLink motor._manufacturer motor}}">{{motor._manufacturer.abbrev}} {{motor.designation}}</td>
-      <td>{{motor.type}}</td>
-      <td>{{formatMMT motor.diameter}}</td>
-      <td>{{views}}</td>
-      <td>{{formatTrend trendSigma}}</td>
+      <td class="hidden-xs">{{motor.type}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort diameter}}">{{formatMMT motor.diameter}}</td>
+      <td class="number">{{views}}</td>
+      <td data-sort="{{formatSort trendSigma}}">{{formatTrend trendSigma}}</td>
     </tr>
   {{/each}}
   </tbody>
 </table>
 <script type="text/javascript">
-setupTable('#{{label}}-list');
+setupTable('#{{label}}-list', [[0,'asc']]);
 </script>
 {{/each}}

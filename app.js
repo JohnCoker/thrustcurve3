@@ -35,6 +35,7 @@ var index = require('./routes/index'),
     info = require('./routes/info'),
     motors = require('./routes/motors'),
     manufacturers = require('./routes/manufacturers'),
+    simfiles = require('./routes/simfiles'),
     contributors = require('./routes/contributors'),
     mystuff = require('./routes/mystuff');
 
@@ -159,6 +160,7 @@ app.use(function(req, res, next) {
 app.use('/', index);
 app.use('/', info);
 app.use('/', motors);
+app.use('/', simfiles);
 app.use('/', manufacturers);
 app.use('/', contributors);
 app.use('/', mystuff);

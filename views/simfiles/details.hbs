@@ -1,0 +1,157 @@
+<h1>{{title}}</h1>
+
+<div class="row">
+  <!-- left col -->
+  <div class="col-md-6">
+    <div role="form" class="form-horizontal form-condensed">
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Motor</label>
+        <div class="col-sm-6">
+          <p class="form-control-static"><a href="{{motorLink motor}}">{{motor._manufacturer.abbrev}} {{motor.designation}}</a></p>
+        </div>
+      </div>
+
+      {{#if simfile._contributor}}
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Contributor</label>
+        <div class="col-sm-6">
+          <p class="form-control-static"><a href="{{contributorLink simfile._contributor}}">{{simfile._contributor.name}}</a></p>
+        </div>
+      </div>
+      {{/if}}
+    
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Data Format</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{simfile.format}}</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Data Source</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{simfile.dataSource}}</p>
+        </div>
+      </div>
+
+      {{#if simfile.license}}
+      <div class="form-group">
+        <label class="col-sm-6 control-label">License</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{simfile.license}}</p>
+        </div>
+      </div>
+      {{/if}}
+
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Submitted</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatDate simfile.createdAt}}</p>
+        </div>
+      </div>
+      {{#updatedLater simfile}}
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Last Updated</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatDate simfile.updatedAt}}</p>
+        </div>
+      </div>
+      {{/updatedLater}}
+
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Download</label>
+        <div class="col-sm-6">
+          <p class="form-control-static"><a href="{{downloadLink}}">download</a></p>
+        </div>
+      </div>
+    </div>
+  </div> <!-- left col -->
+
+  <!-- right col -->
+  <div class="col-md-6">
+    <table class="comparison table table-condensed">
+      <thead>
+        <tr>
+         <th>&nbsp;</th>
+         <th>This File</th>
+         <th>Certified</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Diameter</th>
+          <td>{{formatMMT info.diameter}}</td>
+          <td>{{formatMMT motor.diameter}}</td>
+        </tr>
+        <tr>
+          <th>Length</th>
+          <td>{{formatLength info.length}}</td>
+          <td>{{formatLength motor.length}}</td>
+        </tr>
+        <tr>
+          <th>Prop. Weight</th>
+          <td>{{formatMass info.propellantWeight}}</td>
+          <td>{{formatMass motor.propellantWeight}}</td>
+        </tr>
+        <tr>
+          <th>Total Weight</th>
+          <td>{{formatMass info.totalWeight}}</td>
+          <td>{{formatMass motor.totalWeight}}</td>
+        </tr>
+        <tr>
+          <th>Avg. Thrust</th>
+          <td>{{formatForce stats.avgThrust}}</td>
+          <td>{{formatForce motor.avgThrust}}</td>
+        </tr>
+        <tr>
+          <th>Max. Thrust</th>
+          <td>{{formatForce stats.maxThrust}}</td>
+          <td>{{formatForce motor.maxThrust}}</td>
+        </tr>
+        <tr>
+          <th>Total Impulse</th>
+          <td>{{formatImpulse stats.totalImpulse}}</td>
+          <td>{{formatImpulse motor.totalImpulse}}</td>
+        </tr>
+        <tr>
+          <th>Burn Time</th>
+          <td>{{formatDuration stats.burnTime}}</td>
+          <td>{{formatDuration motor.burnTime}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div> <!-- row -->
+
+{{#if editLink}}
+<p>
+<a href="{{editLink}}">Edit this data file</a>
+or
+<a href="{{deleteLink}}">delete it entirely</a>.
+</p>
+{{/if}}
+
+<a name="notes"></a>
+<h2>File Notes</h2>
+
+{{#if notes}}
+<table id="note-list" class="table table-bordered notes">
+  {{#each notes}}
+    <tr data-id="{{_id}}">
+      <th class="subject">{{subject}}</a></td>
+      <th><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>
+      <th>{{formatDate updatedAt}}</td>
+    </tr>
+    <tr class="content">
+      <td colspan="3">{{content}}</td>
+    </tr>
+  {{/each}}
+</table>
+{{/if}}
+
+<p>
+Do you have a comment on this file?
+Please <a href="{{simfileLink simfile}}/note.html">add a note</a>.
+</p>
+

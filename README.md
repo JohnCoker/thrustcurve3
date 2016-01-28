@@ -112,7 +112,8 @@ thrustcurve3
     ├── layouts
     ├── manufacturers
     ├── motors
-    └── mystuff
+    ├── mystuff
+    └── simfiles
 ```
 
 

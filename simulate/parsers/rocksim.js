@@ -24,12 +24,27 @@ function parse(data, error) {
 
   // find the engine element
   if (xml.root.name == 'engine-database') {
-    if (xml.root.children.length != 1 || xml.root.children[0].name != 'engine-list' ||
-        xml.root.children[0].children.length != 1 || xml.root.children[0].children[0].name != 'engine') {
-      error(errors.ROCKSIM_WRONG_DOC, 'expected single engine element in engine-database');
+    if (xml.root.children.length != 1 || xml.root.children[0].name != 'engine-list') {
+      error(errors.ROCKSIM_WRONG_DOC, 'expected single engine-list element in engine-database');
       return;
     }
-    engine = xml.root.children[0].children[0];
+    value = xml.root.children[0];
+    n = 0;
+    for (i = 0; i < value.children.length; i++) {
+      if (value.children[i].name == 'engine') {
+	if (engine == null)
+	  engine = value.children[i];
+	n++;
+      } else {
+	error(errors.ROCKSIM_WRONG_DOC, 'unexpected element {1} in engine-list', value.children[i].name);
+      }
+      if (engine == null) {
+	error(errors.ROCKSIM_WRONG_DOC, 'missing engine element in engine-list');
+	return;
+      }
+      if (n > 1)
+	error(errors.MULTIPLE_MOTORS, '{1} engine elements in engine-list', n);
+    }
   } else if (xml.root.name == 'engine') {
     engine = xml.root;
   } else {
@@ -122,11 +137,22 @@ function parse(data, error) {
 
   // read data points from grandchild elements
   points = [];
-  if (engine.children.length != 1 || engine.children[0].name != 'data') {
-    error(errors.MISSING_POINTS, 'expected single data element in engine');
+  n = 0;
+  for (i = 0; i < engine.children.length; i++) {
+    if (engine.children[i].name == 'data') {
+      if (dataElt == null)
+	dataElt = engine.children[i];
+      n++;
+    } else if (engine.children[i].name != 'comments') {
+      error(errors.ROCKSIM_WRONG_DOC, 'unexpected element {1} in engine', engine.children[i].name);
+    }
+  }
+  if (dataElt == null) {
+    error(errors.MISSING_POINTS, 'missing data element in engine');
     return;
   }
-  dataElt = engine.children[0];
+  if (n > 1)
+    error(errors.ROCKSIM_WRONG_DOC, '{1} data elements in engine', n);
   lastTime = 0;
   for (i = 0; i < dataElt.children.length; i++) {
     elt = dataElt.children[i];

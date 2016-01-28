@@ -99,7 +99,9 @@ describe("parsers", function() {
     var parsed;
     it("call", function() {
       var data =
-          '; AT K550W\n' +
+          '; AeroTech K550W\n' +
+          '; converted from TMT test stand data 1998 (www.tripoli.org)\n' +
+          '; provided by ThrustCurve.org (www.thrustcurve.org)\n' +
           'K550W 54 410 0 0.919744 1.48736 AT\n' +
           '   0.065 604.264\n' +
           '   3.356 0.000\n';
@@ -142,6 +144,11 @@ describe("parsers", function() {
           '  <engine code="K550W" mfg="Aerotech" delays="6,10,14,18" dia="54." len="410." Type="reloadable" ' +
           'massFrac="58.11" Isp="184.68" peakThrust="853.13" initWt="1515.1" propWt="880.4" Itot="1594.46" ' +
           'avgThrust="455.561" burn-time="3.5">\n' +
+          '   <comments>\n' +
+          '; AeroTech K550W\n' +
+          '; converted from TMT test stand data 1998 (www.tripoli.org)\n' +
+          '; provided by ThrustCurve.org (www.thrustcurve.org)\n' +
+          '   </comments>\n' +
           '   <data>\n' +
           '    <eng-data f="628.15" t="0." m="880.4"/>\n' +
           '    <eng-data f="0." t="3.5" m="0."/>\n' +

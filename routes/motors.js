@@ -7,6 +7,7 @@
 var express = require('express'),
     router = express.Router(),
     ranking = require('../database/ranking'),
+    svg = require('../render/svg'),
     metadata = require('./metadata.js'),
     locals = require('./locals.js');
 
@@ -235,27 +236,31 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
   getMotor(req, res, false, false, function(primary) {
     // get the histogram for this impulse class and stat
     getHistogram(req, primary.impulseClass, stat, function(histogram) {
-      var graph, w, x, x1, y, i;
+      var image, w, x, x1, y, i;
 
       if (histogram == null) {
         res.status(404).send('too little data for ' + stat);
         return;
       }
 
-      graph = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" preserveAspectRatio="none">\n';
+      image = new svg.Image(100, 100);
 
       // draw baseline
-      graph += '  <line x1="0" y1="99.5" x2="100" y2="99.5" stroke="#ccc" stroke-width="1" />\n';
+      image.strokeStyle = '#ccc';
+      image.moveTo(0, 99.5);
+      image.lineTo(100, 99.5);
+      image.stroke();
 
       // graph histogram
       x = 0;
       w = (100 - (histogram.n - 1)) / histogram.n;
+      image.fillStyle = '#ccc';
       for (i = 0; i < histogram.n; i++) {
         x1 = x + w;
 
         if (histogram.buckets[i] > 0) {
           y = 2 + 98 * (histogram.buckets[i] / histogram.maxY);
-          graph += '  <rect x="' + x + '" y="' + (100 - y) + '" width="' + w + '" height="' + y + '" fill="#ccc" />\n';
+          image.fillRect(x, (100 - y), w, y);
         }
 
         x = x1 + 1;
@@ -263,12 +268,15 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
 
       // graph primary motor's value
       if (primary[stat] > 0) {
-        x = (100 * (primary[stat] - histogram.minX) / histogram.rangeX) - 0.5;
-        graph += '  <line x1="' + x + '" y1="1" x2="' + x + '" y2="99" stroke="#9e1a20" stroke-width="1" />\n';
+        image.strokeStyle = '#9e1a20';
+        image.beginPath();
+        x = 0.5 + (99 * (primary[stat] - histogram.minX) / histogram.rangeX);
+        image.moveTo(x, 1);
+        image.lineTo(x, 99);
+        image.stroke();
       }
 
-      graph += '</svg>';
-      res.status(200).type('svg').send(graph);
+      res.status(200).type(image.format).send(image.render());
     });
   });
 });

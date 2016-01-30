@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 300 200" preserveAspectRatio="none">
+ <rect x="25" y="25" width="275" height="150" stroke-width="1" stroke="black" fill="none" />
+ <text x="0" y="15" text-anchor="start" fill="orange">top/left</text>
+ <text x="300" y="15" text-anchor="end" fill="blue">top/right</text>
+ <text x="150" y="190" text-anchor="middle" fill="green">bottom/center</text>
+ <text x="15" y="100" transform="rotate(-90 15,100)" text-anchor="middle" fill="green">left vert</text>
+</svg>

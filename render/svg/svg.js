@@ -314,7 +314,7 @@ class Image {
     if (this._fontSize)
       this._text += ' font-size=' + attributeXML(this._fontSize);
     if (this._fontFamily)
-      this._text += ' font-size=' + attributeXML(this._fontFamily);
+      this._text += ' font-family=' + attributeXML(this._fontFamily);
 
     this._text += '>';
     this._text += contentXML(str);

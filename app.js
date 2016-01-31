@@ -153,6 +153,17 @@ app.use(function(req, res, next) {
   // add helpers directly
   req.helpers = helpers;
 
+  // render notfound (404) page
+  res.notfound = function() {
+    res.status(404);
+    res.render('notfound', {
+      title: 'Page Not Found',
+      layout: 'home',
+      url: req.url,
+      path: req.path
+    });
+  };
+
   next();
 });
 

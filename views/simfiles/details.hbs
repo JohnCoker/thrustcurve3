@@ -59,9 +59,15 @@
       {{/updatedLater}}
 
       <div class="form-group">
-        <label class="col-sm-6 control-label">Download</label>
+        <label class="col-sm-6 control-label">Data File</label>
         <div class="col-sm-6">
           <p class="form-control-static"><a href="{{downloadLink}}">download</a></p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Raw Data</label>
+        <div class="col-sm-6">
+          <p class="form-control-static"><a id="data-link" href="#data">view</a></p>
         </div>
       </div>
     </div>
@@ -124,12 +130,34 @@
 
 </div> <!-- row -->
 
+{{#if errors}}
+<h2>File Errors</h2>
+<p>
+{{#if parsed}}
+File is usabled, but has some problems:
+{{/if}}
+{{#unless parsed}}
+File couldn't be parsed and may be unusable:
+{{/unless}}
+</p>
+<ul>
+{{#each errors}}
+<li>{{message}}</li>
+{{/each}}
+</ul>
+{{/if}}
+
 {{#if editLink}}
 <p>
 <a href="{{editLink}}">Edit this data file</a>
 or
 <a href="{{deleteLink}}">delete it entirely</a>.
 </p>
+{{/if}}
+
+{{#if parsed}}
+<h2>Data Graph</h2>
+<img src="{{graphLink}}" alt="data graph">
 {{/if}}
 
 <a name="notes"></a>
@@ -155,3 +183,14 @@ Do you have a comment on this file?
 Please <a href="{{simfileLink simfile}}/note.html">add a note</a>.
 </p>
 
+<a name="data"></a>
+<div id="data" class="hidden-xs hidden-sm">
+<h2>Raw Data</h2>
+<pre class="data">{{simfile.data}}</pre>
+<script type="text/javascript">
+$('#data-link').click(function(e) {
+  console.log('#data-link');
+  $('#data').removeClass('hidden-xs hidden-sm').show();
+});
+</script>
+</div>

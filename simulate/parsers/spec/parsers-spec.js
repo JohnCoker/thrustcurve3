@@ -2,6 +2,75 @@ var errors = require("../../../lib/errors"),
     parsers = require("../parsers.js");
 
 describe("parsers", function() {
+  describe("AllFormats", function() {
+    it("member", function() {
+      expect(parsers.AllFormats).toBeDefined();
+      expect(Array.isArray(parsers.AllFormats)).toBe(true);
+      expect(parsers.AllFormats.length).toBeGreaterThan(1);
+    });
+  });
+
+  describe("formatInfo", function() {
+    it("function", function() {
+      expect(typeof parsers.formatInfo).toBe('function');
+    });
+    it("undefined", function() {
+      expect(parsers.formatInfo()).toBeUndefined();
+    });
+    it("unknown", function() {
+      expect(parsers.formatInfo('Unknown')).toBeUndefined('');
+    });
+    it("RASP", function() {
+      var info = parsers.formatInfo('Rasp');
+      expect(info).toBeDefined();
+      expect(info.format).toBe('RASP');
+      expect(info.extension).toBe('.eng');
+    });
+    it("RockSim", function() {
+      var info = parsers.formatInfo('rocksim');
+      expect(info).toBeDefined();
+      expect(info.format).toBe('RockSim');
+      expect(info.extension).toBe('.rse');
+    });
+  });
+
+  describe("guessFormat", function() {
+    it("function", function() {
+      expect(typeof parsers.guessFormat).toBe('function');
+    });
+    it("undefined", function() {
+      expect(parsers.guessFormat()).toBeUndefined();
+    });
+    it("empty", function() {
+      expect(parsers.guessFormat('')).toBeUndefined();
+    });
+    it("garbage", function() {
+      expect(parsers.guessFormat('#*(#@)$*@)$*)*$)(*@@!)#*!@#)@')).toBeUndefined();
+    });
+    it("RASP", function() {
+      var data =
+          '; AT K550W\n' +
+          'K550W 54 410 0 0.919744 1.48736 AT\n' +
+          '   0.065 604.264\n' +
+          '   3.356 0.000\n';
+      expect(parsers.guessFormat(data)).toBe('RASP');
+    });
+    it("RockSim", function() {
+      var data =
+          '<engine-database>\n' +
+          ' <engine-list>\n' +
+          '  <engine code="K550W">\n' +
+          '   <data>\n' +
+          '    <eng-data f="628.15" t="0."/>\n' +
+          '    <eng-data f="0." t="3.5"/>\n' +
+          '   </data>\n' +
+          '  </engine>\n' +
+          ' </engine-list>\n' +
+          '</engine-database>\n';
+      expect(parsers.guessFormat(data)).toBe('RockSim');
+    });
+  });
+
   describe("parseData", function() {
     it("function", function() {
       expect(typeof parsers.parseData).toBe('function');
@@ -51,43 +120,6 @@ describe("parsers", function() {
         parsed = parsers.parseData('invalid', 'lsdkjflsdjflasjflasdjfkladsjfdalkfa', function(msg) {});
       }).not.toThrow();
       expect(parsed).toBeUndefined();
-    });
-  });
-
-  describe("guessFormat", function() {
-    it("function", function() {
-      expect(typeof parsers.guessFormat).toBe('function');
-    });
-    it("undefined", function() {
-      expect(parsers.guessFormat()).toBeUndefined();
-    });
-    it("empty", function() {
-      expect(parsers.guessFormat('')).toBeUndefined();
-    });
-    it("garbage", function() {
-      expect(parsers.guessFormat('#*(#@)$*@)$*)*$)(*@@!)#*!@#)@')).toBeUndefined();
-    });
-    it("RASP", function() {
-      var data =
-          '; AT K550W\n' +
-          'K550W 54 410 0 0.919744 1.48736 AT\n' +
-          '   0.065 604.264\n' +
-          '   3.356 0.000\n';
-      expect(parsers.guessFormat(data)).toBe('RASP');
-    });
-    it("RockSim", function() {
-      var data =
-          '<engine-database>\n' +
-          ' <engine-list>\n' +
-          '  <engine code="K550W">\n' +
-          '   <data>\n' +
-          '    <eng-data f="628.15" t="0."/>\n' +
-          '    <eng-data f="0." t="3.5"/>\n' +
-          '   </data>\n' +
-          '  </engine>\n' +
-          ' </engine-list>\n' +
-          '</engine-database>\n';
-      expect(parsers.guessFormat(data)).toBe('RockSim');
     });
   });
 

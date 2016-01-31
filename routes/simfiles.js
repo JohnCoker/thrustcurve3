@@ -34,6 +34,32 @@ function getSimFile(req, res, cb) {
   }
 }
 
+function simFileName(simfile) {
+  var file, info;
+
+  // make the most descriptive name we can
+  if (!simfile._motor.designation) {
+    file = simfile._id.toString();
+  } else {
+    if (simfile._motor._manufacturer.abbrev)
+      file = simfile._motor._manufacturer.abbrev + '_';
+    else
+      file = '';
+    file += simfile._motor.designation;
+  }
+
+  // escape any file system magic characters
+  file = file.replace(/[\/:&<>()_]+/g, '_')
+             .replace(/_+$/, '');
+
+  // add appropriate file extension
+  info = parsers.formatInfo(simfile.format);
+  if (info != null)
+    file += info.extension;
+
+  return file;
+}
+
 /*
  * /simfiles/:id/
  * Specific file details, renders with simfiles/details.hbs template.
@@ -65,6 +91,7 @@ router.get('/simfiles/:id/', function(req, res, next) {
 	editLink: req.helpers.simfileLink(simfile) + 'edit.html',
 	deleteLink: req.helpers.simfileLink(simfile) + 'delete.html',
 	graphLink: req.helpers.simfileLink(simfile) + 'graph.svg',
+	downloadLink: req.helpers.simfileLink(simfile) + 'download/' + simFileName(simfile),
       }));
     }));
   });
@@ -150,6 +177,26 @@ router.get(/\/graphs\/simfile.*\.png/, function(req, res, next) {
     else
       res.status(404).send();
   }));
+});
+
+/*
+ * /simfiles/:id/download/:file
+ * Download the actual simulator file content as a file.
+ */
+router.get('/simfiles/:id/download/:file', function(req, res, next) {
+  getSimFile(req, res, function(simfile) {
+    var info, contentType;
+
+    info = parsers.formatInfo(simfile.format);
+    if (info != null)
+      contentType = info.mimeType;
+    if (!contentType)
+      contentType = 'text/plain';
+
+    res.type(contentType)
+       .header('Content-Disposition', 'attachment; filename=' + simFileName(simfile))
+       .send(simfile.data);
+  });
 });
 
 module.exports = router;

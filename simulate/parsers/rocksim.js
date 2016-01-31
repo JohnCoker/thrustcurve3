@@ -215,5 +215,8 @@ function parse(data, error) {
 
 module.exports = {
   format: 'RockSim',
+  extension: '.rse',
+  mimeType: 'text/x-rse+xml',
   parse: parse,
 };
+Object.freeze(module.exports);

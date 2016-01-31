@@ -125,5 +125,8 @@ function parse(data, error) {
 
 module.exports = {
   format: 'RASP',
+  extension: '.eng',
+  mimeType: 'text/x-rasp+plain',
   parse: parse,
 };
+Object.freeze(module.exports);

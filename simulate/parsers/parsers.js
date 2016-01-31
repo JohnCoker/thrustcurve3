@@ -4,26 +4,22 @@
  */
 'use strict';
 
-var errors = require('../../lib/errors'),
-    rasp = require('./rasp.js'),
-    rocksim = require('./rocksim.js');
+const errors = require('../../lib/errors'),
+      rasp = require('./rasp.js'),
+      rocksim = require('./rocksim.js');
 
-function parseData(format, data, error) {
-  if (format == null || typeof format != 'string' || format === '') {
-    error(errors.DATA_FILE_FORMAT, 'missing data file format to parse');
+const AllFormats = [ rasp, rocksim ];
+
+function formatInfo(format) {
+  var i;
+
+  if (format == null || format === '')
     return;
-  }
-  if (data == null || typeof data != 'string' || data === '') {
-    error(errors.DATA_FILE_EMPTY, 'missing data file data to parse');
-    return;
-  }
-  if (format.toLowerCase() == 'rasp')
-    return rasp.parse(data, error);
-  else if (format.toLowerCase() == 'rocksim')
-    return rocksim.parse(data, error);
-  else {
-    error(errors.DATA_FILE_FORMAT, 'unknown data file format "{1}" to parse', format);
-    return;
+
+  format = format.toLowerCase();
+  for (i = 0; i < AllFormats.length; i++) {
+    if (AllFormats[i].format.toLowerCase() == format || AllFormats[i].extension.substring(1) == format)
+      return AllFormats[i];
   }
 }
 
@@ -47,8 +43,24 @@ function guessFormat(data) {
     return rocksim.format;
 }
 
-var AllFormats = [ "RASP", "RockSim" ];
-Object.freeze(AllFormats);
+function parseData(format, data, error) {
+  if (format == null || typeof format != 'string' || format === '') {
+    error(errors.DATA_FILE_FORMAT, 'missing data file format to parse');
+    return;
+  }
+  if (data == null || typeof data != 'string' || data === '') {
+    error(errors.DATA_FILE_EMPTY, 'missing data file data to parse');
+    return;
+  }
+  if (format.toLowerCase() == 'rasp')
+    return rasp.parse(data, error);
+  else if (format.toLowerCase() == 'rocksim')
+    return rocksim.parse(data, error);
+  else {
+    error(errors.DATA_FILE_FORMAT, 'unknown data file format "{1}" to parse', format);
+    return;
+  }
+}
 
 /**
  * The <b>parsers</b> module contains code to parse simulator data files in various formats.
@@ -126,9 +138,25 @@ Object.freeze(AllFormats);
 module.exports = {
   /**
    * The supported file formats.
-   * @member {string[]}
+   * @member {object[]} info format information
+   * @member {string} info.format offical format name
+   * @member {string} info.extension file extension
+   * @member {string} info.mimeType MIME type for serving data
+   * @member {object} info.parse format-specific parser
    */
   AllFormats: AllFormats,
+
+  /**
+   * Get the information for a single format
+   * @function
+   * @param {string} format file format
+   * @return {object} info
+   * @return {string} info.format offical format name
+   * @return {string} info.extension file extension
+   * @return {string} info.mimeType MIME type for serving data
+   * @return {object} info.parse format-specific parser
+   */
+  formatInfo: formatInfo,
 
   /**
    * <p>Guess the file format from the contents.  All files are assumed to be text.</p>

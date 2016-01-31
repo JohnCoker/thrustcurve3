@@ -22,7 +22,7 @@ First off, here are the top motors across the board and below that check out the
   {{#each overall.motors}}
     <tr>
       <td>{{rank}}</td>
-      <td><a href="{{motorLink motor._manufacturer motor}}">{{motor._manufacturer.abbrev}} {{motor.designation}}</td>
+      <td><a href="{{motorLink motor._manufacturer motor}}">{{motorFullName motor}}</td>
       <td class="hidden-xs">{{motor.type}}</td>
       <td class="number hidden-xs" data-sort="{{formatSort diameter}}">{{formatMMT motor.diameter}}</td>
       <td class="number">{{views}}</td>
@@ -52,7 +52,7 @@ setupTable('#overall-list', [[0,'asc']]);
   {{#each motors}}
     <tr>
       <td>{{rank}}</td>
-      <td><a href="{{motorLink motor._manufacturer motor}}">{{motor._manufacturer.abbrev}} {{motor.designation}}</td>
+      <td><a href="{{motorLink motor._manufacturer motor}}">{{motorFullName motor}}</td>
       <td class="hidden-xs">{{motor.type}}</td>
       <td class="number hidden-xs" data-sort="{{formatSort diameter}}">{{formatMMT motor.diameter}}</td>
       <td class="number">{{views}}</td>

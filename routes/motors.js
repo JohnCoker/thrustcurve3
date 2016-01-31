@@ -123,7 +123,7 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
 
         // render the motor details
         res.render('motors/details', locals(defaults, {
-          title: manufacturer.abbrev + ' ' + motor.designation,
+          title: req.helpers.motorFullName(manufacturer, motor),
           manufacturer: manufacturer,
           motor: motor,
           simfiles: simfiles,

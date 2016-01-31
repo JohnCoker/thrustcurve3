@@ -141,7 +141,7 @@ results: {{length results}}
   <tbody>
   {{#each results}}
     <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
-      <td><a href="{{motorLink _manufacturer this}}">{{designation}}</td>
+      <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
       <td>{{_manufacturer.abbrev}}</td>
       <td>{{type}}</td>
       <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>

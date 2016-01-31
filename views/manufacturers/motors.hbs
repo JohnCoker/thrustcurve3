@@ -14,7 +14,7 @@
   <tbody>
   {{#each motors}}
     <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
-      <td><a href="{{motorLink ../manufacturer this}}">{{designation}}</td>
+      <td><a href="{{motorLink ../manufacturer this}}">{{motorDesignation this}}</td>
       <td>{{type}}</td>
       <td>{{formatMMT diameter}}</td>
       <td class="number">{{formatImpulse totalImpulse}}</td>

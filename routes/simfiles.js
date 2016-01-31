@@ -79,7 +79,7 @@ router.get('/simfiles/:id/', function(req, res, next) {
 
       // render the file details
       res.render('simfiles/details', locals(defaults, {
-	title: simfile._motor.designation + ' Data (' + simfile.format + ')',
+	title: req.helpers.motorDesignation(simfile._motor) + ' Data (' + simfile.format + ')',
 	simfile: simfile,
 	motor: simfile._motor,
 	notes: notes,
@@ -148,7 +148,7 @@ router.get('/simfiles/:id/graph.svg', function(req, res, next) {
       data: parsed,
       width: width,
       height: height,
-      title: simfile._motor._manufacturer.abbrev + ' ' + simfile._motor.designation + ' (' + simfile.format + ')',
+      title: req.helpers.motorFullName(simfile._motor) + ' (' + simfile.format + ')',
       unit: unit
     });
   });

@@ -12,5 +12,8 @@
     "url": "https://github.com/JohnCoker/thrustcurve3/render/svg"
   },
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "xml-parser": "^1.2.1"
+  }
 }

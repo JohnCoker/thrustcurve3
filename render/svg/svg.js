@@ -29,6 +29,16 @@ function attributeXML(s) {
 
 class Image {
   constructor(width, height) {
+    if (typeof width != 'number')
+      width = parseFloat(width);
+    if (isNaN(width) || width <= 0)
+      width = 1;
+
+    if (typeof height != 'number')
+      height = parseFloat(height);
+    if (isNaN(height) || height <= 0)
+      height = 1;
+
     this._width = width;
     this._height = height;
     this._fill = this._stroke = 'black';
@@ -37,7 +47,10 @@ class Image {
     this._fontSize = '10pt';
     this._fontFamily = 'Helvetica';
     this._path = [];
-    this._text = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">\n';
+    this._text = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1"' +
+                 ' width=' + attributeXML(width) + ' height=' + attributeXML(height) +
+                 ' viewBox=' + attributeXML('0 0 ' + width + ' ' + height) +
+                 ' preserveAspectRatio="none">\n';
   }
 
   static get format() {
@@ -77,6 +90,10 @@ class Image {
   }
 
   set lineWidth(v) {
+    if (typeof v != 'number')
+      v = parseFloat(v);
+    if (isNaN(v) || v <= 0)
+      v = 0.01;
     this._thickness = v;
   }
 
@@ -166,7 +183,10 @@ class Image {
   }
 
   strokeRect(x, y, width, height) {
-    this._text += ' <rect x=' + attributeXML(x) + ' y=' + attributeXML(y) + ' width=' + attributeXML(width) + ' height=' + attributeXML(height);
+    this._text += (' <rect x=' + attributeXML(x) +
+		   ' y=' + attributeXML(y) +
+		   ' width=' + attributeXML(width) +
+		   ' height=' + attributeXML(height));
 
     if (this._thickness > 0)
       this._text += ' stroke-width=' + attributeXML(this._thickness);
@@ -177,7 +197,10 @@ class Image {
   }
 
   fillRect(x, y, width, height) {
-    this._text += ' <rect x=' + attributeXML(x) + ' y=' + attributeXML(y) + ' width=' + attributeXML(width) + ' height=' + attributeXML(height);
+    this._text += (' <rect x=' + attributeXML(x) +
+		   ' y=' + attributeXML(y) +
+		   ' width=' + attributeXML(width) +
+		   ' height=' + attributeXML(height));
 
     if (this._fill)
       this._text +=' fill=' + attributeXML(this._fill);
@@ -185,24 +208,38 @@ class Image {
     this._text += ' stroke="none" />\n';
   }
 
-  strokeCircle(x, y, r) {
-    this._text += ' <circle cx=' + attributeXML(x) + ' cy=' + attributeXML(y) + ' r=' + attributeXML(r);
+  strokeCircle(x, y, r, title) {
+    this._text += (' <circle cx=' + attributeXML(x) +
+		   ' cy=' + attributeXML(y) +
+		   ' r=' + attributeXML(r));
 
     if (this._thickness > 0)
       this._text += ' stroke-width=' + attributeXML(this._thickness);
     if (this._stroke)
       this._text += ' stroke=' + attributeXML(this._stroke);
 
-    this._text += ' fill="none" />\n';
+    this._text += ' fill="none"';
+
+    if (title)
+      this._text += '><title>' + contentXML(title) + '</title></circle>\n';
+    else
+      this._text += ' />\n';
   }
 
-  fillCircle(x, y, r, color) {
-    this._text += ' <circle cx=' + attributeXML(x) + ' cy=' + attributeXML(y) + ' r=' + attributeXML(r);
+  fillCircle(x, y, r, title) {
+    this._text += (' <circle cx=' + attributeXML(x) +
+		   ' cy=' + attributeXML(y) +
+		   ' r=' + attributeXML(r));
 
     if (this._fill)
       this._text +=' fill=' + attributeXML(this._fill);
 
-    this._text += ' stroke="none" />\n';
+    this._text += ' stroke="none"';
+
+    if (title)
+      this._text += '><title>' + contentXML(title) + '</title></circle>\n';
+    else
+      this._text += ' />\n';
   }
 
   beginPath() {
@@ -301,7 +338,9 @@ class Image {
   }
 
   fillTextVert(str, x, y) {
-    this._text += ' <text x=' + attributeXML(x) + ' y=' + attributeXML(y) + ' transform="rotate(-90 ' + x + ',' + y + ')"';
+    this._text += (' <text x=' + attributeXML(x) +
+		   ' y=' + attributeXML(y) +
+		   ' transform="rotate(-90 ' + x + ',' + y + ')"');
 
     if (this._align)
       this._text += ' text-anchor=' + attributeXML(this._align);

@@ -92,7 +92,7 @@ function parse(data, error) {
         info.totalWeight = n / 1000;
     } else if (attr == 'propWt') {
       n = parseFloat(value);
-      if (isNaN(n) || n < 1)
+      if (isNaN(n) || n < 0.1)
         error(errors.INVALID_INFO, 'invalid propWt value "{1}"; expected grams', value);
       else
         info.propellantWeight = n / 1000;

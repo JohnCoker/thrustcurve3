@@ -111,6 +111,27 @@ describe("svg", function() {
       expect(xml.children.length).toBe(0);
     });
   });
+  describe("strokeCircle title", function() {
+    var image = new svg.Image(100, 100);
+    it("draw", function() {
+      image.strokeStyle = 'green';
+      image.lineWidth = 5;
+      image.strokeCircle(50, 55, 40, 'hello, world');
+    });
+    it("validate", function() {
+      var xml = oneLine(image);
+      expect(xml.name).toBe('circle');
+      expect(xml.attributes.cx).toBe('50');
+      expect(xml.attributes.cy).toBe('55');
+      expect(xml.attributes.r).toBe('40');
+      expect(xml.attributes.stroke).toBe('green');
+      expect(xml.attributes['stroke-width']).toBe('5');
+      expect(xml.attributes.fill).toBe('none');
+      expect(xml.children.length).toBe(1);
+      expect(xml.children[0].name).toBe('title');
+      expect(xml.children[0].content).toBe('hello, world');
+    });
+  });
   describe("fillCircle", function() {
     var image = new svg.Image(100, 100);
     it("draw", function() {
@@ -126,6 +147,25 @@ describe("svg", function() {
       expect(xml.attributes.fill).toBe('green');
       expect(xml.attributes.stroke).toBe('none');
       expect(xml.children.length).toBe(0);
+    });
+  });
+  describe("fillCircle title", function() {
+    var image = new svg.Image(100, 100);
+    it("draw", function() {
+      image.fillStyle = 'green';
+      image.fillCircle(50, 55, 40, 'hello, world');
+    });
+    it("validate", function() {
+      var xml = oneLine(image);
+      expect(xml.name).toBe('circle');
+      expect(xml.attributes.cx).toBe('50');
+      expect(xml.attributes.cy).toBe('55');
+      expect(xml.attributes.r).toBe('40');
+      expect(xml.attributes.fill).toBe('green');
+      expect(xml.attributes.stroke).toBe('none');
+      expect(xml.children.length).toBe(1);
+      expect(xml.children[0].name).toBe('title');
+      expect(xml.children[0].content).toBe('hello, world');
     });
   });
   describe("fillText", function() {
@@ -233,10 +273,17 @@ describe("svg", function() {
     it("render", function() {
       var text = image.render();
       expect(text).toBeDefined();
-      var lines = text.split(/\n\s*/);
-      expect(lines.length).toBe(7);
-      expect(lines[0]).toMatch(/^<svg/);
-      expect(lines[6]).toMatch(/<\/svg>\s*$/);
+      var xml = xmlparser(text).root;
+      expect(xml.name).toBe('svg');
+      expect(xml.attributes.width).toBe('250');
+      expect(xml.attributes.height).toBe('250');
+      expect(xml.attributes.viewBox).toBe('0 0 250 250');
+      expect(xml.children.length).toBe(5);
+      expect(xml.children[0].name).toBe('rect');
+      expect(xml.children[1].name).toBe('rect');
+      expect(xml.children[2].name).toBe('circle');
+      expect(xml.children[3].name).toBe('polyline');
+      expect(xml.children[4].name).toBe('polyline');
     });
   });
   describe("text", function() {
@@ -268,10 +315,15 @@ describe("svg", function() {
     it("render", function() {
       var text = image.render();
       expect(text).toBeDefined();
-      var lines = text.split(/\n\s*/);
-      expect(lines.length).toBe(7);
-      expect(lines[0]).toMatch(/^<svg/);
-      expect(lines[6]).toMatch(/<\/svg>\s*$/);
+      var xml = xmlparser(text).root;
+      expect(xml.name).toBe('svg');
+      expect(xml.attributes.width).toBe('300');
+      expect(xml.attributes.height).toBe('200');
+      expect(xml.attributes.viewBox).toBe('0 0 300 200');
+      expect(xml.children.length).toBe(5);
+      expect(xml.children[0].name).toBe('rect');
+      for (var i = 1; i < xml.children.length; i++)
+	expect(xml.children[i].name).toBe('text');
     });
   });
 });

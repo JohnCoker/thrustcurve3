@@ -157,7 +157,18 @@ or
 
 {{#if parsed}}
 <h2>Data Graph</h2>
-<img src="{{graphLink}}" alt="data graph">
+<object id="thrustcurve" type="image/svg+xml" data="{{graphLink}}">
+  Sadly, your browser doesn't support SVG images.
+</object>
+<script type="text/javascript">
+$(document).ready(function() {
+  setTimeout(function() {
+    svgPanZoom('#thrustcurve', {
+      controlIconsEnabled: true
+    });
+  }, 100);
+});
+</script>
 {{/if}}
 
 <a name="notes"></a>

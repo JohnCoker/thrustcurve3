@@ -344,8 +344,10 @@ function thrustCurve(spec) {
   for (i = 0; i < spec.data.points.length; i++) {
     x = layout.plotX(spec.data.points[i].time);
     y = layout.plotY(spec.data.points[i].thrust * yConvert);
-    image.fillCircle(x, y, 3);
-    image.strokeCircle(x, y, 3);
+    label = spec.data.points[i].time.toFixed(3) + 's' + ' ' +
+            spec.data.points[i].thrust.toFixed(3) + unit.label;
+    image.fillCircle(x, y, 3, label);
+    image.strokeCircle(x, y, 3, label);
   }
 
   return image;

@@ -32,7 +32,9 @@ First off, here are the top motors across the board and below that check out the
   </tbody>
 </table>
 <script type="text/javascript">
-setupTable('#overall-list', [[0,'asc']]);
+setupTable('#overall-list', {
+  order: [[0,'asc']]
+});
 </script>
 
 {{#each categories}}
@@ -62,6 +64,8 @@ setupTable('#overall-list', [[0,'asc']]);
   </tbody>
 </table>
 <script type="text/javascript">
-setupTable('#{{label}}-list', [[0,'asc']]);
+setupTable('#{{label}}-list', {
+  order: [[0,'asc']]
+});
 </script>
 {{/each}}

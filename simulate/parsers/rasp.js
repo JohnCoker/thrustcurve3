@@ -57,8 +57,8 @@ function parse(data, error) {
   else
     info.length /= 1000;
 
-  // propellant and total weights must be at least 1g
-  if (isNaN(info.propellantWeight) || info.propellantWeight < 0.001)
+  // propellant weight must be .1g and total weight must be 1g
+  if (isNaN(info.propellantWeight) || info.propellantWeight < 0.0001)
     error(errors.INVALID_INFO, 'invalid motor propellantWeight "{1}"; expected kilograms', fields[4]);
   if (isNaN(info.totalWeight) || info.totalWeight < 0.001)
     error(errors.INVALID_INFO, 'invalid motor totalWeight "{1}"; expected kilograms', fields[5]);

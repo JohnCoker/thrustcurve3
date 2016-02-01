@@ -139,7 +139,7 @@ function layoutGraph(info) {
 
   // lay out the X axis
   w = numberWidth(info.xMax.toFixed(fractionDigits(info.xMax)), em);
-  xAxis = layoutAxis(info.xMin, info.xMax, info.width / (w * 3));
+  xAxis = layoutAxis(info.xMin, info.xMax, info.width / (w * 4));
   i = xAxis.length - 1;
   w = numberWidth(xAxis[i].label, em);
   chart.right = info.width - w / 2;

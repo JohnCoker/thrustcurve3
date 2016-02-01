@@ -809,7 +809,6 @@ function doSubmit(req, res, motor) {
 }
 
 router.post('/motors/:mfr/:desig/edit.html', function(req, res, next) {
-  console.log(req.body);
   if (req.db.isId(req.body._id)) {
     // edit existing motor
     req.db.Motor.findOne({ _id: req.body._id }, req.success(function(motor) {

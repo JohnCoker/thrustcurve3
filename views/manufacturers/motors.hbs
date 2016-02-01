@@ -17,9 +17,9 @@
       <td><a href="{{motorLink ../manufacturer this}}">{{motorDesignation this}}</td>
       <td>{{type}}</td>
       <td>{{formatMMT diameter}}</td>
-      <td class="number">{{formatImpulse totalImpulse}}</td>
-      <td class="number hidden-xs">{{formatForce avgThrust}}</td>
-      <td class="number hidden-xs">{{formatDuration burnTime}}</td>
+      <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
     </tr>
   {{/each}}
   </tbody>
@@ -40,5 +40,8 @@ to include motors now out of production.
 {{/if}}
 
 <script type="text/javascript">
-setupTable('#motor-list');
+setupTable('#motor-list', {
+  order: [[3, 'asc']],
+  expand: true
+});
 </script>

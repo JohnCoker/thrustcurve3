@@ -1,9 +1,9 @@
 /**
  * Set up dataTables behavior on a rendered HTML table.
  * @function
- * @param {string} selector jQuery selector for table
+ * @param {string} selector CSS selector for table
  * @param {object} [options] optional config for DataTable plugin
- * @option.expand {boolean} expand double number of displayed rows for tall browser
+ * @param {boolean} [option.expand] expand double number of displayed rows for tall browser
  */
 function setupTable(selector, options) {
   $(document).ready(function() {

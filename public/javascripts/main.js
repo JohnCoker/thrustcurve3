@@ -7,9 +7,9 @@
  */
 function setupTable(selector, options) {
   $(document).ready(function() {
-    options || (options = {});
+    if (!options) options = {};
 
-     var table = $(selector),
+    var table = $(selector),
         pageLength = (options.expand && $(window).height() > 900) ? 20 : 10,
         numRows = table.find('tbody tr').length;
 
@@ -21,7 +21,7 @@ function setupTable(selector, options) {
       pageLength: pageLength,
       paging: numRows > pageLength,
       searching: numRows > pageLength
-    }, options)
+    }, options);
 
     table.DataTable(opts);
   });

@@ -1,1 +1,55 @@
-<h1>{{title}}</h1>
+<h1>Simulator Files</h1>
+
+<table id="simfiles" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Format</th>
+      <th>Motor</th>
+      <th>Contributor</th>
+      <th>Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each simfiles}}
+    <tr>
+      <td><a href="{{simfileLink this}}">{{format}}</td>
+      <td><a href="{{motorLink _motor}}">{{motorFullName _motor}}</a></td>
+      <td><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>
+      <td>{{formatDate updatedAt}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#simfiles', {
+  order: [[3, 'desc']]
+});
+</script>
+
+<h1>Motor Info</h1>
+
+<table id="motors" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Motor</th>
+      <th>Type</th>
+      <th class="number">Diam</th>
+      <th>Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motors}}
+    <tr>
+      <td><a href="{{motorLink this}}">{{motorFullName this}}</a></td>
+      <td>{{type}}</td>
+      <td data-sort="{{formatSort diameter}}" class="number">{{formatMMT diameter}}</td>
+      <td>{{formatDate updatedAt}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#motors', {
+  order: [[3, 'desc']]
+});
+</script>

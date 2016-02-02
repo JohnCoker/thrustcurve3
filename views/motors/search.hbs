@@ -182,7 +182,9 @@ plus a logo that links to this page.
 
 <pre id="linksearch-code"></pre>
 <script type="text/javascript">
-$('#linksearch-code').text($.trim($('#linksearch-live').html()));
+$('#linksearch-code').text('<!-- begin ThrustCurve.org search -->\n' +
+                           $.trim($('#linksearch-live').html()) +
+                           '\n<!-- end ThrustCurve.org search -->');
 </script>
 
 <p>
@@ -191,7 +193,7 @@ If the result looks bad, you may have to apply some of your site's styles to imp
 See the example above for how it should look.
 </p>
 <p>
-Of course, you're also free to incorporate searching on ThrustCurve.org into your site.
+Of course, you're also free to incorporate searching on ThrustCurve.org into your site in other ways.
 Please just make sure the logo appears in your form and links to this page.
 </p>
 {{/if}}

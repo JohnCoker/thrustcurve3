@@ -55,22 +55,19 @@ The data on motors, simulator files, contributors and other miscellany were stor
 
 For an app like this, Node.js is a natural platform for the server side.
 
-The database will either remain MySQL or switch to [MongoDB](https://www.mongodb.com/).
-While MongoDB seems to be more common for Node.js sites nowadays, I remain skeptical in general.
-For this site in particular there's no advantage, and several disadvantages, to a schema-less DB.
-Some of these can be patched up using [Mongoose](http://mongoosejs.com/), but that just makes
-me wonder why we gave up the structure in the first place.
+The database will switch to [MongoDB](https://www.mongodb.com/).
+While I remain skeptical in general and it does seem harder to use and less functional than SQL,
+I have been able to make a good start at building out the site with MongoDB.
 
 I didn't want to go entirely client-side rendering because I wanted the site to be SEO-friendly,
 but I did want to have the option of higher interactivity in the browser.
 Initially, I was looking at [AngularJS](https://angularjs.org/), but their approach is a bit too
 radically client-side, plus 2.0 is still immature.
-[React](https://facebook.github.io/react/) seemed like a better choice for my needs,
-providing a good abstraction without sacrificing server-side rendering.
-
 In the end, all of the full-featured frameworks just felt too complex and cumbersome and I
 went back to a simpler structure of [Express](http://expressjs.com/) with
 Handlebars as the template engine.
+
+So the result is a "MEHN" stack (MongoDB/Express/Handlebars/Node.js).
 
 
 ## Source Organization

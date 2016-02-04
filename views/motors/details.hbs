@@ -203,7 +203,10 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Availability</label>
         <div class="col-sm-6">
-          <p class="form-control-static">{{motor.availability}}</p>
+          <p class="form-control-static">
+          {{#if motor.isAvailable}}<span class="label label-as-badge label-success">{{motor.availability}}</span>{{/if}}
+          {{#unless motor.isAvailable}}<span class="label label-as-badge label-default">{{motor.availability}}</span>{{/unless}}
+          </p>
         </div>
       </div>
     

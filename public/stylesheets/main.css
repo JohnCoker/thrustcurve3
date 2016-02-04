@@ -65,6 +65,10 @@ dd {
   margin-left: 2em;
 }
 
+.label-as-badge {
+  border-radius: 1em;
+}
+
 p.img {
   text-align: center;
 }

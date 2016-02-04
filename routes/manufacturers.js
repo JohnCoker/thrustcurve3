@@ -74,6 +74,9 @@ router.get('/manufacturers/:name/details.html', function(req, res, next) {
     if (req.query.hasOwnProperty('unavailable')) {
       if (req.query.unavailable === '' || req.query.unavailable == 'true')
         unavailable = true;
+    } else {
+      if (!manufacturer.active)
+        unavailable = true;
     }
     if (!unavailable)
         motorsQuery.availability = { $in: req.db.schema.MotorAvailableEnum };
@@ -115,6 +118,7 @@ router.get('/manufacturers/:name/details.html', function(req, res, next) {
         manufacturer: manufacturer,
         impulseRange: range,
         impulseClasses: classes,
+        totalCount: motors.length,
         unavailable: unavailable,
         unavailableLink: req.helpers.manufacturerLink(manufacturer) + '?unavailable',
         motorsLink: motorsLink(manufacturer) + (unavailable ? '&unavailable' : ''),

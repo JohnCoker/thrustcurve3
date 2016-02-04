@@ -34,7 +34,7 @@
       <div class="form-group">
         <label class="col-sm-4 control-label">Impulse Range</label>
         <div class="col-sm-8">
-          <p class="form-control-static">{{impulseRange}}</p>
+          <p class="form-control-static">{{impulseRange}} ({{totalCount}})</p>
         </div>
       </div>
       {{/if}}
@@ -52,8 +52,8 @@
         <label class="col-sm-4 control-label">Status</label>
         <div class="col-sm-8">
           <p class="form-control-static">
-          {{#if manufacturer.active}}<b>active</b>{{/if}}
-          {{#unless manufacturer.active}}inactive{{/unless}}
+          {{#if manufacturer.active}}<span class="label label-as-badge label-success">active</span>{{/if}}
+          {{#unless manufacturer.active}}<span class="label label-as-badge label-default">inactive</span>{{/unless}}
           </p>
         </div>
       </div>

@@ -1,0 +1,112 @@
+<h1>{{title}}</h1>
+
+<div class="row">
+  <!-- left col -->
+  <div class="col-md-3">
+    <img src="/images/manufacturers/{{manufacturer.abbrev}}.png">
+  </div> <!-- left col -->
+
+  <!-- right col -->
+  <div class="col-md-9">
+    <div role="form" class="form-horizontal form-condensed">
+      <div class="form-group">
+        <label class="col-sm-4 control-label">Full Name</label>
+        <div class="col-sm-8">
+          <p class="form-control-static">{{manufacturer.name}}</p>
+        </div>
+      </div>
+    
+      <div class="form-group">
+        <label class="col-sm-4 control-label">Abbreviation</label>
+        <div class="col-sm-8">
+          <p class="form-control-static">{{manufacturer.abbrev}}</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-4 control-label">Aliases</label>
+        <div class="col-sm-8">
+          <p class="form-control-static">{{manufacturer.aliases}}</p>
+        </div>
+      </div>
+
+      {{#if impulseRange}}
+      <div class="form-group">
+        <label class="col-sm-4 control-label">Impulse Range</label>
+        <div class="col-sm-8">
+          <p class="form-control-static">{{impulseRange}}</p>
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if manufacturer.website}}
+      <div class="form-group">
+        <label class="col-sm-4 control-label">Web Site</label>
+        <div class="col-sm-8">
+          <p class="form-control-static"><a href="{{manufacturer.website}}" target="_blank">{{websiteAnchor manufacturer.website}}</a></p>
+        </div>
+      </div>
+      {{/if}}
+
+      <div class="form-group">
+        <label class="col-sm-4 control-label">Status</label>
+        <div class="col-sm-8">
+          <p class="form-control-static">
+          {{#if manufacturer.active}}<b>active</b>{{/if}}
+          {{#unless manufacturer.active}}inactive{{/unless}}
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div> <!-- right col -->
+</div> <!-- row -->
+
+{{#if editLink}}
+<p>
+<a href="{{editLink}}">Edit this manufacturer.</a>
+</p>
+{{/if}}
+
+{{#if impulseClasses}}
+<h2>Motors by Class</h2>
+
+<ul class="classes">
+{{#each impulseClasses}}
+  <li>
+    <a href="{{motorsLink}}"><span class="letter">{{letter}}</span> <span class="count">{{count}}</span></a>
+  </li>
+{{/each}}
+</ul>
+<style type="text/css">
+.classes {
+  list-style: none;
+  padding: 0;
+  font-size: 150%;
+}
+.classes li {
+  display: inline;
+  white-space: nowrap;
+}
+.classes li:not(:first-child)::before {
+  content: "•";
+}
+.classes .letter {
+  font-weight: bolder;
+}
+</style>
+
+{{#unless unavailable}}
+<p>
+These are only those currently available;
+<a href="{{unavailableLink}}">use this query</a>
+to include motors now out of production.
+</p>
+{{/unless}}
+{{/if}}
+
+{{#if motorsLink}}
+<p>
+<a href="{{motorsLink}}">List motors in all impulse classes</a>.
+</p>
+{{/if}}

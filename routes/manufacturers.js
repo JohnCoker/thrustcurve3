@@ -28,6 +28,9 @@ function mfrQuery(req) {
   return { $or: [ { name: name }, { abbrev: name } ] };
 }
 
+function motorsLink(mfr) {
+  return '/manufacturers/' + mfr.abbrev + '/motors.html';
+}
 
 /*
  * /manufacturers/
@@ -49,33 +52,122 @@ router.get([listLink, '/manufacturers/list.html'], function(req, res, next) {
 
 
 /*
+ * /manufacturers/:name/details.html
+ * General info for a manufacturer, renders with manufacturers/details.hbs template.
+ */
+router.get('/manufacturers/:name/details.html', function(req, res, next) {
+  req.db.Manufacturer.findOne(mfrQuery(req), req.success(function(manufacturer) {
+    var motorsQuery, unavailable;
+
+    if (!manufacturer) {
+      res.redirect(303, listLink);
+      return;
+    }
+
+    // always find by manufacturer
+    motorsQuery = {
+      $or: [ { _manufacturer: manufacturer._id }, { _relatedMfr: manufacturer._id } ]
+    };
+
+    // only for available motors unless requested
+    unavailable = false;
+    if (req.query.hasOwnProperty('unavailable')) {
+      if (req.query.unavailable === '' || req.query.unavailable == 'true')
+        unavailable = true;
+    }
+    if (!unavailable)
+        motorsQuery.availability = { $in: req.db.schema.MotorAvailableEnum };
+
+    req.db.Motor.find(motorsQuery)
+                .select('impulseClass')
+                .exec(req.success(function(motors) {
+       var counts = {}, classes = [], cls, range, i;
+
+      // group motors by impulse class
+      for (i = 0; i < motors.length; i++) {
+        cls = motors[i].impulseClass;
+        if (counts.hasOwnProperty(cls))
+          counts[cls]++;
+        else
+          counts[cls] = 1;
+      }
+      for (i = 'A'.charCodeAt(0); i < 'Z'.charCodeAt(0); i++) {
+        cls = String.fromCharCode(i);
+        if (counts.hasOwnProperty(cls)) {
+          classes.push({
+            letter: cls,
+            count: counts[cls],
+            motorsLink: motorsLink(manufacturer) + '?impulseClass=' + cls + (unavailable ? '&unavailable' : ''),
+          });
+        }
+      }
+      if (classes.length > 0) {
+        range = classes[0].letter;
+        if (classes.length == 2)
+          range += ', ' + classes[1].letter;
+        else if (classes.length > 2)
+          range += ' … ' + classes[classes.length - 1].letter;
+      }
+      console.log(range);
+
+      res.render('manufacturers/details', locals(defaults, {
+        title: manufacturer.name,
+        manufacturer: manufacturer,
+        impulseRange: range,
+        impulseClasses: classes,
+        unavailable: unavailable,
+        unavailableLink: req.helpers.manufacturerLink(manufacturer) + '?unavailable',
+        motorsLink: motorsLink(manufacturer) + (unavailable ? '&unavailable' : ''),
+        editLink: '/manufacturers/' + manufacturer._id + '/edit.html'
+      }));
+    }));
+  }));
+});
+
+
+/*
  * /manufacturers/:name/motors.html
  * Motor list for a manufacturer, renders with manufacturers/motors.hbs template.
  */
 router.get('/manufacturers/:name/motors.html', function(req, res, next) {
   req.db.Manufacturer.findOne(mfrQuery(req), req.success(function(manufacturer) {
-    var motorsQuery, unavailable = false;
+    var motorsQuery, impulseClass, unavailable;
+
     if (!manufacturer) {
       res.redirect(303, listLink);
-    } else {
-      motorsQuery = {
-        $or: [ { _manufacturer: manufacturer._id }, { _relatedMfr: manufacturer._id } ]
-      };
-      if (req.query.unavailable !== '' && req.query.unavailable !== 'true')
-        motorsQuery.availability = { $in: req.db.schema.MotorAvailableEnum };
-      else
-        unavailable = true;
-      req.db.Motor.find(motorsQuery, undefined, { sort: { totalImpulse: 1, designation: 1 } }, req.success(function(motors) {
-        res.render('manufacturers/motors', locals(defaults, {
-          title: manufacturer.abbrev + ' Motors',
-          manufacturer: manufacturer,
-          motors: motors,
-          unavailable: unavailable,
-          unavailableLink: req.helpers.manufacturerLink(manufacturer) + '?unavailable',
-          editLink: '/manufacturers/' + manufacturer._id + '/edit.html'
-        }));
-      }));
+      return;
     }
+
+    // always find by manufacturer
+    motorsQuery = {
+      $or: [ { _manufacturer: manufacturer._id }, { _relatedMfr: manufacturer._id } ]
+    };
+
+    // optionally for a single impulse class
+    if (req.query.hasOwnProperty('impulseClass') && /^[A-Z]$/i.test(req.query.impulseClass)) {
+      impulseClass = req.query.impulseClass.toUpperCase();
+      motorsQuery.impulseClass = impulseClass;
+    }
+
+    // only for available motors unless requested
+    unavailable = false;
+    if (req.query.hasOwnProperty('unavailable')) {
+      if (req.query.unavailable === '' || req.query.unavailable == 'true')
+        unavailable = true;
+    }
+    if (!unavailable)
+        motorsQuery.availability = { $in: req.db.schema.MotorAvailableEnum };
+
+    req.db.Motor.find(motorsQuery, undefined, { sort: { totalImpulse: 1, designation: 1 } }, req.success(function(motors) {
+      res.render('manufacturers/motors', locals(defaults, {
+        title: manufacturer.abbrev + (impulseClass ? ' ' + impulseClass : '') + ' Motors',
+        manufacturer: manufacturer,
+        motors: motors,
+        impulseClass: impulseClass,
+        unavailable: unavailable,
+        unavailableLink: motorsLink(manufacturer) + '?unavailable' + (impulseClass ? '&impulseClass=' + impulseClass : '')
+      }));
+    }));
   }));
 });
 

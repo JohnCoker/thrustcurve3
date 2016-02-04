@@ -66,13 +66,16 @@ In the prior site, there were pages for entering and updating motor information,
 but no pages for administering certification organizations or motor manufacturers.
 (It was easily enough done in SQL, but probably impractical in MongoDB.)
 
+To do:
+ * new motor entry
+ * certification org editing
 
 ## Old Site Pages
 
 Previous non-internal, non-admin pages should all redirect to ones on the new site.
 
 Note that most of the static pages are the same, with just a consistent ".html" extension,
-but have move to the info directory.
+but have moved to the info directory.
 For example "background.shtml" is now "info/background.html" (see `routes/info.js`).
 
 This table lists all pages of the old site and will be filled in as v3 proceeds.

@@ -13,6 +13,13 @@ function makeURL(s) {
   return s;
 }
 
+function buildLink(url, anchor) {
+  if (anchor == null || anchor === '')
+    anchor = url;
+
+  return '<a href="' + makeURL(url) + '">' + expandTags(anchor) + '</a>';
+}
+
 function expandTags(s) {
   s = s.replace(/\[b\]([^\[]*)\[\/b\]/gi, function(whole, body) {
         return '<b>' + expandTags(body) + '</b>';
@@ -21,10 +28,16 @@ function expandTags(s) {
         return '<i>' + expandTags(body) + '</i>';
       })
       .replace(/\[url\]([^\[]*)\[\/url\]/gi, function(whole, url) {
-        return '<a href="' + makeURL(url) + '">' + url + '</a>';
+        return buildLink(url);
+      })
+      .replace(/\[link\]([^\[]*)\[\/link\]/gi, function(whole, url) {
+        return buildLink(url);
       })
       .replace(/\[url=([^\]]*)\]([^\[]*)\[\/url\]/gi, function(whole, url, anchor) {
-        return '<a href="' + makeURL(url) + '">' + expandTags(anchor) + '</a>';
+        return buildLink(url, anchor);
+      })
+      .replace(/\[link=([^\]]*)\]([^\[]*)\[\/link\]/gi, function(whole, url, anchor) {
+        return buildLink(url, anchor);
       });
 
   return s;
@@ -106,7 +119,7 @@ function render(input) {
  * <ul>
  * <li><code>[b]</code> bold</li>
  * <li><code>[i]</code> italic</li>
- * <li><code>[url]</code> link</li>
+ * <li><code>[link]</code> web link (also <code>[url]</code></li>
  * <li><code>[list]</code> bulleted or numbered list</li>
  * </ul>
  *

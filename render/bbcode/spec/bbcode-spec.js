@@ -32,20 +32,35 @@ describe("bbcode", function() {
     });
   });
   describe("links", function() {
-    it("simple", function() {
+    it("url: simple", function() {
       expect(bbcode.render('Visit [url]www.example.com[/url]!')).toBe('<p>Visit <a href="http://www.example.com">www.example.com</a>!</p>\n');
     });
-    it("with domain", function() {
+    it("url: with domain", function() {
       expect(bbcode.render('Visit [url]http://www.example.com[/url]!')).toBe('<p>Visit <a href="http://www.example.com">http://www.example.com</a>!</p>\n');
     });
-    it("simple anchor", function() {
+    it("url: simple anchor", function() {
       expect(bbcode.render('Visit [url=www.example.com]example.com[/url]!')).toBe('<p>Visit <a href="http://www.example.com">example.com</a>!</p>\n');
     });
-    it("markup anchor", function() {
+    it("url: markup anchor", function() {
       expect(bbcode.render('Visit [url=www.example.com][b]example[/b].com[/url]!')).toBe('<p>Visit <a href="http://www.example.com"><b>example</b>.com</a>!</p>\n');
     });
-    it("escaping", function() {
+    it("url: escaping", function() {
       expect(bbcode.render('Visit [url]savage">.com[/url]!')).toBe('<p>Visit <a href="http://savage&quot;&gt;.com">savage"&gt;.com</a>!</p>\n');
+    });
+    it("link: simple", function() {
+      expect(bbcode.render('Visit [link]www.example.com[/link]!')).toBe('<p>Visit <a href="http://www.example.com">www.example.com</a>!</p>\n');
+    });
+    it("link: with domain", function() {
+      expect(bbcode.render('Visit [link]http://www.example.com[/link]!')).toBe('<p>Visit <a href="http://www.example.com">http://www.example.com</a>!</p>\n');
+    });
+    it("link: simple anchor", function() {
+      expect(bbcode.render('Visit [link=www.example.com]example.com[/link]!')).toBe('<p>Visit <a href="http://www.example.com">example.com</a>!</p>\n');
+    });
+    it("link: markup anchor", function() {
+      expect(bbcode.render('Visit [link=www.example.com][b]example[/b].com[/link]!')).toBe('<p>Visit <a href="http://www.example.com"><b>example</b>.com</a>!</p>\n');
+    });
+    it("link: escaping", function() {
+      expect(bbcode.render('Visit [link]savage">.com[/link]!')).toBe('<p>Visit <a href="http://savage&quot;&gt;.com">savage"&gt;.com</a>!</p>\n');
     });
   });
   describe("links", function() {

@@ -101,7 +101,7 @@ This table lists all pages of the old site and will be filled in as v3 proceeds.
 | guidehelp.shtml     | motors/guide.html          | motor guide |
 | guidepage.jsp       | motors/guide.html          | motor guide |
 | index.shtml         | index.html                 | |
-| login.jsp           | mystuff/login.html         | |
+| login.jsp           | mystuff/login.html         | account |
 | mfrsearch.jsp       | manufacturers/             | |
 | missingdata.jsp     |                            | |
 | missingstats.jsp    |                            | |
@@ -121,9 +121,9 @@ This table lists all pages of the old site and will be filled in as v3 proceeds.
 | simulation.shtml    | info/simulation.html       | static |
 | simulators.shtml    | info/simulators.html       | static |
 | tctracer.shtml      | info/tctracer.html         | static |
-| updatecontrib.jsp   |                            | |
+| updatecontrib.jsp   | mystuff/profile.html       | account |
 | updatemotor.jsp     | motors/*/edit.html         | admin |
 | updatenote.jsp      |                            | |
-| updaterocket.jsp    |                            | |
+| updaterocket.jsp    |                            | account |
 | updates.jsp         | motors/updates.html        | |
 | updatesimfile.jsp   |                            | |

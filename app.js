@@ -16,8 +16,11 @@ const process = require('process'),
       morgan = require('morgan'),
       session = require('express-session'),
       SessionMongoStore = require('connect-mongo')(session),
+      passport = require('passport'),
+      passportLocal = require('passport-local').Strategy,
       config = require('./config/server.js'),
       schema = require('./database/schema'),
+      prefs = require('./lib/prefs'),
       crawlers = require('./lib/crawlers'),
       helpers = require('./lib/helpers');
 
@@ -64,6 +67,8 @@ app.use(session({
     mongooseConnection: mongoose.connection
   })
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 /*
  * Many of the routes need access to the database and other stuff,
@@ -108,7 +113,7 @@ var db = Object.create(null, {
 app.use(function(req, res, next) {
   // determine if this is a robot/crawler/spider
   req.isBot = function() {
-    if (req.session.contributorId)
+    if (req.user)
       return false;
 
     if (!req.session.hasOwnProperty("bot")) {
@@ -117,6 +122,13 @@ app.use(function(req, res, next) {
     }
     return req.session.bot;
   };
+
+  // set up preferences if user is logged in
+  if (req.user) {
+    prefs.setAll(req.user.preferences);
+  } else {
+    prefs.clear();
+  }
 
   // easy access to database state
   req.db = db;
@@ -165,6 +177,37 @@ app.use(function(req, res, next) {
   };
 
   next();
+});
+
+/*
+ * Most pages work without a login, although their behavior might differ
+ * due to user preferences.  Some pages do require a user be logged in.
+ *
+ * Passport is used to authenticate users (contributors), using the local
+ * strategy with encrypted passwords stored in the database.
+ */
+passport.use(new passportLocal(function(email, password, done) {
+  db.Contributor.findOne({ email: email }, function(err, contributor) {
+    if (err)
+      return done(err);
+    if (!contributor)
+      return done(null, false, { message: 'Unregistered email address.' });
+    contributor.comparePassword(password, function(err, isMatch) {
+      if (err)
+	return done(err);
+      if (!isMatch)
+	return done(null, false, { message: 'Login incorrect.' });
+      done(null, contributor);
+    });
+  });
+}));
+passport.serializeUser(function(contributor, done) {
+  done(null, contributor.id);
+});
+passport.deserializeUser(function(id, done) {
+  db.Contributor.findById(id, function(err, contributor) {
+    done(err, contributor);
+  });
 });
 
 // the defined routes

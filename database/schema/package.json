@@ -14,6 +14,7 @@
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^0.8.5",
     "mongodb": "^2.1.2",
     "mongoose": "^4.3.3",
     "mongoose-dateonly": "^1.0.3"

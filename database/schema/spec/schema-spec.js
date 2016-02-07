@@ -206,6 +206,100 @@ describe('schema', function() {
     });
   });
 
+  describe('contributor', function() {
+    var model = schema.ContributorModel(mongoose);
+
+    it('save', function() {
+      runs(function() {
+        var inst = model({
+          email: 'joe@xample.com',
+	  name: 'Joe Anyone',
+	  organization: 'XYZ Rocket Club',
+          password: 'very secret',
+	  showEmail: true,
+	  website: 'http://example.com/joes-rockets.html',
+        });
+        inst.save(function(err) {
+          if (err)
+            console.error(err);
+        });
+      });
+      waits(100);
+    });
+
+    it('verify saved', function() {
+      var found;
+      waits(100);
+      runs(function() {
+        model.findOne({ email: 'joe@xample.com' }, function(err, results) {
+          if (err)
+            console.error(err);
+          found = results;
+        });
+      });
+      waits(100);
+      runs(function() {
+        expect(found).toBeDefined();
+        expect(found.email).toBe('joe@xample.com');
+	expect(found.password).toMatch(/^\$2a\$11\$[a-zA-Z0-9+\/.]+=*$/);
+	expect(found.name).toBe('Joe Anyone');
+	expect(found.organization).toBe('XYZ Rocket Club');
+        expect(found.showEmail).toBe(true);
+	expect(found.website).toBe('http://example.com/joes-rockets.html');
+      });
+    });
+    it('comparePassword good', function() {
+      var found, wasMatch;
+      waits(100);
+      runs(function() {
+        model.findOne({ email: 'joe@xample.com' }, function(err, results) {
+          if (err)
+            console.error(err);
+          found = results;
+        });
+      });
+      waits(100);
+      runs(function() {
+	expect(found).toBeDefined();
+	found.comparePassword('very secret', function(err, isMatch) {
+	  if (err)
+	    console.error(err);
+	  else
+	    wasMatch = isMatch;
+	});
+      });
+      waits(300);
+      runs(function() {
+	expect(wasMatch).toBe(true);
+      });
+    });
+    it('comparePassword good', function() {
+      var found, wasMatch;
+      waits(100);
+      runs(function() {
+        model.findOne({ email: 'joe@xample.com' }, function(err, results) {
+          if (err)
+            console.error(err);
+          found = results;
+        });
+      });
+      waits(100);
+      runs(function() {
+	expect(found).toBeDefined();
+	found.comparePassword('vary sacred', function(err, isMatch) {
+	  if (err)
+	    console.error(err);
+	  else
+	    wasMatch = isMatch;
+	});
+      });
+      waits(300);
+      runs(function() {
+	expect(wasMatch).toBe(false);
+      });
+    });
+  });
+
   describe('teardown', function() {
     it('disconnect', function() {
       waits(1000);

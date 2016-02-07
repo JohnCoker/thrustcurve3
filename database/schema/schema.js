@@ -4,37 +4,41 @@
  */
 'use strict';
 
-var IdRegex = /^[0-9a-f]{24}$/i;
+const bcrypt = require('bcrypt'),
+      SALT_WORK_FACTOR = 11,
+      units = require('../../lib/units');
 
+// date-only data type
 var DateOnly;
 
+// Mongo object IDs
+const IdRegex = /^[0-9a-f]{24}$/i;
+
 // https://gist.github.com/dperini/729294
-var UrlRegex = /^(?:(?:https?):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i;
+const UrlRegex = /^(?:(?:https?):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i;
 
 // http://www.regular-expressions.info/email.html
-var EmailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const EmailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
-var MotorNameRegex = /^1\/[248]A(0\.)?[1-9]|[A-Z][1-9][0-9]*$/;
-var MotorDesignationRegex = /^[A-Z0-9_./-]+$/;
+const MotorNameRegex = /^1\/[248]A(0\.)?[1-9]|[A-Z][1-9][0-9]*$/;
+const MotorDesignationRegex = /^[A-Z0-9_./-]+$/;
 
-var units = require('../../lib/units');
-
-var MotorTypeEnum = ['SU', 'reload', 'hybrid'];
-var MotorAvailabilityEnum = ['regular', 'occasional', 'OOP'];
-var MotorAvailableEnum = MotorAvailabilityEnum.slice();
+const MotorTypeEnum = ['SU', 'reload', 'hybrid'];
+const MotorAvailabilityEnum = ['regular', 'occasional', 'OOP'];
+const MotorAvailableEnum = MotorAvailabilityEnum.slice();
 MotorAvailableEnum.splice(2, 1);
 Object.freeze(MotorTypeEnum);
 Object.freeze(MotorAvailabilityEnum);
 Object.freeze(MotorAvailableEnum);
 
-var SimFileFormatEnum = ['RASP', 'RockSim', 'ALT4', 'CompuRoc'];
-var SimFileDataSourceEnum = ['cert', 'mfr', 'user'];
-var SimFileLicenseEnum = ['PD', 'free', 'other'];
+const SimFileFormatEnum = ['RASP', 'RockSim', 'ALT4', 'CompuRoc'];
+const SimFileDataSourceEnum = ['cert', 'mfr', 'user'];
+const SimFileLicenseEnum = ['PD', 'free', 'other'];
 Object.freeze(SimFileFormatEnum);
 Object.freeze(SimFileDataSourceEnum);
 Object.freeze(SimFileLicenseEnum);
 
-var MotorViewSourceEnum = ['manufacturer', 'search', 'guide', 'browser', 'popular', 'favorite', 'updates'];
+const MotorViewSourceEnum = ['manufacturer', 'search', 'guide', 'browser', 'popular', 'favorite', 'updates'];
 Object.freeze(MotorViewSourceEnum);
 
 function dateOnly(mongoose) {
@@ -161,6 +165,49 @@ function makeContributorModel(mongoose) {
     }
   });
   schemaOptions(schema);
+
+  // http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
+  schema.pre('save', function(next) {
+    var contributor = this;
+
+    // only hash the password if it has been modified (or is new)
+    if (!contributor.isModified('password'))
+      return next();
+
+    // generate a salt
+    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+      if (err)
+	return next(err);
+
+      // hash the password using our new salt
+      bcrypt.hash(contributor.password, salt, function(err, hash) {
+	if (err)
+	  return next(err);
+
+	// override the cleartext password with the hashed one
+	contributor.password = hash;
+	next();
+      });
+    });
+  });
+
+  schema.methods.comparePassword = function(entered, cb) {
+    // missing or explicitly invalid passwords never match
+    if (entered == null || entered === '' ||
+	!this.password || this.password == '*') {
+      cb(null, false);
+      return;
+    }
+
+    // encrypt and compare with stored hash
+    bcrypt.compare(entered, this.password, function(err, isMatch) {
+      if (err)
+	return cb(err);
+      else
+	cb(null, isMatch);
+    });
+  };
+
   return mongoose.model('Contributor', schema);
 }
 

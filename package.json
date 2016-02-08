@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "find . -name node_modules -prune -o -name spec -type d -print -exec jasmine-node '{}' \\;",
+    "test": "find . -name node_modules -prune -o -name spec -type d -print | xargs -n1 -t jasmine-node",
     "lint": "jshint `find . -name node_modules -prune -o -name out -prune -o -name '*.js' -print | grep -v 'min.js'`"
   },
   "dependencies": {

@@ -1,1 +1,59 @@
 <h1>{{title}}</h1>
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+<p>
+If you already have a ThrustCurve.org account, <a href="{{loginLink}}">please log in</a>.
+Otherwise you can create one here.
+Basic features work without an account, but more is available if you are logged in.
+</p>
+
+<form role="form" class="form-horizontal" name="register" action="{{submitLink}}" method="post" data-toggle="validator">
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Full Name</label>
+    <div class="col-sm-9">
+      <input type="text" name="name" class="form-control" required value="{{info.name}}" />
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="email" class="col-sm-3 control-label">Email</label>
+    <div class="col-sm-9">
+      <input type="email" name="email" class="form-control" required value="{{info.email}}" />
+      <span class="help-block with-errors"></span>
+      <input type="checkbox" name="showEmail" {{#if info.showEmail}}checked{{/if}}> Show email address publicly
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="password" class="col-sm-3 control-label">New Password</label>
+    <div class="col-sm-9">
+      <input type="password" name="password" id="password" class="form-control" required data-minlength="4" />
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="password2" class="col-sm-3 control-label">Confirm</label>
+    <div class="col-sm-9">
+      <input type="password" name="password2" class="form-control" required data-match="#password" />
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      {{#if redirect}}
+      <input type="hidden" name="redirect" value="{{redirect}}" />
+      {{/if}}
+      <button type="submit" class="btn btn-primary">Sign Up</button>
+      <a class="btn btn-default" href="{{loginLink}}">Log In</a>
+    </div>
+  </div>
+</form>
+
+<p>
+If you previously registered but have forgotten your password,
+<a href="/mystuff/forgotpasswd.html">click here to reset it</a>.
+</p>

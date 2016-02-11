@@ -1,38 +1,44 @@
 <h1>{{title}}</h1>
 
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+
 <p>
 If you contribute motor data or make your rockets public,
 other people will be able to link to your profile on the site.
-If you have an affiliation with a rocketry club or your own rocketry web site, you can add them.
+If you have an affiliation with a rocketry club or your own rocketry web site, you can show them as well.
 </p>
 
 <form role="form" class="form-horizontal" name="profile" action="{{submitLink}}" method="post" data-toggle="validator">
   <div class="form-group">
     <label for="name" class="col-sm-3 control-label">Full Name</label>
     <div class="col-sm-9">
-      <input type="text" name="name" class="form-control" required />
+      <input type="text" name="name" class="form-control" required value="{{info.name}}" />
       <span class="help-block with-errors"></span>
     </div>
   </div>
   <div class="form-group">
     <label for="email" class="col-sm-3 control-label">Email</label>
     <div class="col-sm-9">
-      <input type="email" name="email" class="form-control" required />
+      <input type="email" name="email" class="form-control" required value="{{info.email}}" />
       <span class="help-block with-errors"></span>
-      <input type="checkbox" name="showEmail" checked/> Show email address publicly
+      <input type="checkbox" name="showEmail" {{#if info.showEmail}}checked{{/if}}/> Show email address publicly
     </div>
   </div>
   <div class="form-group">
     <label for="organization" class="col-sm-3 control-label">Organization</label>
     <div class="col-sm-9">
-      <input type="text" organization="name" class="form-control" />
+      <input type="text" name="organization" class="form-control" value="{{info.organization}}" />
     </div>
   </div>
   <div class="form-group website">
     <label for="website" class="col-sm-3 control-label">Web Site</label>
     <div class="col-sm-9">
       <div class="input-group">
-        <input type="url" class="form-control" name="website" placeholder="http://...">
+        <input type="url" class="form-control" name="website" placeholder="http://..." value="{{info.website}}" />
         <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
       </div>
       <span class="help-block with-errors"></span>
@@ -44,6 +50,17 @@ If you have an affiliation with a rocketry club or your own rocketry web site, y
     </div>
   </div>
 </form>
+<script type="text/javascript">
+$('.website .test').click(function(e) {
+  var site, a;
+
+  e.preventDefault();
+
+  site = $.trim($(this).closest('div.input-group').find('input').val());
+  if (site)
+    window.open(site, "_blank");
+});
+</script>
 
 <h2>Change Password</h2>
 
@@ -53,7 +70,7 @@ If you need to change your login password, please enter your new password twice.
 
 <form role="form" class="form-horizontal" name="password" action="{{submitLink}}" method="post" data-toggle="validator">
   <div class="form-group">
-    <label for="password" class="col-sm-3 control-label">Password</label>
+    <label for="password" class="col-sm-3 control-label">New Password</label>
     <div class="col-sm-9">
       <input type="password" name="password" id="password" class="form-control" required data-minlength="4" />
       <span class="help-block with-errors"></span>

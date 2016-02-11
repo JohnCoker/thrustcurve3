@@ -214,12 +214,141 @@ router.get(['/mystuff/prefs.html', '/mystuff/preferences.html'], authenticated, 
  * Renders with mystuff/profile.hbs template.
  */
 router.get(profileLink, authenticated, function(req, res, next) {
-  res.render('mystuff/profile', locals(defaults, 'My Profile'));
+  res.render('mystuff/profile', locals(defaults, {
+    title: 'My Profile',
+    info: req.user,
+    submitLink: profileLink,
+  }));
 });
 router.get(['/updatecontrib.jsp'], function(req, res, next) {
   res.redirect(301, profileLink);
 });
 
+router.post(profileLink, authenticated, function(req, res, next) {
+  // collect parameters
+  var info = req.user, errors = [],
+      change = false, changeEmail = false,
+      v;
+
+  if (req.body.hasOwnProperty('name')) {
+    v = req.body.name.trim();
+    if (v === '') {
+      errors.push('Please enter your name for public display.');
+    } else {
+      if (v != info.name) {
+        info.name = v;
+        change = true;
+      }
+    }
+  }
+
+  if (req.body.hasOwnProperty('email')) {
+    v = req.body.email.trim();
+    if (v === '' || !schema.EmailRegex.test(v)) {
+      errors.push('Please enter your email address as your login name.');
+    } else {
+      if (v != info.email) {
+        info.email = v;
+        change = changeEmail = true;
+      }
+    }
+
+    v = req.body.showEmail == 'true' || req.body.showEmail == 'on';
+    if (v != info.showEmail) {
+      info.showEmail = v;
+      change = true;
+    }
+  }
+
+  if (req.body.hasOwnProperty('organization')) {
+    v = req.body.organization.trim();
+    if (v == null || v === '' || v == '-') {
+      if (info.organization != null) {
+        info.organization = undefined;
+        change = true;
+      }
+    } else if (v != info.organization) {
+      info.organization = v;
+      change = true;
+    }
+  }
+
+  if (req.body.hasOwnProperty('website')) {
+    v = req.body.website.trim();
+    if (v == null || v === '' || v == '-') {
+      if (info.website != null) {
+        info.website = undefined;
+        change = true;
+      }
+    } else if (!schema.UrlRegex.test(v)) {
+      errors.push('Please enter a valid URL for your web site.');
+    } else {
+      if (v != info.website) {
+        info.website = v;
+        change = true;
+      }
+    }
+  }
+
+  if (req.body.hasOwnProperty('password')) {
+    v = req.body.password;
+    if (v == null || v === '') {
+      errors.push('A password is required to protect your account.');
+    } else {
+      info.password = v;
+      change = true;
+
+      v = req.body.password2;
+      if (v != info.password)
+        errors.push('Please confirm your password by entering it twice.');
+    }
+  }
+
+  // if no changes, don't do anything
+  if (!change && errors.length < 1) {
+    res.render('mystuff/profile', locals(defaults, {
+      title: 'My Profile',
+      info: info,
+      errors: errors,
+      result: 'unchanged',
+      submitLink: profileLink,
+    }));
+    return;
+  }
+
+  // error handling and update
+  var submit = function() {
+    if (errors.length > 0) {
+      res.render('mystuff/profile', locals(defaults, {
+        title: 'My Profile',
+        info: info,
+        errors: errors,
+        submitLink: profileLink,
+      }));
+    } else {
+      info.save(req.success(function(updated) {
+        res.render('mystuff/profile', locals(defaults, {
+          title: 'My Profile',
+          info: updated,
+          errors: errors,
+          result: 'saved',
+          submitLink: profileLink,
+        }));
+      }));
+    }
+  };
+
+  // make sure the email isn't already in use
+  if (changeEmail && errors.length < 1) {
+    req.db.Contributor.findOne({ email: info.email }, req.success(function(existing) {
+      if (existing && existing._id.toString() != info._id.toString())
+        errors.push('That new email address is already registered.');
+      submit();
+    }));
+  } else {
+    submit();
+  }
+});
 
 /*
  * /mystuff/logout.html

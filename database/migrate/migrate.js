@@ -302,7 +302,24 @@ var tables = [
         name: 'perm_rockets',
         field: 'permissions.editRockets',
       },
-    ]
+    ],
+    fixup: function(output) {
+      // fill in default unit set
+      if (output["preferences.lengthUnit"] == 'in' && output["preferences.massUnit"] == 'oz')
+        output["preferences.defaultUnits"] = 'in/oz';
+      else if (output["preferences.lengthUnit"] == 'in' && output["preferences.massUnit"] == 'lb')
+        output["preferences.defaultUnits"] = 'in/lb';
+      else if (output["preferences.lengthUnit"] == 'cm' && output["preferences.massUnit"] == 'g')
+        output["preferences.defaultUnits"] = 'CGS';
+      else if (output["preferences.lengthUnit"] == 'm' && output["preferences.massUnit"] == 'kg')
+        output["preferences.defaultUnits"] = 'MKS';
+
+      // fill in velocity and acceleration
+      if (output["preferences.altitudeUnit"] == 'ft' || output["preferences.altitudeUnit"] == 'mi') {
+        output["preferences.velocityUnit"] = 'ft/s';
+        output["preferences.accelerationUnit"] = 'ft/s²';
+      }
+    }
   },
   {
     name: 'motor_note',
@@ -531,6 +548,10 @@ function migrateTable(table, rows, fields, cb) {
 
       output[m.output] = v;
     }
+
+    // perform row post-processing
+    if (typeof table.fixup == 'function')
+      table.fixup(output);
 
     migrated.push(model(output));
   }

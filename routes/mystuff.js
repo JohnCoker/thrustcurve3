@@ -8,12 +8,14 @@ const express = require('express'),
       router = express.Router(),
       passport = require('passport'),
       schema = require('../database/schema'),
+      units = require('../lib/units'),
       locals = require('./locals.js'),
       authenticated = require('./authenticated.js');
 
 const loginLink = '/mystuff/login.html',
       registerLink = '/mystuff/register.html',
       forgotLink = '/mystuff/forgotpasswd.html',
+      preferencesLink = '/mystuff/preferences.html',
       profileLink = '/mystuff/profile.html';
 
 const defaults = {
@@ -170,7 +172,7 @@ router.post(registerLink, function(req, res, next) {
  * Renders with mystuff/forgotpasswd.hbs template.
  */
 router.get('/mystuff/forgotpasswd.html', authenticated, function(req, res, next) {
-  res.render('mystuff/forgotpasswd', locals(defaults, {
+  res.render('mystuff/forgotpasswd', locals(req, defaults, {
     title: 'Forgot Password',
     submitLink: forgotLink,
     loginLink: loginLink,
@@ -184,7 +186,7 @@ router.get('/mystuff/forgotpasswd.html', authenticated, function(req, res, next)
  * Renders with mystuff/favorites.hbs template.
  */
 router.get('/mystuff/favorites.html', authenticated, function(req, res, next) {
-  res.render('mystuff/favorites', locals(defaults, 'My Favorites'));
+  res.render('mystuff/favorites', locals(req, defaults, 'My Favorites'));
 });
 
 
@@ -193,7 +195,7 @@ router.get('/mystuff/favorites.html', authenticated, function(req, res, next) {
  * Renders with mystuff/rockets.hbs template.
  */
 router.get('/mystuff/rockets.html', authenticated, function(req, res, next) {
-  res.render('mystuff/rockets', locals(defaults, 'My Rockets'));
+  res.render('mystuff/rockets', locals(req, defaults, 'My Rockets'));
 });
 router.get(['/updaterocket.jsp'], function(req, res, next) {
   res.redirect(301, '/mystuff/rockets.html');
@@ -201,11 +203,74 @@ router.get(['/updaterocket.jsp'], function(req, res, next) {
 
 
 /*
- * /mystuff/preferences.html
- * Renders with mystuff/preferences.hbs template.
+ * /mystuff/prefs.html
+ * Renders with mystuff/prefs.hbs template.
  */
-router.get(['/mystuff/prefs.html', '/mystuff/preferences.html'], authenticated, function(req, res, next) {
-  res.render('mystuff/prefs', locals(defaults, 'My Preferences'));
+router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req, res, next) {
+  // normalize preferences
+  var prefs = {},
+      unitSet;
+
+  // first get the default units
+  if (req.user.preferences.defaultUnits)
+    unitSet = units.defaults.get(req.user.preferences.defaultUnits);
+  if (unitSet == null)
+    unitSet = units.defaults[0];
+  prefs.defaultUnits = unitSet.label;
+
+  // resolve each specific unit preference
+  [ 'length',
+    'mass',
+    'force',
+    'velocity',
+    'acceleration',
+    'altitude'
+  ].forEach(function(unit) {
+    var prefName = unit + 'Unit',
+        prefValue = req.user.preferences[prefName],
+        value;
+
+    if (prefValue)
+      value = units[unit].get(prefValue);
+    if (value == null)
+      value = units[unit].get(unitSet[unit]);
+    prefs[prefName] = value.label;
+  });
+
+  res.render('mystuff/preferences', locals(req, defaults, {
+    title: 'Preferences',
+    units: units,
+    defaults: units.defaults,
+    prefs: prefs,
+    submitLink: preferencesLink,
+  }));
+});
+
+router.post([preferencesLink], authenticated, function(req, res, next) {
+  var change = false;
+
+  [ 'defaultUnits',
+    'lengthUnit',
+    'massUnit',
+    'forceUnit',
+    'velocityUnit',
+    'accelerationUnit',
+    'altitudeUnit'
+  ].forEach(function(pref) {
+    var value = req.body[pref];
+    if (value != null && value !== '' && value != req.user.preferences[pref]) {
+      req.user.preferences[pref] = value;
+      change = true;
+    }
+  });
+
+  if (change) {
+    req.user.save(req.success(function(updated) {
+      res.redirect(preferencesLink + '?result=saved');
+    }));
+  } else {
+    res.redirect(preferencesLink + '?result=unchanged');
+  }
 });
 
 
@@ -214,7 +279,7 @@ router.get(['/mystuff/prefs.html', '/mystuff/preferences.html'], authenticated, 
  * Renders with mystuff/profile.hbs template.
  */
 router.get(profileLink, authenticated, function(req, res, next) {
-  res.render('mystuff/profile', locals(defaults, {
+  res.render('mystuff/profile', locals(req, defaults, {
     title: 'My Profile',
     info: req.user,
     submitLink: profileLink,
@@ -306,7 +371,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
 
   // if no changes, don't do anything
   if (!change && errors.length < 1) {
-    res.render('mystuff/profile', locals(defaults, {
+    res.render('mystuff/profile', locals(req, defaults, {
       title: 'My Profile',
       info: info,
       errors: errors,
@@ -319,7 +384,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
   // error handling and update
   var submit = function() {
     if (errors.length > 0) {
-      res.render('mystuff/profile', locals(defaults, {
+      res.render('mystuff/profile', locals(req, defaults, {
         title: 'My Profile',
         info: info,
         errors: errors,
@@ -327,7 +392,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
       }));
     } else {
       info.save(req.success(function(updated) {
-        res.render('mystuff/profile', locals(defaults, {
+        res.render('mystuff/profile', locals(req, defaults, {
           title: 'My Profile',
           info: updated,
           errors: errors,

@@ -1,0 +1,107 @@
+<h1>{{title}}</h1>
+
+<p>Choose the units in which you would like various measurements displayed.</p>
+
+<form role="form" class="form-horizontal" name="prefs" action="{{submitLink}}" method="post" data-toggle="validator">
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Unit Defaults</label>
+    <div class="col-sm-9">
+      <select name="defaultUnits" class="form-control" required>
+        {{#each units.defaults}}
+        <option value="{{label}}" {{#equal label ../prefs.defaultUnits}}selected{{/equal}}>{{description}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Length Unit</label>
+    <div class="col-sm-9">
+      <select name="lengthUnit" class="form-control" required>
+        {{#each units.length}}
+        <option value="{{label}}" {{#equal label ../prefs.lengthUnit}}selected{{/equal}}>{{description}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Mass Unit</label>
+    <div class="col-sm-9">
+      <select name="massUnit" class="form-control" required>
+        {{#each units.mass}}
+        <option value="{{label}}" {{#equal label ../prefs.massUnit}}selected{{/equal}}>{{description}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Force Unit</label>
+    <div class="col-sm-9">
+      <select name="forceUnit" class="form-control" required>
+        {{#each units.force}}
+        <option value="{{label}}" {{#equal label ../prefs.forceUnit}}selected{{/equal}}>{{description}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Velocity Unit</label>
+    <div class="col-sm-9">
+      <select name="velocityUnit" class="form-control" required>
+        {{#each units.velocity}}
+        <option value="{{label}}" {{#equal label ../prefs.velocityUnit}}selected{{/equal}}>{{description}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Acceleration Unit</label>
+    <div class="col-sm-9">
+      <select name="accelerationUnit" class="form-control" required>
+        {{#each units.acceleration}}
+        <option value="{{label}}" {{#equal label ../prefs.accelerationUnit}}selected{{/equal}}>{{description}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Altitude Unit</label>
+    <div class="col-sm-9">
+      <select name="altitudeUnit" class="form-control" required>
+        {{#each units.altitude}}
+        <option value="{{label}}" {{#equal label ../prefs.altitudeUnit}}selected{{/equal}}>{{description}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Update</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+$('form select[name=defaultUnits]').change(function(e) {
+  var sel = $(this).val();
+  switch (sel) {
+  {{#each defaults}}
+  case '{{label}}':
+    $('form select[name=lengthUnit]').val('{{./length}}');
+    $('form select[name=massUnit]').val('{{mass}}');
+    $('form select[name=forceUnit]').val('{{force}}');
+    $('form select[name=velocityUnit]').val('{{velocity}}');
+    $('form select[name=accelerationUnit]').val('{{acceleration}}');
+    $('form select[name=altitudeUnit]').val('{{altitude}}');
+    break;
+  {{/each}}
+  }
+});
+</script>

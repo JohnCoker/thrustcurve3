@@ -67,7 +67,7 @@ In the end, all of the full-featured frameworks just felt too complex and cumber
 went back to a simpler structure of [Express](http://expressjs.com/) with
 Handlebars as the template engine.
 
-So the result is a "MEHN" stack (MongoDB/Express/Handlebars/Node.js).
+So the result is a "MEHN" stack (Mongo/Express/Handlebars/Node).
 
 
 ## Source Organization
@@ -86,6 +86,7 @@ thrustcurve3
 ├── database
 │   ├── accesslog
 │   ├── migrate
+│   ├── ranking
 │   └── schema
 ├── lib
 │   ├── crawlers
@@ -99,6 +100,7 @@ thrustcurve3
 │   ├── javascripts
 │   └── stylesheets
 ├── render
+│   ├── bbcode
 │   ├── graphs
 │   └── svg
 ├── routes

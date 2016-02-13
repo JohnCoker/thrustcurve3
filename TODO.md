@@ -55,6 +55,9 @@ Also, users should be able to mark their favorite motors.  Note only will this m
 motors easier for them to find again, but motors marked as favorites can be flagged for
 everyone.
 
+To do:
+ * flag motors favorited by other users
+
 ## Preferences
 
 There were unit preferences in the old site, but they didn't affect the display of everything.
@@ -86,8 +89,8 @@ This table lists all pages of the old site and will be filled in as v3 proceeds.
 | apidemo.shtml       |                            | |
 | background.shtml    | info/background.html       | static |
 | bbcode.shtml        |                            | |
-| browser.jsp         | browser.html               | motor browser |
-| browser.shtml       | browser.html               | motor browser |
+| browser.jsp         | motors/browser.html        | motor browser |
+| browser.shtml       | motors/browser.html        | motor browser |
 | certification.shtml | info/certification.html    | static |
 | contribsearch.jsp   |                            | |
 | contribute.shtml    | info/contribute.html       | static |
@@ -127,3 +130,7 @@ This table lists all pages of the old site and will be filled in as v3 proceeds.
 | updaterocket.jsp    |                            | account |
 | updates.jsp         | motors/updates.html        | |
 | updatesimfile.jsp   |                            | |
+
+Note that the new site takes a more REST-style approach for data display, using paths
+that contain names rather than generic pages with ID query parameters.
+For example `/motorsearch.jsp?id=21` becomes `/motors/Estes/C6/`.

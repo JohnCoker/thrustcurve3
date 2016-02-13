@@ -67,6 +67,13 @@ dd {
 
 .label-as-badge {
   border-radius: 1em;
+  position: relative;
+  top: -0.1em;
+}
+h1 .label-as-badge,
+h2 .label-as-badge {
+  font-size: 0.4em;
+  top: -0.6em;
 }
 
 p.img {
@@ -119,4 +126,11 @@ form p.form-control-static.id {
 }
 .form-submit {
   margin-top: 5px;
+}
+
+a.favorite {
+  color: #2e448c;
+}
+a.favorite i.fa {
+  margin-left: 0.25em;
 }

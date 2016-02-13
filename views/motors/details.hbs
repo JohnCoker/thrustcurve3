@@ -13,7 +13,7 @@
   </ul>
 {{/extend}}
 
-<h1>{{title}}</h1>
+<h1>{{title}} {{#if favorite}}<span class="label label-as-badge label-success">favorite</span>{{/if}}</h1>
 
 <div class="row">
   <!-- left col -->
@@ -25,7 +25,7 @@
           <p class="form-control-static"><a href="{{manufacturerLink manufacturer}}">{{manufacturer.name}}</a></p>
         </div>
       </div>
-    
+
       {{#if motor._relatedMfr}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Related Mfr.</label>
@@ -34,14 +34,14 @@
         </div>
       </div>
       {{/if}}
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Designation</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{motorDesignation motor}}</p>
         </div>
       </div>
-    
+
       {{#if motor.altDesignation}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Alt. Designation</label>
@@ -50,14 +50,14 @@
         </div>
       </div>
       {{/if}}
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Common Name</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{motorCommonName motor}}</p>
         </div>
       </div>
-    
+
       {{#if motor.altName}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Alt. Name</label>
@@ -66,14 +66,14 @@
         </div>
       </div>
       {{/if}}
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Motor Type</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{motor.type}}</p>
         </div>
       </div>
-    
+
       {{#if motor.delays}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Delays</label>
@@ -82,63 +82,63 @@
         </div>
       </div>
       {{/if}}
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Diameter</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatMMT motor.diameter}}</p>
         </div>
       </div>
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Length</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatLength motor.length}}</p>
         </div>
       </div>
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Total Weight</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatMass motor.totalWeight}}</p>
         </div>
       </div>
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Prop. Weight</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatMass motor.propellantWeight}}</p>
         </div>
       </div>
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Avg. Thrust</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatForce motor.avgThrust}}</p>
         </div>
       </div>
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Max. Thrust</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatForce motor.maxThrust}}</p>
         </div>
       </div>
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Total Impulse</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatImpulse motor.totalImpulse}}</p>
         </div>
       </div>
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Burn Time</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatDuration motor.burnTime}}</p>
         </div>
       </div>
-    
+
       {{#if motor.isp}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Isp</label>
@@ -147,7 +147,7 @@
         </div>
       </div>
       {{/if}}
-    
+
       {{#if motor.caseInfo}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Case Info</label>
@@ -156,7 +156,7 @@
         </div>
       </div>
       {{/if}}
-    
+
       {{#if motor.propellantInfo}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Propellant Info</label>
@@ -165,14 +165,14 @@
         </div>
       </div>
       {{/if}}
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Cert. Org.</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{motor._certOrg.abbrev}}</p>
         </div>
       </div>
-    
+
       {{#if motor.certDate}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Cert. Date</label>
@@ -181,7 +181,7 @@
         </div>
       </div>
       {{/if}}
-    
+
       {{#if motor.certDesignation}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Cert. Designation</label>
@@ -190,7 +190,7 @@
         </div>
       </div>
       {{/if}}
-    
+
       {{#if motor.dataSheet}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Data Sheet</label>
@@ -199,7 +199,7 @@
         </div>
       </div>
       {{/if}}
-    
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Availability</label>
         <div class="col-sm-6">
@@ -209,7 +209,23 @@
           </p>
         </div>
       </div>
-    
+
+      {{#if username}}
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Favorite</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">
+          {{#if favorite}}
+            Liked on {{formatDate favorite.updatedAt 'short'}}
+            <a class="favorite" href="{{removeFavoriteLink}}" title="remove favorite"><i class="fa fa-thumbs-o-down"></i></a>
+          {{/if}}
+          {{#unless favorite}}
+            <a class="favorite" href="{{addFavoriteLink}}" title="add favorite"><i class="fa fa-thumbs-o-up"></i></a>
+          {{/unless}}
+          </p>
+        </div>
+      </div>
+      {{/if}}
     </div>
   </div> <!-- left col -->
 

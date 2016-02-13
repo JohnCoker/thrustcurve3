@@ -108,7 +108,7 @@ function recordView(req, motor, source) {
   // record this view
   var view = new req.db.MotorView({
     _motor: motor._id,
-    _contributor: req.session.contributorId,
+    _contributor: req.user ? req.user._id : undefined,
     source: source
   });
   req.db.MotorView.create(view);
@@ -121,8 +121,7 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
         // record the motor view
         recordView(req, motor);
 
-        // render the motor details
-        res.render('motors/details', locals(defaults, {
+        var details = locals(defaults, {
           title: req.helpers.motorFullName(manufacturer, motor),
           manufacturer: manufacturer,
           motor: motor,
@@ -132,7 +131,21 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           isCompare: classCount >= 5,
           isReloadCase: motor.type == 'reload' && motor.caseInfo,
           editLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html'
-        }));
+        });
+
+        if (req.user) {
+          // check if this is a favorite motor
+          details.username = req.user.name;
+          details.addFavoriteLink = '/mystuff/addfavorite.html?motor=' + motor._id;
+          details.removeFavoriteLink = '/mystuff/removefavorite.html?motor=' + motor._id;
+          req.db.FavoriteMotor.findOne({ _contributor: req.user._id, _motor: motor._id }, req.success(function(favorite) {
+            details.favorite = favorite;
+            res.render('motors/details', details);
+          }));
+        } else {
+          // render the motor details (no user)
+          res.render('motors/details', details);
+        }
       }));
     }));
   });

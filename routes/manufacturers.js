@@ -111,7 +111,6 @@ router.get('/manufacturers/:name/details.html', function(req, res, next) {
         else if (classes.length > 2)
           range += ' … ' + classes[classes.length - 1].letter;
       }
-      console.log(range);
 
       res.render('manufacturers/details', locals(defaults, {
         title: manufacturer.name,

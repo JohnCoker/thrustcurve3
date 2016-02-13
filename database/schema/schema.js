@@ -334,6 +334,20 @@ function makeMotorRankingModel(mongoose) {
   return mongoose.model('MotorRanking', schema);
 }
 
+function makeFavoriteMotorModel(mongoose) {
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
+    _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', required: true, index: true },
+    _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true, index: true },
+  });
+  schema.index({ _contributor: 1, _motor: 1 }, { unique: true });
+
+  schemaOptions(schema);
+  return mongoose.model('FavoriteMotor', schema);
+}
+
+
 /**
  * <p>The <b>schema</b> module contains the Mongoose schema used by the site.
  * This is largely a copy of the previous MySQL schema, taking some advantage
@@ -456,6 +470,14 @@ module.exports = {
    * @return {object} Mongoose model
    */
   MotorRankingModel: makeMotorRankingModel,
+
+  /**
+   * Produce a Mongoose model for the <em>favoriteMotors</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
+  FavoriteMotorModel: makeFavoriteMotorModel,
 
   /**
    * The legal values for Motor.type.

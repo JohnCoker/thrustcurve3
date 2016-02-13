@@ -1,1 +1,88 @@
 <h1>{{title}}</h1>
+
+{{#unless favorites}}
+<p>
+You don't have any favorite motors yet.
+When you view a motor that you want to keep track of,
+click the <i class="fa fa-thumbs-o-up" title="thumbs up"></i> button to mark it.
+</p>
+{{/unless}}
+{{#if favorites}}
+<table id="favorite-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th class="number">Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Burn</th>
+     <th>Liked</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each favorites}}
+    <tr>
+      <td><a href="{{motorLink _motor}}">{{motorDesignation _motor}}</td>
+      <td>{{_motor._manufacturer.abbrev}}</td>
+      <td class="number" data-sort="{{formatSort _motor.diameter}}">{{formatMMT _motor.diameter}}</td>
+      <td class="number" data-sort="{{formatSort _motor.totalImpulse}}">{{formatImpulse _motor.totalImpulse}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort _motor.avgThrust}}">{{formatForce _motor.avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort _motor.burnTime}}">{{formatDuration _motor.burnTime}}</td>
+      <td data-sort="{{formatSort updatedAt}}">
+        {{formatDate updatedAt 'short'}}
+        <a class="favorite" href="/mystuff/removefavorite.html?motor={{_motor._id}}" title="remove favorite"><i class="fa fa-thumbs-o-down"></i></a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#favorite-list', {
+  order: [[6, 'desc']],
+  expand: true
+});
+</script>
+{{/if}}
+
+{{#if recents}}
+<h2>Recent Motors</h2>
+<p>
+Here are other motors you've recently viewed; maybe some of these are should be favorites.
+</p>
+<table id="recent-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th class="number">Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Burn</th>
+     <th>Viewed</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each recents}}
+    <tr>
+      <td><a href="{{motorLink _motor}}">{{motorDesignation _motor}}</td>
+      <td>{{_motor._manufacturer.abbrev}}</td>
+      <td class="number" data-sort="{{formatSort _motor.diameter}}">{{formatMMT _motor.diameter}}</td>
+      <td class="number" data-sort="{{formatSort _motor.totalImpulse}}">{{formatImpulse _motor.totalImpulse}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort _motor.avgThrust}}">{{formatForce _motor.avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort _motor.burnTime}}">{{formatDuration _motor.burnTime}}</td>
+      <td data-sort="{{formatSort updatedAt}}">
+        {{formatDate updatedAt 'short'}}
+        <a class="favorite" href="/mystuff/addfavorite.html?motor={{_motor._id}}" title="add favorite"><i class="fa fa-thumbs-o-up"></i></a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#recent-list', {
+  order: [[6, 'desc']],
+  expand: true
+});
+</script>
+{{/if}}

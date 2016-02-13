@@ -15,6 +15,7 @@ const express = require('express'),
 const loginLink = '/mystuff/login.html',
       registerLink = '/mystuff/register.html',
       forgotLink = '/mystuff/forgotpasswd.html',
+      favoritesLink = '/mystuff/favorites.html',
       preferencesLink = '/mystuff/preferences.html',
       profileLink = '/mystuff/profile.html';
 
@@ -186,7 +187,103 @@ router.get('/mystuff/forgotpasswd.html', authenticated, function(req, res, next)
  * Renders with mystuff/favorites.hbs template.
  */
 router.get('/mystuff/favorites.html', authenticated, function(req, res, next) {
-  res.render('mystuff/favorites', locals(req, defaults, 'My Favorites'));
+  req.db.FavoriteMotor.find({ _contributor: req.user._id }).exec(req.success(function(favorites) {
+    req.db.MotorView.find({ _contributor: req.user._id }).sort({ updatedAt: -1 }).limit(100).exec(req.success(function(recents) {
+      var ids = [], id, i;
+
+      // colect IDs of favorite motors
+      for (i = 0; i < favorites.length; i++)
+        ids.push(favorites[i]._motor.toString());
+
+      // filter out favorites and de-dup
+      if (recents.length > 0) {
+        for (i = 0; i < recents.length; ) {
+          id = recents[i]._motor.toString();
+          if (ids.indexOf(id) < 0) {
+            // add to motor IDs
+            ids.push(id);
+            i++;
+          } else {
+            // remove from recents
+            recents.splice(i, 1);
+          }
+        }
+      }
+
+      // fetch needed motors
+      req.db.Motor.find({ '_id': { $in: ids } }).populate('_manufacturer', 'abbrev').exec(req.success(function(motors) {
+        var map = {}, id, i;
+
+        // hand-populate favorites and recents
+        for (i = 0; i < motors.length; i++) {
+          id = motors[i]._id.toString();
+          map[id] = motors[i];
+        }
+        for (i = 0; i < favorites.length; i++) {
+          id = favorites[i]._motor.toString();
+          favorites[i]._motor = map[id];
+        }
+        for (i = 0; i < recents.length; i++) {
+          id = recents[i]._motor.toString();
+          recents[i]._motor = map[id];
+        }
+
+        res.render('mystuff/favorites', locals(req, defaults, {
+          title: 'Favorite Motors',
+          favorites: favorites,
+          recents: recents,
+        }));
+      }));
+    }));
+  }));
+});
+
+function addFavorite(req, res, motor) {
+  if (!req.db.isId(motor)) {
+    // invalid motor ID
+    res.status(404).send('Invalid motor ID');
+  } else {
+    req.db.FavoriteMotor.findOne({ _contributor: req.user._id, _motor: motor }, req.success(function(favorite) {
+      if (favorite) {
+        // already a favorite
+        res.redirect(favoritesLink);
+      } else {
+        favorite = new req.db.FavoriteMotor({
+          _contributor: req.user._id,
+          _motor: motor
+        });
+        favorite.save(req.success(function(saved) {
+          // now is a favorite
+          res.redirect(favoritesLink);
+        }));
+      }
+    }));
+  }
+}
+
+router.get('/mystuff/addfavorite.html', authenticated, function(req, res, next) {
+  addFavorite(req, res, req.query.motor);
+});
+router.post('/mystuff/addfavorite.html', authenticated, function(req, res, next) {
+  addFavorite(req, res, req.body.motor);
+});
+
+function removeFavorite(req, res, motor) {
+  if (!req.db.isId(motor)) {
+    // invalid motor ID
+    res.redirect(favoritesLink);
+  } else {
+    req.db.FavoriteMotor.remove({ _contributor: req.user._id, _motor: motor }, req.success(function() {
+      res.redirect(favoritesLink);
+    }));
+  }
+}
+
+router.get('/mystuff/removefavorite.html', authenticated, function(req, res, next) {
+  removeFavorite(req, res, req.query.motor);
+});
+router.post('/mystuff/removefavorite.html', authenticated, function(req, res, next) {
+  removeFavorite(req, res, req.body.motor);
 });
 
 

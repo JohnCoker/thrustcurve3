@@ -16,6 +16,7 @@ const loginLink = '/mystuff/login.html',
       registerLink = '/mystuff/register.html',
       forgotLink = '/mystuff/forgotpasswd.html',
       favoritesLink = '/mystuff/favorites.html',
+      rocketsLink = '/mystuff/rockets.html',
       preferencesLink = '/mystuff/preferences.html',
       profileLink = '/mystuff/profile.html';
 
@@ -291,11 +292,256 @@ router.post('/mystuff/removefavorite.html', authenticated, function(req, res, ne
  * /mystuff/rockets.html
  * Renders with mystuff/rockets.hbs template.
  */
-router.get('/mystuff/rockets.html', authenticated, function(req, res, next) {
-  res.render('mystuff/rockets', locals(req, defaults, 'My Rockets'));
+router.get(rocketsLink, authenticated, function(req, res, next) {
+  req.db.Rocket.find({ _contributor: req.user._id }, req.success(function(rockets) {
+    res.render('mystuff/rockets', locals(req, defaults, {
+      title: 'My Rockets',
+      rockets: rockets
+    }));
+  }));
 });
-router.get(['/updaterocket.jsp'], function(req, res, next) {
-  res.redirect(301, '/mystuff/rockets.html');
+
+
+/*
+ * /mystuff/rocket/id/
+ * Renders with mystuff/showrocket.hbs template.
+ */
+router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
+  var id = req.params.id;
+  if (req.db.isId(id)) {
+    req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+      if (rocket == null) {
+	res.redirect(303, rocketsLink);
+	return;
+      }
+      res.render('mystuff/rocketdetails', locals(req, defaults, {
+	title: rocket.name,
+	rocket: rocket,
+	editLink: '/mystuff/rocket/' + id + '/edit.html',
+	deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+      }));
+    }));
+  } else {
+    res.redirect(303, rocketsLink);
+  }
+});
+
+/*
+ * /mystuff/rocket/id/edit.html
+ * Renders with mystuff/editrocket.hbs template.
+ */
+const finishes = [
+  { label: 'perfect', value: 0.3 },
+  { label: 'good', value: 0.5 },
+  { label: 'average', value: 0.75 },
+  { label: 'high', value: 1.0, last: true },
+];
+Object.freeze(finishes);
+
+router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, next) {
+  var id = req.params.id;
+
+  if (req.db.isId(id)) {
+    req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+      if (rocket == null) {
+	res.redirect(303, rocketsLink);
+	return;
+      }
+      res.render('mystuff/editrocket', locals(req, defaults, {
+	title: 'Edit Rocket',
+	isNew: false,
+	rocket: rocket,
+	lengthUnits: units.length,
+	massUnits: units.mass,
+	finishes: finishes,
+	submitLink: '/mystuff/rocket/' + id + '/edit.html',
+	cancelLink: '/mystuff/rocket/' + id + '/',
+      }));
+    }));
+  } else {
+    // add new rocket
+    var lengthUnit = units.getUnitPref('length').label,
+	massUnit = units.getUnitPref('mass').label,
+	guideUnit, guideLen;
+
+    // default guide length based on chosen units
+    if (lengthUnit == 'in' || lengthUnit == 'ft') {
+      guideUnit = 'ft';
+      guideLen = 3.0;
+    } else {
+      guideUnit = 'm';
+      guideLen = 1.0;
+    }
+
+    res.render('mystuff/editrocket', locals(req, defaults, {
+      title: 'Add Rocket',
+      isNew: true,
+      rocket: {
+	'public': true,
+	bodyDiameterUnit: lengthUnit,
+        weightUnit: massUnit,
+        mmtDiameterUnit: 'mm',
+	mmtLengthUnit: lengthUnit,
+	mmtCount: 1,
+	cd: 0.75,
+        guideLength: guideLen,
+        guideLengthUnit: guideUnit,
+      },
+      lengthUnits: units.length,
+      massUnits: units.mass,
+      finishes: finishes,
+      submitLink: '/mystuff/rocket/new/edit.html',
+      cancelLink: '/mystuff/rockets.html',
+    }));
+  }
+});
+router.get('/updaterocket.jsp', function(req, res, next) {
+  var id = req.query.id;
+  if (id && /^[1-9][0-9]*$/.test(id)) {
+    // old-style MySQL row ID; go to rocket edit
+    req.db.Rocket.findOne({ migratedId: parseInt(id) }, req.success(function(found) {
+      if (found)
+        res.redirect(301, '/mystuff/rocket/' + found._id + '/edit.html');
+      else
+        res.redirect(303, rocketsLink);
+    }));
+  } else {
+    res.redirect(301, rocketsLink);
+  }
+});
+
+function doSubmitRocket(req, res, rocket) {
+  var isNew = false, isChanged = false,
+      errors = [], url, v;
+
+  if (rocket == null) {
+    rocket = {
+      _contributor: req.user._id
+    };
+    isNew = true;
+  }
+
+  // non-numeric values
+  [ 'name',
+    'website',
+    'comments',
+  ].forEach(function(p) {
+    var s;
+    if (req.body.hasOwnProperty(p)) {
+      s = req.body[p].trim();
+      if (s === '') {
+        if (rocket[p] != null) {
+          rocket[p] = undefined;
+          isChanged = true;
+        }
+      } else {
+        if (rocket[p] == null || req.body[p] != rocket[p].toString()) {
+          rocket[p] = req.body[p];
+          isChanged = true;
+        }
+      }
+    }
+  });
+  if (rocket.name == null || rocket.name === '') {
+    errors.push('Rocket name is required.');
+  }
+
+  // public flag
+  v = req.body.public == 'on' || req.body.public == 'true';
+  if (rocket.public != v) {
+    rocket.public = v;
+    isChanged = true;
+  }
+
+  // dimensions with units
+  [ 'bodyDiameter',
+    'weight',
+    'mmtDiameter',
+    'mmtLength',
+    'guideLength',
+  ].forEach(function(valueProp) {
+    var unitProp = valueProp + 'Unit',
+	u, v;
+
+    if (req.body.hasOwnProperty(valueProp)) {
+      v = parseFloat(req.body[valueProp]);
+      u = req.body[unitProp];
+
+      if (valueProp == 'weight')
+	u = units.mass.get(u);
+      else
+	u = units.length.get(u);
+
+      if (isNaN(v) || v <= 0 || u == null)
+	errors.push('Rocket ' + valueProp + ' (with unit) is required.');
+      else if (rocket[valueProp] != v || rocket[unitProp] != u.label) {
+	rocket[valueProp] = v;
+	rocket[unitProp] = u.label;
+	isChanged = true;
+      }
+    }
+  });
+
+  // simple numeric values
+  [ 'mmtCount',
+    'cd',
+  ].forEach(function(p) {
+    var v;
+    if (req.body.hasOwnProperty(p)) {
+      v = parseFloat(req.body[p]);
+      if (isNaN(v) || v <= 0)
+	errors.push('Rocket ' + p + ' is required.');
+      else if (rocket[p] != v) {
+	rocket[p] = v;
+	isChanged = true;
+      }
+    }
+  });
+
+  if (isNew)
+    url = '/mystuff/rocket/new/edit.html';
+  else
+    url = '/mystuff/rocket/' + rocket._id + '/edit.html';
+
+  if (errors.length > 0) {
+    res.render('mystuff/editrocket', locals(req, defaults, {
+      title: isNew ? 'Add Rocket' : 'Edit Rocket',
+      isNew: isNew,
+      rocket: rocket,
+      lengthUnits: units.length,
+      massUnits: units.mass,
+      finishes: finishes,
+      errors: errors,
+      submitLink: url
+    }));
+  } else if (isNew) {
+    req.db.Rocket.create(new req.db.Rocket(rocket), req.success(function(updated) {
+      res.redirect(303, url + '?result=created');
+    }));
+  } else {
+    if (isChanged) {
+      rocket.save(req.success(function(updated) {
+	res.redirect(303, url + '?result=saved');
+      }));
+    } else {
+      res.redirect(303, url + '?result=unchanged');
+    }
+  }
+}
+
+router.post('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, next) {
+  var id = req.params.id;
+
+  if (req.db.isId(id)) {
+    req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+      if (rocket == null)
+	res.redirect(303, rocketsLink);
+      else
+	doSubmitRocket(req, res, rocket);
+    }));
+  } else {
+    doSubmitRocket(req, res);
+  }
 });
 
 

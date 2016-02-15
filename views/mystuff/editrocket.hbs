@@ -1,0 +1,198 @@
+<h1>{{title}}</h1>
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+<form role="form" class="form-horizontal" name="edit-rocket" action="{{submitLink}}" method="post" data-toggle="validator">
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Name</label>
+    <div class="col-sm-9">
+      <input type="text" class="form-control" name="name" required
+             placeholder="" value="{{rocket.name}}">
+      <span class="help-block with-errors"></span>
+      <input type="checkbox" name="public"
+             {{#if rocket.public}}checked{{/if}}>
+      Allow others to see this rocket
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="diameter" class="col-sm-3 control-label">Body Diameter</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="bodyDiameter"
+             step="0.001" min="0.001" required
+             value="{{rocket.bodyDiameter}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="bodyDiameterUnit" required>
+        {{#each lengthUnits}}
+	<option value="{{label}}" {{#equal label ../rocket.bodyDiameterUnit}}selected{{/equal}}>{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="weight" class="col-sm-3 control-label">Dry Weight</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="weight"
+             required
+             value="{{rocket.weight}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="weightUnit" required>
+        {{#each massUnits}}
+	<option value="{{label}}" {{#equal label ../rocket.weightUnit}}selected{{/equal}}>{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="mmtDiameter" class="col-sm-3 control-label">MMT Diameter</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="mmtDiameter"
+             step="0.001" min="0.001" required
+             value="{{rocket.mmtDiameter}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="mmtDiameterUnit" required>
+        {{#each lengthUnits}}
+	<option value="{{label}}" {{#equal label ../rocket.mmtDiameterUnit}}selected{{/equal}}>{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="mmtLength" class="col-sm-3 control-label">MMT Length</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="mmtLength"
+             step="0.001" min="0.001" required
+             value="{{rocket.mmtLength}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="mmtLengthUnit" required>
+        {{#each lengthUnits}}
+	<option value="{{label}}" {{#equal label ../rocket.mmtLengthUnit}}selected{{/equal}}>{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="mmtCount" class="col-sm-3 control-label">MMT Count</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="mmtCount"
+             step="1" min="1" required
+             value="{{rocket.mmtCount}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <p class="form-control-static" id="cluster">motors</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="cd" class="col-sm-3 control-label">C<sub>D</sub></label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="cd"
+             step="0.01" min="0.1" required
+             value="{{rocket.cd}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" id="finish">
+        <option></option>
+	{{#each finishes}}
+	<option value="{{value}}" {{#equal value ../rocket.cd}}selected{{/equal}}>{{label}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="guideLength" class="col-sm-3 control-label">Guide Length</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="guideLength"
+             step="0.001" min="0.001" required
+             value="{{rocket.guideLength}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="guideLengthUnit" required>
+        {{#each lengthUnits}}
+	<option value="{{label}}" {{#equal label ../rocket.guideLengthUnit}}selected{{/equal}}>{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group website">
+    <label for="website" class="col-sm-3 control-label">Web Page</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="url" class="form-control" name="website"
+               placeholder="http://..." value="{{rocket.website}}">
+        <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
+      </div>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+
+  <div class="form-group comments">
+    <label for="comments" class="col-sm-3 control-label">Comments</label>
+    <div class="col-sm-9">
+      <textarea class="form-control" name="comments">{{rocket.comments}}</textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+      <a class="btn btn-default" href="{{cancelLink}}">Cancel</a>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+function clusterStatus() {
+  var count = parseInt($('input[name=mmtCount]').val());
+  if (isNaN(count) || count < 1)
+    $('#cluster').text('')
+  else
+    $('#cluster').text(count > 1 ? 'cluster' : 'single');
+}
+$('input[name=mmtCount]').blur(clusterStatus);
+clusterStatus();
+
+$('input[name=cd]').blur(function(e) {
+  var cd = parseFloat($(this).val());
+
+  if (isNaN(cd) || cd < 0.1)
+    $('#finish').val('')
+  {{#each finishes}}
+  else{{#unless last}} if (cd <= {{value}}){{/unless}}
+    $('#finish').val('{{value}}')
+  {{/each}}
+});
+$('#finish').change(function(e) {
+  var cd = parseFloat($(this).val());
+  if (cd > 0)
+    $('input[name=cd]').val(cd);
+});
+
+$('.website .test').click(function(e) {
+  var site, a;
+
+  e.preventDefault();
+
+  site = $.trim($(this).closest('div.input-group').find('input').val());
+  if (site)
+    window.open(site, "_blank");
+});
+</script>

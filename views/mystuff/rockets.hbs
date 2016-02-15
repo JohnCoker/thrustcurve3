@@ -1,1 +1,44 @@
 <h1>{{title}}</h1>
+
+{{#unless rockets}}
+<p>
+You don't have any rockets defined yet.
+If you add rockets, you can easily find motors for them using the Motor Guide.
+<a href="/mystuff/rocket/new/edit.html">Add your first rocket</a>.
+</p>
+{{/unless}}
+{{#if rockets}}
+<table id="rocket-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Name</th>
+     <th class="number">Body Diam</th>
+     <th class="number">Weight</th>
+     <th class="number">MMT Diam</th>
+     <th class="number">MMT Len</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each rockets}}
+    <tr data-id="{{_id}}">
+      <td><a href="/mystuff/rocket/{{id}}/">{{name}}</a></td>
+      <td class="number" data-sort="{{formatSort bodyDiameter}}">{{formatLength bodyDiameter bodyDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort weight}}">{{formatMass weight weightUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtDiameter}}">{{formatLength mmtDiameter mmtDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtLength}}">{{formatLength mmtLength mmtLengthUnit}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#rocket-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>
+
+<p>
+<a href="/mystuff/rocket/new/edit.html">Add another rocket</a>.
+</p>
+{{/if}}
+

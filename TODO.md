@@ -127,7 +127,7 @@ This table lists all pages of the old site and will be filled in as v3 proceeds.
 | updatecontrib.jsp   | mystuff/profile.html       | account |
 | updatemotor.jsp     | motors/*/edit.html         | admin |
 | updatenote.jsp      |                            | |
-| updaterocket.jsp    |                            | account |
+| updaterocket.jsp    | mystuff/rocket/*/edit.html | account |
 | updates.jsp         | motors/updates.html        | |
 | updatesimfile.jsp   |                            | |
 

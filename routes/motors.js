@@ -299,6 +299,17 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
  * /motors/search.html
  * General motor search, renders with motors/search.hbs template.
  */
+function toDesignation(s) {
+  s = s.toUpperCase();
+  s = s.replace(/[^A-Z0-9_.\/-]+/g, '_');
+  return s;
+}
+
+function toCommonName(s) {
+  s = s.toUpperCase();
+  return s;
+}
+
 function doSearch(req, res, params) {
   metadata.getMotors(req, function(all, available) {
     var query = {},
@@ -335,12 +346,26 @@ function doSearch(req, res, params) {
           else
             failed = true;
 
+        } else if (k == 'designation') {
+	  v = toDesignation(v);
+          query.$or = [
+            { designation: v },
+            { altDesignation: v },
+          ];
+
+        } else if (k == 'commonName') {
+	  v = toCommonName(v);
+          query.$or = [
+            { commonName: v },
+            { altName: v },
+          ];
+
         } else if (k == 'name') {
           query.$or = [
-            { designation: v.toUpperCase() },
-            { altDesignation: v.toUpperCase() },
-            { commonName: v.toUpperCase() },
-            { altName: v.toUpperCase() },
+            { designation: toDesignation(v) },
+            { altDesignation: toDesignation(v) },
+            { commonName: toCommonName(v) },
+            { altName: toCommonName(v) },
           ];
 
         } else if (k == 'diameter') {

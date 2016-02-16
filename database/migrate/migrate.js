@@ -83,8 +83,10 @@ function mapUnit(value) {
   if (value === 20)
     return 'kg';
   if (value === 21)
-    return 'lb';
+    return 'g';
   if (value === 22)
+    return 'lb';
+  if (value === 23)
     return 'oz';
 
   if (value === 40)
@@ -399,6 +401,7 @@ var tables = [
             return;
           if (value < 0.1)
             value = 0.1;
+          return value;
         }
       },
       {

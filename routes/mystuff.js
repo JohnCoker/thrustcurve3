@@ -296,7 +296,8 @@ router.get(rocketsLink, authenticated, function(req, res, next) {
   req.db.Rocket.find({ _contributor: req.user._id }, req.success(function(rockets) {
     res.render('mystuff/rockets', locals(req, defaults, {
       title: 'My Rockets',
-      rockets: rockets
+      rockets: rockets,
+      isDeleted: req.query.result == 'deleted'
     }));
   }));
 });
@@ -317,6 +318,10 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
       res.render('mystuff/rocketdetails', locals(req, defaults, {
 	title: rocket.name,
 	rocket: rocket,
+        result: req.query.result,
+        isCreated: req.query.result == 'created',
+        isSaved: req.query.result == 'saved',
+        isUnchanged: req.query.result == 'unchanged',
 	editLink: '/mystuff/rocket/' + id + '/edit.html',
 	deleteLink: '/mystuff/rocket/' + id + '/delete.html',
       }));
@@ -516,9 +521,11 @@ function doSubmitRocket(req, res, rocket) {
     }));
   } else if (isNew) {
     req.db.Rocket.create(new req.db.Rocket(rocket), req.success(function(updated) {
+      url = '/mystuff/rocket/' + updated._id + '/';
       res.redirect(303, url + '?result=created');
     }));
   } else {
+    url = '/mystuff/rocket/' + rocket._id + '/';
     if (isChanged) {
       rocket.save(req.success(function(updated) {
 	res.redirect(303, url + '?result=saved');
@@ -541,6 +548,22 @@ router.post('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, n
     }));
   } else {
     doSubmitRocket(req, res);
+  }
+});
+
+
+/*
+ * /mystuff/rocket/id/delete.html
+ * Redirects to rocket list.
+ */
+router.get('/mystuff/rocket/:id/delete.html', authenticated, function(req, res, next) {
+  var id = req.params.id;
+  if (req.db.isId(id)) {
+    req.db.Rocket.remove({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+      res.redirect(303, rocketsLink + '?result=deleted');
+    }));
+  } else {
+    res.redirect(303, rocketsLink);
   }
 });
 

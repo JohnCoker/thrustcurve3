@@ -1,10 +1,20 @@
 <h1>{{title}}</h1>
 
-{{#each errors}}
-<div class="alert alert-danger" role="alert">
-{{this}}
+{{#if isSaved}}
+<div class="alert alert-success" role="alert">
+Changes to rocket saved.
 </div>
-{{/each}}
+{{/if}}
+{{#if isCreated}}
+<div class="alert alert-success" role="alert">
+New rocket created.
+</div>
+{{/if}}
+{{#if isUnchanged}}
+<div class="alert alert-success" role="alert">
+No changes to save.
+</div>
+{{/if}}
 
 <form role="form" class="form-horizontal form-condensed">
   <div class="form-group">

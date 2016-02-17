@@ -1,8 +1,14 @@
 <h1>{{title}}</h1>
 
+{{#if isDeleted}}
+<div class="alert alert-success" role="alert">
+Rocket deleted.
+</div>
+{{/if}}
+
 {{#unless rockets}}
 <p>
-You don't have any rockets defined yet.
+You don't have any rockets defined.
 If you add rockets, you can easily find motors for them using the Motor Guide.
 <a href="/mystuff/rocket/new/edit.html">Add your first rocket</a>.
 </p>

@@ -17,68 +17,56 @@ No changes to save.
 {{/if}}
 
 <form role="form" class="form-horizontal form-condensed">
-  <div class="form-group">
-    <label for="name" class="col-sm-3 control-label">Name</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{rocket.name}}</p>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="diameter" class="col-sm-3 control-label">Body Diameter</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{formatLength rocket.bodyDiameter rocket.bodyDiameterUnit}}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="weight" class="col-sm-3 control-label">Dry Weight</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{formatMass rocket.weight rocket.weightUnit}}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="mmtDiameter" class="col-sm-3 control-label">MMT Diameter</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{formatLength rocket.mmtDiameter rocket.mmtDiameterUnit}}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="mmtLength" class="col-sm-3 control-label">MMT Length</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{formatLength rocket.mmtLength rocket.mmtLengthUnit}}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="mmtCount" class="col-sm-3 control-label">MMT Count</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{rocket.mmtCount}}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="cd" class="col-sm-3 control-label">C<sub>D</sub></label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{formatCD rocket.cd}}</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="guideLength" class="col-sm-3 control-label">Guide Length</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{formatLength rocket.guideLength rocket.guideLengthUnit}}</p>
-    </div>
-  </div>
-  <div class="form-group website">
-    <label for="website" class="col-sm-3 control-label">Web Page</label>
-    <div class="col-sm-9">
-      <p class="form-control-static"><a href="{{rocket.website}}" target="_blank">{{websiteAnchor rocket.website}}</a></p>
-    </div>
-  </div>
-  <div class="form-group comments">
-    <label for="comments" class="col-sm-3 control-label">Comments</label>
-    <div class="col-sm-9">
-      <p class="form-control-static">{{rocket.comments}}</p>
-    </div>
-  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <p class="column-title">Overall</p>
+      <div class="form-group">
+        <label for="diameter" class="col-sm-6 control-label">Body Diameter</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatLength rocket.bodyDiameter rocket.bodyDiameterUnit}}</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="weight" class="col-sm-6 control-label">Dry Weight</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatMass rocket.weight rocket.weightUnit}}</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="cd" class="col-sm-6 control-label">C<sub>D</sub></label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatCD rocket.cd}}</p>
+        </div>
+      </div>
+    </div> <!-- left col -->
+    <div class="col-sm-6">
+      <p class="column-title">Motor Mount</p>
+      <div class="form-group">
+        <label for="mmtDiameter" class="col-sm-6 control-label">MMT Diameter</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatLength rocket.mmtDiameter rocket.mmtDiameterUnit}}</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="mmtLength" class="col-sm-6 control-label">MMT Length</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatLength rocket.mmtLength rocket.mmtLengthUnit}}</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="mmtCount" class="col-sm-6 control-label">MMT Count</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{rocket.mmtCount}}</p>
+        </div>
+      </div>
+    </div> <!-- left col -->
+  </div> <!-- row -->
 </form>
+{{#if rocket.comments}}
+<div class="comments">
+{{renderBBCode rocket.comments}}
+</div>
+{{/if}}
 
 {{#if editLink}}
 <p>

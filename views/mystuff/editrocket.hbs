@@ -146,7 +146,7 @@
   <div class="form-group comments">
     <label for="comments" class="col-sm-3 control-label">Comments</label>
     <div class="col-sm-9">
-      <textarea class="form-control" name="comments">{{rocket.comments}}</textarea>
+      <textarea class="form-control" name="comments" id="comments">{{rocket.comments}}</textarea>
     </div>
   </div>
 
@@ -160,6 +160,8 @@
 </form>
 
 <script type="text/javascript">
+CKEDITOR.replace('comments');
+
 function clusterStatus() {
   var count = parseInt($('input[name=mmtCount]').val());
   if (isNaN(count) || count < 1)

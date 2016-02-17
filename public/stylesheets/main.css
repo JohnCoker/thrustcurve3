@@ -79,6 +79,10 @@ h2 .label-as-badge {
 p.img {
   text-align: center;
 }
+p.column-title {
+  text-align: center;
+  border-bottom: 1px solid #888;
+}
 
 img.dropcap {
   float: left;

@@ -28,10 +28,10 @@ If you add rockets, you can easily find motors for them using the Motor Guide.
   {{#each rockets}}
     <tr data-id="{{_id}}">
       <td><a href="/mystuff/rocket/{{id}}/">{{name}}</a></td>
-      <td class="number" data-sort="{{formatSort bodyDiameter}}">{{formatLength bodyDiameter bodyDiameterUnit}}</td>
-      <td class="number" data-sort="{{formatSort weight}}">{{formatMass weight weightUnit}}</td>
-      <td class="number" data-sort="{{formatSort mmtDiameter}}">{{formatLength mmtDiameter mmtDiameterUnit}}</td>
-      <td class="number" data-sort="{{formatSort mmtLength}}">{{formatLength mmtLength mmtLengthUnit}}</td>
+      <td class="number" data-sort="{{formatSort bodyDiameter 'length' bodyDiameterUnit}}">{{formatLength bodyDiameter bodyDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort weight 'mass' weightUnit}}">{{formatMass weight weightUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtDiameter 'length' mmtDiameterUnit}}">{{formatLength mmtDiameter mmtDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtLength 'length' mmtLengthUnit}}">{{formatLength mmtLength mmtLengthUnit}}</td>
     </tr>
   {{/each}}
   </tbody>

@@ -143,7 +143,7 @@
     </div>
   </div>
 
-  <div class="form-group comments">
+  <div class="form-group">
     <label for="comments" class="col-sm-3 control-label">Comments</label>
     <div class="col-sm-9">
       <textarea class="form-control" name="comments" id="comments">{{rocket.comments}}</textarea>
@@ -158,6 +158,109 @@
     </div>
   </div>
 </form>
+
+{{#if adapterLink}}
+<h2>Motor Adapters</h2>
+
+{{#unless rocket.adapters}}
+<p>
+If you have an adapter to a smaller motor mount diameter for this rocket,
+enter it here to find motors that fit the adapter as well.
+</p>
+{{/unless}}
+
+{{#if rocket.adapters}}
+<table id="adapter-list" class="table table-bordered adapters">
+  <thead>
+    <th class="number">Diameter</th>
+    <th class="number">Length</th>
+    <th class="number">Weight</th>
+    <th class="actions">&nbsp;</th>
+  </thead>
+  <tbody>
+  {{#each rocket.adapters}}
+    <tr data-index="{{@index}}">
+      <td class="number" data-sort="{{formatSort mmtDiameter 'length' mmtDiameterUnit}}">{{formatLength mmtDiameter mmtDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtLength 'length' mmtLengthUnit}}">{{formatLength mmtLength mmtLengthUnit}}</td>
+      <td class="number" data-sort="{{formatSort weight 'mass' weightUnit}}">{{formatMass weight weightUnit}}</td>
+      <td class="actions">
+        <form action="{{../adapterLink}}" method="post">
+          <input type="hidden" name="index" value="{{@index}}">
+          <input type="hidden" name="remove" value="1">
+          <button type="submit" class="btn btn-danger btn-xs" title="remove this adapter">Remove</button>
+        </form>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#adapter-list', {
+  order: [[0, 'desc']],
+  columnDefs: [
+    { targets: 'actions', orderable: false }
+  ]
+});
+</script>
+
+<p>
+If you have an adapter for another motor diameter, you can add it as well.
+</p>
+{{/if}}
+
+<form role="form" class="form-horizontal" name="edit-adapter" action="{{adapterLink}}" method="post" data-toggle="validator">
+  <input type="hidden" name="index", value="">
+  <div class="form-group">
+    <label for="mmtDiameter" class="col-sm-3 control-label">MMT Diameter</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="mmtDiameter"
+             step="0.001" min="0.001" required>
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="mmtDiameterUnit" required>
+        {{#each lengthUnits}}
+	<option value="{{label}}">{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="mmtLength" class="col-sm-3 control-label">MMT Length</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="mmtLength"
+             step="0.001" min="0.001" required>
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="mmtLengthUnit" required>
+        {{#each lengthUnits}}
+	<option value="{{label}}">{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="weight" class="col-sm-3 control-label">Adapter Weight</label>
+    <div class="col-sm-6">
+      <input type="number" class="form-control" name="weight" required>
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="weightUnit" required>
+        {{#each massUnits}}
+	<option value="{{label}}">{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Add</button>
+    </div>
+  </div>
+</form>
+{{/if}}
 
 <script type="text/javascript">
 CKEDITOR.replace('comments');
@@ -197,4 +300,5 @@ $('.website .test').click(function(e) {
   if (site)
     window.open(site, "_blank");
 });
+
 </script>

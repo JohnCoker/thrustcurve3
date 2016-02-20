@@ -377,6 +377,13 @@ function doSearch(req, res, params) {
           } else
             failed = true;
 
+        } else if (k == 'length') {
+          v = parseFloat(v);
+          if (v > 0)
+            query.length = { $lt: v + 0.0015 };
+          else
+            failed = true;
+
         } else if (k == 'availability') {
           if (v == null || v == 'available')
             query.availability = { $in: req.db.schema.MotorAvailableEnum };

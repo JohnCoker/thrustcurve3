@@ -83,6 +83,15 @@ p.column-title {
   text-align: center;
   border-bottom: 1px solid #888;
 }
+label.column-title {
+  text-align: center;
+  display: block;
+  border-bottom: 1px solid #888;
+}
+ul.checkboxes {
+  list-style: none;
+  padding-left: 1em;
+}
 
 img.dropcap {
   float: left;

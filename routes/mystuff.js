@@ -305,25 +305,130 @@ router.get(rocketsLink, authenticated, function(req, res, next) {
 
 /*
  * /mystuff/rocket/id/
- * Renders with mystuff/showrocket.hbs template.
+ * Renders with mystuff/rocketdetails.hbs template.
  */
 router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
   var id = req.params.id;
   if (req.db.isId(id)) {
     req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+      var mmtDiameter, mmtLength, tolerance = 0.0015, query, i;
+
       if (rocket == null) {
 	res.redirect(303, rocketsLink);
 	return;
       }
-      res.render('mystuff/rocketdetails', locals(req, defaults, {
-	title: rocket.name,
-	rocket: rocket,
-        result: req.query.result,
-        isCreated: req.query.result == 'created',
-        isSaved: req.query.result == 'saved',
-        isUnchanged: req.query.result == 'unchanged',
-	editLink: '/mystuff/rocket/' + id + '/edit.html',
-	deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+
+      mmtDiameter = units.convertUnitToMKS(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit);
+      mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
+      query = {
+        diameter: { $gt: mmtDiameter - tolerance, $lt: mmtDiameter + tolerance },
+        length: { $lt: mmtLength + tolerance },
+        availability: { $in: schema.MotorAvailableEnum }
+      };
+      if (rocket.adapters && rocket.adapters.length > 0) {
+        query.$or = [ {
+          diameter: query.diameter,
+          length: query.length
+        } ];
+        delete query.diameter;
+        delete query.length;
+        for (i = 0; i < rocket.adapters.length; i++) {
+          mmtDiameter = units.convertUnitToMKS(rocket.adapters[i].mmtDiameter, 'length', rocket.adapters[i].mmtDiameterUnit);
+          mmtLength = units.convertUnitToMKS(rocket.adapters[i].mmtLength, 'length', rocket.adapters[i].mmtLengthUnit);
+          query.$or.push({
+            diameter: { $gt: mmtDiameter - tolerance, $lt: mmtDiameter + tolerance },
+            length: { $lt: mmtLength + tolerance },
+          });
+        }
+      }
+      req.db.Motor.find(query)
+        .sort({ totalImpulse: 1 })
+        .select('totalImpulse impulseClass type _manufacturer')
+        .exec(req.success(function(motors) {
+          var classes = [], types = [], mfrIds = [],
+              classRange, v, i;
+
+          if (motors.length > 0) {
+            for (i = 0; i < motors.length; i++) {
+              v = motors[i].impulseClass;
+              if (classes.indexOf(v) < 0)
+                classes.push(v);
+
+              v = motors[i].type;
+              if (types.indexOf(v) < 0)
+                types.push(v);
+
+              v = motors[i]._manufacturer.toString();
+              if (mfrIds.indexOf(v) < 0)
+                mfrIds.push(v);
+            }
+
+            classes.sort();
+            if (classes.length > 2)
+              classRange = classes[0] + '−' + classes[classes.length - 1];
+            else if (classes.length > 1)
+              classRange = classes[0] + '&' + classes[1];
+            else if (classes.length > 0)
+              classRange = classes[0];
+            else
+              classRange = '—';
+
+            types.sort(function(a,b) {
+              return schema.MotorTypeEnum.indexOf(a) - schema.MotorTypeEnum.indexOf(b);
+            });
+
+            req.db.Manufacturer.find({ _id: { $in: mfrIds } })
+              .sort({ abbrev: 1 })
+              .select('abbrev')
+              .exec(req.success(function(manufacturers) {
+              res.render('mystuff/rocketdetails', locals(req, defaults, {
+                title: rocket.name,
+                rocket: rocket,
+                mmtDiameter: mmtDiameter,
+                mmtLength: mmtLength,
+
+                motors: motors,
+                motorCount: motors.length,
+                singleMotor: motors.length == 1 ? motors[0] : undefined,
+
+                classes: classes,
+                classCount: classes.length,
+                classRange: classRange,
+
+                types: types,
+                typeCount: types.length,
+                singleType: types.length == 1 ? types[0] : undefined,
+
+                manufacturers: manufacturers,
+                manufacturerCount: manufacturers.length,
+                singleManufacturer: manufacturers.length == 1 ? manufacturers[0] : undefined,
+
+                result: req.query.result,
+                isCreated: req.query.result == 'created',
+                isSaved: req.query.result == 'saved',
+                isUnchanged: req.query.result == 'unchanged',
+                editLink: '/mystuff/rocket/' + id + '/edit.html',
+                deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+              }));
+            }));
+          } else {
+            res.render('mystuff/rocketdetails', locals(req, defaults, {
+              title: rocket.name,
+              rocket: rocket,
+
+              motorCount: 0,
+              classCount: 0,
+              classRange: '—',
+              manufacturerCount: 0,
+
+              result: req.query.result,
+              isCreated: req.query.result == 'created',
+              isSaved: req.query.result == 'saved',
+              isUnchanged: req.query.result == 'unchanged',
+              editLink: '/mystuff/rocket/' + id + '/edit.html',
+              deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+            }));
+          }
       }));
     }));
   } else {
@@ -360,6 +465,7 @@ router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, ne
 	massUnits: units.mass,
 	finishes: finishes,
 	submitLink: '/mystuff/rocket/' + id + '/edit.html',
+        adapterLink: '/mystuff/rocket/' + id + '/adapter.html',
 	cancelLink: '/mystuff/rocket/' + id + '/',
       }));
     }));
@@ -551,6 +657,88 @@ router.post('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, n
   }
 });
 
+/*
+ * /mystuff/rocket/id/adapter.html
+ * Redirects to rocket edit page.
+ */
+router.post('/mystuff/rocket/:id/adapter.html', authenticated, function(req, res, next) {
+  var id = req.params.id;
+
+  if (req.db.isId(id)) {
+    req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+      var index, adapter, isNew, isChanged = false, errors = [];
+
+      if (rocket == null) {
+	res.redirect(303, rocketsLink);
+        return;
+      }
+
+      // get the existing adapter
+      if (req.body.index) {
+        index = parseInt(req.body.index);
+        if (isNaN(index) || index < 0)
+          index = -1;
+        else
+          adapter = rocket.adapters[index];
+      }
+      if (adapter == null) {
+        adapter = {};
+        isNew = true;
+      }
+
+      // dimensions with units
+      [
+        'mmtDiameter',
+        'mmtLength',
+        'weight',
+      ].forEach(function(valueProp) {
+        var unitProp = valueProp + 'Unit',
+            u, v;
+
+        if (req.body.hasOwnProperty(valueProp)) {
+          v = parseFloat(req.body[valueProp]);
+          u = req.body[unitProp];
+
+          if (valueProp == 'weight')
+            u = units.mass.get(u);
+          else
+            u = units.length.get(u);
+
+          if (isNaN(v) || v <= 0 || u == null)
+            errors.push('Adapter ' + valueProp + ' (with unit) is required.');
+          else if (adapter[valueProp] != v || adapter[unitProp] != u.label) {
+            adapter[valueProp] = v;
+            adapter[unitProp] = u.label;
+            isChanged = true;
+          }
+        }
+      });
+
+      if (req.body.hasOwnProperty('remove')) {
+        // remove an adapter
+        if (index >= 0 && index < rocket.adapters.length) {
+          rocket.adapters.splice(index, 1);
+          isChanged = true;
+        }
+      } else {
+        // add/update an adapter
+        if (isNew && isChanged)
+          rocket.adapters.push(adapter);
+      }
+
+      if (!isChanged) {
+        res.redirect('/mystuff/rocket/' + rocket._id + '/edit.html?result=unchanged');
+        return;
+      }
+
+      rocket.save(req.success(function(updated) {
+        res.redirect('/mystuff/rocket/' + updated._id + '/edit.html?result=updated');
+      }));
+    }));
+  } else {
+    res.redirect(303, rocketsLink);
+  }
+});
 
 /*
  * /mystuff/rocket/id/delete.html

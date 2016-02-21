@@ -44,7 +44,16 @@ No changes to save.
           <p class="form-control-static">{{formatLength rocket.guideLength rocket.guideLengthUnit}}</p>
         </div>
       </div>
+      {{#if rocket.website}}
+      <div class="form-group">
+        <label for="cd" class="col-sm-6 control-label">Web Page</label>
+        <div class="col-sm-6">
+          <p class="form-control-static"><a href="{{rocket.website}}">{{websiteAnchor rocket.website}}</a></p>
+        </div>
+      </div>
+      {{/if}}
     </div> <!-- left col -->
+
     <div class="col-sm-6">
       <p class="column-title">Motor Mount</p>
       <div class="form-group">
@@ -74,7 +83,6 @@ No changes to save.
           {{formatLength mmtDiameter mmtDiameterUnit}}
           {{/each}}
           </p>
-          </p>
         </div>
       </div>
       {{/if}}
@@ -82,9 +90,10 @@ No changes to save.
   </div> <!-- row -->
 </form>
 {{#if rocket.comments}}
-<div class="comments">
-{{renderBBCode rocket.comments}}
-</div>
+<table class="table table-bordered comments">
+   <tr><th>Comments</th></tr>
+   <tr><td>{{renderBBCode rocket.comments}}</td></tr>
+</table>
 {{/if}}
 
 {{#if editLink}}

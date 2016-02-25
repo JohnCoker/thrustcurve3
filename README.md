@@ -110,6 +110,7 @@ thrustcurve3
 │   └── parsers
 └── views
     ├── contributors
+    ├── guide
     ├── info
     ├── layouts
     ├── manufacturers

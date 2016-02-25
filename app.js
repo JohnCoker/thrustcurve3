@@ -40,7 +40,8 @@ var index = require('./routes/index'),
     manufacturers = require('./routes/manufacturers'),
     simfiles = require('./routes/simfiles'),
     contributors = require('./routes/contributors'),
-    mystuff = require('./routes/mystuff');
+    mystuff = require('./routes/mystuff'),
+    guide = require('./routes/guide');
 
 var app = express();
 
@@ -219,6 +220,7 @@ app.use('/', simfiles);
 app.use('/', manufacturers);
 app.use('/', contributors);
 app.use('/', mystuff);
+app.use('/', guide);
 
 // handle other routes as 404
 app.use(function(req, res, next) {

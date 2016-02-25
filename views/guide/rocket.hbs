@@ -1,0 +1,97 @@
+<h1>{{title}}</h1>
+{{#if rockets}}
+{{#extend "sidebar-extra"}}
+  <h2>My Rockets</h2>
+  <ul class="links">
+  {{#each rockets}}
+    <li><a href="/motors/guide.html?rocket={{_id}}">{{name}}</a></li>
+  {{/each}}
+  </ul>
+{{/extend}}
+{{/if}}
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+{{#unless motorCount}}
+<div class="alert alert-danger" role="alert">
+No motors fit your rocket's motor mount tube
+({{formatMMT mmtDiameter}} x {{formatLength mmtLength}}).
+Please check that the MMT diameter is a standard size and the length is correct (not too short).
+</div>
+<p>
+<a href="{{editLink}}">Edit this rocket</a> or
+<a href="{{entryLink}}">enter other info</a>.
+</p>
+{{/unless}}
+
+{{#if motorCount}}
+<p>
+{{motorCount}} {{classRange}} motors
+by
+{{#if singleManufacturer}}{{singleManufacturer.abbrev}}{{/if}}
+{{#unless singleManufacturer}}{{manufacturerCount}} manufacturers{{/unless}}
+fit your rocket's motor mount tube{{#if rocket.adapters}} or adapters{{/if}}.
+</br>
+<a href="{{editLink}}">Edit this rocket</a>.
+</p>
+
+<form name="guide" action="{{submitLink}}" method="post">
+  <input type="hidden" name="rocket" value="{{rocket._id}}">
+  <div class="row">
+    {{#unless singleClass}}
+    <div class="col-md-3">
+      <label for="classes" class="column-title">Classes</label>
+      <ul class="checkboxes">
+        {{#each classes}}
+        <li><input type="checkbox" name="classes" value="{{this}}" checked> {{this}}</li>
+        {{/each}}
+      </ul>
+    </div> <!-- classes -->
+    {{/unless}}
+
+    {{#unless singleType}}
+    <div class="col-md-3">
+      <label for="types" class="column-title">Types</label>
+      <ul class="checkboxes">
+        {{#each types}}
+        <li><input type="checkbox" name="types" value="{{this}}" checked> {{this}}</li>
+        {{/each}}
+      </ul>
+    </div> <!-- types -->
+    {{/unless}}
+
+    {{#if rocket.adapters}}
+    <div class="col-md-3">
+      <label for="adapters" class="column-title">Adapters</label>
+      <ul class="checkboxes">
+        <li><input type="checkbox" name="adapters" value="-" checked> None</li>
+        {{#each rocket.adapters}}
+        <li><input type="checkbox" name="adapters" value="{{@index}}" checked> {{formatLength mmtDiameter mmtDiameterUnit}}</li>
+        {{/each}}
+      </ul>
+    </div> <!-- adapters -->
+    {{/if}}
+
+    {{#unless singleManufacturer}}
+    <div class="col-md-3">
+      <label for="manufacturers" class="column-title">Manufacturers</label>
+      <ul class="checkboxes">
+        {{#each manufacturers}}
+        <li><input type="checkbox" name="manufacturers" value="{{_id}}" checked> {{abbrev}}</li>
+        {{/each}}
+      </ul>
+    </div> <!-- manufacturers -->
+    {{/unless}}
+  </div> <!-- row -->
+
+  <div class="form-group">
+    <div class="form-submit">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+  </div>
+</form>
+{{/if}}

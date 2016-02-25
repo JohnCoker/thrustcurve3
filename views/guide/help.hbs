@@ -1,0 +1,249 @@
+<h1>{{title}}</h1>
+
+<p>
+The <b>Motor Guide</b>
+helps you to pick an appropriate motor for your rocket from the list of all motors.
+The guide includes a quick-and-dirty flight simulator and will pick
+motors from the list that will probably work for your rocket.
+</p>
+
+<h2>Enter Key Info</h2>
+
+<p>
+The best way to use the guide is to <a href="/mystuff/rockets.html">save your rocket first</a>.
+That way, you can run the guide multiple times and have access to more options
+such as clusters and MMT adapters.
+</p>
+
+<p>
+Note that weight and length values may be entered in various units.
+Use the drop-down box to the right of the entry field to pick the units
+each measurement uses.
+</p>
+
+<dl>
+  <dt>Body Diameter</dt>
+  <dd>
+  the overall outside diameter of the rocket.
+  <br/>
+  Enter the O.D. of the largest body tube in your rocket.
+  Note that you must select the appropriate length units.
+  </dd>
+ 
+  <dt>Dry Weight</dt>
+  <dd>
+  the weight of your rocket as it would fly (everything except the motor).
+  <br/>
+  Note that you must select the appropriate weight (mass) units.
+  </dd>
+ 
+  <dt>MMT Diameter</dt>
+  <dd>
+  the inside diameter of the motor mount tube.
+  <br/>
+  This determines the size of motors that will fit into your rocket.
+  (This value is matched approximately since motor diameters aren't consistent
+  between manufacturers.)
+  Note that you must select the appropriate length units.
+  </dd>
+ 
+  <dt>MMT Length</dt>
+  <dd>
+  the available length of the motor mount tube.
+  <br/>
+  This limits the length of motors that will fit into your rocket.
+  Note that you must select the appropriate length units.
+  </dd>
+ 
+  <dt>C<small><sub>D</sub></small></dt>
+  <dd>
+  coefficient of drag.
+  <br/>
+  This helps to determine the resistance of your rocket as it passes through the air.
+  See <a href="#cd">Explanation of C<small><sub>D</sub></small></a> for more info.
+  </dd>
+ 
+  <dt>Guide Length</dt>
+  <dd>
+  usable length of the rod or rail.
+  <br/>
+  This determines how much length the rocket has to reach a velocity where its fins
+  can keep it flying straight.
+  </dd>
+</dl>
+
+<a name="criteria"></a>
+<h2>Search Criteria</h2>
+
+<p>
+In addition to which motors will physically fit your rocket, you may also narrow down
+the motors that will be simulated to ones that are available to you.
+</p>
+
+<dl>
+  <dt>Impulse Class</dt>
+  <dd>
+  limit the search to a particular class.
+  <br/>
+  If you only want results for motors of a single impulse (letter) class, select it from the list.
+  </dd>
+
+  <dt>Type</dt>
+  <dd>
+  limit the search to a particular motor type.
+  <br/>
+  If you only want results for motors of a certain type, select it from the list.
+  </dd>
+
+  <dt>Manufacturer</dt>
+  <dd>
+  limit the search to a particular manufacturer.
+  <br/>
+  If you only want results for motors from a single manufacturer,
+  select it from the list.
+  </dd>
+</dl>
+
+<p>
+For a saved rocket, there are more options and you can choose multiple values for the options above.
+</p>
+
+
+<a name="results"></a>
+<h2>Understanding the Results</h2>
+
+<p>
+The first paragraph packs a lot of information into a compact form.
+Generally, the details here don't matter, but if you're getting too few results,
+you might make sure that you entered the data properly and have sensible filters.
+</p>
+
+<UL>
+<LI><i>N motors didn't fit</i><br>
+ tells you how many of all the motors in the database wouldn't fit into your rocket.
+ Note that this means the motor mount tube (MMT) inner diameter must be approximately
+ the same as the motor outer diameter and that the MMT length must be at least as long as the motor.
+ <br>Tip: If all motors are failing, check the MMT dimensions.
+<LI><i>N motors eliminated by filters</i><br>
+ tells you how many motors, that would otherwise fit, were eliminated by filters
+ you specified when setting up the guide.
+ <br>Tip: If all motors are failing, check that you don't have overly restrictive filters.
+<LI><i>N motors failed safety checks</i><br>
+ tells you how many motors aren't safe with your rocket.  This is most often caused by
+ motors having too low an initial thrust for the weight of your rocket.
+ <br>Tip: If all motors are failing, check the dry weight.
+</UL>
+
+<p>
+If one or more thrust curve data files are present for a motor that fits your rocket,
+a quick simulation is run with each data file.
+The information in the Motors That Work table shows an average of some of the key
+flight statistics.
+</p>
+
+<UL>
+<LI><b>Weight</b> is the mass at lift-off.  You enter the dry weight of your rocket
+ (that is, everything except the motor) and the total weight at lift-off
+ (including the motor being tested) is shown.
+<LI><b>Launch</b> is the speed attained by the rocket before it leaves the launch guide.
+ This is used to determine whether the motor has enough initial thrust for the rocket.
+<LI><b>Velocity</b> is the maximum speed attained by the rocket in flight.
+ This gives you an idea of how harsh a ride this motor will give your rocket.
+<LI><b>Accel</b> is the maximum acceleration attained by the rocket in flight.
+ This gives you an idea of how hard the motor is pushing the rocket.
+ Note that this is expressed as a multiple of gravity
+  ("Gs" are 9.8m/s&sup2; or 32ft/s&sup2;).
+<LI><b>Altitude</b> is the maximum height above ground (apogee) achieved by the rocket.
+<LI><b>Time</b> is the ascent time (from lift-off to reaching apogee).
+<LI><b>Delay</b> is the optimal delay length (the time from burn-out to apogee).
+</UL>
+
+<p>
+Finally, there may be some warnings listed for the motors.
+Keys for the warnings are listed in the first column of the table and
+the warning text appears at the bottom as a footnote.
+Here are all possible warnings:
+</p>
+
+<UL>
+<LI><B>F</B> MMT dimensions not known, so fit not known.<br>
+ This means that valid motor mount dimensions were not specified for your rocket
+ and the fit could not be checked.
+<LI><B>5</B> Rocket weight and/or average thrust unknown; 5:1 ratio not checked.<br>
+ This means that a valid dry weight was not specified for your rocket or the motor data
+ does not include the average thrust.
+<LI><B>G</B> Rocket launch guide length unknown; minimum velocity not checked.<br>
+ This means that a valid launch guide length was not specified for your rocket.
+<LI><B>W</B> Motor total weight unknown, safety checks not accurate.<br>
+ This means that the motor data does not include the total weight and thus the
+ lift-off weight cannot be determined accurately.
+<LI><B>D</B> No simulation data found for this motor.<br>
+ The motor appears to work, but no one has yet submitted a data file for it and
+ no simulations could be run.
+</UL>
+
+<p>
+Note that this really is a <a href="#disclaimer">quick and dirty simulation</a>.
+For more accurate simulations, please use a real rocket flight simulator;
+see the
+<A HREF="/info/simulators.html">Simulators page</A> for many options.
+</p>
+
+<a name="cd"></a>
+<h2>Explanation of C<sub>D</sub></h2>
+
+<p>
+C<small><sub>D</sub></small> stands for the "coefficient of drag," which is
+a fudge factor that corresponds to the amount of drag a rocket will have.
+This term takes into account things like the shape of the rocket, the shape
+of the fins and the smoothness of the finish.
+(This value has no units and is a constant by which the frontal area drag is multipled.)
+</p>
+
+<p>
+For most models, the C<small><sub>D</sub></small> will be in the range 0.5 - 0.9.
+An ultra-optimized, perfectly finished model with airfoil fins might have a 
+C<small><sub>D</sub></small> as low as 0.3 and a rocket with a complex shape
+or no paint could easily have a C<small><sub>D</sub></small> above 1.0.
+</p>
+
+<p>
+The motor guide defaults the C<small><sub>D</sub></small> to 0.6,
+which is a reasonable starting value.
+If you have prior flight results, you can enter a more accurate value to improve the estimates.
+(Values below 0.1 or above 5.0 are not allowed.)
+The combo box allows quick selection of plausible values:
+</p>
+
+<ul>
+  <li>perfect: 0.3, for a competition rocket with airfoil fins and polished finish</li>
+  <li>good: 0.45, for a simple rocket with good finish</li>
+  <li>average: 0.6, for most sport rockets with average finish</li>
+  <li>high: 1.0, for complex rockets with rough finish</li>
+</ul>
+
+<p>
+This gives you an idea of the roughness of this basic simulation method
+(using a static C<small><sub>D</sub></small>)
+and leads naturally into the next section.
+</p>
+
+
+<a name="disclaimer"></a>
+<H2>Accuracy Disclaimer</H2>
+
+<p>
+The simulations are done using the basic algorithms incorporated in the
+original RASP simulator.
+In creating this software, we relied primarily on the
+<I>Rocket Math 3: Simulations</I> articles by Norm Dziedzic,
+published in NIRA newsletter and later in Extreme Rockety.
+Thanks Norm!
+</p>
+
+<p>
+<i>Disclaimer: This guide is only meant to give you a starting point for choosing motors.</i>
+For more accurate simulations, please use a real rocket flight simulator;
+see the <a href="/info/simulators.html">Simulators page</A> for many options.
+</p>
+

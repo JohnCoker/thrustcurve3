@@ -9,6 +9,7 @@ const express = require('express'),
       passport = require('passport'),
       schema = require('../database/schema'),
       units = require('../lib/units'),
+      metadata = require('./metadata.js'),
       locals = require('./locals.js'),
       authenticated = require('./authenticated.js');
 
@@ -311,7 +312,7 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
   var id = req.params.id;
   if (req.db.isId(id)) {
     req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
-      var mmtDiameter, mmtLength, tolerance = 0.0015, query, i;
+      var mmtDiameter, mmtLength;
 
       if (rocket == null) {
 	res.redirect(303, rocketsLink);
@@ -320,116 +321,51 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
 
       mmtDiameter = units.convertUnitToMKS(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit);
       mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
-      query = {
-        diameter: { $gt: mmtDiameter - tolerance, $lt: mmtDiameter + tolerance },
-        length: { $lt: mmtLength + tolerance },
-        availability: { $in: schema.MotorAvailableEnum }
-      };
-      if (rocket.adapters && rocket.adapters.length > 0) {
-        query.$or = [ {
-          diameter: query.diameter,
-          length: query.length
-        } ];
-        delete query.diameter;
-        delete query.length;
-        for (i = 0; i < rocket.adapters.length; i++) {
-          mmtDiameter = units.convertUnitToMKS(rocket.adapters[i].mmtDiameter, 'length', rocket.adapters[i].mmtDiameterUnit);
-          mmtLength = units.convertUnitToMKS(rocket.adapters[i].mmtLength, 'length', rocket.adapters[i].mmtLengthUnit);
-          query.$or.push({
-            diameter: { $gt: mmtDiameter - tolerance, $lt: mmtDiameter + tolerance },
-            length: { $lt: mmtLength + tolerance },
-          });
-        }
-      }
-      req.db.Motor.find(query)
-        .sort({ totalImpulse: 1 })
-        .select('totalImpulse impulseClass type _manufacturer')
-        .exec(req.success(function(motors) {
-          var classes = [], types = [], mfrIds = [],
-              classRange, v, i;
 
-          if (motors.length > 0) {
-            for (i = 0; i < motors.length; i++) {
-              v = motors[i].impulseClass;
-              if (classes.indexOf(v) < 0)
-                classes.push(v);
+      metadata.getRocketMotors(req, rocket, function(fit) {
+	if (fit.count > 0) {
+	  res.render('mystuff/rocketdetails', locals(req, defaults, {
+	    title: rocket.name,
+	    rocket: rocket,
+	    mmtDiameter: mmtDiameter,
+	    mmtLength: mmtLength,
+	    fit: fit,
 
-              v = motors[i].type;
-              if (types.indexOf(v) < 0)
-                types.push(v);
+	    motorCount: fit.count,
 
-              v = motors[i]._manufacturer.toString();
-              if (mfrIds.indexOf(v) < 0)
-                mfrIds.push(v);
-            }
+	    classes: fit.impulseClasses,
+	    classCount: fit.impulseClasses.length,
+	    classRange: fit.classRange,
 
-            classes.sort();
-            if (classes.length > 2)
-              classRange = classes[0] + '−' + classes[classes.length - 1];
-            else if (classes.length > 1)
-              classRange = classes[0] + '&' + classes[1];
-            else if (classes.length > 0)
-              classRange = classes[0];
-            else
-              classRange = '—';
+	    types: fit.types,
+	    typeCount: fit.types.length,
+	    singleType: fit.types.length == 1 ? fit.types[0] : undefined,
 
-            types.sort(function(a,b) {
-              return schema.MotorTypeEnum.indexOf(a) - schema.MotorTypeEnum.indexOf(b);
-            });
+	    manufacturers: fit.manufacturers,
+	    manufacturerCount: fit.manufacturers.length,
+	    singleManufacturer: fit.manufacturers.length == 1 ? fit.manufacturers[0] : undefined,
 
-            req.db.Manufacturer.find({ _id: { $in: mfrIds } })
-              .sort({ abbrev: 1 })
-              .select('abbrev')
-              .exec(req.success(function(manufacturers) {
-              res.render('mystuff/rocketdetails', locals(req, defaults, {
-                title: rocket.name,
-                rocket: rocket,
-                mmtDiameter: mmtDiameter,
-                mmtLength: mmtLength,
-
-                motors: motors,
-                motorCount: motors.length,
-                singleMotor: motors.length == 1 ? motors[0] : undefined,
-
-                classes: classes,
-                classCount: classes.length,
-                classRange: classRange,
-
-                types: types,
-                typeCount: types.length,
-                singleType: types.length == 1 ? types[0] : undefined,
-
-                manufacturers: manufacturers,
-                manufacturerCount: manufacturers.length,
-                singleManufacturer: manufacturers.length == 1 ? manufacturers[0] : undefined,
-
-                result: req.query.result,
-                isCreated: req.query.result == 'created',
-                isSaved: req.query.result == 'saved',
-                isUnchanged: req.query.result == 'unchanged',
-                editLink: '/mystuff/rocket/' + id + '/edit.html',
-                deleteLink: '/mystuff/rocket/' + id + '/delete.html',
-              }));
-            }));
-          } else {
-            res.render('mystuff/rocketdetails', locals(req, defaults, {
-              title: rocket.name,
-              rocket: rocket,
-
-              motorCount: 0,
-              classCount: 0,
-              classRange: '—',
-              manufacturerCount: 0,
-
-              result: req.query.result,
-              isCreated: req.query.result == 'created',
-              isSaved: req.query.result == 'saved',
-              isUnchanged: req.query.result == 'unchanged',
-              editLink: '/mystuff/rocket/' + id + '/edit.html',
-              deleteLink: '/mystuff/rocket/' + id + '/delete.html',
-            }));
-          }
-      }));
+	    result: req.query.result,
+	    isCreated: req.query.result == 'created',
+	    isSaved: req.query.result == 'saved',
+	    isUnchanged: req.query.result == 'unchanged',
+	    editLink: '/mystuff/rocket/' + id + '/edit.html',
+	    deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+	  }));
+	} else {
+	  res.render('mystuff/rocketdetails', locals(req, defaults, {
+	    title: rocket.name,
+	    rocket: rocket,
+	    fit: fit,
+	    result: req.query.result,
+	    isCreated: req.query.result == 'created',
+	    isSaved: req.query.result == 'saved',
+	    isUnchanged: req.query.result == 'unchanged',
+	    editLink: '/mystuff/rocket/' + id + '/edit.html',
+	    deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+	  }));
+	}
+      });
     }));
   } else {
     res.redirect(303, rocketsLink);
@@ -440,14 +376,6 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
  * /mystuff/rocket/id/edit.html
  * Renders with mystuff/editrocket.hbs template.
  */
-const finishes = [
-  { label: 'perfect', value: 0.3 },
-  { label: 'good', value: 0.5 },
-  { label: 'average', value: 0.75 },
-  { label: 'high', value: 1.0, last: true },
-];
-Object.freeze(finishes);
-
 router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, next) {
   var id = req.params.id;
 
@@ -463,7 +391,7 @@ router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, ne
 	rocket: rocket,
 	lengthUnits: units.length,
 	massUnits: units.mass,
-	finishes: finishes,
+	finishes: metadata.CdFinishes,
 	submitLink: '/mystuff/rocket/' + id + '/edit.html',
         adapterLink: '/mystuff/rocket/' + id + '/adapter.html',
 	cancelLink: '/mystuff/rocket/' + id + '/',
@@ -494,13 +422,13 @@ router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, ne
         mmtDiameterUnit: 'mm',
 	mmtLengthUnit: lengthUnit,
 	mmtCount: 1,
-	cd: 0.75,
+	cd: 0.6,
         guideLength: guideLen,
         guideLengthUnit: guideUnit,
       },
       lengthUnits: units.length,
       massUnits: units.mass,
-      finishes: finishes,
+      finishes: metadata.CdFinishes,
       submitLink: '/mystuff/rocket/new/edit.html',
       cancelLink: '/mystuff/rockets.html',
     }));
@@ -621,7 +549,7 @@ function doSubmitRocket(req, res, rocket) {
       rocket: rocket,
       lengthUnits: units.length,
       massUnits: units.mass,
-      finishes: finishes,
+      finishes: metadata.CdFinishes,
       errors: errors,
       submitLink: url
     }));

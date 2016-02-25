@@ -480,18 +480,6 @@ router.post(searchLink, function(req, res, next) {
 });
 
 /*
- * /motors/guide.html
- * General motor guide, renders with motors/guide.hbs template.
- */
-router.get('/motors/guide.html', function(req, res, next) {
-  res.render('motors/guide', locals(defaults, 'Motor Guide'));
-});
-router.get(['/guidepage.jsp', '/motorguide.jsp'], function(req, res, next) {
-  res.redirect(301, '/motors/guide.html');
-});
-
-
-/*
  * /motors/browser.html
  * Motor browser, renders with motors/browser.hbs template.
  */

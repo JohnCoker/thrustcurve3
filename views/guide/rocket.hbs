@@ -15,6 +15,7 @@
 {{this}}
 </div>
 {{/each}}
+{{#unless errors}}
 {{#unless motorCount}}
 <div class="alert alert-danger" role="alert">
 No motors fit your rocket's motor mount tube
@@ -26,6 +27,7 @@ Please check that the MMT diameter is a standard size and the length is correct 
 <a href="{{entryLink}}">enter other info</a>.
 </p>
 {{/unless}}
+{{/unless}}
 
 {{#if motorCount}}
 <p>
@@ -36,6 +38,10 @@ by
 fit your rocket's motor mount tube{{#if rocket.adapters}} or adapters{{/if}}.
 </br>
 <a href="{{editLink}}">Edit this rocket</a>.
+</p>
+
+<p>
+Narrow down the possible motors using the options below and then run the guide.
 </p>
 
 <form name="guide" action="{{submitLink}}" method="post">

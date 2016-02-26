@@ -107,7 +107,7 @@ This table lists all pages of the old site and will be filled in as v3 proceeds.
 | errors.shtml        | errors.html                  | |
 | forgotpasswd.jsp    | mystuff/forgotpasswd.html    | account |
 | glossary.shtml      | info/glossary.html           | static |
-| guidehelp.shtml     | motors/guide.html            | motor guide |
+| guidehelp.shtml     | motors/guidehelp.html        | motor guide |
 | guidepage.jsp       | motors/guide.html            | motor guide |
 | index.shtml         | index.html                   | |
 | login.jsp           | mystuff/login.html           | account |

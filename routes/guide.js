@@ -35,7 +35,8 @@ function doEntryPage(req, res, rockets) {
       lengthUnits: units.length,
       massUnits: units.mass,
       finishes: metadata.CdFinishes,
-      canSave: req.user != null,
+      submitLink: '/motors/guide.html',
+      rocketsLink: '/mystuff/rockets.html',
     }));
   });
 }
@@ -78,7 +79,7 @@ function doRocketPage(req, res, rockets, rocket) {
 
 router.get('/motors/guide.html', function(req, res, next) {
   if (req.user) {
-    req.db.Rocket.find({ _contributor: req.user._id }, req.success(function(rockets) {
+    req.db.Rocket.find({ _contributor: req.user._id }, undefined, { sort: { name: 1 } }, req.success(function(rockets) {
       if (req.db.isId(req.query.rocket)) {
         // logged in and have starting rocket
         req.db.Rocket.findOne({ _id: req.query.rocket }, req.success(function(rocket) {
@@ -113,6 +114,17 @@ router.get('/motors/guide.html', function(req, res, next) {
 });
 router.get(['/guidepage.jsp', '/motorguide.jsp'], function(req, res, next) {
   res.redirect(301, '/motors/guide.html');
+});
+
+
+/*
+ * /motors/guide.html
+ * Motor guide execution page, renders with guide/results.hbs.
+ */
+router.post('/motors/guide.html', function(req, res, next) {
+  if (req.db.isId(req.body.rocket)) {
+  } else {
+  }
 });
 
 

@@ -6,6 +6,7 @@
   {{#each rockets}}
     <li><a href="/motors/guide.html?rocket={{_id}}">{{name}}</a></li>
   {{/each}}
+  <li><a href="/mystuff/rocket/new/edit.html">Add&hellip;</a></li>
   </ul>
 {{/extend}}
 {{/if}}
@@ -14,12 +15,29 @@
 The motor guide allows you to quickly find motors that will work for a rocket;
 <a href="guidehelp.html">see the help page</a> for more info.
 {{#if rockets}}
-Running it on one of your <a href="/mystuff/rockets.html">existing rockets</a> is quicker and you will have more options.
+Running it on one of your <a href="{{rocketsLink}}">existing rockets</a> is easier and you will have more options.
+</p>
+<form role="form" class="form-horizontal" name="rockets" action="/motors/guide.html" method="get">
+  <div class="form-group">
+    <label for="diameter" class="col-sm-3 control-label">Rocket</label>
+    <div class="col-sm-6">
+      <select class="form-control" name="rocket">
+	{{#each rockets}}
+	<option value="{{_id}}">{{name}}</option>
+	{{/each}}
+      </select>
+    </div>
+    <div class="col-sm-3">
+      <button type="submit" class="btn btn-primary">Choose</button>
+    </div>
+  </div>
+</form>
+<p>
 {{else}}
-If you <a href="/mystuff/rockets.html">create a rocket</a>,
+If you <a href="{{rocketsLink}}">create a rocket</a>,
 you can run the guide more easily in future as well as have more options.
 {{/if}}
-Otherwise, you can try the guide out by entering the key info here.
+Otherwise, you can try the guide out by entering key info here.
 </p>
 
 {{#each errors}}
@@ -170,3 +188,20 @@ Otherwise, you can try the guide out by entering the key info here.
     </div>
   </div>
 </form>
+<script type="text/javascript">
+$('input[name=cd]').blur(function(e) {
+  var cd = parseFloat($(this).val());
+
+  if (isNaN(cd) || cd < 0.1)
+    $('#finish').val('')
+  {{#each finishes}}
+  else{{#unless last}} if (cd <= {{value}}){{/unless}}
+    $('#finish').val('{{value}}')
+  {{/each}}
+});
+$('#finish').change(function(e) {
+  var cd = parseFloat($(this).val());
+  if (cd > 0)
+    $('input[name=cd]').val(cd);
+});
+</script>

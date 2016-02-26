@@ -127,7 +127,7 @@ or <a href="/motors/browser.html?diameter={{mmtDiameter}}&length={{mmtLength}}">
 <p>
 Find motors that will work using the motor guide:
 </p>
-<form name="guide" action="/motors/guide.html" method="post">
+<form name="guide" action="{{guideLink}}" method="post">
   <input type="hidden" name="rocket" value="{{rocket._id}}">
   <div class="row">
     {{#unless singleClass}}

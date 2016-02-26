@@ -351,6 +351,7 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
 	    isUnchanged: req.query.result == 'unchanged',
 	    editLink: '/mystuff/rocket/' + id + '/edit.html',
 	    deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+	    guideLink: '/motors/guide.html',
 	  }));
 	} else {
 	  res.render('mystuff/rocketdetails', locals(req, defaults, {
@@ -483,6 +484,9 @@ function doSubmitRocket(req, res, rocket) {
   });
   if (rocket.name == null || rocket.name === '') {
     errors.push('Rocket name is required.');
+  }
+  if (rocket.website != null && !schema.UrlRegex.test(rocket.website)) {
+    errors.push('Web page is not a valid URL.');
   }
 
   // public flag

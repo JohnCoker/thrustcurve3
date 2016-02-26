@@ -39,7 +39,7 @@
     <label for="weight" class="col-sm-3 control-label">Dry Weight</label>
     <div class="col-sm-6">
       <input type="number" class="form-control" name="weight"
-             required
+             step="0.001" min="0.001" required
              value="{{rocket.weight}}">
       <span class="help-block with-errors"></span>
     </div>

@@ -9,7 +9,7 @@ const express = require('express'),
       passport = require('passport'),
       schema = require('../database/schema'),
       units = require('../lib/units'),
-      metadata = require('./metadata.js'),
+      metadata = require('../lib/metadata'),
       locals = require('./locals.js'),
       authenticated = require('./authenticated.js');
 

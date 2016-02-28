@@ -92,6 +92,7 @@ thrustcurve3
 │   ├── crawlers
 │   ├── errors
 │   ├── helpers
+│   ├── metadata
 │   ├── prefs
 │   └── units
 ├── public

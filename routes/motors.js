@@ -6,9 +6,9 @@
 
 var express = require('express'),
     router = express.Router(),
+    metadata = require('../lib/metadata'),
     ranking = require('../database/ranking'),
     svg = require('../render/svg'),
-    metadata = require('./metadata.js'),
     locals = require('./locals.js');
 
 var defaults = {

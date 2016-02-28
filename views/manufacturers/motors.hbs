@@ -15,7 +15,7 @@
   {{#each motors}}
     <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
       <td><a href="{{motorLink ../manufacturer this}}">{{motorDesignation this}}</td>
-      <td>{{type}}</td>
+      <td>{{formatType type}}</td>
       <td>{{formatMMT diameter}}</td>
       <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
       <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>

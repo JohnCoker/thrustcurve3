@@ -1,0 +1,16 @@
+{
+  "name": "metadata",
+  "version": "1.0.0",
+  "description": "collect meta-information about motors",
+  "main": "metadata.js",
+  "scripts": {
+    "test": "jasmine-node spec",
+    "lint": "jshint *.js spec/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/lib/metadata"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC"
+}

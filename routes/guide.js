@@ -7,8 +7,8 @@
 var express = require('express'),
     router = express.Router(),
     units = require('../lib/units'),
+    metadata = require('../lib/metadata'),
     schema = require('../database/schema'),
-    metadata = require('./metadata.js'),
     locals = require('./locals.js');
 
 var defaults = {

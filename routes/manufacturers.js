@@ -6,7 +6,7 @@
 
 var express = require('express'),
     router = express.Router(),
-    metadata = require('./metadata.js'),
+    metadata = require('../lib/metadata'),
     locals = require('./locals.js');
 
 var defaults = {

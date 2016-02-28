@@ -22,13 +22,21 @@ var defaults = {
  */
 function doEntryPage(req, res, rockets) {
   metadata.getAvailableMotors(req, function(available) {
+    var lengthUnit = units.getUnitPref('length').label,
+        massUnit = units.getUnitPref('mass').label,
+        guideDefault = units.defaultGuideLength();
+
     res.render('guide/entry', locals(req, defaults, {
       title: "Motor Guide",
       rockets: rockets,
       rocket: {
-	cd: 0.6,
-	guideLength: 1,
-	guideLengthUnit: 'm'
+        bodyDiameterUnit: lengthUnit,
+        weightUnit: massUnit,
+        mmtDiameterUnit: 'mm',
+        mmtLengthUnit: lengthUnit,
+        cd: 0.6,
+        guideLength: guideDefault.value,
+        guideLengthUnit: guideDefault.unit,
       },
       schema: schema,
       metadata: available,
@@ -87,9 +95,9 @@ router.get('/motors/guide.html', function(req, res, next) {
               rocket._contributor.toString() != req.user._id.toString() &&
               !rocket.public)
             rocket = undefined;
-	  if (rocket)
+          if (rocket)
             doRocketPage(req, res, rockets, rocket);
-	  else
+          else
             doEntryPage(req, res, rockets);
         }));
       } else {
@@ -103,9 +111,9 @@ router.get('/motors/guide.html', function(req, res, next) {
       if (rocket != null && !rocket.public)
         rocket = undefined;
       if (rocket)
-	doRocketPage(req, res, undefined, rocket);
+        doRocketPage(req, res, undefined, rocket);
       else
-	doEntryPage(req, res);
+        doEntryPage(req, res);
     }));
   } else {
     // not logged in and no starting rocket

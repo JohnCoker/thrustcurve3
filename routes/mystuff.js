@@ -34,8 +34,8 @@ function getRedirect(req) {
     redirect = req.session.loginRedirect;
     delete req.session.loginRedirect;
   } else if ((referer = req.header('Referer')) &&
-	     (/^https?:\/\/(www\.)?thrustcurve\.org\//.test(referer) ||
-	      /^http:\/\/localhost:\d+\//.test(referer)) &&
+             (/^https?:\/\/(www\.)?thrustcurve\.org\//.test(referer) ||
+              /^http:\/\/localhost:\d+\//.test(referer)) &&
              !/(login|register)\.html/.test(referer)) {
     // use the referrer, since it's on the site
     redirect = referer;
@@ -315,57 +315,57 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
       var mmtDiameter, mmtLength;
 
       if (rocket == null) {
-	res.redirect(303, rocketsLink);
-	return;
+        res.redirect(303, rocketsLink);
+        return;
       }
 
       mmtDiameter = units.convertUnitToMKS(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit);
       mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
 
       metadata.getRocketMotors(req, rocket, function(fit) {
-	if (fit.count > 0) {
-	  res.render('mystuff/rocketdetails', locals(req, defaults, {
-	    title: rocket.name,
-	    rocket: rocket,
-	    mmtDiameter: mmtDiameter,
-	    mmtLength: mmtLength,
-	    fit: fit,
+        if (fit.count > 0) {
+          res.render('mystuff/rocketdetails', locals(req, defaults, {
+            title: rocket.name,
+            rocket: rocket,
+            mmtDiameter: mmtDiameter,
+            mmtLength: mmtLength,
+            fit: fit,
 
-	    motorCount: fit.count,
+            motorCount: fit.count,
 
-	    classes: fit.impulseClasses,
-	    classCount: fit.impulseClasses.length,
-	    classRange: fit.classRange,
+            classes: fit.impulseClasses,
+            classCount: fit.impulseClasses.length,
+            classRange: fit.classRange,
 
-	    types: fit.types,
-	    typeCount: fit.types.length,
-	    singleType: fit.types.length == 1 ? fit.types[0] : undefined,
+            types: fit.types,
+            typeCount: fit.types.length,
+            singleType: fit.types.length == 1 ? fit.types[0] : undefined,
 
-	    manufacturers: fit.manufacturers,
-	    manufacturerCount: fit.manufacturers.length,
-	    singleManufacturer: fit.manufacturers.length == 1 ? fit.manufacturers[0] : undefined,
+            manufacturers: fit.manufacturers,
+            manufacturerCount: fit.manufacturers.length,
+            singleManufacturer: fit.manufacturers.length == 1 ? fit.manufacturers[0] : undefined,
 
-	    result: req.query.result,
-	    isCreated: req.query.result == 'created',
-	    isSaved: req.query.result == 'saved',
-	    isUnchanged: req.query.result == 'unchanged',
-	    editLink: '/mystuff/rocket/' + id + '/edit.html',
-	    deleteLink: '/mystuff/rocket/' + id + '/delete.html',
-	    guideLink: '/motors/guide.html',
-	  }));
-	} else {
-	  res.render('mystuff/rocketdetails', locals(req, defaults, {
-	    title: rocket.name,
-	    rocket: rocket,
-	    fit: fit,
-	    result: req.query.result,
-	    isCreated: req.query.result == 'created',
-	    isSaved: req.query.result == 'saved',
-	    isUnchanged: req.query.result == 'unchanged',
-	    editLink: '/mystuff/rocket/' + id + '/edit.html',
-	    deleteLink: '/mystuff/rocket/' + id + '/delete.html',
-	  }));
-	}
+            result: req.query.result,
+            isCreated: req.query.result == 'created',
+            isSaved: req.query.result == 'saved',
+            isUnchanged: req.query.result == 'unchanged',
+            editLink: '/mystuff/rocket/' + id + '/edit.html',
+            deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+            guideLink: '/motors/guide.html',
+          }));
+        } else {
+          res.render('mystuff/rocketdetails', locals(req, defaults, {
+            title: rocket.name,
+            rocket: rocket,
+            fit: fit,
+            result: req.query.result,
+            isCreated: req.query.result == 'created',
+            isSaved: req.query.result == 'saved',
+            isUnchanged: req.query.result == 'unchanged',
+            editLink: '/mystuff/rocket/' + id + '/edit.html',
+            deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+          }));
+        }
       });
     }));
   } else {
@@ -383,49 +383,40 @@ router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, ne
   if (req.db.isId(id)) {
     req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
       if (rocket == null) {
-	res.redirect(303, rocketsLink);
-	return;
+        res.redirect(303, rocketsLink);
+        return;
       }
       res.render('mystuff/editrocket', locals(req, defaults, {
-	title: 'Edit Rocket',
-	isNew: false,
-	rocket: rocket,
-	lengthUnits: units.length,
-	massUnits: units.mass,
-	finishes: metadata.CdFinishes,
-	submitLink: '/mystuff/rocket/' + id + '/edit.html',
+        title: 'Edit Rocket',
+        isNew: false,
+        rocket: rocket,
+        lengthUnits: units.length,
+        massUnits: units.mass,
+        finishes: metadata.CdFinishes,
+        submitLink: '/mystuff/rocket/' + id + '/edit.html',
         adapterLink: '/mystuff/rocket/' + id + '/adapter.html',
-	cancelLink: '/mystuff/rocket/' + id + '/',
+        cancelLink: '/mystuff/rocket/' + id + '/',
       }));
     }));
   } else {
     // add new rocket
     var lengthUnit = units.getUnitPref('length').label,
-	massUnit = units.getUnitPref('mass').label,
-	guideUnit, guideLen;
-
-    // default guide length based on chosen units
-    if (lengthUnit == 'in' || lengthUnit == 'ft') {
-      guideUnit = 'ft';
-      guideLen = 3.0;
-    } else {
-      guideUnit = 'm';
-      guideLen = 1.0;
-    }
+        massUnit = units.getUnitPref('mass').label,
+        guideDefault = units.defaultGuideLength();
 
     res.render('mystuff/editrocket', locals(req, defaults, {
       title: 'Add Rocket',
       isNew: true,
       rocket: {
-	'public': true,
-	bodyDiameterUnit: lengthUnit,
+        'public': true,
+        bodyDiameterUnit: lengthUnit,
         weightUnit: massUnit,
         mmtDiameterUnit: 'mm',
-	mmtLengthUnit: lengthUnit,
-	mmtCount: 1,
-	cd: 0.6,
-        guideLength: guideLen,
-        guideLengthUnit: guideUnit,
+        mmtLengthUnit: lengthUnit,
+        mmtCount: 1,
+        cd: 0.6,
+        guideLength: guideDefault.value,
+        guideLengthUnit: guideDefault.unit,
       },
       lengthUnits: units.length,
       massUnits: units.mass,
@@ -504,23 +495,23 @@ function doSubmitRocket(req, res, rocket) {
     'guideLength',
   ].forEach(function(valueProp) {
     var unitProp = valueProp + 'Unit',
-	u, v;
+        u, v;
 
     if (req.body.hasOwnProperty(valueProp)) {
       v = parseFloat(req.body[valueProp]);
       u = req.body[unitProp];
 
       if (valueProp == 'weight')
-	u = units.mass.get(u);
+        u = units.mass.get(u);
       else
-	u = units.length.get(u);
+        u = units.length.get(u);
 
       if (isNaN(v) || v <= 0 || u == null)
-	errors.push('Rocket ' + valueProp + ' (with unit) is required.');
+        errors.push('Rocket ' + valueProp + ' (with unit) is required.');
       else if (rocket[valueProp] != v || rocket[unitProp] != u.label) {
-	rocket[valueProp] = v;
-	rocket[unitProp] = u.label;
-	isChanged = true;
+        rocket[valueProp] = v;
+        rocket[unitProp] = u.label;
+        isChanged = true;
       }
     }
   });
@@ -533,10 +524,10 @@ function doSubmitRocket(req, res, rocket) {
     if (req.body.hasOwnProperty(p)) {
       v = parseFloat(req.body[p]);
       if (isNaN(v) || v <= 0)
-	errors.push('Rocket ' + p + ' is required.');
+        errors.push('Rocket ' + p + ' is required.');
       else if (rocket[p] != v) {
-	rocket[p] = v;
-	isChanged = true;
+        rocket[p] = v;
+        isChanged = true;
       }
     }
   });
@@ -566,7 +557,7 @@ function doSubmitRocket(req, res, rocket) {
     url = '/mystuff/rocket/' + rocket._id + '/';
     if (isChanged) {
       rocket.save(req.success(function(updated) {
-	res.redirect(303, url + '?result=saved');
+        res.redirect(303, url + '?result=saved');
       }));
     } else {
       res.redirect(303, url + '?result=unchanged');
@@ -580,9 +571,9 @@ router.post('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, n
   if (req.db.isId(id)) {
     req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
       if (rocket == null)
-	res.redirect(303, rocketsLink);
+        res.redirect(303, rocketsLink);
       else
-	doSubmitRocket(req, res, rocket);
+        doSubmitRocket(req, res, rocket);
     }));
   } else {
     doSubmitRocket(req, res);
@@ -601,7 +592,7 @@ router.post('/mystuff/rocket/:id/adapter.html', authenticated, function(req, res
       var index, adapter, isNew, isChanged = false, errors = [];
 
       if (rocket == null) {
-	res.redirect(303, rocketsLink);
+        res.redirect(303, rocketsLink);
         return;
       }
 

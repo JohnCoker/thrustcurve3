@@ -39,9 +39,11 @@ No motors fit your rocket and satisfied the search criteria.
   <thead>
     <tr>
      <th>Designation</th>
-     <th>Manufacturer</th>
+     <th class="visible-md visible-lg">Manufacturer</th>
      <th class="number">T:W</th>
      <th class="number">Guide</th>
+     <th class="number visible-lg">Velocity</th>
+     <th class="number visible-lg">Accel</th>
      <th class="number">Apogee</th>
      <th class="number">Delay</th>
     </tr>
@@ -49,11 +51,13 @@ No motors fit your rocket and satisfied the search criteria.
   <tbody>
   {{#each results}}
     <tr {{#if fail}}class="failed danger"{{/if}} data-id="{{motor._id}}">
-      <td>{{motor.designation}}</td>
-      <td>{{manufacturer.abbrev}}</td>
+      <td><a href="{{motorLink manufacturer motor}}">{{motor.designation}}</a></td>
+      <td class="visible-md visible-lg">{{manufacturer.abbrev}}</td>
       <td class="number" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
       <td class="number" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
-      <td class="number" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
+      <td class="number" data-sort="{{formatSort simulation.maxVelocity}}">{{formatVelocity simulation.maxVelocity}}</td>
+      <td class="number visible-lg" data-sort="{{formatSort simulation.maxAccleration}}">{{formatVelocity simulation.maxAcceleration}}</td>
+      <td class="number visible-lg" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
       <td class="number" data-sort="{{formatSort optimalDelay}}">{{formatDuration optimalDelay}}</td>
     </tr>
   {{/each}}

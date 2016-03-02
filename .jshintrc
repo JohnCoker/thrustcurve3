@@ -7,5 +7,6 @@
   "undef": true,
   "unused": "vars",
   "evil": "true",
+  "loopfunc": "true",
   "esnext": "true"
 }

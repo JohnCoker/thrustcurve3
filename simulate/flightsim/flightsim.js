@@ -14,19 +14,13 @@ var STP = {
 };
 Object.freeze(STP);
 
-function simulate(rocket, motor, data, params, error) {
-  var inputs, stats, curve,
-      tLiftoff, tBurnout, tApogee, velGuide, accMax, velMax, altBurnout, altMax, impulse,
-      t, dt, mass, dm, acc, vel, alt, liftoff, fDrag, fThrust;
+function simulateRocket(rocket, motor, data, params, error) {
+  var inputs;
 
   if (arguments.length == 4 && typeof params == 'function') {
     error = params;
     params = undefined;
   }
-  if (params == null)
-    params = STP;
-  if (error == null)
-    error = function() {};
 
   inputs = {
     rocketMass: units.convertUnitToMKS(rocket.weight, 'mass', rocket.weightUnit),
@@ -36,6 +30,23 @@ function simulate(rocket, motor, data, params, error) {
     motorInitialMass: motorInitialMass(motor),
     motorBurnoutMass: motorBurnoutMass(motor),
   };
+
+  return simulate(inputs, data, params, error);
+}
+
+function simulate(inputs, data, params, error) {
+  var stats, curve,
+      tLiftoff, tBurnout, tApogee, velGuide, accMax, velMax, altBurnout, altMax, impulse,
+      t, dt, mass, dm, acc, vel, alt, liftoff, fDrag, fThrust;
+
+  if (arguments.length == 3 && typeof params == 'function') {
+    error = params;
+    params = undefined;
+  }
+  if (params == null)
+    params = STP;
+  if (error == null)
+    error = function() {};
 
   // validate inputs
   if (typeof inputs.rocketMass != 'number' || isNaN(inputs.rocketMass) || inputs.rocketMass <= 0) {
@@ -228,7 +239,7 @@ function standardDrag(diameter, cd, params) {
  * <p>The output from a simulation run is an object containing calculated input values and
  * statistics:</p>
  * <ul>
- * <li>inputs: calculated values (see below)</li>
+ * <li>inputs: calculated input values (see below)</li>
  * <li>liftoffTime: time to first movement</li>
  * <li>burnoutTime: time to complete motor burnout</li>
  * <li>apogeeTime: time to apogee</li>
@@ -286,14 +297,47 @@ module.exports = {
   STP: STP,
 
   /**
-   * Run a single flight simulation.
+   * Run a single flight simulation on a saved rocket and motor.
    * @function
-   * @param {object} rocket information on the rocket
+   * @param {object} rocket entered rocket info with units
    * @param {object} motor information on the motor
    * @param {object} data parsed thrust curve
    * @param {object} [params] simulation parameters
    * @param {function} [error] error reporter
    * @return {object} simulation results
    */
+  simulateRocket: simulateRocket,
+
+  /**
+   * Run a single flight simulation with loaded info.
+   * @function
+   * @param {object} input rocket information in MKS
+   * @param {number} input.rocketMass dry weight (Kg)
+   * @param {number} input.bodyDiameter nominal body diameter (m)
+   * @param {number} input.cd coefficient of drag
+   * @param {number} input.guideLength launch guide length (m)
+   * @param {number} input.motorInitialMass launch weight of motor (Kg)
+   * @param {number} input.motorBurnoutMass post-burn weight of motor (Kg)
+   * @param {object} data parsed thrust curve
+   * @param {object} [params] simulation parameters
+   * @param {function} [error] error reporter
+   * @return {object} simulation results
+   */
   simulate: simulate,
+
+  /**
+   * Calculate the motor's initial (lift-off) mass.
+   * @function
+   * @param {object} motor model
+   * @return {number} mass (Kg)
+   */
+  motorInitialMass: motorInitialMass,
+
+  /**
+   * Calculate the motor's final (burn-out) mass.
+   * @function
+   * @param {object} motor model
+   * @return {number} mass (Kg)
+   */
+  motorBurnoutMass: motorBurnoutMass,
 };

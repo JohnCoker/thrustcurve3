@@ -12,6 +12,57 @@ describe("flightsim", function() {
       expect(params.rho).toBeCloseTo(1.225, 3);
     });
   });
+  describe("motorInitialMass", function() {
+    it("both", function() {
+      var m = {
+        totalWeight: 0.1,
+        propellantWeight: 0.04
+      };
+      expect(flightsim.motorInitialMass(m)).toBe(0.1);
+    });
+    it("total only", function() {
+      var m = {
+        totalWeight: 0.1
+      };
+      expect(flightsim.motorInitialMass(m)).toBe(0.1);
+    });
+    it("propellant only", function() {
+      var m = {
+        propellantWeight: 0.04
+      };
+      expect(flightsim.motorInitialMass(m)).toBeCloseTo(0.08, 4);
+    });
+    it("neither", function() {
+      var m = {};
+      expect(flightsim.motorInitialMass(m)).toBe(0.0);
+    });
+  });
+  describe("motorBurnoutMass", function() {
+    it("both", function() {
+      var m = {
+        totalWeight: 0.1,
+        propellantWeight: 0.04
+      };
+      expect(flightsim.motorBurnoutMass(m)).toBeCloseTo(0.06, 4);
+    });
+    it("total only", function() {
+      var m = {
+        totalWeight: 0.1
+      };
+      expect(flightsim.motorBurnoutMass(m)).toBeCloseTo(0.05, 4);
+    });
+    it("propellant only", function() {
+      var m = {
+        propellantWeight: 0.04
+      };
+      expect(flightsim.motorBurnoutMass(m)).toBeCloseTo(0.04, 4);
+    });
+    it("neither", function() {
+      var m = {};
+      expect(flightsim.motorBurnoutMass(m)).toBe(0.0);
+    });
+  });
+
   describe("Generic Rocket on M1939", function() {
     var rocket, motor, data, result;
     it("rocket", function() {
@@ -71,9 +122,9 @@ describe("flightsim", function() {
       expect(stats.totalImpulse).toBeCloseTo(10339.8, 1);
       expect(stats.burnTime).toBeCloseTo(6.5, 1);
     });
-    it("simulate", function() {
+    it("simulateRocket", function() {
       expect(function() {
-        result = flightsim.simulate(rocket, motor, data, errors.print);
+        result = flightsim.simulateRocket(rocket, motor, data, errors.print);
       }).not.toThrow();
       expect(result).toBeDefined();
     });

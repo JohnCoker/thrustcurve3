@@ -11,6 +11,17 @@
 {{/extend}}
 {{/if}}
 
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+{{#each warnings}}
+<div class="alert alert-warning" role="alert">
+{{this}}
+</div>
+{{/each}}
+
 <p>
 The motor guide allows you to quickly find motors that will work for a rocket;
 <a href="guidehelp.html">see the help page</a> for more info.
@@ -39,12 +50,6 @@ you can run the guide more easily in future as well as have more options.
 {{/if}}
 Otherwise, you can try the guide out by entering key info here.
 </p>
-
-{{#each errors}}
-<div class="alert alert-danger" role="alert">
-{{this}}
-</div>
-{{/each}}
 
 <form role="form" class="form-horizontal" name="guide" action="{{submitLink}}" method="post" data-toggle="validator">
   <p class="col-sm-offset-3 col-sm-9 form-control-static">Rocket Information</p>

@@ -373,14 +373,14 @@ function doSearch(req, res, params) {
           if (v > 0) {
             if (v > 1)
               v /= 1000;
-            query.diameter = { $gt: v - 0.0015, $lt: v + 0.0015 };
+            query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
           } else
             failed = true;
 
         } else if (k == 'length') {
           v = parseFloat(v);
           if (v > 0)
-            query.length = { $lt: v + 0.0015 };
+            query.length = { $lt: v + metadata.MotorDiameterTolerance };
           else
             failed = true;
 

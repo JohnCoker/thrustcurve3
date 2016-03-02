@@ -1,0 +1,69 @@
+<h1>{{title}}</h1>
+{{#if rockets}}
+{{#extend "sidebar-extra"}}
+  <h2>My Rockets</h2>
+  <ul class="links">
+  {{#each rockets}}
+    <li><a href="/motors/guide.html?rocket={{_id}}">{{name}}</a></li>
+  {{/each}}
+  <li><a href="/mystuff/rocket/new/edit.html">Add&hellip;</a></li>
+  </ul>
+{{/extend}}
+{{/if}}
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+{{#each warnings}}
+<div class="alert alert-warning" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+{{#unless results}}
+<p>
+No motors fit your rocket and satisfied the search criteria.
+</p>
+{{/unless}}
+{{#if results}}
+<p>
+{{fitCount}} motors fit the rocket;
+{{passCount}} worked
+{{#if failCount}}and {{failCount}} did not{{/if}}
+({{simCount}} simulations run).
+</p>
+
+<table id="result-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th class="number">T:W</th>
+     <th class="number">Guide</th>
+     <th class="number">Apogee</th>
+     <th class="number">Delay</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each results}}
+    <tr {{#if fail}}class="failed danger"{{/if}} data-id="{{motor._id}}">
+      <td>{{motor.designation}}</td>
+      <td>{{manufacturer.abbrev}}</td>
+      <td class="number" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
+      <td class="number" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
+      <td class="number" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
+      <td class="number" data-sort="{{formatSort optimalDelay}}">{{formatDuration optimalDelay}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#result-list', {
+  order: [[4, 'asc']],
+  expand: true
+});
+</script>
+
+{{/if}}

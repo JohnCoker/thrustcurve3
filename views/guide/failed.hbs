@@ -1,0 +1,23 @@
+<h1>{{title}}</h1>
+{{#if rockets}}
+{{#extend "sidebar-extra"}}
+  <h2>My Rockets</h2>
+  <ul class="links">
+  {{#each rockets}}
+    <li><a href="/motors/guide.html?rocket={{_id}}">{{name}}</a></li>
+  {{/each}}
+  <li><a href="/mystuff/rocket/new/edit.html">Add&hellip;</a></li>
+  </ul>
+{{/extend}}
+{{/if}}
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+<p>
+The motor guide could not run due to the errors above.
+Use your back button to adjust the inputs or <a href="/motors/guide.html">start over</a>.
+</p>

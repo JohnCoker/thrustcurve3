@@ -140,7 +140,7 @@ router.get(['/guidepage.jsp', '/motorguide.jsp'], function(req, res, next) {
 
 /*
  * /motors/guide.html
- * Motor guide execution page, renders with guide/results.hbs.
+ * Motor guide execution page, redirects to /motors/guide/id/summary.html.
  */
 function getMMTs(rocket, adapters, errors) {
   var mmts = [], main = true,
@@ -209,9 +209,9 @@ function getMMTs(rocket, adapters, errors) {
 
 function doRunGuide(req, res, rocket) {
   // get metadata on available motors
-  metadata.get(req, function(caches) {
+  metadata.getAvailableMotors(req, function(available) {
     var errors = [], warnings = [], filter = {}, filterCount = 0,
-        inputs, mmts, steps, results, fitCount, simCount, passCount, failCount, g, i;
+        inputs, mmts, steps, results, totalFit, totalSim, totalFail, totalPass, g, i;
 
     // collect inputs common to all simulations
     inputs = {};
@@ -237,182 +237,202 @@ function doRunGuide(req, res, rocket) {
 
     // add selected impulse class(es) to filter
     if (req.body.classes && req.body.classes.length > 0) {
-      if (req.body.classes.length > 1)
+      if (Array.isArray(req.body.classes))
         filter.impulseClass = { $in: req.body.classes };
       else
-        filter.impulseClass = req.body.classes[0];
+        filter.impulseClass = req.body.classes;
     } else if (req.body.class)
       filter.impulseClass = req.body.class;
     if (filter.impulseClass)
       filterCount++;
-  
+
     // add selected motor type(s) to filter
     if (req.body.types && req.body.types.length > 0) {
-      if (req.body.types.length > 1)
+      if (Array.isArray(req.body.types))
         filter.type = { $in: req.body.types };
       else
-        filter.type = req.body.types[0];
+        filter.type = req.body.types;
     } else if (req.body.type)
       filter.type = req.body.type;
     if (filter.type)
       filterCount++;
-  
+
     // add selected manufacturer(s) to filter
     if (req.body.manufacturers && req.body.manufacturers.length > 0) {
-      if (req.body.manufacturers.length > 1)
+      if (Array.isArray(req.body.manufacturers))
         filter._manufacturer = { $in: req.body.manufacturers };
       else
-        filter._manufacturer = req.body.manufacturers[0];
+        filter._manufacturer = req.body.manufacturers;
     } else if (req.body.manufacturer)
       filter._manufacturer = req.body.manufacturer;
     if (filter._manufacturer)
       filterCount++;
-  
+
     // limit to available motors
     filter.availability = { $in: schema.MotorAvailableEnum };
     Object.freeze(filter);
-  
+
     // collect selected MMT and adapters
     mmts = getMMTs(rocket, req.body.adapters, errors);
-    Object.freeze(mmts);
     if (mmts == null || mmts.length < 1)
       errors.push('No MMT dimensions and no adapters specified.');
 
-    // bail out if we have input errors
-    if (errors.length > 0) {
-      res.render('guide/entry', locals(req, defaults, {
-        title: "Motor Guide",
-        rocket: rocket,
-        errors: errors,
-        warnings: warnings,
-        schema: schema,
-        metadata: caches.availableMotorCache,
-        lengthUnits: units.length,
-        massUnits: units.mass,
-        finishes: metadata.CdFinishes,
-        submitLink: guidePage,
-        rocketsLink: '/mystuff/rockets.html',
-      }));
-      return;
-    }
+    // count the number of motors that match the filter
+    req.db.Motor.count(filter, req.success(function(filterMatch) {
+      if (filterMatch < 1)
+        errors.push('No motors match the filter criteria.');
 
-    // set up steps to run
-    steps = [];
-    results = [];
-    fitCount = simCount = passCount = failCount = 0;
-    for (i = 0; i < mmts.length; i++) {
-      steps.push(function() {
-        var mmt = mmts[i];
-        return function(cb) {
-          var query;
+      // bail out if we have input errors
+      if (errors.length > 0) {
+        res.render('guide/failed', locals(req, defaults, {
+          title: "Motor Guide",
+          rocket: rocket,
+          errors: errors,
+          warnings: warnings,
+          schema: schema,
+          metadata: available,
+          lengthUnits: units.length,
+          massUnits: units.mass,
+          finishes: metadata.CdFinishes,
+          submitLink: guidePage,
+          rocketsLink: '/mystuff/rockets.html',
+        }));
+        return;
+      }
 
-	  // query all motors that fit this MMT
-          query = _.extend({}, filter, {
-            diameter: { $gt: mmt.diameter - metadata.MotorDiameterTolerance, $lt: mmt.diameter + metadata.MotorDiameterTolerance },
-            length: { $lt: mmt.length + metadata.MotorDiameterTolerance },
-          });
-          req.db.Motor.find(query)
-            .sort({ totalImpulse: 1 })
-            .exec(req.success(function(motors) {
-              var mmtInputs;
+      // set up steps to run, each producing results
+      steps = [];
+      results = [];
+      totalFit = totalSim = totalFail = totalPass = 0;
 
-              fitCount += motors.length;
+      // one step per motor mount
+      for (i = 0; i < mmts.length; i++) {
+        steps.push(function() {
+          var mmt = mmts[i];
+          return function(cb) {
+            var query;
 
-	      // adjust inputs to account for MMT weight (in case of adapter)
-              mmtInputs = _.extend({}, inputs, { rocketMass: inputs.rocketMass + mmt.weight });
+            // query all motors that fit this MMT
+            query = _.extend({}, filter, {
+              diameter: { $gt: mmt.diameter - metadata.MotorDiameterTolerance, $lt: mmt.diameter + metadata.MotorDiameterTolerance },
+              length: { $lt: mmt.length + metadata.MotorDiameterTolerance },
+            });
+            req.db.Motor.find(query)
+              .sort({ totalImpulse: 1 })
+              .exec(req.success(function(motors) {
+                var mmtInputs, simCount = 0, passCount = 0, failCount = 0;
 
-	      // query all sim files for the motors that fit
-              req.db.SimFile.find({ _motor: { $in: _.pluck(motors, '_id') } })
-                .sort({ _motor: 1, updatedAt: -1 })
-                .exec(req.success(function(simfiles) {
-		  var motor, result, motorFiles, simmed, data, simInputs, simOutput, simErrors, i, j;
+                // adjust inputs to account for MMT weight (in case of adapter)
+                mmtInputs = _.extend({}, inputs, { rocketMass: inputs.rocketMass + mmt.weight });
 
-		  // for each motor, get what info we can
-		  for (i = 0; i < motors.length; i++) {
-		    motor = motors[i];
+                // query all sim files for the motors that fit
+                req.db.SimFile.find({ _motor: { $in: _.pluck(motors, '_id') } })
+                  .sort({ _motor: 1, updatedAt: -1 })
+                  .exec(req.success(function(simfiles) {
+                    var motor, result, motorFiles, simmed, data, simInputs, simOutput, simErrors, i, j;
 
-                    // simulation inputs for this motor
-		    simInputs = _.extend({}, mmtInputs, {
-		      motorInitialMass: flightsim.motorInitialMass(motor),
-		      motorBurnoutMass: flightsim.motorBurnoutMass(motor),
-		    });
+                    // for each motor, get what info we can
+                    for (i = 0; i < motors.length; i++) {
+                      motor = motors[i];
 
-		    // set up result info
-		    result = {
-		      mmt: mmt,
-		      manufacturer: caches.manufacturers.byId(motor._manufacturer),
-		      motor: motor,
-		      thrustWeight: (motor.avgThrust / flightsim.STP.G) / (mmtInputs.rocketMass + simInputs.motorInitialMass)
-		    };
+                      // simulation inputs for this motor
+                      simInputs = _.extend({}, mmtInputs, {
+                        motorInitialMass: flightsim.motorInitialMass(motor),
+                        motorBurnoutMass: flightsim.motorBurnoutMass(motor),
+                      });
 
-		    // for each motor, run the first simulation we can
-		    motorFiles = _.filter(simfiles, function(f) { return f._motor.toString() == motor._id.toString(); });
-		    simmed = false;
-		    for (j = 0; j < motorFiles.length && !simmed; j++) {
-		      // parse the data in the sim file
-		      data = parsers.parseData(motorFiles[j].format, motorFiles[j].data, new ErrorCollector());
-		      if (data != null) {
-			simErrors = new ErrorCollector();
-			simOutput = flightsim.simulate(simInputs, data, simErrors);
-			if (simOutput != null) {
-			  result.simulation = simOutput;
-                          if (result.simulation.apogeeTime > result.simulation.burnoutTime)
-                            result.optimalDelay = result.simulation.apogeeTime - result.simulation.burnoutTime;
-			  simmed = true;
-			  simCount++;
-			}
-		      }
-		    }
+                      // set up result info
+                      result = {
+                        _motor: motor._id,
+                        mmt: mmt.name,
+                        thrustWeight: (motor.avgThrust / flightsim.STP.G) / (mmtInputs.rocketMass + simInputs.motorInitialMass)
+                      };
 
-                    // determine if this motor works or not
-                    if (result.simulation) {
-                      // simulation; check guide velocity and min altitude
-                      if (result.simulation.guideVelocity < MinGuideVelocity)
-                        result.reason = 'slow off guide';
-                      else if (result.simulation.maxAltitude && result.maxAltitude < minAltitude(motor))
-                        result.reason = 'apogee too low';
-                    } else {
-                      // no simulation; check thrust/weight ratio
-                      if (result.ThrustWeight < MinThrustWeight)
-                        result.reason = 'thrust:weight';
+                      // for each motor, run the first simulation we can
+                      motorFiles = _.filter(simfiles, function(f) { return f._motor.toString() == motor._id.toString(); });
+                      simmed = false;
+                      for (j = 0; j < motorFiles.length && !simmed; j++) {
+                        // parse the data in the sim file
+                        data = parsers.parseData(motorFiles[j].format, motorFiles[j].data, new ErrorCollector());
+                        if (data != null) {
+                          simErrors = new ErrorCollector();
+                          simOutput = flightsim.simulate(simInputs, data, simErrors);
+                          if (simOutput != null) {
+                            result.simulation = simOutput;
+                            if (result.simulation.apogeeTime > result.simulation.burnoutTime)
+                              result.optimalDelay = result.simulation.apogeeTime - result.simulation.burnoutTime;
+                            simmed = true;
+                          }
+                        }
+                      }
+                      if (simmed)
+                        simCount++;
+
+                      // determine if this motor works or not
+                      if (result.simulation) {
+                        // simulation; check guide velocity and min altitude
+                        if (result.simulation.guideVelocity < MinGuideVelocity)
+                          result.reason = 'slow off guide';
+                        else if (result.simulation.maxAltitude && result.maxAltitude < minAltitude(motor))
+                          result.reason = 'apogee too low';
+                      } else {
+                        // no simulation; check thrust/weight ratio
+                        if (result.ThrustWeight < MinThrustWeight)
+                          result.reason = 'thrust:weight';
+                      }
+                      if (result.reason) {
+                        result.pass = false;
+                        failCount++;
+                      } else {
+                        result.pass = true;
+                        passCount++;
+                      }
+                      results.push(result);
                     }
-                    if (result.reason) {
-                      result.fail = true;
-                      result.pass = false;
-                      failCount++;
-                    } else {
-                      result.pass = true;
-                      result.fail = false;
-                      passCount++;
-                    }
-		    results.push(result);
-		  }
-		  cb(null, mmt.name);
-                }));
-            }));
-        };
-      }());
-    }
-    steps.push(function(cb) {
-      res.render('guide/results', locals(req, defaults, {
-        title: "Motor Guide Results",
-        rocket: rocket,
-        errors: errors,
-        warnings: warnings,
-        filterCount: filterCount,
-        mmtCount: mmts.length,
-        fitCount: fitCount,
-        simCount: simCount,
-        results: results,
-        resultCount: results.length,
-        failCount: failCount,
-        passCount: passCount,
-        singleMMT: mmts.length == 1 ? mmts[0].name : undefined,
-        restartLink: rocket._id ? (guidePage + '?rocket=' + rocket._id) : guidePage,
-      }));
-      cb(null, 'sent response');
-    });
-    async.series(steps);
+
+                    mmt.fit = motors.length;
+                    mmt.sim = simCount;
+                    mmt.pass = passCount;
+                    mmt.fail = failCount;
+
+                    totalFit += motors.length;
+                    totalSim += simCount;
+                    totalPass += passCount;
+                    totalFail += failCount;
+
+                    cb(null, mmt.name);
+                  }));
+              }));
+          };
+        }());
+      }
+
+      // save and redirect to summary page
+      steps.push(function(cb) {
+        var result;
+
+        result = new req.db.GuideResult({
+          _rocket: rocket._id,
+          _contributor: req.user ? req.user._id : undefined,
+          public: !!rocket.public,
+          inputs: inputs,
+          mmts: mmts,
+          warnings: warnings,
+          filters: filterCount,
+          filtered: filterMatch,
+          fit: totalFit,
+          sim: totalSim,
+          pass: totalPass,
+          fail: totalFail,
+          results: results
+        });
+        req.db.GuideResult.create(result, req.success(function(saved) {
+          res.redirect('/motors/guide/' + saved._id + '/summary.html');
+          cb(null, 'saved');
+        }));
+      });
+      async.series(steps);
+    }));
   });
 }
 
@@ -446,6 +466,72 @@ router.post(guidePage, function(req, res, next) {
   }
 });
 
+/*
+ * /motors/guide/id/summary.html.
+ * Motor guide result summary page, renders with guide/summary.hbs.
+ */
+router.get('/motors/guide/:id/summary.html', function(req, res, next) {
+  if (!req.db.isId(req.params.id)) {
+    res.redirect(guidePage);
+    return;
+  }
+
+  req.db.GuideResult.findOne({ _id: req.params.id }, req.success(function(result) {
+    // make sure viewer can access the result
+    if (result == null) {
+      res.status(404).send();
+      return;
+    }
+    if (!result.public && (req.user == null || req.user._id.toString() != result._contributor.toString())) {
+      res.status(403).send();
+      return;
+    }
+
+    // get metadata on manufacturers
+    metadata.getManufacturers(req, function(manufacturers) {
+      // get all motors that fit
+      req.db.Motor.find({ _id: { $in: _.pluck(result.results, '_motor') } }, req.success(function(motors) {
+        var pass = [], fail = [], m, r, i;
+
+        // augment results with summary info
+        for (i = 0; i < result.results.length; i++) {
+          r = result.results[i];
+
+          // load motors
+          m = _.find(motors, function(v) { return v._id.toString() == r._motor.toString(); });
+          if (m) {
+            r.motor = m;
+            r.manufacturer = manufacturers.byId(m._manufacturer);
+          }
+
+          r.fail = !r.pass;
+
+          if (r.pass)
+            pass.push(r);
+          else
+            fail.push(r);
+        }
+
+        res.render('guide/summary', locals(req, defaults, {
+          title: "Motor Guide Results",
+          warnings: result.warnings,
+          mmtCount: result.mmts.length,
+          filteredCount: result.filtered,
+          fitCount: result.fit,
+          simCount: result.sim,
+          allResults: result.results,
+          passResults: pass,
+          failResults: fail,
+          resultCount: result.results.length,
+          failCount: result.fail,
+          passCount: result.pass,
+          singleMMT: result.mmts.length == 1 ? result.mmts[0].name : undefined,
+          restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
+        }));
+      }));
+    });
+  }));
+});
 
 /*
  * /motors/guidehelp.html

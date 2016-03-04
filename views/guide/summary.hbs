@@ -11,30 +11,30 @@
 {{/extend}}
 {{/if}}
 
-{{#each errors}}
-<div class="alert alert-danger" role="alert">
-{{this}}
-</div>
-{{/each}}
 {{#each warnings}}
 <div class="alert alert-warning" role="alert">
 {{this}}
 </div>
 {{/each}}
 
-{{#unless results}}
+{{#unless allResults}}
 <p>
 No motors fit your rocket and satisfied the search criteria.
+<br/>
+Use your back button to adjust the inputs or <a href="{{restartLink}}">start over</a>.
 </p>
 {{/unless}}
-{{#if results}}
+{{#if allResults}}
 <p>
 {{fitCount}} motors fit the rocket;
 {{passCount}} worked
 {{#if failCount}}and {{failCount}} did not{{/if}}
 ({{simCount}} simulations run).
+<br/>
+If these aren't what you want, use the back button to adjust the inputs or <a href="{{restartLink}}">start over</a>.
 </p>
-
+{{/if}}
+{{#if passResults}}
 <table id="result-list" class="table table-bordered">
   <thead>
     <tr>
@@ -49,14 +49,14 @@ No motors fit your rocket and satisfied the search criteria.
     </tr>
   </thead>
   <tbody>
-  {{#each results}}
-    <tr {{#if fail}}class="failed danger"{{/if}} data-id="{{motor._id}}">
+  {{#each passResults}}
+    <tr data-id="{{motor._id}}">
       <td><a href="{{motorLink manufacturer motor}}">{{motor.designation}}</a></td>
       <td class="visible-md visible-lg">{{manufacturer.abbrev}}</td>
       <td class="number" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
       <td class="number" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
       <td class="number" data-sort="{{formatSort simulation.maxVelocity}}">{{formatVelocity simulation.maxVelocity}}</td>
-      <td class="number visible-lg" data-sort="{{formatSort simulation.maxAccleration}}">{{formatVelocity simulation.maxAcceleration}}</td>
+      <td class="number visible-lg" data-sort="{{formatSort simulation.maxAccleration}}">{{formatAcceleration simulation.maxAcceleration}}</td>
       <td class="number visible-lg" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
       <td class="number" data-sort="{{formatSort optimalDelay}}">{{formatDuration optimalDelay}}</td>
     </tr>
@@ -65,9 +65,8 @@ No motors fit your rocket and satisfied the search criteria.
 </table>
 <script type="text/javascript">
 setupTable('#result-list', {
-  order: [[4, 'asc']],
+  order: [[6, 'asc']],
   expand: true
 });
 </script>
-
 {{/if}}

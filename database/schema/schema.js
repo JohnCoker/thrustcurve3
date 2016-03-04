@@ -347,6 +347,50 @@ function makeFavoriteMotorModel(mongoose) {
   return mongoose.model('FavoriteMotor', schema);
 }
 
+function makeGuideResultModel(mongoose) {
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
+    _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
+    _rocket: { type: mongoose.Schema.Types.ObjectId, ref: 'Rocket' },
+    public: { type: Boolean, required: true },
+    inputs: {
+      rocketMass: { type: Number, required: true },
+      bodyDiameter: { type: Number, required: true },
+      cd: { type: Number, required: true },
+      guideLength: { type: Number, required: true },
+    },
+    mmts: [ {
+      name: { type: String, required: true },
+      diameter: { type: Number, required: true },
+      length: { type: Number, required: true },
+      weight: { type: Number },
+      fit: { type: Number, required: true },
+      sim: { type: Number, required: true },
+      pass: { type: Number, required: true },
+      fail: { type: Number, required: true }
+    } ],
+    warnings: [ { type: String, required: true } ],
+    filters: { type: Number, required: true },
+    filtered: { type: Number, required: true },
+    fit: { type: Number, required: true },
+    sim: { type: Number, required: true },
+    pass: { type: Number, required: true },
+    fail: { type: Number, required: true },
+    results: [ {
+      _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor' },
+      mmt: { type: String, required: true },
+      thrustWeight: { type: Number, required: true },
+      simulation: { type: mongoose.Schema.Types.Mixed },
+      optimalDelay: { type: Number },
+      pass: { type: Boolean, required: true },
+      reason: { type: String },
+    } ]
+  });
+  schemaOptions(schema);
+  return mongoose.model('GuideResult', schema);
+}
+
 
 /**
  * <p>The <b>schema</b> module contains the Mongoose schema used by the site.
@@ -478,6 +522,14 @@ module.exports = {
    * @return {object} Mongoose model
    */
   FavoriteMotorModel: makeFavoriteMotorModel,
+
+  /**
+   * Produce a Mongoose model for the <em>guideResults</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
+  GuideResultModel: makeGuideResultModel,
 
   /**
    * The legal values for Motor.type.

@@ -4,10 +4,10 @@
  */
 'use strict';
 
-const express = require('express'),
+const _ = require('underscore'),
+      express = require('express'),
       router = express.Router(),
       async = require('async'),
-      _ = require('underscore'),
       units = require('../lib/units'),
       ErrorCollector = require('../lib/errors').Collector,
       metadata = require('../lib/metadata'),
@@ -172,6 +172,7 @@ function getMMTs(rocket, adapters, errors) {
 
           mmts.push({
             name: units.formatUnit(a.mmtDiameter, 'length', a.mmtDiameterUnit) + ' adapter',
+            adapter: true,
             diameter: d,
             length: l,
             weight: w
@@ -191,6 +192,7 @@ function getMMTs(rocket, adapters, errors) {
       errors.push('Rocket has no MMT length.');
     mmts.push({
       name: units.formatUnit(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit) + ' MMT',
+      adapter: false,
       diameter: d,
       length: l,
       weight: 0
@@ -470,7 +472,7 @@ router.post(guidePage, function(req, res, next) {
  * /motors/guide/id/summary.html.
  * Motor guide result summary page, renders with guide/summary.hbs.
  */
-router.get('/motors/guide/:id/summary.html', function(req, res, next) {
+function loadResults(req, res, cb) {
   if (!req.db.isId(req.params.id)) {
     res.redirect(guidePage);
     return;
@@ -491,13 +493,13 @@ router.get('/motors/guide/:id/summary.html', function(req, res, next) {
     metadata.getManufacturers(req, function(manufacturers) {
       // get all motors that fit
       req.db.Motor.find({ _id: { $in: _.pluck(result.results, '_motor') } }, req.success(function(motors) {
-        var pass = [], fail = [], m, r, i;
+        var m, r, i;
 
-        // augment results with summary info
+        // complete result elements
         for (i = 0; i < result.results.length; i++) {
           r = result.results[i];
 
-          // load motors
+          // set motor and manufacturer
           m = _.find(motors, function(v) { return v._id.toString() == r._motor.toString(); });
           if (m) {
             r.motor = m;
@@ -505,32 +507,81 @@ router.get('/motors/guide/:id/summary.html', function(req, res, next) {
           }
 
           r.fail = !r.pass;
-
-          if (r.pass)
-            pass.push(r);
-          else
-            fail.push(r);
         }
 
-        res.render('guide/summary', locals(req, defaults, {
-          title: "Motor Guide Results",
-          warnings: result.warnings,
-          mmtCount: result.mmts.length,
-          filteredCount: result.filtered,
-          fitCount: result.fit,
-          simCount: result.sim,
-          allResults: result.results,
-          passResults: pass,
-          failResults: fail,
-          resultCount: result.results.length,
-          failCount: result.fail,
-          passCount: result.pass,
-          singleMMT: result.mmts.length == 1 ? result.mmts[0].name : undefined,
-          restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
-        }));
+        // load rocket if there is one
+        if (result._rocket) {
+          req.db.Rocket.findOne({ _id: result._rocket }, req.success(function(rocket) {
+            result.rocket = rocket;
+            cb(result);
+          }));
+        } else {
+          cb(result);
+        }
       }));
     });
   }));
+}
+
+function doSummaryPage(req, res, rockets) {
+  loadResults(req, res, function(result) {
+    var passResults = _.where(result.results, { pass: true });
+    res.render('guide/summary', locals(req, defaults, {
+      title: "Motor Guide Results",
+      rockets: rockets,
+      result: result,
+      anyResults: result.results.length > 0,
+      passResults: passResults,
+      detailsLink: '/motors/guide/' + result._id + '/details.html',
+      restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
+    }));
+  });
+}
+
+router.get('/motors/guide/:id/summary.html', function(req, res, next) {
+  if (req.user) {
+    req.db.Rocket.find({ _contributor: req.user._id }, undefined, { sort: { name: 1 } }, req.success(function(rockets) {
+      doSummaryPage(req, res, rockets);
+    }));
+  } else {
+    doSummaryPage(req, res);
+  }
+});
+
+function doDetailsPage(req, res, rockets) {
+  loadResults(req, res, function(result) {
+    var adapters = false,
+        i;
+
+    for (i = 0; i < result.mmts.length; i++) {
+      if (result.mmts[i].adapter)
+        adapters = true;
+    }
+
+    res.render('guide/details', locals(req, defaults, {
+      title: "Motor Guide Details",
+      rockets: rockets,
+      result: result,
+      allResults: result.results,
+      multiMMT: result.mmts.length > 1,
+      adapters: adapters,
+      minGuideVelocity: MinGuideVelocity,
+      minThrustWeight: MinThrustWeight,
+      summaryLink: '/motors/guide/' + result._id + '/summary.html',
+      rocketLink: result.rocket ? '/mystuff/rocket/' + result.rocket._id + '/' : undefined,
+      restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
+    }));
+  });
+}
+
+router.get('/motors/guide/:id/details.html', function(req, res, next) {
+  if (req.user) {
+    req.db.Rocket.find({ _contributor: req.user._id }, undefined, { sort: { name: 1 } }, req.success(function(rockets) {
+      doDetailsPage(req, res, rockets);
+    }));
+  } else {
+    doDetailsPage(req, res);
+  }
 });
 
 /*

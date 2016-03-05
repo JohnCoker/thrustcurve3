@@ -1,0 +1,145 @@
+<h1>{{title}}</h1>
+{{#if rockets}}
+{{#extend "sidebar-extra"}}
+  <h2>My Rockets</h2>
+  <ul class="links">
+  {{#each rockets}}
+    <li><a href="/motors/guide.html?rocket={{_id}}">{{name}}</a></li>
+  {{/each}}
+  <li><a href="/mystuff/rocket/new/edit.html">Add&hellip;</a></li>
+  </ul>
+{{/extend}}
+{{/if}}
+
+{{#each result.warnings}}
+<div class="alert alert-warning" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+<div role="form" class="form-horizontal form-condensed">
+  {{#if result.rocket}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Rocket</label>
+    <div class="col-sm-9">
+      <p class="form-control-static"><a href="{{rocketLink}}">{{result.rocket.name}}</a></p>
+    </div>
+  </div>
+  {{/if}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Body Diameter</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatLength result.inputs.bodyDiameter}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Dry Weight</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatMass result.inputs.rocketMass}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-3 control-label">C<sub>D</sub></label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatCD result.inputs.cd}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Guide Length</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatLength result.inputs.guideLength}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Motors Searched</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{result.filtered}}</p>
+    </div>
+  </div>
+</div>
+
+<table id="mmt-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th title="motor mount tube">MMT</th>
+     <th class="number" title="inside diameter">Diameter</th>
+     <th class="number" title="available length">Length</th>
+     <th class="number" title="motors that fit">Fit</th>
+     <th class="number" title="motors simulated">Sims</th>
+     <th class="number" title="motors that passed">Pass</th>
+     <th class="number" title="motors that failed">Fail</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each result.mmts}}
+    <tr>
+      <td>{{name}}</td>
+      <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+      <td class="number" data-sort="{{formatSort length}}">{{formatLength length}}</td>
+      <td class="number">{{fit}}</td>
+      <td class="number">{{sim}}</td>
+      <td class="number">{{pass}}</td>
+      <td class="number">{{fail}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+  {{#if multiMMT}}
+  <tfoot>
+    <tr>
+      <td>total</td>
+      <td class="number"></td>
+      <td class="number"></td>
+      <td class="number">{{result.fit}}</td>
+      <td class="number">{{result.sim}}</td>
+      <td class="number">{{result.pass}}</td>
+      <td class="number">{{result.fail}}</td>
+    </tr>
+  <tfoot>
+  {{/if}}
+</table>
+<script type="text/javascript">
+setupTable('#mmt-list', {
+  order: [[1, 'desc']]
+});
+</script>
+
+<h2>Complete Results</h2>
+
+{{#if allResults}}
+<table id="result-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th class="visible-md visible-lg">Manufacturer</th>
+     <th class="number" title="thrust-to-weight ratio">T:W</th>
+     <th class="number" title="velocity off launch guide">Guide</th>
+     <th class="number" title="maximum altitude">Apogee</th>
+     <th class="number" title="optimal delay time">Delay</th>
+     <th title="reason motor failed">Result</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each allResults}}
+    <tr class="{{#if pass}}success{{/if}}" data-id="{{motor._id}}">
+      <td><a href="{{motorLink manufacturer motor}}">{{motor.designation}}</a></td>
+      <td class="visible-md visible-lg">{{manufacturer.abbrev}}</td>
+      <td class="number {{#less thrustWeight ../minThrustWeight}}warning{{/less}}" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
+      <td class="number {{#less simulation.guideVelocity ../minGuideVelocity}}warning{{/less}}" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
+      <td class="number" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
+      <td class="number" data-sort="{{formatSort optimalDelay}}">{{formatDuration optimalDelay}}</td>
+      <td class="{{#if fail}}danger{{/if}}" data-sort="{{fail}}">{{#if fail}}{{reason}}{{else}}good{{/if}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#result-list', {
+  order: [[4, 'asc']],
+  expand: true
+});
+</script>
+{{/if}}
+
+<p>
+See the <a href="{{summaryLink}}">summary results</a> for just motors that work.
+</p>

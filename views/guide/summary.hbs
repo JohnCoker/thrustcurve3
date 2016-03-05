@@ -11,25 +11,29 @@
 {{/extend}}
 {{/if}}
 
-{{#each warnings}}
+{{#each result.warnings}}
 <div class="alert alert-warning" role="alert">
 {{this}}
 </div>
 {{/each}}
 
-{{#unless allResults}}
+{{#unless anyResults}}
 <p>
-No motors fit your rocket and satisfied the search criteria.
+No motors fit
+{{#if result.rocket}}<a href="/mystuff/rocket/{{result.rocket._id}}/">{{result.rocket.name}}</a>{{else}}the rocket{{/if}}
+and satisfied the search criteria.
 <br/>
 Use your back button to adjust the inputs or <a href="{{restartLink}}">start over</a>.
 </p>
 {{/unless}}
-{{#if allResults}}
+{{#if anyResults}}
 <p>
-{{fitCount}} motors fit the rocket;
-{{passCount}} worked
-{{#if failCount}}and {{failCount}} did not{{/if}}
-({{simCount}} simulations run).
+{{result.fit}} motors fit
+{{#if result.rocket}}<a href="/mystuff/rocket/{{result.rocket._id}}/">{{result.rocket.name}}</a>{{else}}the rocket{{/if}}
+and satisfied the search criteria;
+{{result.pass}} worked
+{{#if result.fail}}and {{result.fail}} did not{{/if}}
+({{result.sim}} simulations run).
 <br/>
 If these aren't what you want, use the back button to adjust the inputs or <a href="{{restartLink}}">start over</a>.
 </p>
@@ -40,12 +44,12 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
     <tr>
      <th>Designation</th>
      <th class="visible-md visible-lg">Manufacturer</th>
-     <th class="number">T:W</th>
-     <th class="number">Guide</th>
-     <th class="number visible-lg">Velocity</th>
-     <th class="number visible-lg">Accel</th>
-     <th class="number">Apogee</th>
-     <th class="number">Delay</th>
+     <th class="number" title="thrust-to-weight ratio">T:W</th>
+     <th class="number" title="velocity off launch guide">Guide</th>
+     <th class="number visible-lg" title="maximum speed">Velocity</th>
+     <th class="number visible-lg" title="maximum acceleration">Accel</th>
+     <th class="number" title="maximum altitude">Apogee</th>
+     <th class="number" title="optimal delay time">Delay</th>
     </tr>
   </thead>
   <tbody>
@@ -55,9 +59,9 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
       <td class="visible-md visible-lg">{{manufacturer.abbrev}}</td>
       <td class="number" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
       <td class="number" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
-      <td class="number" data-sort="{{formatSort simulation.maxVelocity}}">{{formatVelocity simulation.maxVelocity}}</td>
+      <td class="number visible-lg" data-sort="{{formatSort simulation.maxVelocity}}">{{formatVelocity simulation.maxVelocity}}</td>
       <td class="number visible-lg" data-sort="{{formatSort simulation.maxAccleration}}">{{formatAcceleration simulation.maxAcceleration}}</td>
-      <td class="number visible-lg" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
+      <td class="number" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
       <td class="number" data-sort="{{formatSort optimalDelay}}">{{formatDuration optimalDelay}}</td>
     </tr>
   {{/each}}
@@ -70,3 +74,7 @@ setupTable('#result-list', {
 });
 </script>
 {{/if}}
+
+<p>
+See the <a href="{{detailsLink}}">complete results</a> for more details.
+</p>

@@ -362,6 +362,7 @@ function makeGuideResultModel(mongoose) {
     },
     mmts: [ {
       name: { type: String, required: true },
+      adapter: { type: Boolean, required: true },
       diameter: { type: Number, required: true },
       length: { type: Number, required: true },
       weight: { type: Number },

@@ -5,6 +5,7 @@
 'use strict';
 
 const _ = require('underscore'),
+      xlsx = require('xlsx'),
       express = require('express'),
       router = express.Router(),
       async = require('async'),
@@ -472,7 +473,7 @@ router.post(guidePage, function(req, res, next) {
  * /motors/guide/id/summary.html.
  * Motor guide result summary page, renders with guide/summary.hbs.
  */
-function loadResults(req, res, cb) {
+function loadGuideResult(req, res, cb) {
   if (!req.db.isId(req.params.id)) {
     res.redirect(guidePage);
     return;
@@ -524,7 +525,7 @@ function loadResults(req, res, cb) {
 }
 
 function doSummaryPage(req, res, rockets) {
-  loadResults(req, res, function(result) {
+  loadGuideResult(req, res, function(result) {
     var passResults = _.where(result.results, { pass: true });
     res.render('guide/summary', locals(req, defaults, {
       title: "Motor Guide Results",
@@ -533,6 +534,7 @@ function doSummaryPage(req, res, rockets) {
       anyResults: result.results.length > 0,
       passResults: passResults,
       detailsLink: '/motors/guide/' + result._id + '/details.html',
+      spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
       restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
     }));
   });
@@ -549,7 +551,7 @@ router.get('/motors/guide/:id/summary.html', function(req, res, next) {
 });
 
 function doDetailsPage(req, res, rockets) {
-  loadResults(req, res, function(result) {
+  loadGuideResult(req, res, function(result) {
     var adapters = false,
         i;
 
@@ -568,6 +570,7 @@ function doDetailsPage(req, res, rockets) {
       minGuideVelocity: MinGuideVelocity,
       minThrustWeight: MinThrustWeight,
       summaryLink: '/motors/guide/' + result._id + '/summary.html',
+      spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
       rocketLink: result.rocket ? '/mystuff/rocket/' + result.rocket._id + '/' : undefined,
       restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
     }));
@@ -582,6 +585,231 @@ router.get('/motors/guide/:id/details.html', function(req, res, next) {
   } else {
     doDetailsPage(req, res);
   }
+});
+
+/*
+ * /motors/guide/id/spreadsheet.xlsx.
+ * Motor guide result spreadsheet, serves file directly.
+ */
+class Worksheet {
+  constructor() {
+    this.range = {s: {c:10000000, r:10000000}, e: {c:0, r:0 }};
+    this.cells = {};
+  }
+
+  setCell(r, c, cell) {
+    var ref;
+
+    if (this.range.s.r > r)
+      this.range.s.r = r;
+    if (this.range.s.c > c)
+      this.range.s.c = c;
+    if (this.range.e.r < r)
+      this.range.e.r = r;
+    if (this.range.e.c < c)
+      this.range.e.c = c;
+
+    ref = xlsx.utils.encode_cell({ c: c, r: r });
+    this.cells[ref] = cell;
+  }
+
+  setString(r, c, v, b) {
+    this.setCell(r, c, {
+      t: 's',
+      v: v
+    });
+  }
+
+  setLabel(r, c, v, u) {
+    this.setString(r, c, v + ' (' + units.getUnitPref(u).label + ')', true);
+  }
+
+  setNumber(r, c, v) {
+    if (typeof v != 'number' || isNaN(v))
+      return;
+    this.setCell(r, c, {
+      t: 'n',
+      v: v.toFixed(4)
+    });
+  }
+
+  setUnit(r, c, v, u) {
+    if (u == 'mmt') {
+      this.setNumber(r, c, units.convertMMTFromMKS(v));
+    } else {
+      this.setNumber(r, c, units.convertPrefFromMKS(v, u));
+    }
+  }
+
+  setDate(r, c, v) {
+    this.setCell(r, c, {
+      t: 'd',
+      v: v
+    });
+  }
+
+  setColWidths() {
+    var a, i;
+
+    if (arguments.length === 1 && Array.isArray(arguments[0]))
+      a = arguments[0];
+    else
+      a = arguments;
+
+    this.widths = [];
+    for (i = 0; i < a.length; i++)
+      this.widths.push({ wch: a[i] });
+  }
+
+  produce() {
+    this.cells['!ref'] = xlsx.utils.encode_range(this.range);
+    if (this.widths)
+      this.cells['!cols'] = this.widths;
+    return this.cells;
+  }
+}
+
+router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
+  loadGuideResult(req, res, function(result) {
+    var rocketSheet = new Worksheet(), motorsSheet = new Worksheet(),
+	workbook, row, widths, data, r, i;
+
+    // warnings
+    row = 0;
+    if (result.warnings && result.warnings.length > 0) {
+      for (i = 0; i < result.warnings.length; i++) {
+	rocketSheet.setString(row, 0, 'warning: ' + result.warnings[i]);
+	row++;
+      }
+      row++;
+    }
+
+    // rocket info
+    if (result.rocket) {
+      rocketSheet.setString(row, 0, 'Rocket Name');
+      rocketSheet.setString(row, 1, result.rocket.name);
+      row++;
+    }
+
+    rocketSheet.setString(row, 0, 'Body Diameter');
+    rocketSheet.setUnit(row, 1, result.inputs.bodyDiameter, 'length');
+    row++;
+
+    rocketSheet.setString(row, 0, 'Dry Weight');
+    rocketSheet.setUnit(row, 1, result.inputs.rocketMass, 'mass');
+    row++;
+
+    rocketSheet.setString(row, 0, 'CD');
+    rocketSheet.setNumber(row, 1, result.inputs.cd);
+    row++;
+
+    rocketSheet.setString(row, 0, 'Guide Length');
+    rocketSheet.setUnit(row, 1, result.inputs.guideLength, 'length');
+    row++;
+
+    rocketSheet.setString(row, 0, 'Motors Searched');
+    rocketSheet.setNumber(row, 1, result.filtered);
+    row++;
+
+    rocketSheet.setString(row, 0, 'Date Run');
+    rocketSheet.setDate(row, 1, result.updatedAt);
+    row++;
+
+    // MMTs
+    row++;
+    rocketSheet.setString(row, 0, 'MMT');
+    rocketSheet.setString(row, 1, 'Diameter (mm)');
+    rocketSheet.setLabel(row, 2, 'Length', 'length');
+    rocketSheet.setString(row, 3, 'Fit');
+    rocketSheet.setString(row, 4, 'Sim');
+    rocketSheet.setString(row, 5, 'Pass');
+    rocketSheet.setString(row, 6, 'Fail');
+    row++;
+    for (i = 0; i < result.mmts.length; i++) {
+      rocketSheet.setString(row, 0, result.mmts[i].name);
+      rocketSheet.setUnit(row, 1, result.mmts[i].diameter, 'mmt');
+      rocketSheet.setUnit(row, 2, result.mmts[i].length, 'length');
+      rocketSheet.setNumber(row, 3, result.mmts[i].fit);
+      rocketSheet.setNumber(row, 4, result.mmts[i].sim);
+      rocketSheet.setNumber(row, 5, result.mmts[i].pass);
+      rocketSheet.setNumber(row, 6, result.mmts[i].fail);
+      row++;
+    }
+    if (result.mmts.length > 1) {
+      rocketSheet.setString(row, 0, 'total');
+      rocketSheet.setNumber(row, 3, result.fit);
+      rocketSheet.setNumber(row, 4, result.sim);
+      rocketSheet.setNumber(row, 5, result.pass);
+      rocketSheet.setNumber(row, 6, result.fail);
+      row++;
+    }
+
+    rocketSheet.setColWidths(15, 15, 15, 8, 8, 8, 8);
+
+    // motor results
+    row = 0;
+    motorsSheet.setString(row,  0, 'Designation');
+    motorsSheet.setString(row,  1, 'Manufacturer');
+    motorsSheet.setString(row,  2, 'MMT');
+    motorsSheet.setLabel (row,  3, 'Weight', 'mass');
+    motorsSheet.setString(row,  4, 'T:W');
+    motorsSheet.setString(row,  5, 'Liftoff (s)');
+    motorsSheet.setLabel (row,  6, 'Guide', 'velocity');
+    motorsSheet.setLabel (row,  7, 'Burnout', 'altitude');
+    motorsSheet.setString(row,  8, 'Burnout (s)');
+    motorsSheet.setLabel (row,  9, 'Apogee', 'altitude');
+    motorsSheet.setString(row, 10, 'Apogee (s)');
+    motorsSheet.setLabel (row, 11, 'Velocity', 'velocity');
+    motorsSheet.setLabel (row, 12, 'Accel', 'acceleration');
+    motorsSheet.setString(row, 13, 'Delay (s)');
+    motorsSheet.setString(row, 14, 'Reason');
+    row++;
+
+    for (i = 0; i < result.results.length; i++) {
+      r = result.results[i];
+      motorsSheet.setString(row,  0, r.motor.designation);
+      motorsSheet.setString(row,  1, r.manufacturer.abbrev);
+      motorsSheet.setString(row,  2, r.mmt);
+      motorsSheet.setUnit  (row,  3, r.simulation.inputs.loadedInitialMass, 'mass');
+      motorsSheet.setNumber(row,  4, r.thrustWeight);
+      motorsSheet.setNumber(row,  5, r.simulation.liftoffTime);
+      motorsSheet.setUnit  (row,  6, r.simulation.guideVelocity, 'velocity');
+      motorsSheet.setUnit  (row,  7, r.simulation.burnoutAltitude, 'altitude');
+      motorsSheet.setNumber(row,  8, r.simulation.burnoutTime);
+      motorsSheet.setUnit  (row,  9, r.simulation.maxAltitude, 'altitude');
+      motorsSheet.setNumber(row, 10, r.simulation.apogeeTime);
+      motorsSheet.setUnit  (row, 11, r.simulation.maxVelocity, 'velocity');
+      motorsSheet.setUnit  (row, 12, r.simulation.maxAcceleration, 'acceleration');
+      motorsSheet.setNumber(row, 13, r.optimalDelay);
+      motorsSheet.setString(row, 14, r.reason || 'good');
+      row++;
+    }
+
+    widths = [15, 15, 15];
+    for (i = 0; i < 11; i++)
+      widths.push(10);
+    widths.push(20);
+    motorsSheet.setColWidths(widths);
+
+    // entire workbook
+    workbook = {
+      SheetNames: ['rocket', 'motors'],
+      Sheets: {
+	rocket: rocketSheet.produce(),
+	motors: motorsSheet.produce()
+      }
+    };
+    data = xlsx.write(workbook, {
+      bookType: 'xlsx',
+      bookSST: true,
+      type: 'binary'
+    });
+
+    res.type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+       .append('Last-Modified', result.updatedAt)
+       .attachment('motorguide.xlsx')
+       .end(data, 'binary');
+  });
 });
 
 /*

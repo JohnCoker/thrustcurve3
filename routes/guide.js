@@ -5,7 +5,6 @@
 'use strict';
 
 const _ = require('underscore'),
-      xlsx = require('xlsx'),
       express = require('express'),
       router = express.Router(),
       async = require('async'),
@@ -15,6 +14,7 @@ const _ = require('underscore'),
       schema = require('../database/schema'),
       parsers = require('../simulate/parsers'),
       flightsim = require('../simulate/flightsim'),
+      spreadsheet = require('../render/spreadsheet'),
       locals = require('./locals.js');
 
 const MinGuideVelocity = 14.9,
@@ -591,87 +591,10 @@ router.get('/motors/guide/:id/details.html', function(req, res, next) {
  * /motors/guide/id/spreadsheet.xlsx.
  * Motor guide result spreadsheet, serves file directly.
  */
-class Worksheet {
-  constructor() {
-    this.range = {s: {c:10000000, r:10000000}, e: {c:0, r:0 }};
-    this.cells = {};
-  }
-
-  setCell(r, c, cell) {
-    var ref;
-
-    if (this.range.s.r > r)
-      this.range.s.r = r;
-    if (this.range.s.c > c)
-      this.range.s.c = c;
-    if (this.range.e.r < r)
-      this.range.e.r = r;
-    if (this.range.e.c < c)
-      this.range.e.c = c;
-
-    ref = xlsx.utils.encode_cell({ c: c, r: r });
-    this.cells[ref] = cell;
-  }
-
-  setString(r, c, v, b) {
-    this.setCell(r, c, {
-      t: 's',
-      v: v
-    });
-  }
-
-  setLabel(r, c, v, u) {
-    this.setString(r, c, v + ' (' + units.getUnitPref(u).label + ')', true);
-  }
-
-  setNumber(r, c, v) {
-    if (typeof v != 'number' || isNaN(v))
-      return;
-    this.setCell(r, c, {
-      t: 'n',
-      v: v.toFixed(4)
-    });
-  }
-
-  setUnit(r, c, v, u) {
-    if (u == 'mmt') {
-      this.setNumber(r, c, units.convertMMTFromMKS(v));
-    } else {
-      this.setNumber(r, c, units.convertPrefFromMKS(v, u));
-    }
-  }
-
-  setDate(r, c, v) {
-    this.setCell(r, c, {
-      t: 'd',
-      v: v
-    });
-  }
-
-  setColWidths() {
-    var a, i;
-
-    if (arguments.length === 1 && Array.isArray(arguments[0]))
-      a = arguments[0];
-    else
-      a = arguments;
-
-    this.widths = [];
-    for (i = 0; i < a.length; i++)
-      this.widths.push({ wch: a[i] });
-  }
-
-  produce() {
-    this.cells['!ref'] = xlsx.utils.encode_range(this.range);
-    if (this.widths)
-      this.cells['!cols'] = this.widths;
-    return this.cells;
-  }
-}
-
 router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
   loadGuideResult(req, res, function(result) {
-    var rocketSheet = new Worksheet(), motorsSheet = new Worksheet(),
+    var rocketSheet = new spreadsheet.Worksheet('rocket'),
+        motorsSheet = new spreadsheet.Worksheet('motors'),
 	workbook, row, widths, data, r, i;
 
     // warnings
@@ -691,44 +614,44 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
       row++;
     }
 
-    rocketSheet.setString(row, 0, 'Body Diameter');
+    rocketSheet.setLabel(row, 0, 'Body Diameter', 'length');
     rocketSheet.setUnit(row, 1, result.inputs.bodyDiameter, 'length');
     row++;
 
-    rocketSheet.setString(row, 0, 'Dry Weight');
+    rocketSheet.setLabel(row, 0, 'Dry Weight', 'mass');
     rocketSheet.setUnit(row, 1, result.inputs.rocketMass, 'mass');
     row++;
 
-    rocketSheet.setString(row, 0, 'CD');
+    rocketSheet.setLabel(row, 0, 'CD');
     rocketSheet.setNumber(row, 1, result.inputs.cd);
     row++;
 
-    rocketSheet.setString(row, 0, 'Guide Length');
+    rocketSheet.setLabel(row, 0, 'Guide Length', 'length');
     rocketSheet.setUnit(row, 1, result.inputs.guideLength, 'length');
     row++;
 
-    rocketSheet.setString(row, 0, 'Motors Searched');
+    rocketSheet.setLabel(row, 0, 'Motors Searched');
     rocketSheet.setNumber(row, 1, result.filtered);
     row++;
 
-    rocketSheet.setString(row, 0, 'Date Run');
+    rocketSheet.setLabel(row, 0, 'Date Run');
     rocketSheet.setDate(row, 1, result.updatedAt);
     row++;
 
     // MMTs
     row++;
-    rocketSheet.setString(row, 0, 'MMT');
-    rocketSheet.setString(row, 1, 'Diameter (mm)');
+    rocketSheet.setLabel(row, 0, 'MMT');
+    rocketSheet.setLabel(row, 1, 'Diameter ', 'mmt');
     rocketSheet.setLabel(row, 2, 'Length', 'length');
-    rocketSheet.setString(row, 3, 'Fit');
-    rocketSheet.setString(row, 4, 'Sim');
-    rocketSheet.setString(row, 5, 'Pass');
-    rocketSheet.setString(row, 6, 'Fail');
+    rocketSheet.setLabel(row, 3, 'Fit');
+    rocketSheet.setLabel(row, 4, 'Sim');
+    rocketSheet.setLabel(row, 5, 'Pass');
+    rocketSheet.setLabel(row, 6, 'Fail');
     row++;
     for (i = 0; i < result.mmts.length; i++) {
       rocketSheet.setString(row, 0, result.mmts[i].name);
-      rocketSheet.setUnit(row, 1, result.mmts[i].diameter, 'mmt');
-      rocketSheet.setUnit(row, 2, result.mmts[i].length, 'length');
+      rocketSheet.setUnit  (row, 1, result.mmts[i].diameter, 'mmt');
+      rocketSheet.setUnit  (row, 2, result.mmts[i].length, 'length');
       rocketSheet.setNumber(row, 3, result.mmts[i].fit);
       rocketSheet.setNumber(row, 4, result.mmts[i].sim);
       rocketSheet.setNumber(row, 5, result.mmts[i].pass);
@@ -748,21 +671,21 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
 
     // motor results
     row = 0;
-    motorsSheet.setString(row,  0, 'Designation');
-    motorsSheet.setString(row,  1, 'Manufacturer');
-    motorsSheet.setString(row,  2, 'MMT');
-    motorsSheet.setLabel (row,  3, 'Weight', 'mass');
-    motorsSheet.setString(row,  4, 'T:W');
-    motorsSheet.setString(row,  5, 'Liftoff (s)');
-    motorsSheet.setLabel (row,  6, 'Guide', 'velocity');
-    motorsSheet.setLabel (row,  7, 'Burnout', 'altitude');
-    motorsSheet.setString(row,  8, 'Burnout (s)');
-    motorsSheet.setLabel (row,  9, 'Apogee', 'altitude');
-    motorsSheet.setString(row, 10, 'Apogee (s)');
-    motorsSheet.setLabel (row, 11, 'Velocity', 'velocity');
-    motorsSheet.setLabel (row, 12, 'Accel', 'acceleration');
-    motorsSheet.setString(row, 13, 'Delay (s)');
-    motorsSheet.setString(row, 14, 'Reason');
+    motorsSheet.setLabel(row,  0, 'Designation');
+    motorsSheet.setLabel(row,  1, 'Manufacturer');
+    motorsSheet.setLabel(row,  2, 'MMT');
+    motorsSheet.setLabel(row,  3, 'Weight', 'mass');
+    motorsSheet.setLabel(row,  4, 'T:W');
+    motorsSheet.setLabel(row,  5, 'Liftoff', 'duration');
+    motorsSheet.setLabel(row,  6, 'Guide', 'velocity');
+    motorsSheet.setLabel(row,  7, 'Burnout', 'altitude');
+    motorsSheet.setLabel(row,  8, 'Burnout', 'duration');
+    motorsSheet.setLabel(row,  9, 'Apogee', 'altitude');
+    motorsSheet.setLabel(row, 10, 'Apogee', 'duration');
+    motorsSheet.setLabel(row, 11, 'Velocity', 'velocity');
+    motorsSheet.setLabel(row, 12, 'Accel', 'acceleration');
+    motorsSheet.setLabel(row, 13, 'Delay', 'duration');
+    motorsSheet.setLabel(row, 14, 'Result');
     row++;
 
     for (i = 0; i < result.results.length; i++) {
@@ -770,16 +693,19 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
       motorsSheet.setString(row,  0, r.motor.designation);
       motorsSheet.setString(row,  1, r.manufacturer.abbrev);
       motorsSheet.setString(row,  2, r.mmt);
-      motorsSheet.setUnit  (row,  3, r.simulation.inputs.loadedInitialMass, 'mass');
+
       motorsSheet.setNumber(row,  4, r.thrustWeight);
-      motorsSheet.setNumber(row,  5, r.simulation.liftoffTime);
-      motorsSheet.setUnit  (row,  6, r.simulation.guideVelocity, 'velocity');
-      motorsSheet.setUnit  (row,  7, r.simulation.burnoutAltitude, 'altitude');
-      motorsSheet.setNumber(row,  8, r.simulation.burnoutTime);
-      motorsSheet.setUnit  (row,  9, r.simulation.maxAltitude, 'altitude');
-      motorsSheet.setNumber(row, 10, r.simulation.apogeeTime);
-      motorsSheet.setUnit  (row, 11, r.simulation.maxVelocity, 'velocity');
-      motorsSheet.setUnit  (row, 12, r.simulation.maxAcceleration, 'acceleration');
+      if (r.simulation) {
+        motorsSheet.setUnit  (row,  3, r.simulation.inputs.loadedInitialMass, 'mass');
+        motorsSheet.setNumber(row,  5, r.simulation.liftoffTime);
+        motorsSheet.setUnit  (row,  6, r.simulation.guideVelocity, 'velocity');
+        motorsSheet.setUnit  (row,  7, r.simulation.burnoutAltitude, 'altitude');
+        motorsSheet.setNumber(row,  8, r.simulation.burnoutTime);
+        motorsSheet.setUnit  (row,  9, r.simulation.maxAltitude, 'altitude');
+        motorsSheet.setNumber(row, 10, r.simulation.apogeeTime);
+        motorsSheet.setUnit  (row, 11, r.simulation.maxVelocity, 'velocity');
+        motorsSheet.setUnit  (row, 12, r.simulation.maxAcceleration, 'acceleration');
+      }
       motorsSheet.setNumber(row, 13, r.optimalDelay);
       motorsSheet.setString(row, 14, r.reason || 'good');
       row++;
@@ -792,20 +718,12 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     motorsSheet.setColWidths(widths);
 
     // entire workbook
-    workbook = {
-      SheetNames: ['rocket', 'motors'],
-      Sheets: {
-	rocket: rocketSheet.produce(),
-	motors: motorsSheet.produce()
-      }
-    };
-    data = xlsx.write(workbook, {
-      bookType: 'xlsx',
-      bookSST: true,
-      type: 'binary'
+    workbook = new spreadsheet.Workbook({
+      sheets: [rocketSheet, motorsSheet]
     });
+    data = workbook.produce();
 
-    res.type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.type(workbook.mimeType)
        .append('Last-Modified', result.updatedAt)
        .attachment('motorguide.xlsx')
        .end(data, 'binary');

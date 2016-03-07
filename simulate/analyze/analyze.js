@@ -94,6 +94,37 @@ function normalize(input, params, error) {
     return output;
 }
 
+function scale(input, factor, error) {
+  var points, output, i;
+
+  // optional arguments
+  if (error == null)
+    error = function() {};
+
+  if (typeof factor != 'number' || isNaN(factor) || factor <= 0) {
+    error(errors.INVALID_INFO, "invalid scale factor {1}", factor);
+    return;
+  }
+
+  // get raw data points to scale
+  if (Array.isArray(input))
+    points = input;
+  else
+    points = input.points;
+
+  // copy data points, scaling the Y values
+  output = [];
+  for (i = 0; i < points.length; i++) {
+    output.push({
+      time: points[i].time,
+      thrust: points[i].thrust * factor
+    });
+  }
+
+  if (output.length > 0)
+    return output;
+}
+
 function stats(data, params, error) {
   var points, maxTime, maxThrust, burnStart, burnEnd, burnTime, totalImpulse,
       cutoff, lastPoint, nextPoint, i, x, y;
@@ -308,6 +339,22 @@ module.exports = {
    * @return {object[]} normalized data points
    */
   normalize: normalize,
+
+  /**
+   * <p>Build a scaled set of time/thrust data points from the original file data
+   * to simulate a cluster of (the same) motors.</p>
+   *
+   * <p>Unless there are no input points at all, an array of output points is returned.
+   * However if the data is completely bad, undefined is returned.
+   * Each point's thrust value is multipled by the scale factor; the time is unchanged.</p>
+   *
+   * @function
+   * @param {object} data a parsed data file
+   * @param {number} scale scale factor
+   * @param {function} [error] error reporter
+   * @return {object[]} scaled data points
+   */
+  scale: scale,
 
   /**
    * <p>Produced a set of statistics from the original thrust curve data points.

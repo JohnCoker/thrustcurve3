@@ -14,6 +14,7 @@ const _ = require('underscore'),
       schema = require('../database/schema'),
       parsers = require('../simulate/parsers'),
       flightsim = require('../simulate/flightsim'),
+      analyze = require('../simulate/analyze'),
       spreadsheet = require('../render/spreadsheet'),
       locals = require('./locals.js');
 
@@ -214,7 +215,7 @@ function doRunGuide(req, res, rocket) {
   // get metadata on available motors
   metadata.getAvailableMotors(req, function(available) {
     var errors = [], warnings = [], filter = {}, filterCount = 0,
-        inputs, mmts, steps, results, totalFit, totalSim, totalFail, totalPass, g, i;
+        inputs, cluster, mmts, steps, results, totalFit, totalSim, totalFail, totalPass, g, i;
 
     // collect inputs common to all simulations
     inputs = {};
@@ -236,6 +237,12 @@ function doRunGuide(req, res, rocket) {
       inputs.guideLength = g.mks;
       warnings.push('No guide length specified; using ' + units.formatUnit(g.value, 'length', g.unit) + '.');
     }
+
+    if (rocket.mmtCount > 1.5)
+      cluster = inputs.cluster = Math.round(rocket.mmtCount);
+    else
+      cluster = 1;
+
     Object.freeze(inputs);
 
     // add selected impulse class(es) to filter
@@ -326,7 +333,7 @@ function doRunGuide(req, res, rocket) {
                 var mmtInputs, simCount = 0, passCount = 0, failCount = 0;
 
                 // adjust inputs to account for MMT weight (in case of adapter)
-                mmtInputs = _.extend({}, inputs, { rocketMass: inputs.rocketMass + mmt.weight });
+                mmtInputs = _.extend({}, inputs, { rocketMass: inputs.rocketMass + cluster * mmt.weight });
 
                 // query all sim files for the motors that fit
                 req.db.SimFile.find({ _motor: { $in: _.pluck(motors, '_id') } })
@@ -340,15 +347,15 @@ function doRunGuide(req, res, rocket) {
 
                       // simulation inputs for this motor
                       simInputs = _.extend({}, mmtInputs, {
-                        motorInitialMass: flightsim.motorInitialMass(motor),
-                        motorBurnoutMass: flightsim.motorBurnoutMass(motor),
+                        motorInitialMass: cluster * flightsim.motorInitialMass(motor),
+                        motorBurnoutMass: cluster * flightsim.motorBurnoutMass(motor)
                       });
 
                       // set up result info
                       result = {
                         _motor: motor._id,
                         mmt: mmt.name,
-                        thrustWeight: (motor.avgThrust / flightsim.STP.G) / (mmtInputs.rocketMass + simInputs.motorInitialMass)
+                        thrustWeight: (cluster * motor.avgThrust / flightsim.STP.G) / (mmtInputs.rocketMass + simInputs.motorInitialMass)
                       };
 
                       // for each motor, run the first simulation we can
@@ -358,6 +365,8 @@ function doRunGuide(req, res, rocket) {
                         // parse the data in the sim file
                         data = parsers.parseData(motorFiles[j].format, motorFiles[j].data, new ErrorCollector());
                         if (data != null) {
+                          if (cluster > 1)
+                            data = analyze.scale(data, cluster);
                           simErrors = new ErrorCollector();
                           simOutput = flightsim.simulate(simInputs, data, simErrors);
                           if (simOutput != null) {
@@ -630,6 +639,12 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     rocketSheet.setUnit(row, 1, result.inputs.guideLength, 'length');
     row++;
 
+    if (result.inputs.cluster > 1) {
+      rocketSheet.setLabel(row, 0, 'Cluster');
+      rocketSheet.setNumber(row, 1, result.inputs.cluster);
+      row++;
+    }
+
     rocketSheet.setLabel(row, 0, 'Motors Searched');
     rocketSheet.setNumber(row, 1, result.filtered);
     row++;
@@ -649,7 +664,10 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     rocketSheet.setLabel(row, 6, 'Fail');
     row++;
     for (i = 0; i < result.mmts.length; i++) {
-      rocketSheet.setString(row, 0, result.mmts[i].name);
+      if (result.inputs.cluster > 1)
+        rocketSheet.setString(row, 0, result.mmts[i].name + ' ×' + result.inputs.cluster.toFixed());
+      else
+        rocketSheet.setString(row, 0, result.mmts[i].name);
       rocketSheet.setUnit  (row, 1, result.mmts[i].diameter, 'mmt');
       rocketSheet.setUnit  (row, 2, result.mmts[i].length, 'length');
       rocketSheet.setNumber(row, 3, result.mmts[i].fit);

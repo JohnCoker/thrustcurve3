@@ -359,6 +359,7 @@ function makeGuideResultModel(mongoose) {
       bodyDiameter: { type: Number, required: true },
       cd: { type: Number, required: true },
       guideLength: { type: Number, required: true },
+      cluster: { type: Number, min: 2 }
     },
     mmts: [ {
       name: { type: String, required: true },

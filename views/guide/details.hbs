@@ -50,10 +50,18 @@
       <p class="form-control-static">{{formatLength result.inputs.guideLength}}</p>
     </div>
   </div>
+  {{#if result.inputs.cluster}}
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Cluster</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatInt result.inputs.cluster}}</p>
+    </div>
+  </div>
+  {{/if}}
   <div class="form-group">
     <label class="col-sm-3 control-label">Motors Searched</label>
     <div class="col-sm-9">
-      <p class="form-control-static">{{result.filtered}}</p>
+      <p class="form-control-static">{{formatInt result.filtered}}</p>
     </div>
   </div>
 </div>
@@ -73,13 +81,13 @@
   <tbody>
   {{#each result.mmts}}
     <tr>
-      <td>{{name}}</td>
+      <td>{{name}}{{#if ../result.inputs.cluster}} ×{{formatInt ../../result.inputs.cluster}}{{/if}}</td>
       <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
       <td class="number" data-sort="{{formatSort length}}">{{formatLength length}}</td>
-      <td class="number">{{fit}}</td>
-      <td class="number">{{sim}}</td>
-      <td class="number">{{pass}}</td>
-      <td class="number">{{fail}}</td>
+      <td class="number">{{formatInt fit}}</td>
+      <td class="number">{{formatInt sim}}</td>
+      <td class="number">{{formatInt pass}}</td>
+      <td class="number">{{formatInt fail}}</td>
     </tr>
   {{/each}}
   </tbody>
@@ -89,10 +97,10 @@
       <td>total</td>
       <td class="number"></td>
       <td class="number"></td>
-      <td class="number">{{result.fit}}</td>
-      <td class="number">{{result.sim}}</td>
-      <td class="number">{{result.pass}}</td>
-      <td class="number">{{result.fail}}</td>
+      <td class="number">{{formatInt result.fit}}</td>
+      <td class="number">{{formatInt result.sim}}</td>
+      <td class="number">{{formatInt result.pass}}</td>
+      <td class="number">{{formatInt result.fail}}</td>
     </tr>
   <tfoot>
   {{/if}}

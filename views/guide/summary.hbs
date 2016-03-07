@@ -30,6 +30,7 @@ Use your back button to adjust the inputs or <a href="{{restartLink}}">start ove
 <p>
 {{result.fit}} motors fit
 {{#if result.rocket}}<a href="/mystuff/rocket/{{result.rocket._id}}/">{{result.rocket.name}}</a>{{else}}the rocket{{/if}}
+{{#if result.inputs.cluster}}({{formatInt result.inputs.cluster}}-motor cluster){{/if}}
 and satisfied the search criteria;
 {{result.pass}} worked
 {{#if result.fail}}and {{result.fail}} did not{{/if}}

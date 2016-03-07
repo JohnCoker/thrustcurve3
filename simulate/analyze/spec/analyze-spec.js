@@ -165,6 +165,61 @@ describe("analyze", function() {
     });
   });
 
+  describe("scale", function() {
+    describe("AT K550", function() {
+      var orig = [
+	    { time: 0.065, thrust: 604.264 },
+	    { time: 0.196, thrust: 642.625 },
+	    { time: 0.327, thrust: 682.197 },
+	    { time: 0.458, thrust: 732.995 },
+	    { time: 0.591, thrust: 758.236 },
+	    { time: 0.723, thrust: 780.289 },
+	    { time: 0.854, thrust: 794.452 },
+	    { time: 0.985, thrust: 797.939 },
+	    { time: 1.117, thrust: 797.601 },
+	    { time: 1.249, thrust: 773.842 },
+	    { time: 1.381, thrust: 711.608 },
+	    { time: 1.512, thrust: 646.522 },
+	    { time: 1.644, thrust: 590.724 },
+	    { time: 1.775, thrust: 537.505 },
+	    { time: 1.907, thrust: 491.012 },
+	    { time: 2.040, thrust: 445.836 },
+	    { time: 2.171, thrust: 401.461 },
+	    { time: 2.302, thrust: 364.291 },
+	    { time: 2.433, thrust: 319.614 },
+	    { time: 2.566, thrust: 255.577 },
+	    { time: 2.698, thrust: 172.573 },
+	    { time: 2.829, thrust: 103.501 },
+	    { time: 2.960, thrust: 51.795 },
+	    { time: 3.092, thrust: 26.814 },
+	    { time: 3.224, thrust: 15.203 },
+	    { time: 3.356, thrust: 0.000 },
+          ], output;
+      it("call", function() {
+	var i;
+
+	for (i = 0; i < orig.length; i++)
+	  Object.freeze(orig[i]);
+	Object.freeze(orig);
+
+	expect(function() {
+	  output = analyze.scale(orig, 3);
+	}).not.toThrow();
+	expect(output).toBeDefined();
+	expect(typeof output).toBe('object');
+      });
+      it("scaled", function() {
+	var i;
+
+	expect(output.length).toBe(orig.length);
+	for (i = 0; i < orig.length; i++) {
+	  expect(output[i].time).toBe(orig[i].time);
+	  expect(output[i].thrust).toBe(orig[i].thrust * 3);
+	}
+      });
+    });
+  });
+
   describe("stats", function() {
     describe("invalid", function() {
       it("empty array", function() {

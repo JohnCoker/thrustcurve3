@@ -1,0 +1,106 @@
+<h1>{{title}}</h1>
+
+<style type="text/css">
+p.column-links {
+  text-align: center;
+  font-size: 14pt;
+  margin: 0;
+}
+</style>
+
+<p>
+The rocket motor browser provides a way to walk through the {{formatInt motorCount}} rocket motors available.
+Start out by choosing one of the high-level ways to narrow down your search,
+and then more specific options will be available for refining your search down to a manageable size.
+</p>
+
+<p>
+If none of these is quite right, try going to the <a href="{{advancedLink}}">advanced browser</a>.
+</p>
+
+<a name="impulse"></a>
+<h2>Impluse Classes</h2>
+
+<p>Start out by selecting a category of total impulse (size or power):</p>
+
+<div class="row hidden-xs">
+  <div class="col-sm-3">
+    <a href="{{impulseLink}}=lpr"><img class="img-responsive" src="/images/browser/lpr.jpg"></a>
+  </div>
+  <div class="col-sm-3">
+    <a href="{{impulseLink}}=mpr"><img class="img-responsive" src="/images/browser/mpr.jpg"></a>
+  </div>
+  <div class="col-sm-6">
+    <a href="{{impulseLink}}=hpr"><img class="img-responsive" src="/images/browser/hpr.jpg"></a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-3">
+    <p class="column-title"><a href="{{impulseLink}}=lpr">Low Power</a></p>
+    <p class="column-links">
+      <a href="{{impulseLink}}=A" title="A impulse motors">A</a>
+      <a href="{{impulseLink}}=B" title="B impulse motors">B</a>
+      <a href="{{impulseLink}}=C" title="C impulse motors">C</a>
+      <a href="{{impulseLink}}=D" title="D impulse motors">D</a>
+      <a href="{{impulseLink}}=E" title="E impulse motors">E</a>
+    </p>
+  </div>
+  <div class="col-sm-3">
+    <p class="column-title"><a href="{{impulseLink}}=mpr">Mid Power</a></p>
+    <p class="column-links">
+      <a href="{{impulseLink}}=F" title="F impulse motors">F</a>
+      <a href="{{impulseLink}}=G" title="G impulse motors">G</a>
+    </p>
+  </div>
+  <div class="col-sm-6">
+    <p class="column-title"><a href="{{impulseLink}}=hpr">High Power</a></p>
+    <p class="column-links">
+      <a href="{{impulseLink}}=L1" title="level 1 motors">L1</a>:
+      <a href="{{impulseLink}}=H" title="H impulse motors">H</a>
+      <a href="{{impulseLink}}=I" title="I impulse motors">I</A>
+      &nbsp;
+      <a href="{{impulseLink}}=L2" title="level 2 motors">L2</a>:
+      <a href="{{impulseLink}}=J" title="J impulse motors">J</a>
+      <a href="{{impulseLink}}=K" title="K impulse motors">K</a>
+      <a href="{{impulseLink}}=L" title="L impulse motors">L</a>
+      &nbsp;
+      <a href="{{impulseLink}}=L3" title="level 3 motors">L3</a>:
+      <a href="{{impulseLink}}=M" title="M impulse motors">M</a>
+      <a href="{{impulseLink}}=N" title="N impulse motors">N</a>
+      <a href="{{impulseLink}}=O" title="O impulse motors">O</a>
+    </p>
+  </div>
+</div>
+
+<a name="types"></a>
+<h2>Motor Types</h2>
+
+<p>Start out by selecting a basic motor type:</p>
+
+<div class="row">
+  <div class="col-sm-4">
+    <a href="{{typeLink}}=su"><img class="img-responsive hidden-xs" src="/images/browser/su.jpg"></a>
+    <p class="column-links"><a href="{{typeLink}}=su">Single-Use</a>
+  </div>
+  <div class="col-sm-4">
+    <a href="{{typeLink}}=reload"><img class="img-responsive hidden-xs" src="/images/browser/reload.jpg"></a>
+    <p class="column-links"><a href="{{typeLink}}=reload">Reloads</a>
+  </div>
+  <div class="col-sm-4">
+    <a href="{{typeLink}}=hybrid"><img class="img-responsive hidden-xs" src="/images/browser/hybrid.jpg"></a>
+    <p class="column-links"><a href="{{typeLink}}=hybrid">Hybrids</a>
+  </div>
+</div>
+
+<a name="manufacturers"></a>
+<h2>Motor Manufacturers</h2>
+
+<p>Start out by selecting a single manufacturer:</p>
+
+<div class="row">
+  {{#each manufacturers}}
+  <div class="col-xs-3">
+    <a href="{{../manufacturerLink}}={{abbrev}}"><img class="img-responsive" src="/images/manufacturers/{{abbrev}}.png"></a>
+  </div>
+  {{/each}}
+</div>

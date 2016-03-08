@@ -111,6 +111,7 @@ thrustcurve3
 │   ├── flightsim
 │   └── parsers
 └── views
+    ├── browser
     ├── contributors
     ├── guide
     ├── info

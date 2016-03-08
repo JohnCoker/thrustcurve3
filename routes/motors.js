@@ -479,17 +479,6 @@ router.post(searchLink, function(req, res, next) {
   doSearch(req, res, req.body);
 });
 
-/*
- * /motors/browser.html
- * Motor browser, renders with motors/browser.hbs template.
- */
-router.get('/motors/browser.html', function(req, res, next) {
-  res.render('motors/browser', locals(defaults, 'Motor Browser'));
-});
-router.get(['/browser.shtml', '/browser.jsp'], function(req, res, next) {
-  res.redirect(301, '/motors/browser.html');
-});
-
 
 /*
  * /motors/missingdata.html

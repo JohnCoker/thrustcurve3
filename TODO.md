@@ -89,53 +89,53 @@ For example "background.shtml" is now "info/background.html" (see `routes/info.j
 
 This table lists all pages of the old site and will be filled in as v3 proceeds.
 
-| old page            | new page                     | notes |
-|:--------------------|:-----------------------------|:------|
-| advsearch.jsp       |                              | internal page |
-| apidemo.shtml       |                              | |
-| background.shtml    | info/background.html         | static |
-| bbcode.shtml        |                              | |
-| browser.jsp         | motors/browser.html          | motor browser |
-| browser.shtml       | motors/browser.html          | motor browser |
-| certification.shtml | info/certification.html      | static |
-| contribsearch.jsp   |                              | |
-| contribute.shtml    | info/contribute.html         | static |
-| deletenote.jsp      |                              | |
-| deleterocket.jsp    | mystuff/rocket/*/delete.html | account |
-| deletesimfile.jsp   |                              | |
-| download.jsp        | simfiles/*/download.html     | |
-| errors.shtml        | errors.html                  | |
-| forgotpasswd.jsp    | mystuff/forgotpasswd.html    | account |
-| glossary.shtml      | info/glossary.html           | static |
-| guidehelp.shtml     | motors/guidehelp.html        | motor guide |
-| guidepage.jsp       | motors/guide.html            | motor guide |
-| index.shtml         | index.html                   | |
-| login.jsp           | mystuff/login.html           | account |
-| mfrsearch.jsp       | manufacturers/               | |
-| missingdata.jsp     |                              | |
-| missingstats.jsp    |                              | |
-| mobile.shtml        | info/mobile.html             | static |
-| motorguide.jsp      | motors/guide.html            | motor guide |
-| motorsearch.jsp     | motors/search.html           | attribute search |
-| motorstats.shtml    | info/motorstats.html         | static |
-| notfound.jsp        | notfound.html                | |
-| notfound.shtml      | notfound.html                | |
-| outbox.jsp          |                              | |
-| raspformat.shtml    | info/raspformat.html         | |
-| search.shtml        | motors/search.html           | attribute search |
-| searchapi.shtml     | info/searchapi.html          | |
-| searchpage.jsp      | motors/search.html           | attribute search |
-| servererror.jsp     |                              | |
-| simfilesearch.jsp   | simfiles/*/                  | |
-| simulation.shtml    | info/simulation.html         | static |
-| simulators.shtml    | info/simulators.html         | static |
-| tctracer.shtml      | info/tctracer.html           | static |
-| updatecontrib.jsp   | mystuff/profile.html         | account |
-| updatemotor.jsp     | motors/*/edit.html           | admin |
-| updatenote.jsp      |                              | |
-| updaterocket.jsp    | mystuff/rocket/*/edit.html   | account |
-| updates.jsp         | motors/updates.html          | |
-| updatesimfile.jsp   |                              | |
+| old page            | new page                     | ✓ | notes |
+|:--------------------|:-----------------------------|---|:------|
+| advsearch.jsp       |                              | ✓ | internal page |
+| apidemo.shtml       |                              |   |
+| background.shtml    | info/background.html         | ✓ | static |
+| bbcode.shtml        |                              |   | |
+| browser.jsp         | motors/browser.html          | ✓ | motor browser |
+| browser.shtml       | motors/browser.html          | ✓ | motor browser |
+| certification.shtml | info/certification.html      | ✓ | static |
+| contribsearch.jsp   |                              |   | |
+| contribute.shtml    | info/contribute.html         | ✓ | static |
+| deletenote.jsp      |                              |   | |
+| deleterocket.jsp    | mystuff/rocket/*/delete.html | ✓ | account |
+| deletesimfile.jsp   |                              |   | |
+| download.jsp        | simfiles/*/download.html     |   | |
+| errors.shtml        | errors.html                  |   | |
+| forgotpasswd.jsp    | mystuff/forgotpasswd.html    |   | account |
+| glossary.shtml      | info/glossary.html           |   | static |
+| guidehelp.shtml     | motors/guidehelp.html        | ✓ | motor guide |
+| guidepage.jsp       | motors/guide.html            | ✓ | motor guide |
+| index.shtml         | index.html                   | ✓ | |
+| login.jsp           | mystuff/login.html           | ✓ | account |
+| mfrsearch.jsp       | manufacturers/               | ✓ | |
+| missingdata.jsp     |                              |   | |
+| missingstats.jsp    |                              |   | |
+| mobile.shtml        | info/mobile.html             | ✓ | static |
+| motorguide.jsp      | motors/guide.html            | ✓ | motor guide |
+| motorsearch.jsp     | motors/search.html           | ✓ | attribute search |
+| motorstats.shtml    | info/motorstats.html         | ✓ | static |
+| notfound.jsp        | notfound.html                | ✓ | |
+| notfound.shtml      | notfound.html                | ✓ | |
+| outbox.jsp          |                              |   | |
+| raspformat.shtml    | info/raspformat.html         | ✓ | |
+| search.shtml        | motors/search.html           | ✓ | attribute search |
+| searchapi.shtml     | info/searchapi.html          | ✓ | |
+| searchpage.jsp      | motors/search.html           | ✓ | attribute search |
+| servererror.jsp     |                              | ✓ | |
+| simfilesearch.jsp   | simfiles/*/                  | ✓ | |
+| simulation.shtml    | info/simulation.html         | ✓ | static |
+| simulators.shtml    | info/simulators.html         | ✓ | static |
+| tctracer.shtml      | info/tctracer.html           | ✓ | static |
+| updatecontrib.jsp   | mystuff/profile.html         | ✓ | account |
+| updatemotor.jsp     | motors/*/edit.html           | ✓ | admin |
+| updatenote.jsp      |                              |   | |
+| updaterocket.jsp    | mystuff/rocket/*/edit.html   | ✓ | account |
+| updates.jsp         | motors/updates.html          | ✓ | |
+| updatesimfile.jsp   |                              |   | |
 
 Note that the new site takes a more REST-style approach for data display, using paths
 that contain names rather than generic pages with ID query parameters.

@@ -1,0 +1,93 @@
+<h1>{{title}}</h1>
+
+<style type="text/css">
+ul.trail {
+  list-style-type: none;
+  padding: 0;
+}
+ul.trail li {
+  display: inline-block;
+}
+ul.trail li:not(.head)::before {
+  content: " » ";
+}
+ul.trail li:first-child::before {
+  content: "";
+}
+ul.trail li.current .name {
+  font-weight: bold;
+  color: black;
+}
+.lists ul {
+  padding: 0;
+}
+.lists li {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+</style>
+
+<ul class="trail">
+{{#each trail}}
+  {{#if current}}
+    <li class="current"><span class="name">{{label}}</span> ({{formatInt ../../motorCount}})</li>
+  {{else}}
+    <li {{#if head}}class="head"{{/if}}><a href="{{link}}" title="{{label}}">{{label}}</a></li>
+  {{/if}}
+{{/each}}
+</ul>
+
+{{#unless lists}}
+<p>No categories remain to be selected.</p>
+{{/unless}}
+{{#if lists}}
+<div class="row lists">
+  {{#each lists}}
+  <div class="col-sm-2">
+    <p class="column-title">{{label}}</p>
+    <ul class="checkboxes">
+      {{#each values}}
+      <li><a href="{{link}}">{{label}}</a></li>
+      {{/each}}
+    </ul>
+  </div>
+  {{/each}}
+</div>
+{{/if}}
+
+{{#if motors}}
+<h2>Matching Motors</h2>
+
+<table id="motor-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th>Type</th>
+     <th class="number">Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Burn</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motors}}
+    <tr data-id="{{_id}}">
+      <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
+      <td>{{_manufacturer.abbrev}}</td>
+      <td>{{formatType type}}</td>
+      <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+      <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#motor-list', {
+  order: [[4, 'asc']]
+});
+</script>
+{{/if}}

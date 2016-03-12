@@ -7,15 +7,10 @@
 const _ = require('underscore'),
       express = require('express'),
       router = express.Router(),
-      async = require('async'),
       units = require('../lib/units'),
-      ErrorCollector = require('../lib/errors').Collector,
       metadata = require('../lib/metadata'),
+      helpers = require('../lib/helpers'),
       schema = require('../database/schema'),
-      parsers = require('../simulate/parsers'),
-      flightsim = require('../simulate/flightsim'),
-      analyze = require('../simulate/analyze'),
-      spreadsheet = require('../render/spreadsheet'),
       locals = require('./locals.js');
 
 const defaults = {
@@ -43,30 +38,323 @@ function shuffle(array) {
   return array;
 }
 
+const categories = [
+  {
+    label: 'low-power',
+    value: 'lpr',
+    regex: /^[A-D]$/
+  },
+  {
+    label: 'mid-power',
+    value: 'mpr',
+    regex: /^[EFG]$/
+  },
+  {
+    label: 'high-power',
+    value: 'hpr',
+    regex: /^[H-O]$/
+  },
+  {
+    label: 'level 1',
+    value: 'l1',
+    regex: /^[HI]$/
+  },
+  {
+    label: 'level 2',
+    value: 'l2',
+    regex: /^[JKL]$/
+  },
+  {
+    label: 'level 3',
+    value: 'l3',
+    regex: /^[MNO]$/
+  },
+];
+
+const dimensions = [
+  {
+    label: "Category",
+    prop: "category",
+    matchingValues: function(summary) {
+      var match = [],
+          yes, no, i, j;
+
+      for (j = 0; j < categories.length; j++) {
+        yes = no = 0;
+        for (i = 0; i < summary.impulseClasses.length; i++) {
+          if (categories[j].regex.test(summary.impulseClasses[i]))
+            yes++;
+          else
+            no++;
+        }
+        if (yes > 0 && no > 0)
+          match.push(categories[j]);
+      }
+      return match;
+    },
+    applySelection: function(all, query, v) {
+      var i;
+
+      v = v.toLowerCase();
+      for (i = 0; i < categories.length; i++) {
+        if (v == categories[i].label || v == categories[i].value) {
+          query.impulseClass = categories[i].regex;
+          return categories[i].label;
+        }
+      }
+    }
+  },
+  {
+    label: "Class",
+    prop: "class",
+    matchingValues: function(summary) {
+      return _.map(summary.impulseClasses, function(c) { return { label: c, value: c }; });
+    },
+    applySelection: function(all, query, v) {
+      query.impulseClass = v;
+      return v;
+    }
+  },
+  {
+    label: "Manufacturer",
+    prop: "manufacturer",
+    matchingValues: function(summary) {
+      return _.map(summary.manufacturers, function(m) { return { label: m.abbrev, value: m._id }; });
+    },
+    applySelection: function(all, query, v) {
+      var m = all.manufacturers.byId(v) || all.manufacturers.byName(v);
+      if (m) {
+        query._manufacturer = m._id;
+        return m.abbrev;
+      }
+    }
+  },
+  {
+    label: "Type",
+    prop: "type",
+    matchingValues: function(summary) {
+      return _.map(summary.types, function(c) { return { label: helpers.formatType(c), value: c }; });
+    },
+    applySelection: function(all, query, v) {
+      query.type = v;
+      return v;
+    }
+  },
+  {
+    label: "Diameter",
+    prop: "diameter",
+    matchingValues: function(summary) {
+      return _.map(summary.diameters, function(d) { return { label: units.formatMMTFromMKS(d), value: d.toFixed(4) }; });
+    },
+    applySelection: function(all, query, v) {
+      v = parseFloat(v);
+      query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
+      return units.formatMMTFromMKS(v);
+    }
+  },
+  {
+    label: "Burn Time",
+    prop: "burnTime",
+    matchingValues: function(summary) {
+      return _.map(summary.burnTimes, function(b) {
+        var group = metadata.burnTimeGroup(b);
+        return { label: group.label, value: group.nominal };
+      });
+    },
+    applySelection: function(all, query, v) {
+      var group = metadata.burnTimeGroup(parseFloat(v));
+      if (group == null)
+        return false;
+
+      query.burnTime = { $gt: group.min, $lt: group.max };
+      return group.label;
+    }
+  },
+  {
+    label: "Propellant",
+    prop: "propellant",
+    matchingValues: function(summary) {
+      return _.map(summary.propellants, function(p) { return { label: p, value: p }; });
+    },
+    applySelection: function(all, query, v) {
+      query.propellantInfo = v;
+      return v;
+    }
+  },
+  {
+    label: "Case",
+    prop: "case",
+    matchingValues: function(summary) {
+      return _.map(summary.cases, function(c) { return { label: c, value: c }; });
+    },
+    applySelection: function(all, query, v) {
+      query.caseInfo = v;
+      return v;
+    }
+  },
+];
+
+function applyQuery(allMotors, query, prop, value) {
+  var i;
+
+  for (i = 0; i < dimensions.length; i++) {
+    if (dimensions[i].prop == prop)
+      return dimensions[i].applySelection(allMotors, query, value);
+  }
+}
+
 /*
  * /motors/browser.html
- * Motor browser, renders with motors/browser.hbs template.
+ * Motor browser, renders with browser/intro.hbs or browser/lists.hbs template.
  */
+const MaxValues = 20;
+
+function renderLists(req, res, trail, match, motors) {
+  var lists = [],
+      values, base, next, i, j;
+
+  if (trail.length > 0) {
+    base = trail[trail.length - 1].link;
+    next = trail[trail.length - 1].order + 1;
+  } else {
+    base = browserPage + '?advanced';
+    next = 1;
+  }
+
+  for (i = 0; i < dimensions.length; i++) {
+    values = dimensions[i].matchingValues(match);
+    if (values && values.length > 1 && values.length <= MaxValues) {
+      for (j = 0; j < values.length; j++)
+        values[j].link = base + '&' + next + dimensions[i].prop + '=' + encodeURIComponent(values[j].value);
+      lists.push({
+        label: dimensions[i].label,
+        prop: dimensions[i].prop,
+        values: values,
+      });
+    }
+  }
+
+  if (motors && motors.length > MaxValues)
+    motors = undefined;
+  if (motors && motors.length > 0) {
+    for (i = 0; i < motors.length; i++)
+      motors[i]._manufacturer = match.manufacturers.byId(motors[i]._manufacturer);
+
+    if (motors.length < 2)
+      lists = [];
+  }
+
+  console.log(match);
+
+  res.render('browser/lists', locals(defaults, {
+    title: 'Motor Browser',
+    trail: trail,
+    lists: lists,
+    motorCount: match.count,
+    motors: motors
+  }));
+}
+
 router.get(browserPage, function(req, res, next) {
   metadata.get(req, function(caches) {
-    var mfrs = [],
-        i;
+    var params = Object.keys(req.query), advanced = false, criteria = 0,
+        query, trail, param, name, order, label, mfrs, i, j;
 
-    for (i = 0; i < caches.manufacturers.length; i++) {
-      if (caches.manufacturers[i].active)
-        mfrs.push(caches.manufacturers[i]);
+    // parse input parameters
+    if (params.length > 0) {
+      query = {};
+      trail = [];
+      for (i = 0; i < params.length; i++) {
+        // extract next parameter, with optional order
+        param = name = params[i];
+        order = Infinity;
+        if (/^\d/.test(param)) {
+          order = parseInt(param);
+          name = param.replace(/^\d+/, '');
+        }
+        if (order <= 0)
+          order = Infinity;
+    
+        if (param == 'advanced')
+          advanced = true;
+        else {
+          label = applyQuery(caches.allMotors, query, name, req.query[param]);
+          if (label) {
+            advanced = true;
+            criteria++;
+            trail.push({
+              prop: name,
+              order: order,
+              label: label,
+              value: req.query[param]
+            });
+          }
+        }
+      }
     }
-    shuffle(mfrs);
+  
+    if (advanced) {
+      // head of trail (all motors)
+      trail.splice(0, 0, {
+        label: 'All',
+        order: 0,
+        link: browserPage + '?advanced',
+        head: true
+      });
 
-    res.render('browser/intro', locals(defaults, {
-      title: 'Motor Browser',
-      motorCount: caches.availableMotors.count,
-      manufacturers: mfrs,
-      advancedLink: browserPage + '?advanced',
-      impulseLink: browserPage + '?1category',
-      typeLink: browserPage + '?1type',
-      manufacturerLink: browserPage + '?1manufacturer',
-    }));
+      // show matching lists to narrow down
+      if (criteria > 0) {
+        // organize breadcrumb trail
+        if (trail.length > 1) {
+          trail.sort(function(a,b) {
+            if (a.order != b.order)
+              return a.order - b.order;
+            else
+              return a.prop - b.prop;
+          });
+        }
+        for (i = 1; i < trail.length; i++) {
+          trail[i].order = i;
+
+          trail[i].link = browserPage + '?advanced';
+          for (j = 0; j <= i; j++)
+            trail[i].link += '&' + trail[j].order + trail[j].prop + '=' + trail[j].value;
+
+          trail[i].current = (i == trail.length - 1);
+        }
+
+        // query motors that match selections
+        query.availability = { $in: schema.MotorAvailableEnum };
+        metadata.getMatchingMotors(req, query, function(match, motors) {
+          renderLists(req, res, trail, match, motors);
+        });
+      } else {
+        // all available motors
+        metadata.getAvailableMotors(req, function(summary) {
+          renderLists(req, res, trail, summary);
+        });
+      }
+
+    } else {
+      // render intro page
+      mfrs = [];
+      for (i = 0; i < caches.manufacturers.length; i++) {
+        if (caches.manufacturers[i].active)
+          mfrs.push(caches.manufacturers[i]);
+      }
+      shuffle(mfrs);
+  
+      res.render('browser/intro', locals(defaults, {
+        title: 'Motor Browser',
+        motorCount: caches.availableMotors.count,
+        manufacturers: mfrs,
+        advancedLink: browserPage + '?advanced',
+        categoryLink: browserPage + '?1category',
+        classLink: browserPage + '?1class',
+        typeLink: browserPage + '?1type',
+        manufacturerLink: browserPage + '?1manufacturer',
+      }));
+    }
   });
 });
 router.get(['/browser.shtml', '/browser.jsp'], function(req, res, next) {

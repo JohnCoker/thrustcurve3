@@ -112,7 +112,7 @@ const dimensions = [
     },
     applySelection: function(all, query, v) {
       query.impulseClass = v;
-      return v;
+      return v + ' class';
     }
   },
   {
@@ -125,7 +125,7 @@ const dimensions = [
       var m = all.manufacturers.byId(v) || all.manufacturers.byName(v);
       if (m) {
         query._manufacturer = m._id;
-        return m.abbrev;
+        return 'by ' + m.abbrev;
       }
     }
   },
@@ -137,7 +137,7 @@ const dimensions = [
     },
     applySelection: function(all, query, v) {
       query.type = v;
-      return v;
+      return helpers.formatType(v);
     }
   },
   {
@@ -149,7 +149,7 @@ const dimensions = [
     applySelection: function(all, query, v) {
       v = parseFloat(v);
       query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
-      return units.formatMMTFromMKS(v);
+      return units.formatMMTFromMKS(v) + ' diameter';
     }
   },
   {
@@ -167,7 +167,7 @@ const dimensions = [
         return false;
 
       query.burnTime = { $gt: group.min, $lt: group.max };
-      return group.label;
+      return group.label + ' burn time';
     }
   },
   {
@@ -233,6 +233,8 @@ function renderLists(req, res, trail, match, motors) {
       });
     }
   }
+  if (lists.length > 6)
+    lists.splice(6, lists.length - 6);
 
   if (motors && motors.length > MaxValues)
     motors = undefined;
@@ -296,7 +298,7 @@ router.get(browserPage, function(req, res, next) {
     if (advanced) {
       // head of trail (all motors)
       trail.splice(0, 0, {
-        label: 'All',
+        label: 'All Motors',
         order: 0,
         link: browserPage + '?advanced',
         head: true
@@ -317,11 +319,12 @@ router.get(browserPage, function(req, res, next) {
           trail[i].order = i;
 
           trail[i].link = browserPage + '?advanced';
-          for (j = 0; j <= i; j++)
-            trail[i].link += '&' + trail[j].order + trail[j].prop + '=' + trail[j].value;
-
-          trail[i].current = (i == trail.length - 1);
+          for (j = 0; j <= i; j++) {
+	    if (trail[j].prop)
+              trail[i].link += '&' + trail[j].order + trail[j].prop + '=' + trail[j].value;
+	  }
         }
+        trail[trail.length - 1].current = true;
 
         // query motors that match selections
         query.availability = { $in: schema.MotorAvailableEnum };
@@ -329,6 +332,8 @@ router.get(browserPage, function(req, res, next) {
           renderLists(req, res, trail, match, motors);
         });
       } else {
+        trail[0].current = true;
+
         // all available motors
         metadata.getAvailableMotors(req, function(summary) {
           renderLists(req, res, trail, summary);

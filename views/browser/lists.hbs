@@ -9,7 +9,7 @@ ul.trail li {
   display: inline-block;
 }
 ul.trail li:not(.head)::before {
-  content: " » ";
+  content: " »  ";
 }
 ul.trail li:first-child::before {
   content: "";
@@ -33,7 +33,7 @@ ul.trail li.current .name {
   {{#if current}}
     <li class="current"><span class="name">{{label}}</span> ({{formatInt ../../motorCount}})</li>
   {{else}}
-    <li {{#if head}}class="head"{{/if}}><a href="{{link}}" title="{{label}}">{{label}}</a></li>
+    <li {{#if head}}class="head"{{/if}}><a href="{{link}}">{{label}}</a></li>
   {{/if}}
 {{/each}}
 </ul>
@@ -48,7 +48,7 @@ ul.trail li.current .name {
     <p class="column-title">{{label}}</p>
     <ul class="checkboxes">
       {{#each values}}
-      <li><a href="{{link}}">{{label}}</a></li>
+      <li><a href="{{link}}" title="{{label}}">{{label}}</a></li>
       {{/each}}
     </ul>
   </div>

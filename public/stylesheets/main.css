@@ -82,6 +82,7 @@ p.img {
 p.column-title {
   text-align: center;
   border-bottom: 1px solid #888;
+  margin-bottom: 1pt;
 }
 label.column-title {
   text-align: center;

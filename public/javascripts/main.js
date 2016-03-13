@@ -3,7 +3,7 @@
  * @function
  * @param {string} selector CSS selector for table
  * @param {object} [options] optional config for DataTable plugin
- * @param {boolean} [option.expand] expand double number of displayed rows for tall browser
+ * @param {boolean} [options.expand] double number of displayed rows for tall browser
  */
 function setupTable(selector, options) {
   $(document).ready(function() {
@@ -11,7 +11,8 @@ function setupTable(selector, options) {
 
     var table = $(selector),
         pageLength = (options.expand && $(window).height() > 900) ? 20 : 10,
-        numRows = table.find('tbody tr').length;
+        numRows = table.find('tbody tr').length,
+        gadgets = numRows > pageLength;
 
     var opts = _.extend({
       lengthMenu: [
@@ -19,8 +20,10 @@ function setupTable(selector, options) {
         [ '10', '20', '50', 'all' ]
       ],
       pageLength: pageLength,
-      paging: numRows > pageLength,
-      searching: numRows > pageLength
+
+      searching: gadgets,
+      info: gadgets,
+      paging: gadgets,
     }, options);
 
     table.DataTable(opts);

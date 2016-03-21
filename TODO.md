@@ -8,6 +8,8 @@
  * site map generation
  * robots.txt
  * outbox feature?
+ * compare selected motors?
+ * motor initial (first 1/2s) thrust?
 
 ## Search
 

@@ -7,6 +7,8 @@
 var express = require('express'),
     router = express.Router(),
     metadata = require('../lib/metadata'),
+    units = require('../lib/units'),
+    helpers = require('../lib/helpers'),
     ranking = require('../database/ranking'),
     svg = require('../render/svg'),
     locals = require('./locals.js');
@@ -225,7 +227,7 @@ function getHistogram(req, cls, stat, cb) {
 }
 
 router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
-  var stat;
+  var stat, format;
 
   // determine the motor statistic
   if (!req.query.stat) {
@@ -244,37 +246,64 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
     res.status(404).send('unknown motor statistic ' + stat);
     return;
   }
+  if (stat == 'totalImpulse')
+    format = function(v) { return units.formatPrefFromMKS(v, 'force', false) + 's'; }
+  else if (stat == 'burnTime')
+    format = helpers.formatDuration;
+  else if (/Thrust/.test(stat))
+    format = function(v) { return units.formatPrefFromMKS(v, 'force', false); }
+  else
+    format = toFixed;
 
   // load this motor
   getMotor(req, res, false, false, function(primary) {
     // get the histogram for this impulse class and stat
     getHistogram(req, primary.impulseClass, stat, function(histogram) {
-      var image, w, x, x1, y, i;
+      var width, height, image, em, descender, w, x, x1, y, i;
 
       if (histogram == null) {
         res.status(404).send('too little data for ' + stat);
         return;
       }
 
-      image = new svg.Image(100, 100);
+      width = 200;
+      height = 100;
+      image = new svg.Image(width, height);
+
+      em = 10;
+      descender = 1;
+      image.font = em + 'px Helvetica';
 
       // draw baseline
       image.strokeStyle = '#ccc';
-      image.moveTo(0, 99.5);
-      image.lineTo(100, 99.5);
+      image.moveTo(0, height - 0.5 - em);
+      image.lineTo(width, height - 0.5 - em);
       image.stroke();
+
+      // minimum value on left
+      image.fillStyle = 'black';
+      image.textAlign = 'left';
+      image.fillText(format(histogram.minX), 0, height - descender);
+
+      // maximum value on left
+      image.textAlign = 'right';
+      image.fillText(format(histogram.maxX), width, height - descender);
 
       // graph histogram
       x = 0;
-      w = (100 - (histogram.n - 1)) / histogram.n;
-      image.fillStyle = '#ccc';
+      w = (width - (histogram.n - 1)) / histogram.n;
       for (i = 0; i < histogram.n; i++) {
         x1 = x + w;
 
         if (histogram.buckets[i] > 0) {
-          y = 2 + 98 * (histogram.buckets[i] / histogram.maxY);
-          image.fillRect(x, (100 - y), w, y);
+          image.fillStyle = '#ccc';
+          y = 2 + (height - 2 - 2 * em) * (histogram.buckets[i] / histogram.maxY);
+          image.fillRect(x, (height - em - y), w, y);
         }
+
+        image.fillStyle = 'black';
+        image.textAlign = 'center';
+        image.fillText(histogram.buckets[i].toFixed(), x + w / 2, height - em - y - descender - 1);
 
         x = x1 + 1;
       }
@@ -283,9 +312,9 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
       if (primary[stat] > 0) {
         image.strokeStyle = '#9e1a20';
         image.beginPath();
-        x = 0.5 + (99 * (primary[stat] - histogram.minX) / histogram.rangeX);
-        image.moveTo(x, 1);
-        image.lineTo(x, 99);
+        x = 0.5 + ((width - 1) * (primary[stat] - histogram.minX) / histogram.rangeX);
+                image.moveTo(x, 1);
+        image.lineTo(x, height - 1 - em);
         image.stroke();
       }
 

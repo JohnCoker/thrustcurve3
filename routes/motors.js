@@ -290,21 +290,15 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
       image.fillText(format(histogram.maxX), width, height - descender);
 
       // graph histogram
+      image.fillStyle = '#ccc';
       x = 0;
       w = (width - (histogram.n - 1)) / histogram.n;
       for (i = 0; i < histogram.n; i++) {
         x1 = x + w;
-
         if (histogram.buckets[i] > 0) {
-          image.fillStyle = '#ccc';
-          y = 2 + (height - 2 - 2 * em) * (histogram.buckets[i] / histogram.maxY);
+          y = 2 + (height - 2 - em) * (histogram.buckets[i] / histogram.maxY);
           image.fillRect(x, (height - em - y), w, y);
         }
-
-        image.fillStyle = 'black';
-        image.textAlign = 'center';
-        image.fillText(histogram.buckets[i].toFixed(), x + w / 2, height - em - y - descender - 1);
-
         x = x1 + 1;
       }
 

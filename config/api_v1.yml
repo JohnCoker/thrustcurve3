@@ -1,0 +1,42 @@
+swagger: 2.0
+info:
+  title: ThrustCurve.org API
+  description: Programmatic access to ThrustCurve.org motor and simulator file database.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: John Coker
+    url: http://www.thrustcurve.org/searchapi.html
+    email: john@jcsw.com
+  license:
+    name: ISC
+    url: https://opensource.org/licenses/ISC
+  version: 1.0.0
+
+host: localhost:3000
+basePath: /api/v1
+consumes:
+- application/json
+- text/xml
+produces:
+- application/json
+- text/xml
+
+paths:
+  /metadata.json:
+    get:
+      description: Gets metadata about all motors in the database.
+      produces:
+      - application/json
+      responses:
+	'200':
+	  description: metadata response
+	  schema:
+            $ref: '#/definitions/Metadata'
+	default:
+	  description: error payload
+          schema:
+            $ref: '#/definitions/Errors'
+
+definitions:
+  Errors:
+  Metadata:

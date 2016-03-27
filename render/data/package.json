@@ -1,0 +1,19 @@
+{
+  "name": "data",
+  "version": "1.0.0",
+  "description": "build data responses in XML and JSON",
+  "main": "data.js",
+  "scripts": {
+    "test": "jasmine-node spec",
+    "lint": "jshint *.js spec/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/render/data"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "xml-writer": "^1.6.0"
+  }
+}

@@ -247,13 +247,13 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
     return;
   }
   if (stat == 'totalImpulse')
-    format = function(v) { return units.formatPrefFromMKS(v, 'force', false) + 's'; }
+    format = function(v) { return units.formatPrefFromMKS(v, 'force', false) + 's'; };
+  else if (/Thrust/.test(stat))
+    format = function(v) { return units.formatPrefFromMKS(v, 'force', false); };
   else if (stat == 'burnTime')
     format = helpers.formatDuration;
-  else if (/Thrust/.test(stat))
-    format = function(v) { return units.formatPrefFromMKS(v, 'force', false); }
   else
-    format = toFixed;
+    format = function(v) { return v.toFixed(); };
 
   // load this motor
   getMotor(req, res, false, false, function(primary) {

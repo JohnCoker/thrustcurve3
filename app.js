@@ -42,7 +42,8 @@ var index = require('./routes/index'),
     contributors = require('./routes/contributors'),
     mystuff = require('./routes/mystuff'),
     guide = require('./routes/guide'),
-    browser = require('./routes/browser');
+    browser = require('./routes/browser'),
+    api_v1 = require('./routes/api_v1');
 
 var app = express();
 
@@ -224,6 +225,7 @@ app.use('/', contributors);
 app.use('/', mystuff);
 app.use('/', guide);
 app.use('/', browser);
+app.use('/', api_v1);
 
 // handle other routes as 404
 app.use(function(req, res, next) {

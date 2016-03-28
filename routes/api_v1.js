@@ -127,13 +127,11 @@ function sendMetadata(res, format, metadata) {
 
 function doMetadata(req, res, format) {
   var request = getElement(req.body, 'metadata-request') || {};
-  console.log(request);
 
   metadata.get(req, function(cache) {
     var query, keys;
   
     query = searchQuery(request, cache);
-    console.log(query);
     keys = Object.keys(query);
     if (keys.length == 1 && query.availability == 'available') {
       // available motors

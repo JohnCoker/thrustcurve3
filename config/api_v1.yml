@@ -28,12 +28,12 @@ paths:
       produces:
       - application/json
       responses:
-	'200':
-	  description: metadata response
-	  schema:
+        '200':
+          description: metadata response
+          schema:
             $ref: '#/definitions/Metadata'
-	default:
-	  description: error payload
+        default:
+          description: error payload
           schema:
             $ref: '#/definitions/Errors'
 

@@ -25,7 +25,7 @@ function getElement(parent, name) {
     if (/-[a-z]/.test(name)) {
       name2 = data.JSONFormat.camelCase(name);
       if (parent.hasOwnProperty(name2))
-	return trimValue(parent[name2]);
+        return trimValue(parent[name2]);
     }
   }
 }
@@ -49,42 +49,85 @@ function searchQuery(request, cache) {
   var query = {},
       v, m;
 
-  // manufacturer name/abbrev
+  // manufacturer
   v = getElement(request, 'manufacturer');
-  if (v) {
+  if (v != null) {
     m = cache.manufacturers.byName(v);
     query._manufacturer = m ? m._id : null;
   }
 
+  // designation
+  v = getElement(request, 'designation');
+  if (v != null) {
+    v = toDesignation(v);
+    query.$or = [
+      { designation: v },
+      { altDesignation: v },
+    ];
+  }
+
+  // common name
+  v = getElement(request, 'common-name');
+  if (v != null) {
+    v = toCommonName(v);
+    query.$or = [
+      { commonName: v },
+      { altName: v },
+    ];
+  }
+
+  // impulse class
+  v = getElement(request, 'impulse-class');
+  if (v != null) {
+    v = toImpulseClass();
+    query.impulseClass = v;
+  }
+
   // diameter, mm
   v = getElement(request, 'diameter');
-  if (v && (m = parseFloat(v)) > 0) {
-    m /= 1000;
-    query.diameter = {
-      $gt: m - metadata.MotorDiameterTolerance,
-      $lt: m + metadata.MotorDiameterTolerance
-    };
+  if (v != null) {
+    m = parseFloat(v);
+    if (m > 0) {
+      m /= 1000;
+      query.diameter = {
+        $gt: m - metadata.MotorDiameterTolerance,
+        $lt: m + metadata.MotorDiameterTolerance
+      };
+    } else
+      query.diameter = 0;
   }
 
   // motor type
   v = getElement(request, 'type');
-  if (v)
+  if (v != null)
     query.type = v;
 
-  // cert. org name/abbrev
+  // cert. org.
   v = getElement(request, 'cert-org');
-  if (v) {
+  if (v != null) {
     m = cache.certOrgs.byName(v);
     query._certOrg = m ? m._id : null;
   }
 
   // availability
   v = getElement(request, 'availability');
-  if (v)
+  if (v != null)
     query.availability = v;
 
   return query;
 }
+
+/*
+ * Basic CORS support.
+ */
+router.all('/api/v1/*', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Methods', 'GET,POST');
+  next();
+});
+
 
 /*
  * /api/v1/swagger
@@ -126,7 +169,13 @@ function sendMetadata(res, format, metadata) {
 }
 
 function doMetadata(req, res, format) {
-  var request = getElement(req.body, 'metadata-request') || {};
+  var request;
+  if (req.method == 'GET')
+    request = req.query;
+  else
+    request = getElement(req.body, 'metadata-request') || {};
+  console.log('request:');
+  console.log(request);
 
   metadata.get(req, function(cache) {
     var query, keys;
@@ -139,7 +188,7 @@ function doMetadata(req, res, format) {
     } else if (keys.length > 0) {
       // specific motor query
       metadata.getMatchingMotors(req, query, function(metadata) {
-	sendMetadata(res, format, metadata);
+        sendMetadata(res, format, metadata);
       });
     } else {
       // all motors

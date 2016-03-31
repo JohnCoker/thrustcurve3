@@ -333,6 +333,11 @@ function toCommonName(s) {
   return s;
 }
 
+function toImpulseClass(s) {
+  s = s.toUpperCase();
+  return s.replace(/^1\/[248]A$/, 'A');
+}
+
 function doSearch(req, res, params) {
   metadata.getMotors(req, function(all, available) {
     var query = {},
@@ -370,14 +375,14 @@ function doSearch(req, res, params) {
             failed = true;
 
         } else if (k == 'designation') {
-	  v = toDesignation(v);
+          v = toDesignation(v);
           query.$or = [
             { designation: v },
             { altDesignation: v },
           ];
 
         } else if (k == 'commonName') {
-	  v = toCommonName(v);
+          v = toCommonName(v);
           query.$or = [
             { commonName: v },
             { altName: v },
@@ -399,6 +404,10 @@ function doSearch(req, res, params) {
             query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
           } else
             failed = true;
+
+        } else if (k == 'impulseClass') {
+          v = toImpulseClass(v);
+          query.impulseClass = v;
 
         } else if (k == 'length') {
           v = parseFloat(v);
@@ -580,14 +589,14 @@ router.get('/motors/popular.html', function(req, res, next) {
 router.get('/motors/updates.html', function(req, res, next) {
   metadata.getManufacturers(req, function(all, available) {
     req.db.Motor.find({}, undefined, { sort: { updatedAt: -1 } })
-		.select('_manufacturer designation type diameter updatedAt')
-		.limit(20)
-		.exec(req.success(function(motors) {
+                .select('_manufacturer designation type diameter updatedAt')
+                .limit(20)
+                .exec(req.success(function(motors) {
       req.db.SimFile.find({}, undefined, { sort: { updatedAt: -1 } })
-		    .select('_motor _contributor format updatedAt')
-		    .limit(20)
-		    .populate('_motor _contributor')
-		    .exec(req.success(function(simfiles) {
+                    .select('_motor _contributor format updatedAt')
+                    .limit(20)
+                    .populate('_motor _contributor')
+                    .exec(req.success(function(simfiles) {
         var i;
 
         // populate the manufacturers
@@ -600,11 +609,11 @@ router.get('/motors/updates.html', function(req, res, next) {
             simfiles[i]._motor._manufacturer = all.byId(simfiles[i]._motor._manufacturer);
         }
 
-	res.render('motors/updates', locals(defaults, {
-	  title: 'Recent Updates',
-	  motors: motors,
-	  simfiles: simfiles
-	}));
+        res.render('motors/updates', locals(defaults, {
+          title: 'Recent Updates',
+          motors: motors,
+          simfiles: simfiles
+        }));
       }));
     }));
   });

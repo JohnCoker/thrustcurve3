@@ -1,1 +1,76 @@
 <h1>{{title}}</h1>
+
+<p>
+This site provides a UI for searching for motors and downloading data right within any web browser.
+However, for those intrepid souls who would like to integerate the data provided by this site into programs
+(such as flight simulators), an API is provided.
+<br/>
+<i>Normal users of the site can just ignore this page.</i>
+</p>
+
+<p>
+The API described on this page provides basic database access through REST endpoints.
+Inputs can be specified as XML, JSON or form data and results can be returned as XML or JSON.
+(The v1 API, described on this page, is a superset of the XML-only API supported by the v2 site.)
+</p>
+
+<p>
+There are five actions supported, all of which use HTTP POST methods:
+</p>
+<ul>
+<li><a href="#metadata">metadata</a>: get search criteria</li>
+<li><a href="#search">search</a>: find matching motors</li>
+<li><a href="#download">download</a>: retrieve simulator data files</li>
+<li><a href="#getrockets">getrockets</a>: retrieve user's saved rockets</li>
+<li><a href="#motorguide">motorguide</a>: find motors that work for a rocket</li>
+</ul>
+
+<p>
+There is a <a href="/api/v1/swagger.json">Swagger spec</a> for API.
+</p>
+
+<p>
+Each API is described in its own section below, plus there are a few
+<a href="#examples">example programs</a> at the bottom.
+</p>
+
+
+<a name="metadata"></a>
+<h2>Metadata</h2>
+
+JSON endpoint: /api/v1/metadata.json (Swagger spec)
+XML endpoint: /api/v1/metadata.xml (request and response schema)
+compatible endpoint: /servlets/metadata
+
+<p>
+The metadata API doesn't return stats or data on individual motors, but instead is used to find out what actual criteria exist for doing a search.
+</p>
+
+</p>
+This is useful for building interactive programs that want to populate a set of combo boxes with valid search criteria,
+without hard-coding the actual values into the program.
+The simplest case is to return metadata encompasing all motors in the database using no input at all:
+<a href="/api/v1/metadata.json">/api/v1/metadata.json</a>.
+</p>
+
+<p>
+However, its usually desirable to get metadata only for the motors that the user of the API is actually interested in.
+For example, if you don't care about motors that are out of production, restricting the metadata to available motors
+makes more sense:
+<a href="/api/v1/metadata.json?availability=available">/api/v1/metadata.json?availability=available</a>.
+</p>
+
+<a name="search"></a>
+<h2>Search</h2>
+
+<a name="download"></a>
+<h2>Download</h2>
+
+<a name="getrockets"></a>
+<h2>Get Rockets</h2>
+
+<a name="motorguide"></a>
+<h2>Motor Guide</h2>
+
+<a name="examples"></a>
+<h2>Example Programs</h2>

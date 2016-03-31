@@ -16,6 +16,7 @@
     "exphbs": "^1.0.1",
     "express": "~4.13.1",
     "express-session": "^1.13.0",
+    "express-xml-bodyparser": "^0.3.0",
     "handlebars-helper": "0.0.12",
     "less-middleware": "1.0.x",
     "mongoose": "^4.3.4",

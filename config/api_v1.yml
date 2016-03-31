@@ -1,11 +1,10 @@
-swagger: 2.0
+swagger: "2.0"
 info:
   title: ThrustCurve.org API
   description: Programmatic access to ThrustCurve.org motor and simulator file database.
-  termsOfService: http://swagger.io/terms/
   contact:
     name: John Coker
-    url: http://www.thrustcurve.org/searchapi.html
+    url: http://www.thrustcurve.org/api.html
     email: john@jcsw.com
   license:
     name: ISC
@@ -17,6 +16,7 @@ basePath: /api/v1
 consumes:
 - application/json
 - text/xml
+- application/x-www-form-urlencoded
 produces:
 - application/json
 - text/xml
@@ -25,8 +25,108 @@ paths:
   /metadata.json:
     get:
       description: Gets metadata about all motors in the database.
+      consumes:
+      - application/x-www-form-urlencoded
       produces:
       - application/json
+      parameters:
+      - name: manufacturer
+        in: query
+        description: manufacturer name or abbreviation
+        type: string
+        required: false
+      - name: impulseClass
+        in: query
+        description: letter class of motor
+        type: string
+        required: false
+      - name: diameter
+        in: query
+        description: motor diameter in mm
+        type: number
+        required: false
+      - name: type
+        in: query
+        description: motor type
+        type: string
+        enum:
+        - SU
+        - reload
+        - hybrid
+        required: false
+      - name: certOrg
+        in: query
+        description: certification organization name or abbreviation
+        type: string
+        required: false
+      - name: availability
+        in: query
+        description: motor current availability
+        type: string
+        enum:
+        - regular
+        - occasional
+        - OOP
+        - available
+        - all
+        required: false
+      responses:
+        '200':
+          description: metadata response
+          schema:
+            $ref: '#/definitions/Metadata'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/Errors'
+    post:
+      description: Gets metadata about all motors in the database.
+      consumes:
+      - application/x-www-form-urlencoded
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: manufacturer
+        in: body
+        description: manufacturer name or abbreviation
+        type: string
+        required: false
+      - name: impulseClass
+        in: body
+        description: letter class of motor
+        type: string
+        required: false
+      - name: diameter
+        in: body
+        description: motor diameter in mm
+        type: number
+        required: false
+      - name: type
+        in: body
+        description: motor type
+        type: string
+        enum:
+        - SU
+        - reload
+        - hybrid
+        required: false
+      - name: certOrg
+        in: body
+        description: certification organization name or abbreviation
+        type: string
+        required: false
+      - name: availability
+        in: body
+        description: motor current availability
+        type: string
+        enum:
+        - regular
+        - occasional
+        - OOP
+        - available
+        - all
+        required: false
       responses:
         '200':
           description: metadata response

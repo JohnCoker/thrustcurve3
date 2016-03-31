@@ -90,7 +90,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | outbox.jsp          |                              |   | outbox |
 | raspformat.shtml    | info/raspformat.html         | ✓ | general info |
 | search.shtml        | motors/search.html           | ✓ | attribute search |
-| searchapi.shtml     | info/searchapi.html          |   | general info |
+| searchapi.shtml     | info/api.html                |   | general info |
 | searchpage.jsp      | motors/search.html           | ✓ | attribute search |
 | servererror.jsp     | error.html                   | ✓ | internal page |
 | simfilesearch.jsp   | simfiles/*/                  | ✓ | data files |

@@ -74,11 +74,7 @@ paths:
         '200':
           description: metadata response
           schema:
-            $ref: '#/definitions/Metadata'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/Errors'
+            $ref: '#/definitions/MetadataResponse'
     post:
       description: Gets metadata about all motors in the database.
       consumes:
@@ -87,23 +83,34 @@ paths:
       produces:
       - application/json
       parameters:
-      - name: manufacturer
+      - name: body
         in: body
+        schema:
+          $ref: '#/definitions/MetadataRequest'
+      responses:
+        '200':
+          description: metadata response
+          schema:
+            $ref: '#/definitions/MetadataResponse'
+
+definitions:
+  MetadataRequest:
+    type: object
+    description: metadata query criteria
+    properties:
+      manufacturer:
         description: manufacturer name or abbreviation
         type: string
         required: false
-      - name: impulseClass
-        in: body
+      impulseClass:
         description: letter class of motor
         type: string
         required: false
-      - name: diameter
-        in: body
+      diameter:
         description: motor diameter in mm
         type: number
         required: false
-      - name: type
-        in: body
+      type:
         description: motor type
         type: string
         enum:
@@ -111,13 +118,11 @@ paths:
         - reload
         - hybrid
         required: false
-      - name: certOrg
-        in: body
+      certOrg:
         description: certification organization name or abbreviation
         type: string
         required: false
-      - name: availability
-        in: body
+      availability:
         description: motor current availability
         type: string
         enum:
@@ -127,16 +132,46 @@ paths:
         - available
         - all
         required: false
-      responses:
-        '200':
-          description: metadata response
-          schema:
-            $ref: '#/definitions/Metadata'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/Errors'
 
-definitions:
-  Errors:
-  Metadata:
+  MetadataResponse:
+    type: object
+    description: motor metadata
+    properties:
+      manufacturers:
+        type: array
+        description: motor manufacturers
+        items:
+          $ref: '#/definitions/NameAndAbbrev'
+      certOrgs:
+        type: array
+        description: certification organizations
+        items:
+          $ref: '#/definitions/NameAndAbbrev'
+      types:
+        type: array
+        description: motor types
+        items:
+          type: string
+      diameters:
+        type: array
+        description: motor diameters
+        items:
+          type: number
+      impulseClasses:
+        type: array
+        description: total impulse letter classes
+        items:
+          type: string
+
+  NameAndAbbrev:
+    type: object
+    description: full name and abbreviation
+    properties:
+      name:
+        type: string
+        required: true
+        description: full (official) name
+      abbrev:
+        type: string
+        required: false
+        description: most common abbreviation

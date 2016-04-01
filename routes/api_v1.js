@@ -139,8 +139,13 @@ router.get('/api/v1/swagger.yml', function(req, res, next) {
   res.type('application/yaml').sendFile(specFile);
 });
 router.get('/api/v1/swagger.json', function(req, res, next) {
-  var spec = yamljs.load(specFile);
-  res.type('application/json').send(spec);
+  var spec = yamljs.load(specFile),
+      text;
+  if (req.query.hasOwnProperty('pretty'))
+    text = JSON.stringify(spec, undefined, 2);
+  else
+    text = JSON.stringify(spec);
+  res.type('application/json').send(text);
 });
 
 
@@ -174,8 +179,6 @@ function doMetadata(req, res, format) {
     request = req.query;
   else
     request = getElement(req.body, 'metadata-request') || {};
-  console.log('request:');
-  console.log(request);
 
   metadata.get(req, function(cache) {
     var query, keys;

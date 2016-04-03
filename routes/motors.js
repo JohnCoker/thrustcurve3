@@ -322,22 +322,6 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
  * /motors/search.html
  * General motor search, renders with motors/search.hbs template.
  */
-function toDesignation(s) {
-  s = s.toUpperCase();
-  s = s.replace(/[^A-Z0-9_.\/-]+/g, '_');
-  return s;
-}
-
-function toCommonName(s) {
-  s = s.toUpperCase();
-  return s;
-}
-
-function toImpulseClass(s) {
-  s = s.toUpperCase();
-  return s.replace(/^1\/[248]A$/, 'A');
-}
-
 function doSearch(req, res, params) {
   metadata.getMotors(req, function(all, available) {
     var query = {},
@@ -375,14 +359,14 @@ function doSearch(req, res, params) {
             failed = true;
 
         } else if (k == 'designation') {
-          v = toDesignation(v);
+          v = metadata.toDesignation(v);
           query.$or = [
             { designation: v },
             { altDesignation: v },
           ];
 
         } else if (k == 'commonName') {
-          v = toCommonName(v);
+          v = metadata.toCommonName(v);
           query.$or = [
             { commonName: v },
             { altName: v },
@@ -390,10 +374,10 @@ function doSearch(req, res, params) {
 
         } else if (k == 'name') {
           query.$or = [
-            { designation: toDesignation(v) },
-            { altDesignation: toDesignation(v) },
-            { commonName: toCommonName(v) },
-            { altName: toCommonName(v) },
+            { designation: metadata.toDesignation(v) },
+            { altDesignation: metadata.toDesignation(v) },
+            { commonName: metadata.toCommonName(v) },
+            { altName: metadata.toCommonName(v) },
           ];
 
         } else if (k == 'diameter') {
@@ -406,7 +390,7 @@ function doSearch(req, res, params) {
             failed = true;
 
         } else if (k == 'impulseClass') {
-          v = toImpulseClass(v);
+          v = metadata.toImpulseClass(v);
           query.impulseClass = v;
 
         } else if (k == 'length') {

@@ -60,7 +60,7 @@ function searchQuery(request, cache) {
   // designation
   v = getElement(request, 'designation');
   if (v != null) {
-    v = toDesignation(v);
+    v = metadata.toDesignation(v);
     query.$or = [
       { designation: v },
       { altDesignation: v },
@@ -70,7 +70,7 @@ function searchQuery(request, cache) {
   // common name
   v = getElement(request, 'common-name');
   if (v != null) {
-    v = toCommonName(v);
+    v = metadata.toCommonName(v);
     query.$or = [
       { commonName: v },
       { altName: v },
@@ -80,7 +80,7 @@ function searchQuery(request, cache) {
   // impulse class
   v = getElement(request, 'impulse-class');
   if (v != null) {
-    v = toImpulseClass();
+    v = metadata.toImpulseClass(v);
     query.impulseClass = v;
   }
 
@@ -183,7 +183,7 @@ function doMetadata(req, res, format) {
   if (req.method == 'GET')
     request = req.query;
   else
-    request = getElement(req.body, 'metadata-request') || {};
+    request = getElement(req.body, 'metadata-request') || req.body;
 
   metadata.get(req, function(cache) {
     var query, keys;

@@ -13,18 +13,16 @@ info:
 
 host: localhost:3000
 basePath: /api/v1
-consumes:
-- application/json
-- text/xml
-- application/x-www-form-urlencoded
-produces:
-- application/json
-- text/xml
+tags:
+  - name: metadata
+    description: Gets metadata about all motors in the database.
 
 paths:
   /metadata.json:
     get:
-      description: Gets metadata about all motors in the database.
+      tags:
+      - metadata
+      description: GET method specifies criteria as query parameters
       consumes:
       - application/x-www-form-urlencoded
       produces:
@@ -76,7 +74,9 @@ paths:
           schema:
             $ref: '#/definitions/MetadataResponse'
     post:
-      description: Gets metadata about all motors in the database.
+      tags:
+      - metadata
+      description: POST method specifies JSON object with criteria
       consumes:
       - application/json
       produces:
@@ -102,12 +102,15 @@ definitions:
       manufacturer:
         description: manufacturer name or abbreviation
         type: string
+        example: Estes
       impulseClass:
         description: letter class of motor
         type: string
+        example: C
       diameter:
         description: motor diameter in mm
         type: number
+        example: 18
       type:
         description: motor type
         type: string
@@ -115,9 +118,11 @@ definitions:
         - SU
         - reload
         - hybrid
+        example: SU
       certOrg:
         description: certification organization name or abbreviation
         type: string
+        example: NAR
       availability:
         description: motor current availability
         type: string
@@ -127,6 +132,7 @@ definitions:
         - OOP
         - available
         - all
+        example: available
 
   MetadataResponse:
     type: object
@@ -137,26 +143,45 @@ definitions:
         description: motor manufacturers
         items:
           $ref: '#/definitions/NameAndAbbrev'
+        example:
+        - name: Estes Industries
+          abbrev: Estes
       certOrgs:
         type: array
         description: certification organizations
         items:
           $ref: '#/definitions/NameAndAbbrev'
+        example:
+        - name: National Association of Rocketry
+          abbrev: NAR
       types:
         type: array
         description: motor types
         items:
           type: string
+          enum:
+          - SU
+          - reload
+          - hybrid
+        example:
+        - SU
       diameters:
         type: array
         description: motor diameters
         items:
           type: number
+        example:
+        - 13
+        - 18
       impulseClasses:
         type: array
         description: total impulse letter classes
         items:
           type: string
+        example:
+        - A
+        - B
+        - C
 
   NameAndAbbrev:
     type: object

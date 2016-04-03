@@ -10,6 +10,7 @@ const express = require('express'),
       path = require('path'),
       xmlparser = require('express-xml-bodyparser'),
       yamljs = require('yamljs'),
+      schema = require('../database/schema'),
       metadata = require('../lib/metadata'),
       data = require('../render/data');
 
@@ -37,7 +38,7 @@ function trimValue(v) {
   if (typeof v == 'string') {
     v = v.trim();
     if (v == '*' || v == 'all')
-      return undefined;
+      return;
   }
   if (Array.isArray(v) && v.length == 1)
     return trimValue(v[0]);
@@ -111,8 +112,12 @@ function searchQuery(request, cache) {
 
   // availability
   v = getElement(request, 'availability');
-  if (v != null)
-    query.availability = v;
+  if (v != null) {
+    if (v == 'available')
+      query.availability = { $in: schema.MotorAvailableEnum };
+    else
+      query.availability = v;
+  }
 
   return query;
 }

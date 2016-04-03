@@ -78,13 +78,14 @@ paths:
     post:
       description: Gets metadata about all motors in the database.
       consumes:
-      - application/x-www-form-urlencoded
       - application/json
       produces:
       - application/json
       parameters:
-      - name: body
-        in: body
+      - in: body
+        name: body
+        description: metadata query criteria
+        required: true
         schema:
           $ref: '#/definitions/MetadataRequest'
       responses:
@@ -101,15 +102,12 @@ definitions:
       manufacturer:
         description: manufacturer name or abbreviation
         type: string
-        required: false
       impulseClass:
         description: letter class of motor
         type: string
-        required: false
       diameter:
         description: motor diameter in mm
         type: number
-        required: false
       type:
         description: motor type
         type: string
@@ -117,11 +115,9 @@ definitions:
         - SU
         - reload
         - hybrid
-        required: false
       certOrg:
         description: certification organization name or abbreviation
         type: string
-        required: false
       availability:
         description: motor current availability
         type: string
@@ -131,7 +127,6 @@ definitions:
         - OOP
         - available
         - all
-        required: false
 
   MetadataResponse:
     type: object
@@ -169,9 +164,7 @@ definitions:
     properties:
       name:
         type: string
-        required: true
         description: full (official) name
       abbrev:
         type: string
-        required: false
         description: most common abbreviation

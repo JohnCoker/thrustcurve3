@@ -246,8 +246,6 @@ function renderLists(req, res, trail, match, motors) {
       lists = [];
   }
 
-  console.log(match);
-
   res.render('browser/lists', locals(defaults, {
     title: 'Motor Browser',
     trail: trail,

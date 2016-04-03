@@ -146,6 +146,8 @@ router.get('/api/v1/swagger.yml', function(req, res, next) {
 router.get('/api/v1/swagger.json', function(req, res, next) {
   var spec = yamljs.load(specFile),
       text;
+  if (process.env.NODE_ENV == 'production' || req.query.hasOwnProperty('canonical'))
+    spec.host = 'www.thrustcurve.org';
   if (req.query.hasOwnProperty('pretty'))
     text = JSON.stringify(spec, undefined, 2);
   else

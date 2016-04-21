@@ -15,14 +15,18 @@ host: localhost:3000
 basePath: /api/v1
 tags:
   - name: metadata
-    description: Gets metadata about all motors in the database.
+    description: Get metadata about all motors in the database.
+  - name: search
+    description: Find motors by various criteria.
+  - name: download
+    description: Retrieve simulator file data for specific motors.
 
 paths:
   /metadata.json:
     get:
       tags:
       - metadata
-      description: GET method specifies criteria as query parameters
+      description: The GET method specifies search criteria as query parameters.
       consumes:
       - application/x-www-form-urlencoded
       produces:
@@ -76,7 +80,7 @@ paths:
     post:
       tags:
       - metadata
-      description: POST method specifies JSON object with criteria
+      description: The POST method specifies JSON object with search criteria.
       consumes:
       - application/json
       produces:
@@ -93,6 +97,35 @@ paths:
           description: metadata response
           schema:
             $ref: '#/definitions/MetadataResponse'
+
+  /search.json:
+    post:
+      tags:
+      - search
+      description: The POST method specifies a JSON object with search criteria.
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: metadata query criteria
+        required: true
+        schema:
+          $ref: '#/definitions/MetadataRequest'
+      responses:
+        '200':
+          description: metadata response
+          schema:
+            $ref: '#/definitions/MetadataResponse'
+
+paths:
+  /download.json:
+    post:
+      tags:
+      - search
+      description: POST method specifies JSON object with criteria
 
 definitions:
   MetadataRequest:

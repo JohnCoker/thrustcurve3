@@ -11,6 +11,7 @@ const express = require('express'),
       xmlparser = require('express-xml-bodyparser'),
       yamljs = require('yamljs'),
       schema = require('../database/schema'),
+      errors = require('../lib/errors'),
       metadata = require('../lib/metadata'),
       data = require('../render/data');
 
@@ -46,7 +47,7 @@ function trimValue(v) {
   return v;
 }
 
-function searchQuery(request, cache) {
+function searchQuery(request, cache, error) {
   var query = {},
       v, m;
 
@@ -94,8 +95,10 @@ function searchQuery(request, cache) {
         $gt: m - metadata.MotorDiameterTolerance,
         $lt: m + metadata.MotorDiameterTolerance
       };
-    } else
+    } else {
+      error(errors.INVALID_QUERY, 'Invalid diameter value; expected millimeters.');
       query.diameter = 0;
+    }
   }
 
   // motor type
@@ -190,7 +193,7 @@ function doMetadata(req, res, format) {
   metadata.get(req, function(cache) {
     var query, keys;
   
-    query = searchQuery(request, cache);
+    query = searchQuery(request, cache, new errors.Collector());
     keys = Object.keys(query);
     if (keys.length == 1 && query.availability == 'available') {
       // available motors

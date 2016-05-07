@@ -4,7 +4,7 @@
 
  * flag motors favorited by other users
  * add Like, +1, Flattr, etc for motor pages
- * missing data page
+ * "missing data" page
  * site map generation
  * robots.txt
  * outbox feature?
@@ -37,12 +37,16 @@
  * certification org editing
  * user administration
  * delete data files
- * missingstats page
+ * "missing stats" page
 
 ## API
 
- * re-implement XML API (/api/1)
- * add JSON API (/api/2)
+ * re-implement XML API with JSON option (/api/1)
+   * metadata
+   * search
+   * download
+   * getrockets
+   * motorguide
  * documentation page
  * demonstration page
 

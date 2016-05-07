@@ -42,7 +42,6 @@
 ## API
 
  * re-implement XML API with JSON option (/api/1)
-   * metadata
    * search
    * download
    * getrockets
@@ -107,11 +106,11 @@ This table lists all pages of the old site and will be filled in as work proceed
 | updaterocket.jsp    | mystuff/rocket/*/edit.html   | ✓ | account |
 | updates.jsp         | motors/updates.html          | ✓ | general info |
 | updatesimfile.jsp   |                              |   | contribution |
-| servlets/metadata   |                              |   | API |
-| servlets/search     |                              |   | API |
-| servlets/download   |                              |   | API |
-| servlets/getrockets |                              |   | API |
-| servlets/motorguide |                              |   | API |
+| servlets/metadata   | api/1/metadata.*             | ✓ | API |
+| servlets/search     | api/1/search.*               |   | API |
+| servlets/download   | api/1/download.*             |   | API |
+| servlets/getrockets | api/1/getrockets.*           |   | API |
+| servlets/motorguide | api/1/motorguide.*           |   | API |
 
 Note that the new site takes a more REST-style approach for data display, using paths
 that contain names rather than generic pages with ID query parameters.

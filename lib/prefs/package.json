@@ -12,5 +12,8 @@
     "url": "https://github.com/JohnCoker/thrustcurve3/lib/prefs"
   },
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "continuation-local-storage": "^3.1.7"
+  }
 }

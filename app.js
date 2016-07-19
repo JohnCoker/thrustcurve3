@@ -18,6 +18,7 @@ const process = require('process'),
       SessionMongoStore = require('connect-mongo')(session),
       passport = require('passport'),
       passportLocal = require('passport-local').Strategy,
+      sessionStorage = require('continuation-local-storage').createNamespace('session'),
       config = require('./config/server.js'),
       schema = require('./database/schema'),
       prefs = require('./lib/prefs'),
@@ -129,59 +130,61 @@ app.use(function(req, res, next) {
   };
 
   // set up preferences if user is logged in
-  if (req.user) {
-    prefs.setAll(req.user.preferences);
-  } else {
-    prefs.clear();
-  }
-
-  // easy access to database state
-  req.db = db;
-  req.success = function(cb) {
-    return function(err, result) {
-      if (err) {
-        res.status(err.status || 500);
-        res.render('error', {
-          title: 'Database Error',
-          layout: 'home',
-          url: req.url,
-          status: err.status,
-          message: err.message,
-          error: err
-        });
-      } else {
-        try {
-          cb(result);
-        } catch (e) {
-          res.status(500);
-          res.render('error', {
-            title: 'Server Error',
-            layout: 'home',
-            url: req.url,
-            status: 500,
-            message: e.message,
-            error: e
-          });
-        }
-      }
+  sessionStorage.run(function() {
+    sessionStorage.set('req', req);
+    sessionStorage.set('user', req.user);
+    sessionStorage.set('prefs', {});
+    if (req.user)
+      prefs.setAll(req.user.preferences);
+  
+    // easy access to database state
+    req.db = db;
+    req.success = function(cb) {
+      return function(err, result) {
+	if (err) {
+	  res.status(err.status || 500);
+	  res.render('error', {
+	    title: 'Database Error',
+	    layout: 'home',
+	    url: req.url,
+	    status: err.status,
+	    message: err.message,
+	    error: err
+	  });
+	} else {
+	  try {
+	    cb(result);
+	  } catch (e) {
+	    res.status(500);
+	    res.render('error', {
+	      title: 'Server Error',
+	      layout: 'home',
+	      url: req.url,
+	      status: 500,
+	      message: e.message,
+	      error: e
+	    });
+	  }
+	}
+      };
     };
-  };
-
-  // add helpers directly
-  req.helpers = helpers;
-
-  // render notfound (404) page
-  res.notfound = function() {
-    res.status(404);
-    res.render('notfound', {
-      title: 'Page Not Found',
-      layout: 'home',
-      url: req.url,
-      path: req.path
-    });
-  };
-
-  next();
+  
+    // add helpers directly
+    req.helpers = helpers;
+  
+    // render notfound (404) page
+    res.notfound = function() {
+      res.status(404);
+      res.render('notfound', {
+	title: 'Page Not Found',
+	layout: 'home',
+	url: req.url,
+	path: req.path
+      });
+    };
+  
+    next();
+  });
 });
 
 /*

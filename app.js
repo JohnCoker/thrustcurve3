@@ -6,6 +6,7 @@
 
 const process = require('process'),
       mongoose = require('mongoose'),
+      cls = require('continuation-local-storage'),
       express = require('express'),
       exphbs = require('exphbs'),
       path = require('path'),
@@ -18,7 +19,6 @@ const process = require('process'),
       SessionMongoStore = require('connect-mongo')(session),
       passport = require('passport'),
       passportLocal = require('passport-local').Strategy,
-      sessionStorage = require('continuation-local-storage').createNamespace('session'),
       config = require('./config/server.js'),
       schema = require('./database/schema'),
       prefs = require('./lib/prefs'),
@@ -116,6 +116,7 @@ var db = Object.create(null, {
     return schema.IdRegex.test(v);
   } }
 });
+var clsNamespace = cls.createNamespace('session');
 app.use(function(req, res, next) {
   // determine if this is a robot/crawler/spider
   req.isBot = function() {
@@ -129,18 +130,17 @@ app.use(function(req, res, next) {
     return req.session.bot;
   };
 
-  // set up preferences if user is logged in
-  sessionStorage.run(function() {
-    sessionStorage.set('req', req);
-    sessionStorage.set('user', req.user);
-    sessionStorage.set('prefs', {});
-    if (req.user)
-      prefs.setAll(req.user.preferences);
-  
+  // make request and prefs available throughout processing
+  clsNamespace.bindEmitter(req);
+  clsNamespace.bindEmitter(res);
+  clsNamespace.run(function() {
+    clsNamespace.set('req', req);
+    clsNamespace.set('prefs', req.user ? req.user.preferences : {});
+
     // easy access to database state
     req.db = db;
     req.success = function(cb) {
-      return function(err, result) {
+      return clsNamespace.bind(function(err, result) {
 	if (err) {
 	  res.status(err.status || 500);
 	  res.render('error', {
@@ -166,7 +166,7 @@ app.use(function(req, res, next) {
 	    });
 	  }
 	}
-      };
+      });
     };
   
     // add helpers directly
@@ -182,7 +182,7 @@ app.use(function(req, res, next) {
 	path: req.path
       });
     };
-  
+
     next();
   });
 });

@@ -1,3 +1,3 @@
 module.exports = {
-  mongoUrl: 'mongodb://localhost/thrustcurve'
+  mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost/thrustcurve'
 };

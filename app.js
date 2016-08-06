@@ -21,7 +21,6 @@ const process = require('process'),
       passportLocal = require('passport-local').Strategy,
       config = require('./config/server.js'),
       schema = require('./database/schema'),
-      prefs = require('./lib/prefs'),
       crawlers = require('./lib/crawlers'),
       helpers = require('./lib/helpers');
 
@@ -35,18 +34,18 @@ mongoose.connect(config.mongoUrl, function(err) {
 });
 
 // site routes grouped by area
-var index = require('./routes/index'),
-    info = require('./routes/info'),
-    motors = require('./routes/motors'),
-    manufacturers = require('./routes/manufacturers'),
-    simfiles = require('./routes/simfiles'),
-    contributors = require('./routes/contributors'),
-    mystuff = require('./routes/mystuff'),
-    guide = require('./routes/guide'),
-    browser = require('./routes/browser'),
-    api_v1 = require('./routes/api_v1');
+const index = require('./routes/index'),
+      info = require('./routes/info'),
+      motors = require('./routes/motors'),
+      manufacturers = require('./routes/manufacturers'),
+      simfiles = require('./routes/simfiles'),
+      contributors = require('./routes/contributors'),
+      mystuff = require('./routes/mystuff'),
+      guide = require('./routes/guide'),
+      browser = require('./routes/browser'),
+      api_v1 = require('./routes/api_v1');
 
-var app = express();
+const app = express();
 
 // view engine setup using Handlebars
 require('handlebars-helper').help(exphbs.handlebars);
@@ -95,7 +94,7 @@ app.use(passport.session());
  *
  * helpers: the helpers module with useful formatting functions.
  */
-var db = Object.create(null, {
+const db = Object.create(null, {
   mongoose: { value: mongoose },
   schema: { value: schema },
   Manufacturer: { value: schema.ManufacturerModel(mongoose) },
@@ -116,7 +115,7 @@ var db = Object.create(null, {
     return schema.IdRegex.test(v);
   } }
 });
-var clsNamespace = cls.createNamespace('session');
+const clsNamespace = cls.createNamespace('session');
 app.use(function(req, res, next) {
   // determine if this is a robot/crawler/spider
   req.isBot = function() {

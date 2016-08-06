@@ -12,4 +12,6 @@ db.simfilenotes.drop()
 db.rockets.drop()
 db.motorviews.drop()
 db.motorrankings.drop()
+db.favoritemotors.drop()
+db.guideresults.drop()
 _EOF_

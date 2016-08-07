@@ -4,7 +4,7 @@
  */
 'use strict';
 
-const bcrypt = require('bcrypt'),
+const bcrypt = require('bcrypt-nodejs'),
       SALT_WORK_FACTOR = 11,
       units = require('../../lib/units');
 

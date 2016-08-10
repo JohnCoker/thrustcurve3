@@ -16,6 +16,7 @@ const _ = require('underscore'),
       flightsim = require('../simulate/flightsim'),
       analyze = require('../simulate/analyze'),
       spreadsheet = require('../render/spreadsheet'),
+      csv = require('../render/csv'),
       locals = require('./locals.js');
 
 const MinGuideVelocity = 14.9,
@@ -544,6 +545,7 @@ function doSummaryPage(req, res, rockets) {
       passResults: passResults,
       detailsLink: '/motors/guide/' + result._id + '/details.html',
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
+      csvLink: '/motors/guide/' + result._id + '/spreadsheet.csv',
       restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
     }));
   });
@@ -580,6 +582,7 @@ function doDetailsPage(req, res, rockets) {
       minThrustWeight: MinThrustWeight,
       summaryLink: '/motors/guide/' + result._id + '/summary.html',
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
+      csvLink: '/motors/guide/' + result._id + '/spreadsheet.csv',
       rocketLink: result.rocket ? '/mystuff/rocket/' + result.rocket._id + '/' : undefined,
       restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
     }));
@@ -745,6 +748,63 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
        .append('Last-Modified', result.updatedAt)
        .attachment('motorguide.xlsx')
        .end(data, 'binary');
+  });
+});
+
+/*
+ * /motors/guide/id/spreadsheet.csv.
+ * Motor guide result spreadsheet, serves file directly.
+ */
+router.get('/motors/guide/:id/spreadsheet.csv', function(req, res, next) {
+  loadGuideResult(req, res, function(result) {
+    var file = new csv.File(),
+	text, r, i;
+
+    file.colLabel('Designation');
+    file.colLabel('Manufacturer');
+    file.colLabel('MMT');
+    file.colLabel('Weight', 'mass');
+    file.colLabel('T:W');
+    file.colLabel('Liftoff', 'duration');
+    file.colLabel('Guide', 'velocity');
+    file.colLabel('Burnout', 'altitude');
+    file.colLabel('Burnout', 'duration');
+    file.colLabel('Apogee', 'altitude');
+    file.colLabel('Apogee', 'duration');
+    file.colLabel('Velocity', 'velocity');
+    file.colLabel('Accel', 'acceleration');
+    file.colLabel('Delay', 'duration');
+    file.colLabel('Result');
+    file.row();
+
+    for (i = 0; i < result.results.length; i++) {
+      r = result.results[i];
+      file.col(r.motor.designation);
+      file.col(r.manufacturer.abbrev);
+      file.col(r.mmt);
+
+      file.colNumber(r.thrustWeight, 1);
+      if (r.simulation) {
+        file.colUnit  (r.simulation.inputs.loadedInitialMass, 'mass');
+        file.colNumber(r.simulation.liftoffTime, 2);
+        file.colUnit  (r.simulation.guideVelocity, 'velocity');
+        file.colUnit  (r.simulation.burnoutAltitude, 'altitude');
+        file.colNumber(r.simulation.burnoutTime, 1);
+        file.colUnit  (r.simulation.maxAltitude, 'altitude');
+        file.colNumber(r.simulation.apogeeTime, 1);
+        file.colUnit  (r.simulation.maxVelocity, 'velocity');
+        file.colUnit  (r.simulation.maxAcceleration, 'acceleration');
+      }
+      file.colNumber(r.optimalDelay, 1);
+      file.col(r.reason || 'good');
+      file.row();
+    }
+
+    text = file.produce();
+    res.type(file.mimeType)
+       .append('Last-Modified', result.updatedAt)
+       .attachment('motorguide.csv')
+       .end(text);
   });
 });
 

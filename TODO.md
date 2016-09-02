@@ -27,7 +27,6 @@
 
 ## Account
 
- * forgotten password flow
  * search and display of users
  * add/edit/delete notes
 
@@ -75,7 +74,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | deletesimfile.jsp   |                              |   | contribution |
 | download.jsp        | simfiles/*/download.html     |   | outbox |
 | errors.shtml        |                              | — | general info |
-| forgotpasswd.jsp    | mystuff/forgotpasswd.html    |   | account |
+| forgotpasswd.jsp    | mystuff/forgotpasswd.html    | ✓ | account |
 | glossary.shtml      | info/glossary.html           | ✓ | general info |
 | guidehelp.shtml     | motors/guidehelp.html        | ✓ | motor guide |
 | guidepage.jsp       | motors/guide.html            | ✓ | motor guide |

@@ -162,7 +162,9 @@ function makeContributorModel(mongoose) {
       editNotes: Boolean,
       editContributors: Boolean,
       editRockets: Boolean
-    }
+    },
+    resetToken: String,
+    resetExpires: Date
   });
   schemaOptions(schema);
 
@@ -180,7 +182,7 @@ function makeContributorModel(mongoose) {
 	return next(err);
 
       // hash the password using our new salt
-      bcrypt.hash(contributor.password, salt, function(err, hash) {
+      bcrypt.hash(contributor.password, salt, undefined, function(err, hash) {
 	if (err)
 	  return next(err);
 

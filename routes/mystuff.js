@@ -7,6 +7,9 @@
 const express = require('express'),
       router = express.Router(),
       passport = require('passport'),
+      crypto = require('crypto'),
+      sendgrid = require('sendgrid'),
+      config = require('../config/server.js'),
       schema = require('../database/schema'),
       units = require('../lib/units'),
       metadata = require('../lib/metadata'),
@@ -16,13 +19,17 @@ const express = require('express'),
 const loginLink = '/mystuff/login.html',
       registerLink = '/mystuff/register.html',
       forgotLink = '/mystuff/forgotpasswd.html',
+      resetLink = '/mystuff/resetpasswd.html',
       favoritesLink = '/mystuff/favorites.html',
       rocketsLink = '/mystuff/rockets.html',
       preferencesLink = '/mystuff/preferences.html',
       profileLink = '/mystuff/profile.html';
 
 const defaults = {
-  layout: 'mystuff'
+  layout: 'mystuff',
+  loginLink: loginLink,
+  registerLink: registerLink,
+  forgotLink: forgotLink,
 };
 
 function getRedirect(req) {
@@ -55,8 +62,6 @@ router.get(loginLink, function(req, res, next) {
     title: 'Log In',
     layout: 'info',
     submitLink: loginLink,
-    registerLink: registerLink,
-    forgotLink: forgotLink,
     redirect: getRedirect(req),
   }));
 });
@@ -81,8 +86,6 @@ router.get(registerLink, function(req, res, next) {
     layout: 'info',
     info: { showEmail: true },
     submitLink: registerLink,
-    loginLink: loginLink,
-    forgotLink: forgotLink,
     redirect: getRedirect(req),
   }));
 });
@@ -133,8 +136,6 @@ router.post(registerLink, function(req, res, next) {
       info: info,
       errors: errors,
       submitLink: registerLink,
-      loginLink: loginLink,
-      forgotLink: forgotLink,
     }));
     return;
   }
@@ -148,8 +149,6 @@ router.post(registerLink, function(req, res, next) {
         email: info.email,
         errors: ['Email address already registered.'],
         submitLink: forgotLink,
-        loginLink: loginLink,
-        registerLink: registerLink,
       });
       return;
     }
@@ -174,13 +173,145 @@ router.post(registerLink, function(req, res, next) {
  * /mystuff/forgotpasswd.html
  * Renders with mystuff/forgotpasswd.hbs template.
  */
-router.get('/mystuff/forgotpasswd.html', authenticated, function(req, res, next) {
+router.get([forgotLink, '/forgotpasswd.jsp'], function(req, res, next) {
   res.render('mystuff/forgotpasswd', locals(req, defaults, {
     title: 'Forgot Password',
     submitLink: forgotLink,
-    loginLink: loginLink,
-    registerLink: registerLink,
   }));
+});
+
+router.post(forgotLink, function(req, res, next) {
+  var email = req.body.username.trim();
+
+  req.db.Contributor.findOne({ email: email }).exec(req.success(function(user) {
+    if (user == null) {
+      res.render('mystuff/forgotpasswd', locals(req, defaults, {
+        title: 'Forgot Password',
+        submitLink: forgotLink,
+        email: email,
+        errors: [ "No user with that email registered." ]
+      }));
+      return;
+    }
+
+    crypto.randomBytes(20, function(err, buf) {
+      var token = buf.toString('hex');
+      user.resetToken = token;
+      user.resetExpires = Date.now() + 30 * 60 * 1000; // 30m
+      user.save(req.success(function(updated) {
+        var link = req.protocol + '://' + req.headers.host + resetLink + "?t=" + token;
+
+        sendgrid(config.sendGridUsername, config.sendGridPassword).send({
+          to: email,
+          from: 'noreply@thrustcurve.org',
+          subject: 'ThrustCurve.org password reset',
+          text: 'You (or someone pretending to be you) requested that your ThrustCurve.org password be reset.\n' +
+                'Please click this link or paste it into your browser address bar to choose a new password:\n\n' +
+                link + '\n\n' +
+                'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+        }, function(err, json) {
+	  if (err) {
+	    res.status(err.status || 500);
+	    res.render('error', {
+	      title: 'Email Error',
+	      layout: 'mystuff',
+	      url: req.url,
+	      error: err
+	    });
+	  } else {
+	    res.render('mystuff/forgotpasswd', locals(req, defaults, {
+	      title: 'Forgot Password',
+	      submitLink: forgotLink,
+	      email: email,
+	      isSent: true
+	    }));
+	  }
+	});
+      }));
+    });
+  }));
+});
+
+/*
+ * /mystuff/resetpasswd.html
+ * Renders with mystuff/resetpasswd.hbs template.
+ */
+function getTokenUser(req, res, next) {
+  var token = req.body.token || req.query.token || req.query.t;
+  if (token)
+    token = token.trim();
+
+  if (token == null || token == '') {
+    res.render('mystuff/forgotpasswd', locals(req, defaults, {
+      title: 'Forgot Password',
+      submitLink: forgotLink,
+      errors: [ "Password reset link invalid." ]
+    }));
+  } else {
+    req.db.Contributor.findOne({
+      resetToken: token,
+      resetExpires: { $gt: Date.now() }
+    }).exec(req.success(function(user) {
+      if (user == null) {
+        res.render('mystuff/forgotpasswd', locals(req, defaults, {
+          title: 'Forgot Password',
+          submitLink: forgotLink,
+          errors: [ "Password reset link expired." ]
+        }));
+      } else {
+        next(token, user);
+      }
+    }));
+  }
+}
+
+router.get(resetLink, function(req, res, next) {
+  getTokenUser(req, res, function(token, user) {
+    res.render('mystuff/resetpasswd', locals(req, defaults, {
+      title: 'Reset Password',
+      submitLink: resetLink,
+      token: token,
+    }));
+  });
+});
+
+router.post(resetLink, function(req, res, next) {
+  getTokenUser(req, res, function(token, user) {
+    var errors = [],
+        password, confirm;
+
+    password = req.body.password;
+    if (password == null || password === '') {
+      errors.push('Please enter a password to protect your account.');
+    } else {
+      confirm = req.body.password2;
+      if (confirm != password)
+        errors.push('Please confirm your password by entering it twice.');
+    }
+
+    if (errors.length > 0) {
+      res.render('mystuff/resetpasswd', locals(req, defaults, {
+        title: 'Reset Password',
+        submitLink: resetLink,
+        token: token,
+        errors: errors
+      }));
+    } else {
+      // update the user and log them in
+      user.resetToken = undefined;
+      user.resetExpires = undefined;
+      user.lastLogin = new Date();
+      user.password = password;
+      user.save(req.success(function(updated) {
+        req.login(updated, function(err) {
+          if (err)
+            return next(err);
+
+          res.redirect(profileLink);
+        });
+      }));
+    }
+  });
 });
 
 

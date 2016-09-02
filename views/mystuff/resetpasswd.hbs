@@ -1,0 +1,40 @@
+<h1>{{title}}</h1>
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+{{#if isSent}}
+<div class="alert alert-success" role="alert">
+</div>
+{{/if}}
+
+<p>
+Please enter a new ThrustCurve.org account password twice to reset it.
+If you don't want to reset your password, you can <a href="{{loginLink}}">log in</a>.
+</p>
+
+<form role="form" class="form-horizontal" name="reset" action="{{submitLink}}" method="post" data-toggle="validator">
+  <input type="hidden" name="token" value="{{token}}" />
+  <div class="form-group">
+    <label for="username" class="col-sm-3 control-label">New Password</label>
+    <div class="col-sm-9">
+      <input type="password" name="password" id="password" class="form-control" required data-minlength="4" />
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="username" class="col-sm-3 control-label">Confirm</label>
+    <div class="col-sm-9">
+      <input type="password" name="password2" class="form-control" required data-match="#password" />
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Reset</button>
+      <a class="btn btn-default" href="{{loginLink}}">Log In</a>
+    </div>
+  </div>
+</form>

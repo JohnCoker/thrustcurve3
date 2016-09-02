@@ -5,6 +5,11 @@
 {{this}}
 </div>
 {{/each}}
+{{#if isSent}}
+<div class="alert alert-success" role="alert">
+Email sent to {{email}} with instructions.
+</div>
+{{/if}}
 
 <p>
 If you have forgotten your ThrustCurve.org account password, you can reset it here.

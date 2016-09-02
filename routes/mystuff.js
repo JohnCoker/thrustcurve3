@@ -199,7 +199,7 @@ router.post(forgotLink, function(req, res, next) {
       user.resetToken = token;
       user.resetExpires = Date.now() + 30 * 60 * 1000; // 30m
       user.save(req.success(function(updated) {
-        var link = req.protocol + '://' + req.headers.host + resetLink + "?t=" + token;
+        var link = 'https://' + req.headers.host + resetLink + "?t=" + token;
 
         sendgrid(config.sendGridUsername, config.sendGridPassword).send({
           to: email,
@@ -210,23 +210,23 @@ router.post(forgotLink, function(req, res, next) {
                 link + '\n\n' +
                 'If you did not request this, please ignore this email and your password will remain unchanged.\n'
         }, function(err, json) {
-	  if (err) {
-	    res.status(err.status || 500);
-	    res.render('error', {
-	      title: 'Email Error',
-	      layout: 'mystuff',
-	      url: req.url,
-	      error: err
-	    });
-	  } else {
-	    res.render('mystuff/forgotpasswd', locals(req, defaults, {
-	      title: 'Forgot Password',
-	      submitLink: forgotLink,
-	      email: email,
-	      isSent: true
-	    }));
-	  }
-	});
+          if (err) {
+            res.status(err.status || 500);
+            res.render('error', {
+              title: 'Email Error',
+              layout: 'mystuff',
+              url: req.url,
+              error: err
+            });
+          } else {
+            res.render('mystuff/forgotpasswd', locals(req, defaults, {
+              title: 'Forgot Password',
+              submitLink: forgotLink,
+              email: email,
+              isSent: true
+            }));
+          }
+        });
       }));
     });
   }));

@@ -36,7 +36,7 @@ describe('schema', function() {
 
     it('find abbrev', function() {
       var found;
-      waits(100);
+      waits(150);
       runs(function() {
         model.findOne({ abbrev: 'RRU' }, function(err, results) {
           if (err)
@@ -44,7 +44,7 @@ describe('schema', function() {
           found = results;
         });
       });
-      waits(100);
+      waits(150);
       runs(function() {
         var now = new Date();
 

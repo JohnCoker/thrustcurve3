@@ -783,9 +783,10 @@ router.get('/motors/guide/:id/spreadsheet.csv', function(req, res, next) {
       file.col(r.manufacturer.abbrev);
       file.col(r.mmt);
 
+      if (r.simulation)
+        file.colUnit(r.simulation.inputs.loadedInitialMass, 'mass');
       file.colNumber(r.thrustWeight, 1);
       if (r.simulation) {
-        file.colUnit  (r.simulation.inputs.loadedInitialMass, 'mass');
         file.colNumber(r.simulation.liftoffTime, 2);
         file.colUnit  (r.simulation.guideVelocity, 'velocity');
         file.colUnit  (r.simulation.burnoutAltitude, 'altitude');

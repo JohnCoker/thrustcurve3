@@ -41,6 +41,7 @@ module.exports = function() {
     if (!req.isAuthenticated()) {
       req.session.loginRedirect = req.originalUrl;
       res.redirect('/mystuff/login.html');
+      return;
     }
 
     // user must have all the specified permissions

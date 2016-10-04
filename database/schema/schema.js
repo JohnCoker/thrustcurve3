@@ -181,7 +181,7 @@ function makeContributorModel(mongoose) {
       editSimFiles: Boolean,
       editNotes: Boolean,
       editContributors: Boolean,
-      editRockets: Boolean
+      editRockets: Boolean,
       editPermissions: Boolean,
     },
     resetToken: String,

@@ -135,6 +135,7 @@ app.use(function(req, res, next) {
   clsNamespace.run(function() {
     clsNamespace.set('req', req);
     clsNamespace.set('prefs', req.user ? req.user.preferences : {});
+    clsNamespace.set('perms', req.user ? req.user.permissions : {});
 
     // easy access to database state
     req.db = db;

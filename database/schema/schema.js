@@ -41,6 +41,17 @@ Object.freeze(SimFileLicenseEnum);
 const MotorViewSourceEnum = ['manufacturer', 'search', 'guide', 'browser', 'popular', 'favorite', 'updates'];
 Object.freeze(MotorViewSourceEnum);
 
+const PermissionMap = {
+  "metadata":     "editMetadata",
+  "motors":       "editMotors",
+  "simfiles":     "editSimFiles",
+  "notes":        "editNotes",
+  "contributors": "editContributors",
+  "rockets":      "editRockets",
+  "permissions":  "editPermissions",
+};
+Object.freeze(PermissionMap);
+
 function dateOnly(mongoose) {
   if (DateOnly == null)
     DateOnly = require('mongoose-dateonly')(mongoose);
@@ -54,6 +65,14 @@ function schemaOptions(schema) {
       this.updatedAt = new Date();
     next();
   });
+}
+
+function getPermissionKey(name) {
+  if (typeof name != 'string')
+    return;
+
+  name = name.replace(/^edit/i, '').toLowerCase();
+  return PermissionMap[name];
 }
 
 function makeManufacturerModel(mongoose) {
@@ -157,11 +176,13 @@ function makeContributorModel(mongoose) {
       altitudeUnit: { type: String, enum: units.altitude.labels }
     },
     permissions: {
+      editMetadata: Boolean,
       editMotors: Boolean,
       editSimFiles: Boolean,
       editNotes: Boolean,
       editContributors: Boolean,
       editRockets: Boolean
+      editPermissions: Boolean,
     },
     resetToken: String,
     resetExpires: Date
@@ -208,6 +229,10 @@ function makeContributorModel(mongoose) {
       else
 	cb(null, isMatch);
     });
+  };
+
+  schema.methods.hasPermission = function(perm) {
+    return this.permissions != null && this.permissions[perm] == true;
   };
 
   return mongoose.model('Contributor', schema);
@@ -576,4 +601,17 @@ module.exports = {
    * @member {string[]}
    */
   MotorViewSourceEnum: MotorViewSourceEnum,
+
+  /**
+   * A map of short names (lower-case) to Contributor.permissions keys.
+   * @member {object}
+   */
+  PermissionMap: PermissionMap,
+
+  /**
+   * Map a permission name to a Contributor.permissions key.
+   * @param {string} perm permission name
+   * @return {string} member key
+   */
+  getPermissionKey: getPermissionKey,
 };

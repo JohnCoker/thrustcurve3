@@ -11,13 +11,14 @@ var express = require('express'),
     helpers = require('../lib/helpers'),
     ranking = require('../database/ranking'),
     svg = require('../render/svg'),
-    locals = require('./locals.js');
+    locals = require('./locals.js'),
+    authorized = require('./authorized.js');
 
 var defaults = {
   layout: 'motors',
 };
 
-var searchLink = '/motors/search.html';
+const searchLink = '/motors/search.html';
 
 
 /*
@@ -618,7 +619,7 @@ function toMMGS(v) {
     return v * 1000;
 }
 
-router.get('/motors/:mfr/:desig/edit.html', function(req, res, next) {
+router.get('/motors/:mfr/:desig/edit.html', authorized('motors'), function(req, res, next) {
   metadata.get(req, function(caches) {
     if (!req.params.mfr || req.params.mfr == '-') {
       // create a new motor without a manufacturer
@@ -846,7 +847,7 @@ function doSubmit(req, res, motor) {
   }));
 }
 
-router.post('/motors/:mfr/:desig/edit.html', function(req, res, next) {
+router.post('/motors/:mfr/:desig/edit.html', authorized('motors'), function(req, res, next) {
   if (req.db.isId(req.body._id)) {
     // edit existing motor
     req.db.Motor.findOne({ _id: req.body._id }, req.success(function(motor) {

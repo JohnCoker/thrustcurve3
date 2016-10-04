@@ -321,6 +321,12 @@ var tables = [
         output["preferences.velocityUnit"] = 'ft/s';
         output["preferences.accelerationUnit"] = 'ft/s²';
       }
+
+      // new admin new permissions
+      if (output["email"] == 'john@jcsw.com') {
+        output["permissions.editMetadata"] = true;
+        output["permissions.editPermissions"] = true;
+      }
     }
   },
   {

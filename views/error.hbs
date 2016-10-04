@@ -9,8 +9,16 @@ Please
 what you were doing and include the error below so I can fix it.
 </p>
 
+{{#if error}}
 <pre>
 {{url}}
 
 {{error.stack}}
 </pre>
+{{else}}
+<pre>
+{{url}}
+
+{{message}}
+</pre>
+{{/if}}

@@ -7,7 +7,8 @@
 var express = require('express'),
     router = express.Router(),
     metadata = require('../lib/metadata'),
-    locals = require('./locals.js');
+    locals = require('./locals.js'),
+    authorized = require('./authorized.js');
 
 var defaults = {
   layout: 'info',
@@ -179,7 +180,7 @@ router.get('/manufacturers/:name/motors.html', function(req, res, next) {
  * /manufacturers/:name/edit.html
  * Edit manufacturer info, renders with manufacturers/edit.hbs template.
  */
-router.get('/manufacturers/:id/edit.html', function(req, res, next) {
+router.get('/manufacturers/:id/edit.html', authorized('metadata'), function(req, res, next) {
   req.db.Manufacturer.findOne(mfrQuery(req), req.success(function(result) {
     if (result) {
       res.render('manufacturers/edit', locals(defaults, {
@@ -202,7 +203,7 @@ router.get('/manufacturers/:id/edit.html', function(req, res, next) {
   }));
 });
 
-router.post('/manufacturers/:id/edit.html', function(req, res, next) {
+router.post('/manufacturers/:id/edit.html', authorized('metadata'), function(req, res, next) {
   req.db.Manufacturer.findOne(mfrQuery(req), req.success(function(manufacturer) {
     var isNew = false, isChanged = false,
         aliases;

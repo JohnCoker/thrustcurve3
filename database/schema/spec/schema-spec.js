@@ -298,6 +298,41 @@ describe('schema', function() {
 	expect(wasMatch).toBe(false);
       });
     });
+    it('hasPermission', function() {
+      var found;
+      waits(100);
+      runs(function() {
+        model.findOne({ email: 'joe@xample.com' }, function(err, results) {
+          if (err)
+            console.error(err);
+          found = results;
+        });
+      });
+      waits(300);
+      runs(function() {
+        expect(found.hasPermission('editMotors')).toBe(false);
+        expect(found.hasPermission('noSuchPerm')).toBe(false);
+      });
+    });
+  });
+
+  describe('permissions', function() {
+    describe("getPermissionKey", function() {
+      it("missing", function() {
+        expect(schema.getPermissionKey()).toBeUndefined();
+        expect(schema.getPermissionKey(null)).toBeUndefined();
+        expect(schema.getPermissionKey('')).toBeUndefined();
+        expect(schema.getPermissionKey({a:1})).toBeUndefined();
+      });
+      it("invalid", function() {
+        expect(schema.getPermissionKey('stuff')).toBeUndefined();
+      });
+      it("motors", function() {
+        expect(schema.getPermissionKey('motors')).toBe('editMotors');
+        expect(schema.getPermissionKey('Motors')).toBe('editMotors');
+        expect(schema.getPermissionKey('editMotors')).toBe('editMotors');
+      });
+    });
   });
 
   describe('teardown', function() {

@@ -37,7 +37,6 @@
  * manufacturer editing
  * user administration
  * delete data files
- * "missing stats" page
 
 ## API
 
@@ -83,7 +82,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | login.jsp           | mystuff/login.html           | ✓ | account |
 | mfrsearch.jsp       | manufacturers/               | ✓ | manufacturers |
 | missingdata.jsp     |                              |   | contribution |
-| missingstats.jsp    |                              |   | admin |
+| missingstats.jsp    |                              | ✓ | admin |
 | mobile.shtml        | info/mobile.html             | ✓ | general info |
 | motorguide.jsp      | motors/guide.html            | ✓ | motor guide |
 | motorsearch.jsp     | motors/search.html           | ✓ | attribute search |

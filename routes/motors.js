@@ -4,7 +4,8 @@
  */
 'use strict';
 
-var express = require('express'),
+var _ = require('underscore'),
+    express = require('express'),
     router = express.Router(),
     metadata = require('../lib/metadata'),
     units = require('../lib/units'),
@@ -502,10 +503,93 @@ router.post(searchLink, function(req, res, next) {
  * Motors without data, renders with motors/missingdata.hbs template.
  */
 router.get('/motors/missingdata.html', function(req, res, next) {
-  res.render('motors/missingdata', locals(defaults, 'Motor Without Data'));
+  var results = [];
+  res.render('motors/missingdata', locals(defaults, {
+    title: 'Motor Without Data',
+    motors: results
+  }));
 });
 router.get(['/missingdata.jsp'], function(req, res, next) {
   res.redirect(301, '/motors/missingdata.html');
+});
+
+
+/*
+ * /motors/missingstats.html
+ * Motors with missing statistics, renders with motors/missingstats.hbs template.
+ */
+const ignoreStats = ['isp'];
+
+router.get('/motors/missingstats.html', function(req, res, next) {
+  var or = [], stats = [],
+      query, keys, info, c, i;
+
+  keys = Object.keys(req.db.Motor.schema.paths);
+  for (i = 0; i < keys.length; i++) {
+    if (ignoreStats.indexOf(keys[i]) >= 0)
+      continue;
+
+    info = req.db.Motor.schema.paths[keys[i]];
+    if (info.instance == 'Number' && info.options.min != null) {
+      stats.push({
+	field: keys[i],
+	label: keys[i][0].toUpperCase() + keys[i].substring(1).replace(/([A-Z])/g, ' $1'),
+	min: info.options.min,
+	missing: 0,
+      });
+
+      if (!info.isRequired) {
+	c = {};
+	c[info.path] = null;
+	or.push(c);
+      }
+
+      c = {};
+      c[info.path] = { $lt: info.options.min };
+      or.push(c);
+    }
+  }
+  console.log(or);
+
+  query = {
+    $or: or,
+    availability: { $in: req.db.schema.MotorAvailableEnum }
+  };
+  req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } }).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
+    var motor, missing, names, stat, v, i, j;
+
+    for (i = 0; i < results.length; i++) {
+      motor = results[i];
+      missing = [];
+      names = '';
+      for (j = 0; j < stats.length; j++) {
+	stat = stats[j];
+	v = motor[stat.field];
+	if (v == null || v < stat.min) {
+	  missing.push(stat.field);
+	  stat.missing++;
+
+	  if (names !== '')
+	    names += ', ';
+	  names += stat.label;
+	}
+      }
+      motor.missingStats = missing;
+      motor.missingStats.names = names;
+    }
+    console.log(stats);
+
+    res.render('motors/missingstats', locals(defaults, {
+      title: 'Motor Missing Statistics',
+      allStats: stats,
+      missingStats: _.filter(stats, function(s) { return s.missing > 0; }),
+      results: results,
+    }));
+  }));
+
+});
+router.get(['/missingstats.jsp'], function(req, res, next) {
+  res.redirect(301, '/motors/missingstats.html');
 });
 
 

@@ -1,0 +1,73 @@
+<h1>{{title}}</h1>
+
+<p>
+The statistics listed for each motor are taken from certification documents when possible;
+when the documents are incomplete or unavailable, information is filled in from the manufacturer.
+</p>
+
+{{#if results}}
+<p>
+{{length results}} motors are missing one or more statistics.
+</p>
+<table id="result-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th>Type</th>
+     <th>Missing Stats</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each results}}
+    <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
+      <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
+      <td>{{_manufacturer.abbrev}}</td>
+      <td>{{formatType type}}</td>
+      <td>{{missingStats.names}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#result-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>
+{{else}}
+<p>No motors are missing statistics; that's wonderful!</p>
+{{/if}}
+
+{{#if allStats}}
+<h2>The Statistics</h2>
+<p>
+Here are the statistics maintained for each motor.
+For more info on what these statistics mean,
+<a href="/info/motorstats.html">see the Motor Statistics page</a>.
+</p>
+
+<table id="stat-list" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Statistic Name</th>
+      <th class="number">Minimum Value</th>
+      <th class="number">Motors Missing</th>
+    </tr>
+  </thead>
+  <body>
+  {{#each allStats}}
+  <tr class="stat-{{field}}">
+    <td>{{label}}</td>
+    <td class="number">{{min}}</td>
+    <td class="number">{{missing}}</td>
+  </tr>
+  {{/each}}
+  </body>
+</table>
+<script type="text/javascript">
+setupTable('#stat-list', {
+  order: [[2, 'desc']]
+});
+</script>
+{{/if}}

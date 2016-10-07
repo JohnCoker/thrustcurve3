@@ -214,7 +214,7 @@ function calculate(options, cb) {
       var summaryMap = {};
       var viewCount = 0;
       var latterCount = 0;
-      var views = options.MotorView.find(q).stream();
+      var views = options.MotorView.find(q).cursor();
       views.on('data', function(view) {
         var id = view._motor.toString(),
             summary = summaryMap[id];
@@ -299,7 +299,7 @@ function calculate(options, cb) {
          * and impulse class.
          */
         q = { _id: { $in: motorIds } };
-        var motors = options.Motor.find(q, 'designation impulseClass').stream();
+        var motors = options.Motor.find(q, 'designation impulseClass').cursor();
         motors.on('data', function(motor) {
           var id = motor._id.toString(),
               summary = summaryMap[id];

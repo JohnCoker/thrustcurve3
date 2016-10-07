@@ -232,7 +232,7 @@ function makeContributorModel(mongoose) {
   };
 
   schema.methods.hasPermission = function(perm) {
-    return this.permissions != null && this.permissions[perm] == true;
+    return this.permissions != null && this.permissions[perm] === true;
   };
 
   return mongoose.model('Contributor', schema);

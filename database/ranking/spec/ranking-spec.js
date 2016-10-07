@@ -7,6 +7,7 @@ describe("ranking", function() {
   var db;
 
   it('connect', function() {
+    mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/test', function(err) {
       if (err) {
         console.error(err);

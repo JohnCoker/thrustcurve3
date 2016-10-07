@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 describe('schema', function() {
   describe('setup', function() {
     it('connect', function() {
+      mongoose.Promise = global.Promise;
       mongoose.connect('mongodb://localhost/test', function(err) {
         if (err)
           console.error(err);

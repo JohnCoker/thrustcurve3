@@ -80,7 +80,7 @@ class File {
     else if (unit === 'duration')
       this.colNumber(num, 1);
     else {
-      var unit = units.getUnitPref(unit);
+      unit = units.getUnitPref(unit);
       this.colNumber(num / unit.toMKS, unit.digits);
     }
   }

@@ -323,7 +323,7 @@ var tables = [
       }
 
       // new admin new permissions
-      if (output["email"] == 'john@jcsw.com') {
+      if (output.email == 'john@jcsw.com') {
         output["permissions.editMetadata"] = true;
         output["permissions.editPermissions"] = true;
       }
@@ -596,6 +596,7 @@ var mysqlConn;
 // open DBs
 var steps = [
   function(cb) {
+    mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/thrustcurve', {
     }, function(err) {
       if (err) {

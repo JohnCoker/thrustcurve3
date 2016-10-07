@@ -25,6 +25,7 @@ const process = require('process'),
       helpers = require('./lib/helpers');
 
 // fail if initial connection is impossible
+mongoose.Promise = global.Promise;
 mongoose.connect(config.mongoUrl, function(err) {
   if (err) {
     console.error('unable to connect to MongoDB');

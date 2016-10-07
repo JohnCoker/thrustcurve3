@@ -181,6 +181,7 @@ function load(fn, cb) {
 // open DB
 var steps = [
   function(cb) {
+    mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/thrustcurve', {
     }, function(err) {
       if (err) {

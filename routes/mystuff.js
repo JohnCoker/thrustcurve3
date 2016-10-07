@@ -241,7 +241,7 @@ function getTokenUser(req, res, next) {
   if (token)
     token = token.trim();
 
-  if (token == null || token == '') {
+  if (token == null || token === '') {
     res.render('mystuff/forgotpasswd', locals(req, defaults, {
       title: 'Forgot Password',
       submitLink: forgotLink,

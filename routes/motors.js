@@ -549,7 +549,6 @@ router.get('/motors/missingstats.html', function(req, res, next) {
       or.push(c);
     }
   }
-  console.log(or);
 
   query = {
     $or: or,
@@ -577,7 +576,6 @@ router.get('/motors/missingstats.html', function(req, res, next) {
       motor.missingStats = missing;
       motor.missingStats.names = names;
     }
-    console.log(stats);
 
     res.render('motors/missingstats', locals(defaults, {
       title: 'Motor Missing Statistics',

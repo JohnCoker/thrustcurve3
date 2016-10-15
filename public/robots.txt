@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /mystuff/
+Disallow: /api/
+Disallow: /admin/

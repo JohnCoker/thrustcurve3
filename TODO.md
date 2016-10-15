@@ -6,7 +6,6 @@
  * add Like, +1, Flattr, etc for motor pages
  * "missing data" page
  * site map generation
- * robots.txt
  * outbox feature?
  * compare selected motors?
  * motor initial (first 1/2s) thrust?

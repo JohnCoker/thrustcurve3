@@ -5,7 +5,6 @@
  * flag motors favorited by other users
  * add Like, +1, Flattr, etc for motor pages
  * "missing data" page
- * site map generation
  * outbox feature?
  * compare selected motors?
  * motor initial (first 1/2s) thrust?

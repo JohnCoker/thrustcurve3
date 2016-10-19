@@ -41,9 +41,10 @@ const index = require('./routes/index'),
       manufacturers = require('./routes/manufacturers'),
       simfiles = require('./routes/simfiles'),
       contributors = require('./routes/contributors'),
-      mystuff = require('./routes/mystuff'),
       guide = require('./routes/guide'),
       browser = require('./routes/browser'),
+      mystuff = require('./routes/mystuff'),
+      admin = require('./routes/admin'),
       api_v1 = require('./routes/api_v1');
 
 const app = express();
@@ -226,9 +227,10 @@ app.use('/', motors);
 app.use('/', simfiles);
 app.use('/', manufacturers);
 app.use('/', contributors);
-app.use('/', mystuff);
 app.use('/', guide);
 app.use('/', browser);
+app.use('/', mystuff);
+app.use('/', admin);
 app.use('/', api_v1);
 
 // handle other routes as 404

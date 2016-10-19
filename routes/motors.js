@@ -654,7 +654,7 @@ router.get('/motors/popular.html', function(req, res, next) {
  * Recent motor updates, renders with motors/updates.hbs template.
  */
 router.get('/motors/updates.html', function(req, res, next) {
-  metadata.getManufacturers(req, function(all, available) {
+  metadata.getManufacturers(req, function(manufacturers) {
     req.db.Motor.find({}, undefined, { sort: { updatedAt: -1 } })
                 .select('_manufacturer designation type diameter updatedAt')
                 .limit(20)
@@ -669,11 +669,11 @@ router.get('/motors/updates.html', function(req, res, next) {
         // populate the manufacturers
         for (i = 0; i < motors.length; i++) {
           if (!motors[i].populated('_manufacturer'))
-            motors[i]._manufacturer = all.byId(motors[i]._manufacturer);
+            motors[i]._manufacturer = manufacturers.byId(motors[i]._manufacturer);
         }
         for (i = 0; i < simfiles.length; i++) {
           if (!simfiles[i]._motor.populated('_manufacturer'))
-            simfiles[i]._motor._manufacturer = all.byId(simfiles[i]._motor._manufacturer);
+            simfiles[i]._motor._manufacturer = manufacturers.byId(simfiles[i]._motor._manufacturer);
         }
 
         res.render('motors/updates', locals(defaults, {

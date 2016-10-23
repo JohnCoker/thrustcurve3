@@ -514,7 +514,7 @@ router.get('/motors/missingdata.html', function(req, res, next) {
                 .populate('_manufacturer')
                 .exec(req.success(function(results) {
         res.render('motors/missingdata', locals(defaults, {
-          title: 'Motor Without Data',
+          title: 'Motors Without Data',
           results: results,
         }));
       }));
@@ -593,7 +593,7 @@ router.get('/motors/missingstats.html', function(req, res, next) {
     }
 
     res.render('motors/missingstats', locals(defaults, {
-      title: 'Motor Missing Statistics',
+      title: 'Motors Missing Statistics',
       allStats: stats,
       missingStats: _.filter(stats, function(s) { return s.missing > 0; }),
       results: results,

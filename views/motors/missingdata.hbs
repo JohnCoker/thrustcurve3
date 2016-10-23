@@ -1,1 +1,50 @@
 <h1>{{title}}</h1>
+
+<p>
+Motor simulator data files can be provided by the manufacturer, by the certification organization
+or creted by rocketeers like you.
+<a href="/info/contribute.html">You can help</a> complete the data available;
+if you have better simulator data for any motor, please upload it.
+</p>
+
+{{#if results}}
+<p>
+{{length results}} motors have no simulator data files.
+</p>
+<table id="result-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th>Type</th>
+     <th class="number">Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Burn</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each results}}
+    <tr class="{{#unless isAvailable}}unavailable{{/unless}}" data-id="{{_id}}">
+      <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
+      <td>{{_manufacturer.abbrev}}</td>
+      <td>{{formatType type}}</td>
+      <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+      <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#result-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>
+{{else}}
+<p>
+No motors are missing data; that's wonderful!
+</p>
+{{/if}}

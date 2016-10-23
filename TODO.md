@@ -4,7 +4,6 @@
 
  * flag motors favorited by other users
  * add Like, +1, Flattr, etc for motor pages
- * "missing data" page
  * outbox feature?
  * compare selected motors?
  * motor initial (first 1/2s) thrust?
@@ -79,7 +78,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | index.shtml         | index.html                   | ✓ | home page |
 | login.jsp           | mystuff/login.html           | ✓ | account |
 | mfrsearch.jsp       | manufacturers/               | ✓ | manufacturers |
-| missingdata.jsp     |                              |   | contribution |
+| missingdata.jsp     |                              | ✓ | contribution |
 | missingstats.jsp    |                              | ✓ | admin |
 | mobile.shtml        | info/mobile.html             | ✓ | general info |
 | motorguide.jsp      | motors/guide.html            | ✓ | motor guide |

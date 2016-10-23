@@ -503,10 +503,21 @@ router.post(searchLink, function(req, res, next) {
  * Motors without data, renders with motors/missingdata.hbs template.
  */
 router.get('/motors/missingdata.html', function(req, res, next) {
-  var results = [];
-  res.render('motors/missingdata', locals(defaults, {
-    title: 'Motor Without Data',
-    motors: results
+  // get the motor IDs that have data files
+  req.db.SimFile.distinct('_motor', req.success(function(ids) {
+    // now query all available motors with IDs not in this set
+    var query = {
+      _id: { $nin: ids },
+      availability: { $in: req.db.schema.MotorAvailableEnum }
+    };
+    req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } })
+                .populate('_manufacturer')
+                .exec(req.success(function(results) {
+        res.render('motors/missingdata', locals(defaults, {
+          title: 'Motor Without Data',
+          results: results,
+        }));
+      }));
   }));
 });
 router.get(['/missingdata.jsp'], function(req, res, next) {
@@ -524,6 +535,7 @@ router.get('/motors/missingstats.html', function(req, res, next) {
   var or = [], stats = [],
       query, keys, info, c, i;
 
+  // find all numeric statistic elements of motors for which we have a minimum valid value
   keys = Object.keys(req.db.Motor.schema.paths);
   for (i = 0; i < keys.length; i++) {
     if (ignoreStats.indexOf(keys[i]) >= 0)
@@ -550,11 +562,14 @@ router.get('/motors/missingstats.html', function(req, res, next) {
     }
   }
 
+  // search for all available motors with a missing or invalid value for any of those stats
   query = {
     $or: or,
     availability: { $in: req.db.schema.MotorAvailableEnum }
   };
-  req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } }).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
+  req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } })
+              .populate('_manufacturer')
+              .exec(req.success(function(results) {
     var motor, missing, names, stat, v, i, j;
 
     for (i = 0; i < results.length; i++) {

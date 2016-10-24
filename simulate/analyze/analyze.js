@@ -10,6 +10,7 @@ var StdParams = {
   burnTimeCutoff: 0.05,  // percent
   timeEpsilon: 0.00005,  // seconds
   thrustEpsilon: 0.0005, // Newtons
+  initialTimeCutoff: 0.5 // seconds
 };
 Object.freeze(StdParams);
 
@@ -126,7 +127,7 @@ function scale(input, factor, error) {
 }
 
 function stats(data, params, error) {
-  var points, maxTime, maxThrust, burnStart, burnEnd, burnTime, totalImpulse,
+  var points, maxTime, maxThrust, burnStart, burnEnd, burnTime, totalImpulse, initialThrust,
       cutoff, lastPoint, nextPoint, i, x, y;
 
   // optional arguments
@@ -205,11 +206,20 @@ function stats(data, params, error) {
   if (points[0].time > 0) {
     // assume average of thrust and zero (at t0)
     totalImpulse += points[0].time * points[0].thrust / 2;
+
+    // see if first point is after initial cutoff
+    if (points[0].time > params.initialTimeCutoff - params.timeEpsilon)
+      initialThrust = totalImpulse / points[0].time;
   }
   for (i = 1; i < points.length; i++) {
     // assume average thrust between two time points
     totalImpulse += ((points[i].time - points[i - 1].time) *
 		     (points[i].thrust + points[i - 1].thrust) / 2);
+
+    // see if this point is after initial cutoff
+    if (initialThrust == null &&
+	points[i].time > params.initialTimeCutoff - params.timeEpsilon)
+      initialThrust = totalImpulse / points[i].time;
   }
 
   return {
@@ -222,6 +232,7 @@ function stats(data, params, error) {
     burnEnd: burnEnd,
     burnTime: burnTime,
     totalImpulse: totalImpulse,
+    initialThrust: initialThrust
   };
 }
 
@@ -372,6 +383,7 @@ module.exports = {
    * <li>burnEnd: the time at which the thrust drops below the cut-off</li>
    * <li>burnTime: the standardized burn time based on the cut-off</li>
    * <li>totalImpulse: integration of the area under the thrust curve</li>
+   * <li>initialThrust: average thrust through 0.5s after ignition</li>
    * </ul>
    *
    * <p>Note that the burn time and average thrust are dependent on the

@@ -322,6 +322,9 @@ describe("analyze", function() {
       it("totalImpulse", function() {
 	expect(stats.totalImpulse).toBeCloseTo(1624.9, 1);
       });
+      it("initialThrust", function() {
+	expect(stats.initialThrust).toBeCloseTo(643, 0);
+      });
     });
   });
 

@@ -118,6 +118,15 @@
         </div>
       </div>
 
+      {{#if initialThrust}}
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Initial Thrust</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatForce initialThrust}}</p>
+        </div>
+      </div>
+      {{/if}}
+
       <div class="form-group">
         <label class="col-sm-6 control-label">Max. Thrust</label>
         <div class="col-sm-6">

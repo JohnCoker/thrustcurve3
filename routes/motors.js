@@ -11,6 +11,8 @@ var _ = require('underscore'),
     units = require('../lib/units'),
     helpers = require('../lib/helpers'),
     ranking = require('../database/ranking'),
+    parsers = require('../simulate/parsers'),
+    analyze = require('../simulate/analyze'),
     svg = require('../render/svg'),
     locals = require('./locals.js'),
     authorized = require('./authorized.js');
@@ -122,14 +124,35 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
   getMotor(req, res, true, true, function(motor, manufacturer, classCount) {
     req.db.SimFile.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).populate('_contributor').exec(req.success(function(simfiles) {
       req.db.MotorNote.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).populate('_contributor').exec(req.success(function(notes) {
+        var initialThrust, parsed, stats, n, i;
+
         // record the motor view
         recordView(req, motor);
+
+        // calculate initial thrust
+        if (simfiles.length > 0) {
+          initialThrust = 0;
+          n = 0;
+          for (i = 0; i < simfiles.length; i++) {
+            parsed = parsers.parseData(simfiles[i].format, simfiles[i].data, null);
+            if (parsed != null) {
+              stats = analyze.stats(parsed, null);
+              if (stats != null && stats.initialThrust > 0) {
+                initialThrust += stats.initialThrust;
+                n++;
+              }
+            }
+          }
+          if (n > 1)
+            initialThrust /= n;
+        }
 
         var details = locals(defaults, {
           title: req.helpers.motorFullName(manufacturer, motor),
           manufacturer: manufacturer,
           motor: motor,
           simfiles: simfiles,
+          initialThrust: initialThrust,
           notes: notes,
           classCount: classCount,
           isCompare: classCount >= 5,
@@ -544,16 +567,16 @@ router.get('/motors/missingstats.html', function(req, res, next) {
     info = req.db.Motor.schema.paths[keys[i]];
     if (info.instance == 'Number' && info.options.min != null) {
       stats.push({
-	field: keys[i],
-	label: keys[i][0].toUpperCase() + keys[i].substring(1).replace(/([A-Z])/g, ' $1'),
-	min: info.options.min,
-	missing: 0,
+        field: keys[i],
+        label: keys[i][0].toUpperCase() + keys[i].substring(1).replace(/([A-Z])/g, ' $1'),
+        min: info.options.min,
+        missing: 0,
       });
 
       if (!info.isRequired) {
-	c = {};
-	c[info.path] = null;
-	or.push(c);
+        c = {};
+        c[info.path] = null;
+        or.push(c);
       }
 
       c = {};
@@ -577,16 +600,16 @@ router.get('/motors/missingstats.html', function(req, res, next) {
       missing = [];
       names = '';
       for (j = 0; j < stats.length; j++) {
-	stat = stats[j];
-	v = motor[stat.field];
-	if (v == null || v < stat.min) {
-	  missing.push(stat.field);
-	  stat.missing++;
+        stat = stats[j];
+        v = motor[stat.field];
+        if (v == null || v < stat.min) {
+          missing.push(stat.field);
+          stat.missing++;
 
-	  if (names !== '')
-	    names += ', ';
-	  names += stat.label;
-	}
+          if (names !== '')
+            names += ', ';
+          names += stat.label;
+        }
       }
       motor.missingStats = missing;
       motor.missingStats.names = names;

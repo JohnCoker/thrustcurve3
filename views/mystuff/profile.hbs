@@ -89,3 +89,21 @@ If you need to change your login password, please enter your new password twice.
     </div>
   </div>
 </form>
+
+{{#hasPerm 'any'}}
+<h2>Admin Permissions</h2>
+
+<p>
+You have site administrator permissions:
+</p>
+<ul>
+{{#each perms}}
+<li><b>{{key}}</b>: {{desc}}</li>
+{{/each}}
+</ul>
+
+<p>
+Please be careful when using adminstrator access and be respectful of others contributions.
+</p>
+
+{{/hasPerm}}

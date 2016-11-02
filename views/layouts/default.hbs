@@ -85,6 +85,7 @@
                 <li><a href="/info/mobile.html">Smart Phone App</a></li>
               </ul>
             </li>
+            {{#hasPerm 'any'}}
             <li class="dropdown" title="site administration">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -92,6 +93,7 @@
                 <li><a href="/motors/missingstats.html">Motors Missing Stats</a></li>
               </ul>
             </li>
+            {{/hasPerm}}
           </ul>
           <form class="navbar-form navbar-right" method="get" action="/motors/search.html">
             <input type="text" name="name" class="form-control" placeholder="motor">

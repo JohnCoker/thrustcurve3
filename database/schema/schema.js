@@ -41,16 +41,44 @@ Object.freeze(SimFileLicenseEnum);
 const MotorViewSourceEnum = ['manufacturer', 'search', 'guide', 'browser', 'popular', 'favorite', 'updates'];
 Object.freeze(MotorViewSourceEnum);
 
-const PermissionMap = {
-  "metadata":     "editMetadata",
-  "motors":       "editMotors",
-  "simfiles":     "editSimFiles",
-  "notes":        "editNotes",
-  "contributors": "editContributors",
-  "rockets":      "editRockets",
-  "permissions":  "editPermissions",
-};
-Object.freeze(PermissionMap);
+const PermissionInfo = [
+  {
+    key: "editMetadata",
+    alias: "metadata",
+    desc: "edit certification org and manufacturers"
+  },
+  {
+    key: "editMotors",
+    alias: "motors",
+    desc: "create and edit motors"
+  },
+  {
+    key: "editSimFiles",
+    alias: "simfiles",
+    desc: "edit other users' simfiles"
+  },
+  {
+    key: "editNotes",
+    alias: "notes",
+    desc: "edit any motor or simfile notes"
+  },
+  {
+    key: "editContributors",
+    alias: "contributors",
+    desc: "edit other users' info"
+  },
+  {
+    key: "editRockets",
+    alias: "rockets",
+    desc: "edit other users' rockets"
+  },
+  {
+    key: "editPermissions",
+    alias: "permissions",
+    desc: "change user permissions"
+  },
+];
+Object.freeze(PermissionInfo);
 
 function dateOnly(mongoose) {
   if (DateOnly == null)
@@ -68,11 +96,16 @@ function schemaOptions(schema) {
 }
 
 function getPermissionKey(name) {
+  var i;
+
   if (typeof name != 'string')
     return;
 
   name = name.replace(/^edit/i, '').toLowerCase();
-  return PermissionMap[name];
+  for (i = 0; i < PermissionInfo.length; i++) {
+    if (PermissionInfo[i].alias == name)
+      return PermissionInfo[i].key;
+  }
 }
 
 function makeManufacturerModel(mongoose) {
@@ -603,10 +636,11 @@ module.exports = {
   MotorViewSourceEnum: MotorViewSourceEnum,
 
   /**
-   * A map of short names (lower-case) to Contributor.permissions keys.
-   * @member {object}
+   * An array of objects containing Contributor.permissions keys, short lower-case aliases
+   * and descriptions.
+   * @member {object[]}
    */
-  PermissionMap: PermissionMap,
+  PermissionInfo: PermissionInfo,
 
   /**
    * Map a permission name to a Contributor.permissions key.

@@ -887,9 +887,20 @@ router.post([preferencesLink], authenticated, function(req, res, next) {
  * Renders with mystuff/profile.hbs template.
  */
 router.get(profileLink, authenticated, function(req, res, next) {
+  var perms = [],
+      key, i;
+
+  if (req.user && req.user.permissions) {
+    for (i = 0; i < schema.PermissionInfo.length; i++) {
+      key = schema.PermissionInfo[i].key;
+      if (req.user.permissions[key] === true)
+	perms.push(schema.PermissionInfo[i]);
+    }
+  }
   res.render('mystuff/profile', locals(req, defaults, {
     title: 'My Profile',
     info: req.user,
+    perms: perms,
     submitLink: profileLink,
   }));
 });

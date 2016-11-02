@@ -77,8 +77,8 @@ This table lists all pages of the old site and will be filled in as work proceed
 | index.shtml         | index.html                   | ✓ | home page |
 | login.jsp           | mystuff/login.html           | ✓ | account |
 | mfrsearch.jsp       | manufacturers/               | ✓ | manufacturers |
-| missingdata.jsp     |                              | ✓ | contribution |
-| missingstats.jsp    |                              | ✓ | admin |
+| missingdata.jsp     | motors/missingdata.html      | ✓ | admin |
+| missingstats.jsp    | motors/missingstats.html     | ✓ | admin |
 | mobile.shtml        | info/mobile.html             | ✓ | general info |
 | motorguide.jsp      | motors/guide.html            | ✓ | motor guide |
 | motorsearch.jsp     | motors/search.html           | ✓ | attribute search |

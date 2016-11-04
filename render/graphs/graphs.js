@@ -13,12 +13,14 @@ const SVG = svg.contentType,
       DefaultWidth = 300,
       DefaultHeight = 200,
       AImpulseN = 1.25,
+      TitleFill = 'black',
       GridStroke = '#aaa',
       CurveStroke = '#9e1a20',
       CurveFill = '#e7e7e7',
-      PointStroke = 'white',
-      PointFill = '9e1a20',
+      PointStroke = '#9e1a20',
+      PointFill = 'white',
       PointWidth = 2,
+      PointRadius = 3,
       AnnotationStroke = '#2e448c',
       AnnotationWidth = 0.5;
 
@@ -204,6 +206,16 @@ function layoutGraph(info) {
   };
 }
 
+function motorLabel(motor) {
+  var label = motor.commonName;
+  if (/^1\//.test(label)) {
+    label = label.replace(/^1\/2/, '½')
+		 .replace(/^1\/4/, '¼')
+		 .replace(/^1\/8/, '⅛');
+  }
+  return label;
+}
+
 function thrustCurve(spec) {
   var stats, image, width, height, unit, layout, yConvert, x0, y1, x, y, label, i;
 
@@ -255,7 +267,7 @@ function thrustCurve(spec) {
   image.fill();
 
   // draw the title and copyright
-  image.fillStyle = 'black';
+  image.fillStyle = TitleFill;
   if (spec.title) {
     image.textAlign = 'left';
     image.fillText(spec.title, layout.chart.left, layout.ascender);
@@ -361,8 +373,8 @@ function thrustCurve(spec) {
     y = layout.plotY(spec.data.points[i].thrust * yConvert);
     label = spec.data.points[i].time.toFixed(3) + 's' + ' ' +
             spec.data.points[i].thrust.toFixed(3) + unit.label;
-    image.fillCircle(x, y, 3, label);
-    image.strokeCircle(x, y, 3, label);
+    image.fillCircle(x, y, PointRadius, label);
+    image.strokeCircle(x, y, PointRadius, label);
   }
 
   return image;
@@ -439,7 +451,7 @@ function impulseComparison(spec) {
   image.fillRect(layout.chart.left, layout.chart.top, layout.chart.width, height);
 
   // draw the title and copyright
-  image.fillStyle = 'black';
+  image.fillStyle = TitleFill;
   if (spec.title) {
     image.textAlign = 'left';
     image.fillText(spec.title, layout.chart.left, layout.ascender);
@@ -509,7 +521,7 @@ function impulseComparison(spec) {
     image.fillText(layout.yAxis[i].label, x0 - layout.em / 10, y + layout.em / 3);
   }
 
-  // draw each motor
+  // draw each motor's dot
   image.fillStyle = PointFill;
   image.strokeStyle = PointStroke;
   image.lineWidth = PointWidth;
@@ -520,16 +532,15 @@ function impulseComparison(spec) {
     if (motor.totalImpulse > 0 && yv > 0) {
       x = layout.plotX(motor.totalImpulse);
       y = layout.plotY(yv);
-      image.fillCircle(x, y, 4, motor.commonName);
-      image.strokeCircle(x, y, 4, motor.commonName);
+      image.fillStyle = PointFill;
+      image.fillCircle(x, y, PointRadius, motor.commonName);
+      image.strokeCircle(x, y, PointRadius, motor.commonName);
 
-      label = motor.commonName;
-      if (/^1\//.test(label)) {
-        label = label.replace(/^1\/2/, '½')
-                     .replace(/^1\/4/, '¼')
-                     .replace(/^1\/8/, '⅛');
+      label = motorLabel(motor);
+      if (label) {
+	image.fillStyle = TitleFill;
+	image.fillText(label, x + 6, y + layout.em / 3);
       }
-      image.fillText(label, x + 6, y + layout.em / 3);
     }
   }
 

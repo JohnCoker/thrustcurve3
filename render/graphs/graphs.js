@@ -8,8 +8,23 @@ const units = require('../../lib/units'),
       analyze = require('../../simulate/analyze'),
       svg = require('../svg');
 
-const SVG = svg.contentType;
-const AllFormats = [SVG];
+const SVG = svg.contentType,
+      AllFormats = [SVG],
+      DefaultWidth = 300,
+      DefaultHeight = 200,
+      AImpulseN = 1.25,
+      GridStroke = '#aaa',
+      CurveStroke = '#9e1a20',
+      CurveFill = '#e7e7e7',
+      PointStroke = 'white',
+      PointFill = '9e1a20',
+      PointWidth = 2,
+      AnnotationStroke = '#2e448c',
+      AnnotationWidth = 0.5;
+
+function copyright() {
+  return '© ThrustCurve.org ' + new Date().getFullYear();
+}
 
 function fractionDigits(maxValue) {
   var digits;
@@ -201,8 +216,8 @@ function thrustCurve(spec) {
     width = spec.width;
     height = spec.height;
   } else {
-    width = 300;
-    height = 200;
+    width = DefaultWidth;
+    height = DefaultHeight;
   }
   if (spec.unit)
     unit = units.force.get(spec.unit);
@@ -227,7 +242,7 @@ function thrustCurve(spec) {
   image.fillRect(layout.chart.left, layout.chart.top, layout.chart.width, height);
 
   // fill under the thrust curve
-  image.fillStyle = '#e7e7e7';
+  image.fillStyle = CurveFill;
   image.beginPath();
   image.moveTo(layout.plotX(0), layout.plotY(0));
   for (i = 0; i < spec.data.points.length; i++) {
@@ -246,7 +261,7 @@ function thrustCurve(spec) {
     image.fillText(spec.title, layout.chart.left, layout.ascender);
   }
   image.textAlign = 'right';
-  image.fillText('© ThrustCurve.org ' + new Date().getFullYear(), layout.chart.right, layout.ascender);
+  image.fillText(copyright(), layout.chart.right, layout.ascender);
 
   // draw the X axis legend
   image.textAlign = 'center';
@@ -257,7 +272,7 @@ function thrustCurve(spec) {
   image.fillTextVert('Thrust (' + unit.description + ')', layout.ascender, (layout.chart.top + layout.chart.bottom) / 2);
 
   // draw the X axis labels
-  image.strokeStyle = '#aaa';
+  image.strokeStyle = GridStroke;
   image.textAlign = 'center';
   y1 = layout.chart.bottom + layout.em / 3;
   for (i = 0; i < layout.xAxis.length; i++) {
@@ -286,8 +301,8 @@ function thrustCurve(spec) {
   }
 
   // draw the annotations
-  image.strokeStyle = image.fillStyle = '#2e448c';
-  image.lineWidth = 0.5;
+  image.strokeStyle = image.fillStyle = AnnotationStroke;
+  image.lineWidth = AnnotationWidth;
   if (stats.avgThrust > 0) {
     y = layout.plotY(stats.avgThrust * yConvert);
 
@@ -327,7 +342,7 @@ function thrustCurve(spec) {
   }
 
   // draw the thrust curve line
-  image.strokeStyle = '#9e1a20';
+  image.strokeStyle = CurveStroke;
   image.lineWidth = 3;
   image.beginPath();
   image.moveTo(layout.plotX(0), layout.plotY(0));
@@ -338,9 +353,9 @@ function thrustCurve(spec) {
   image.stroke();
 
   // draw the thrust curve points
-  image.fillStyle = 'white';
-  image.strokeStyle = '#9e1a20';
-  image.lineWidth = 2;
+  image.fillStyle = PointFill;
+  image.strokeStyle = PointStroke;
+  image.lineWidth = PointWidth;
   for (i = 0; i < spec.data.points.length; i++) {
     x = layout.plotX(spec.data.points[i].time);
     y = layout.plotY(spec.data.points[i].thrust * yConvert);
@@ -348,6 +363,174 @@ function thrustCurve(spec) {
             spec.data.points[i].thrust.toFixed(3) + unit.label;
     image.fillCircle(x, y, 3, label);
     image.strokeCircle(x, y, 3, label);
+  }
+
+  return image;
+}
+
+function impulseComparison(spec) {
+  var stats, image, width, height, motor, xMin, xMax, layout, x0, y1, xv, yv, x, y, label, i;
+
+  if (spec == null || spec.motors == null || spec.motors.length < 1)
+    return;
+  stats = {};
+  for (i = 0; i < spec.motors.length; i++) {
+    motor = spec.motors[i];
+    if (motor.totalImpulse > 0) {
+      if (stats.minImpulse > 0) {
+        stats.minImpulse = Math.min(stats.minImpulse, motor.totalImpulse);
+        stats.maxImpulse = Math.max(stats.maxImpulse, motor.totalImpulse);
+      } else {
+        stats.minImpulse = motor.totalImpulse;
+        stats.maxImpulse = motor.totalImpulse;
+      }
+    }
+    yv = motor[spec.stat];
+    if (yv > 0) {
+      if (stats.minYStat > 0) {
+        stats.minYStat = Math.min(stats.minYStat, yv);
+        stats.maxYStat = Math.max(stats.maxYStat, yv);
+      } else {
+        stats.minYStat = yv;
+        stats.maxYStat = yv;
+      }
+    }
+  }
+  /* jshint -W018 */
+  if (!(stats.minImpulse > 0) || !(stats.minYStat > 0)) {
+    // not enough info
+    return;
+  }
+
+  if (spec.width >= 1 && spec.height >= 1) {
+    width = spec.width;
+    height = spec.height;
+  } else {
+    width = DefaultWidth;
+    height = DefaultHeight;
+  }
+
+  if (stats.minImpulse < AImpulseN)
+    xMin = 0;
+  else {
+    xMin = AImpulseN;
+    while (xMin * 2 <= stats.minImpulse)
+      xMin *= 2;
+  }
+
+  xMax = AImpulseN * 2;
+  while (stats.maxImpulse > xMax)
+    xMax *= 2;
+
+  layout = layoutGraph({
+    width: width,
+    height: height,
+    xMin: xMin,
+    xMax: xMax,
+    yMin: stats.minYStat,
+    yMax: stats.maxYStat,
+  });
+
+  image = new svg.Image(width, height);
+  image.font = layout.em + 'px Helvetica';
+
+  // fill the chart area
+  image.fillStyle = 'white';
+  image.fillRect(layout.chart.left, layout.chart.top, layout.chart.width, height);
+
+  // draw the title and copyright
+  image.fillStyle = 'black';
+  if (spec.title) {
+    image.textAlign = 'left';
+    image.fillText(spec.title, layout.chart.left, layout.ascender);
+  }
+  image.textAlign = 'right';
+  image.fillText(copyright(), layout.chart.right, layout.ascender);
+
+  // draw the X axis legend
+  image.textAlign = 'center';
+  image.fillText('Total Impulse (letter)', (layout.chart.left + layout.chart.right) / 2, height - layout.descender);
+
+  // draw the Y axis legend
+  image.textAlign = 'center';
+  if (spec.stat == 'burnTime')
+    label = 'Burn Time (seconds)';
+  else {
+    label = spec.stat.substring(0, 1).toUpperCase() +
+            spec.stat.substring(1).replace(/([A-Z])/g, ' $1') +
+            ' (newtons)';
+  }
+  image.fillTextVert(label, layout.ascender, (layout.chart.top + layout.chart.bottom) / 2);
+
+  // draw the X axis labels
+  image.strokeStyle = AnnotationStroke;
+  image.lineWidth = AnnotationWidth;
+  image.textAlign = 'center';
+  y1 = layout.chart.bottom + layout.em / 3;
+  xv = AImpulseN;
+  for (i = 0; i < layout.xAxis.length; i++) {
+    x = layout.plotX(xv);
+    if (x > layout.chart.right)
+      break;
+
+    if (i > 0 && x >= layout.chart.left) {
+      image.beginPath();
+      image.moveTo(x, layout.chart.top);
+      image.lineTo(x, y1);
+      image.stroke();
+    }
+
+    if (i === 0) {
+      if (x > layout.chart.left)
+        image.fillText(String.fromCharCode(65 + i), x, y1 + layout.ascender);
+    } else {
+      x = layout.plotX(xv + xv / 2);
+      if (x > layout.chart.left && x < layout.chart.right)
+        image.fillText(String.fromCharCode(65 + i), x, y1 + layout.ascender);
+    }
+
+    xv *= 2;
+  }
+
+  // draw the Y axis labels and grid lines
+  image.strokeStyle = GridStroke;
+  image.lineWidth = 1;
+  i = layout.yAxis.length - 1;
+  image.textAlign = 'right';
+  x0 = layout.chart.left - layout.em / 3;
+  for (i = 0; i < layout.yAxis.length; i++) {
+    y = layout.plotY(layout.yAxis[i].value);
+
+    image.beginPath();
+    image.moveTo(x0, y);
+    image.lineTo(layout.chart.right, y);
+    image.stroke();
+
+    image.fillText(layout.yAxis[i].label, x0 - layout.em / 10, y + layout.em / 3);
+  }
+
+  // draw each motor
+  image.fillStyle = PointFill;
+  image.strokeStyle = PointStroke;
+  image.lineWidth = PointWidth;
+  image.textAlign = 'left';
+  for (i = 0; i < spec.motors.length; i++) {
+    motor = spec.motors[i];
+    yv = motor[spec.stat];
+    if (motor.totalImpulse > 0 && yv > 0) {
+      x = layout.plotX(motor.totalImpulse);
+      y = layout.plotY(yv);
+      image.fillCircle(x, y, 4, motor.commonName);
+      image.strokeCircle(x, y, 4, motor.commonName);
+
+      label = motor.commonName;
+      if (/^1\//.test(label)) {
+        label = label.replace(/^1\/2/, '½')
+                     .replace(/^1\/4/, '¼')
+                     .replace(/^1\/8/, '⅛');
+      }
+      image.fillText(label, x + 6, y + layout.em / 3);
+    }
   }
 
   return image;
@@ -391,11 +574,44 @@ module.exports = {
    * If an error occurs, 500 status is sent.
    * @function
    * @param {object} res Express response object
-   * @param {object} spec graph information (see thrustcurve)
+   * @param {object} spec graph information (see #thrustCurve)
    * @return {boolean} true if image sent
    */
   sendThrustCurve: function(res, spec) {
     var image = thrustCurve(spec);
+    if (image == null) {
+      res.status(500).send();
+      return false;
+    } else {
+      res.type(image.format).send(image.render());
+      return true;
+    }
+  },
+
+  /**
+   * Build a total impulse comparison graph for multiple motors and return it.
+   * If an error occurs, null is returned.
+   * @function
+   * @param {object} spec graph information
+   * @param {object} spec.motors motor data
+   * @param {string} spec.stat motor statistic for Y axis
+   * @param {number} spec.width target image width
+   * @param {height} spec.height target image width
+   * @param {string} [spec.title] graph title
+   * @return {object} constructed image object
+   */
+  impulseComparison: impulseComparison,
+
+  /**
+   * Build a total impulse comparison graph for multiple motors and send it to the response.
+   * If an error occurs, 500 status is sent.
+   * @function
+   * @param {object} res Express response object
+   * @param {object} spec graph information (see #impulseComparison)
+   * @return {boolean} true if image sent
+   */
+  sendImpulseComparison: function(res, spec) {
+    var image = impulseComparison(spec);
     if (image == null) {
       res.status(500).send();
       return false;

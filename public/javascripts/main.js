@@ -15,6 +15,8 @@ function setupTable(selector, options) {
         gadgets = numRows > pageLength;
 
     var opts = _.extend({
+      columnDefs: [{targets: 'no-sort', orderable: false}],
+
       lengthMenu: [
         [ 10, 20, 50, -1 ],
         [ '10', '20', '50', 'all' ]

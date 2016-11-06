@@ -67,7 +67,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'ThrustCurve.org',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   store: new SessionMongoStore({
     mongooseConnection: mongoose.connection
   })

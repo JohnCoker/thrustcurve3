@@ -4,20 +4,24 @@
  */
 'use strict';
 
-var _ = require('underscore'),
-    express = require('express'),
-    router = express.Router(),
-    metadata = require('../lib/metadata'),
-    units = require('../lib/units'),
-    helpers = require('../lib/helpers'),
-    ranking = require('../database/ranking'),
-    parsers = require('../simulate/parsers'),
-    analyze = require('../simulate/analyze'),
-    svg = require('../render/svg'),
-    locals = require('./locals.js'),
-    authorized = require('./authorized.js');
+const _ = require('underscore'),
+      express = require('express'),
+      router = express.Router(),
+      errors = require('../lib/errors'),
+      metadata = require('../lib/metadata'),
+      units = require('../lib/units'),
+      helpers = require('../lib/helpers'),
+      ranking = require('../database/ranking'),
+      parsers = require('../simulate/parsers'),
+      analyze = require('../simulate/analyze'),
+      svg = require('../render/svg'),
+      locals = require('./locals.js'),
+      authorized = require('./authorized.js');
 
-var defaults = {
+const MaxViewed = 100,            // maximum recorded in recent views
+      LastViewed = MaxViewed / 4; // threshold for de-duping recorded views
+
+const defaults = {
   layout: 'motors',
 };
 
@@ -76,13 +80,23 @@ function recordView(req, motor, source) {
   if (req.isBot())
     return;
 
-  // don't record multiple views in same session
+  // don't record multiple views in quick succession
+  var seen = false, i;
   if (req.session.motorsViewed == null)
     req.session.motorsViewed = [];
-  else if (req.session.motorsViewed.indexOf(motor._id.toString()) >= 0)
-    return;
-  req.session.motorsViewed.push(motor._id.toString());
+  else {
+    i = req.session.motorsViewed.indexOf(motor._id.toString());
+    if (i >= 0) {
+      req.session.motorsViewed.splice(i, 1);
+      seen = i < LastViewed;
+    }
+    if (req.session.motorsViewed.length >= MaxViewed)
+      req.session.motorsViewed.length = MaxViewed - 1;
+  }
+  req.session.motorsViewed.splice(0, 0, motor._id.toString());
   req.session.touch();
+  if (seen)
+    return;
 
   // guess source if possible
   if (source == null) {
@@ -134,7 +148,7 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           initialThrust = 0;
           n = 0;
           for (i = 0; i < simfiles.length; i++) {
-            parsed = parsers.parseData(simfiles[i].format, simfiles[i].data, null);
+            parsed = parsers.parseData(simfiles[i].format, simfiles[i].data, new errors.Collector());
             if (parsed != null) {
               stats = analyze.stats(parsed, null);
               if (stats != null && stats.initialThrust > 0) {
@@ -684,6 +698,75 @@ router.get('/motors/popular.html', function(req, res, next) {
       }));
     }));
   }));
+});
+
+
+/*
+ * /motors/recent.html
+ * Most recently viewed motors, renders with motors/recent.hbs template.
+ */
+router.get('/motors/recent.html', function(req, res, next) {
+  if (req.session.motorsViewed && req.session.motorsViewed.length > 0) {
+    req.db.Motor.find({ _id: { $in: req.session.motorsViewed } }).populate('_manufacturer').exec(req.success(function(motors) {
+      var counts = {}, classes = [], suggestions = [],
+	  cls, i;
+
+      // provide sorting key
+      for (i = 0; i < motors.length; i++)
+	motors[i].recentOrder = req.session.motorsViewed.indexOf(motors[i]._id.toString());
+      motors.sort(function(a, b) {
+	return a.recentOrder - b.recentOrder;
+      });
+
+      // group motors by impulse class
+      for (i = 0; i < motors.length; i++) {
+        cls = motors[i].impulseClass;
+        if (counts.hasOwnProperty(cls))
+          counts[cls]++;
+        else
+          counts[cls] = 1;
+      }
+      for (i = 'A'.charCodeAt(0); i < 'Z'.charCodeAt(0); i++) {
+        cls = String.fromCharCode(i);
+        if (counts.hasOwnProperty(cls)) {
+          classes.push({
+            letter: cls,
+            count: counts[cls],
+	    multi: counts[cls] > 1,
+          });
+        }
+      }
+
+      // suggest classes to compare
+      if (classes.length > 1) {
+	for (i = 0; i < classes.length; i++) {
+	  if (classes[i].count > 2)
+	    suggestions.push(classes[i]);
+	}
+	suggestions.sort(function(a,b) {
+	  if (a.count != b.count)
+	    return b.count - a.count;
+	  return a.letter - b.letter;
+	});
+	if (suggestions.length > 3)
+	  suggestions.length = 3;
+      }
+
+      res.render('motors/recent', locals(defaults, {
+	title: 'Most Recently Viewed',
+	motors: motors,
+	impulseClasses: classes,
+	suggestClasses: suggestions,
+      }));
+    }));
+  } else {
+    res.render('motors/recent', locals(defaults, {
+      title: 'Most Recently Viewed',
+      motors: [],
+      impulseClasses: [],
+      suggestClasses: [],
+    }));
+  }
 });
 
 

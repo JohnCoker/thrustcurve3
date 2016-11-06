@@ -1,0 +1,90 @@
+<h1>{{title}}</h1>
+
+{{#unless motors}}
+<p>
+You haven't yet viewed any motors in the current browsing session.
+As you view details of different motors, the ones you've seen most recently will accumulate here.
+You can also permanently mark motors as <a href="/mystuff/favorites.html">Favorites</a> to find them again.
+</p>
+{{/unless}}
+
+{{#if motors}}
+<p>
+Here are {{length motors}} motors you've viewed recently.  You can use the link in the Designation
+column to view the details again or compare several motors by selecting the check boxes and using the
+Compare button at the bottom.
+{{#if suggestClasses}}
+<br/>Or start with:
+{{#each suggestClasses}}
+<a class="impulseClass" href="#{{letter}}">{{letter}} motors ({{count}})</a>
+{{#unless @last}}&bullet;{{/unless}}
+{{/each}}
+{{/if}}
+</p>
+<form name="compare" method="post" action="/motors/compare.html">
+<table id="recent-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th title="Select" class="no-sort"><input type="checkbox" name="all"/></th>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th>Type</th>
+     <th class="number">Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Burn</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motors}}
+    <tr data-id="{{_id}}" data-class="{{impulseClass}}">
+      <td data-sort="{{recentOrder}}"><input type="checkbox" name="motors" value="{{_id}}"/></td>
+      <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
+      <td>{{_manufacturer.abbrev}}</td>
+      <td>{{formatType type}}</td>
+      <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+      <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<button type="submit" class="btn btn-default" id="compare">Compare Selected Motors</button>
+</form>
+
+<script type="text/javascript">
+setupTable('#recent-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+function buttonState() {
+  var count = $('#recent-list tbody input[type=checkbox]:checked').length;
+  if (count > 1)
+    $('#compare').removeProp('disabled');
+  else
+    $('#compare').prop('disabled', 'disabled');
+}
+buttonState();
+
+$('#recent-list thead input[type=checkbox]').change(function(e) {
+  var all = $(this).is(':checked');
+  $('#recent-list tbody input[type=checkbox]').prop('checked', all);
+  buttonState();
+});
+$('#recent-list tbody input[type=checkbox]').change(function(e) {
+  var one = $(this).is(':checked');
+  if (!one)
+    $('#recent-list thead input[type=checkbox]').prop('checked', false);
+  buttonState();
+});
+$('a.impulseClass').click(function(e) {
+  e.preventDefault();
+  var letter = $(this).attr('href').replace(/^[^#]*#/, '');
+  $('#recent-list thead input[type=checkbox]').prop('checked', false);
+  $('#recent-list tbody input[type=checkbox]').prop('checked', false);
+  $('#recent-list tbody tr[data-class=' + letter + '] input[type=checkbox]').prop('checked', true);
+  buttonState();
+});
+</script>
+{{/if}}

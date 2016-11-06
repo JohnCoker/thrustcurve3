@@ -38,38 +38,7 @@ function shuffle(array) {
   return array;
 }
 
-const categories = [
-  {
-    label: 'low-power',
-    value: 'lpr',
-    regex: /^[A-D]$/
-  },
-  {
-    label: 'mid-power',
-    value: 'mpr',
-    regex: /^[EFG]$/
-  },
-  {
-    label: 'high-power',
-    value: 'hpr',
-    regex: /^[H-O]$/
-  },
-  {
-    label: 'level 1',
-    value: 'l1',
-    regex: /^[HI]$/
-  },
-  {
-    label: 'level 2',
-    value: 'l2',
-    regex: /^[JKL]$/
-  },
-  {
-    label: 'level 3',
-    value: 'l3',
-    regex: /^[MNO]$/
-  },
-];
+const categories = metadata.Categories;
 
 const dimensions = [
   {

@@ -376,7 +376,7 @@ describe("svg", function() {
 	title: 'group two',
 	class: 'grpcls',
 	style: 'color: blue'
-      );
+      });
     });
     it("rects", function() {
       image.strokeRect(25, 25, 275, 150);

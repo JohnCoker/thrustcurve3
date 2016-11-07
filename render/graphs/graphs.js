@@ -536,7 +536,6 @@ function impulseComparison(spec) {
   image.fillStyle = PointFill;
   image.strokeStyle = PointStroke;
   image.lineWidth = PointWidth;
-  image.textAlign = 'left';
   for (i = 0; i < spec.motors.length; i++) {
     motor = spec.motors[i];
     yv = motor[spec.stat];
@@ -552,7 +551,13 @@ function impulseComparison(spec) {
 
       if (label) {
 	image.fillStyle = TitleFill;
-	image.fillText(label, x + 6, y + layout.em / 3);
+	if (x > layout.chart.right - layout.chart.width / 10) {
+	  image.textAlign = 'right';
+	  image.fillText(label, x - 6, y + layout.em / 3);
+	} else {
+	  image.textAlign = 'left';
+	  image.fillText(label, x + 6, y + layout.em / 3);
+	}
       }
       image.endG();
     }

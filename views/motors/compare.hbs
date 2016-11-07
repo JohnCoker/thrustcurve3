@@ -14,21 +14,84 @@ You selected {{length motors}}
 {{#if multiClasses}}(in {{length impulseClasses}} impulse classes){{/if}}
 {{#if singleClass}}({{singleClass}} impulse){{/if}}
 motors for comparison.
+If this isn't right, <a href="/motors/recent.html">go back to Recent Motors</a> and choose others.
 </p>
 
 <div class="row">
   <div class="col-md-6">
     <h2>Burn Time vs Impulse</h2>
     {{#if impulseBurnTimeImg}}
-    <img src="{{impulseBurnTimeImg}}" />
+    <img id="impulseBurnTime" src="{{impulseBurnTimeImg}}" />
     {{/if}}
   </div>
   <div class="col-md-6">
     <h2>Avg Thrust vs Impulse</h2>
     {{#if impulseAvgThrustImg}}
-    <img src="{{impulseAvgThrustImg}}" />
+    <img id="impulseAvgThrust" src="{{impulseAvgThrustImg}}" />
     {{/if}}
   </div>
 </div>
+
+<script type="text/javascript">
+var Motors = {
+{{#each motors}}
+  "{{_id}}": {
+    title: "{{motorFullName this}}",
+    diameter: "{{formatMMT diameter}}",
+    totalImpulse: "{{formatImpulse totalImpulse}}",
+    avgThrust: "{{formatForce avgThrust}}",
+    maxThrust: "{{formatForce maxThrust}}",
+    burnTime: "{{formatDuration burnTime}}",
+    detailLink: "{{motorLink this}}"
+  },
+{{/each}}
+};
+
+function formatToolTip() {
+  var svg = $(this),
+      id, info;
+
+  id = svg.attr('id').replace(/[^-]*-/g, '');
+  if (id && (info = Motors[id])) {
+    return ('<b>' + info.title + '</b>\n' +
+            '<table class="stats">' +
+            '<tr><td>Diameter:</td><td>&nbsp;' + info.diameter + '</tr>\n' +
+	    '<tr><td>Tot Impulse:</td><td>&nbsp;' + info.totalImpulse + '</td></tr>\n' +
+	    '<tr><td>Avg Thrust:</td><td>&nbsp;' + info.avgThrust + '</td></tr>\n' +
+	    '<tr><td>Max Thrust:</td><td>&nbsp;' + info.maxThrust + '</td></tr>\n' +
+	    '<tr><td>Burn Time:</td><td>&nbsp;' + info.burnTime + '</td></tr>\n' +
+            '</table>\n');
+  } else {
+    return svg.attr('title') || svg.attr('orig-title');
+  }
+}
+
+function showToolTip() {
+  var svg = $(this),
+      id, info;
+
+  id = svg.attr('id').replace(/[^-]*-/g, '');
+  if (id) {
+    $('.motor-point:not(.motor-point-' + id + ')').css('opacity', 0.35)
+    $('.motor-point-' + id).css('font-weight', 'bold')
+  }
+}
+
+function hideToolTip() {
+  $('.motor-point').css('opacity', 1).css('font-weight', 'normal');
+}
+
+inlineSVG('#impulseBurnTime, #impulseAvgThrust', function(svg) {
+  svg.find('g.motor-point')
+     .removeAttr('title').tooltip({
+       container: 'body',
+       html: true,
+       delay: 50,
+       title: formatToolTip,
+     })
+     .on('show.bs.tooltip', showToolTip)
+     .on('hide.bs.tooltip', hideToolTip);
+});
+</script>
 
 {{/if}}

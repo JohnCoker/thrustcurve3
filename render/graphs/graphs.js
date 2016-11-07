@@ -210,8 +210,8 @@ function motorLabel(motor) {
   var label = motor.commonName;
   if (/^1\//.test(label)) {
     label = label.replace(/^1\/2/, '½')
-		 .replace(/^1\/4/, '¼')
-		 .replace(/^1\/8/, '⅛');
+                 .replace(/^1\/4/, '¼')
+                 .replace(/^1\/8/, '⅛');
   }
   return label;
 }
@@ -489,26 +489,26 @@ function impulseComparison(spec) {
       label = String.fromCharCode(65 + i);
       x = layout.plotX(xv);
       if (x > layout.chart.right)
-	break;
+        break;
   
       if (i === 0) {
-	image.beginPath();
-	image.moveTo(layout.chart.left, layout.chart.top);
-	image.lineTo(layout.chart.left, y1);
-	image.stroke();
+        image.beginPath();
+        image.moveTo(layout.chart.left, layout.chart.top);
+        image.lineTo(layout.chart.left, y1);
+        image.stroke();
       } else if (x >= layout.chart.left) {
-	image.beginPath();
-	image.moveTo(x, layout.chart.top);
-	image.lineTo(x, y1);
-	image.stroke();
+        image.beginPath();
+        image.moveTo(x, layout.chart.top);
+        image.lineTo(x, y1);
+        image.stroke();
       }
   
       if (i === 0) {
-	image.fillText(label, x, y1 + layout.ascender);
+        image.fillText(label, x, y1 + layout.ascender);
       } else {
-	x = layout.plotX(xv + xv / 2);
-	if (x < layout.chart.right)
-	  image.fillText(label, x, y1 + layout.ascender);
+        x = layout.plotX(xv + xv / 2);
+        if (x < layout.chart.right)
+          image.fillText(label, x, y1 + layout.ascender);
       }
     }
 
@@ -550,14 +550,14 @@ function impulseComparison(spec) {
       image.strokeCircle(x, y, PointRadius);
 
       if (label) {
-	image.fillStyle = TitleFill;
-	if (x > layout.chart.right - layout.chart.width / 10) {
-	  image.textAlign = 'right';
-	  image.fillText(label, x - 6, y + layout.em / 3);
-	} else {
-	  image.textAlign = 'left';
-	  image.fillText(label, x + 6, y + layout.em / 3);
-	}
+        image.fillStyle = TitleFill;
+        if (x > layout.chart.right - layout.chart.width / 10) {
+          image.textAlign = 'right';
+          image.fillText(label, x - 6, y + layout.em / 3);
+        } else {
+          image.textAlign = 'left';
+          image.fillText(label, x + 6, y + layout.em / 3);
+        }
       }
       image.endG();
     }

@@ -722,9 +722,9 @@ function extractClasses(motors) {
     cls = String.fromCharCode(i);
     if (counts.hasOwnProperty(cls)) {
       classes.push({
-	letter: cls,
-	count: counts[cls],
-	multi: counts[cls] > 1,
+        letter: cls,
+        count: counts[cls],
+        multi: counts[cls] > 1,
       });
     }
   }
@@ -735,35 +735,35 @@ router.get('/motors/recent.html', function(req, res, next) {
   if (req.session.motorsViewed && req.session.motorsViewed.length > 0) {
     req.db.Motor.find({ _id: { $in: req.session.motorsViewed } }).populate('_manufacturer').exec(req.success(function(motors) {
       var classes = extractClasses(motors), suggestions = [],
-	  i;
+          i;
 
       // provide sorting key
       for (i = 0; i < motors.length; i++)
-	motors[i].recentOrder = req.session.motorsViewed.indexOf(motors[i]._id.toString());
+        motors[i].recentOrder = req.session.motorsViewed.indexOf(motors[i]._id.toString());
       motors.sort(function(a, b) {
-	return a.recentOrder - b.recentOrder;
+        return a.recentOrder - b.recentOrder;
       });
 
       // suggest classes to compare
       if (classes.length > 1) {
-	for (i = 0; i < classes.length; i++) {
-	  if (classes[i].count > 2)
-	    suggestions.push(classes[i]);
-	}
-	suggestions.sort(function(a,b) {
-	  if (a.count != b.count)
-	    return b.count - a.count;
-	  return a.letter - b.letter;
-	});
-	if (suggestions.length > 3)
-	  suggestions.length = 3;
+        for (i = 0; i < classes.length; i++) {
+          if (classes[i].count > 2)
+            suggestions.push(classes[i]);
+        }
+        suggestions.sort(function(a,b) {
+          if (a.count != b.count)
+            return b.count - a.count;
+          return a.letter - b.letter;
+        });
+        if (suggestions.length > 3)
+          suggestions.length = 3;
       }
 
       res.render('motors/recent', locals(defaults, {
-	title: 'Most Recently Viewed',
-	motors: motors,
-	impulseClasses: classes,
-	suggestClasses: suggestions,
+        title: 'Most Recently Viewed',
+        motors: motors,
+        impulseClasses: classes,
+        suggestClasses: suggestions,
       }));
     }));
   } else {
@@ -788,22 +788,22 @@ function compare(req, res, ids) {
   if (ids && ids.length > 0) {
     req.db.Motor.find({ _id: { $in: ids } }).populate('_manufacturer').exec(req.success(function(motors) {
       var classes = extractClasses(motors),
-	  query = '?', i;
+          query = '?', i;
 
       for (i = 0; i < motors.length; i++) {
-	if (i > 0)
-	  query += '&';
-	query += 'motors=' + motors[i]._id;
+        if (i > 0)
+          query += '&';
+        query += 'motors=' + motors[i]._id;
       }
 
       res.render('motors/compare', locals(defaults, {
-	title: 'Compare Motors',
-	motors: motors,
-	impulseClasses: classes,
-	multiClasses: classes.length > 1,
-	singleClass: classes.length == 1 ? classes[0].letter : undefined,
-	impulseBurnTimeImg: impulseBurnTimeImg + query,
-	impulseAvgThrustImg: impulseAvgThrustImg + query,
+        title: 'Compare Motors',
+        motors: motors,
+        impulseClasses: classes,
+        multiClasses: classes.length > 1,
+        singleClass: classes.length == 1 ? classes[0].letter : undefined,
+        impulseBurnTimeImg: impulseBurnTimeImg + query,
+        impulseAvgThrustImg: impulseAvgThrustImg + query,
       }));
     }));
   } else {
@@ -827,8 +827,8 @@ router.get(impulseBurnTimeImg, function(req, res, next) {
   if (ids && ids.length > 0) {
     req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName impulseClass totalImpulse burnTime').exec(req.success(function(motors) {
       graphs.sendImpulseComparison(res, {
-	motors: motors,
-	stat: 'burnTime'
+        motors: motors,
+        stat: 'burnTime'
       });
     }));
   } else {
@@ -841,8 +841,8 @@ router.get(impulseAvgThrustImg, function(req, res, next) {
   if (ids && ids.length > 0) {
     req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName impulseClass totalImpulse avgThrust').exec(req.success(function(motors) {
       graphs.sendImpulseComparison(res, {
-	motors: motors,
-	stat: 'avgThrust'
+        motors: motors,
+        stat: 'avgThrust'
       });
     }));
   } else {

@@ -47,26 +47,37 @@ var Motors = {
 {{/each}}
 };
 
-function formatToolTip() {
+function popoverTitle() {
+  var svg = $(this),
+      id, info;
+
+  id = svg.attr('id').replace(/[^-]*-/g, '');
+  if (id && (info = Motors[id]))
+    return info.title;
+  else
+    return svg.attr('title') || svg.attr('orig-title');
+}
+
+function popoverContent() {
   var svg = $(this),
       id, info;
 
   id = svg.attr('id').replace(/[^-]*-/g, '');
   if (id && (info = Motors[id])) {
-    return ('<b>' + info.title + '</b>\n' +
-            '<table class="stats">' +
-            '<tr><td>Diameter:</td><td>&nbsp;' + info.diameter + '</tr>\n' +
-	    '<tr><td>Tot Impulse:</td><td>&nbsp;' + info.totalImpulse + '</td></tr>\n' +
-	    '<tr><td>Avg Thrust:</td><td>&nbsp;' + info.avgThrust + '</td></tr>\n' +
-	    '<tr><td>Max Thrust:</td><td>&nbsp;' + info.maxThrust + '</td></tr>\n' +
-	    '<tr><td>Burn Time:</td><td>&nbsp;' + info.burnTime + '</td></tr>\n' +
-            '</table>\n');
+    return ('<table class="stats">' +
+            '<tr><td>Diameter:</td><td>' + info.diameter + '</td></tr>\n' +
+            '<tr><td>Tot Impulse:</td><td>' + info.totalImpulse + '</td></tr>\n' +
+            '<tr><td>Avg Thrust:</td><td>' + info.avgThrust + '</td></tr>\n' +
+            '<tr><td>Max Thrust:</td><td>' + info.maxThrust + '</td></tr>\n' +
+            '<tr><td>Burn Time:</td><td>' + info.burnTime + '</td></tr>\n' +
+            '</table>\n' +
+            '<i>click for motor page</i>');
   } else {
-    return svg.attr('title') || svg.attr('orig-title');
+    return '';
   }
 }
 
-function showToolTip() {
+function hoverMotor() {
   var svg = $(this),
       id, info;
 
@@ -77,20 +88,34 @@ function showToolTip() {
   }
 }
 
-function hideToolTip() {
+function leaveMotor() {
   $('.motor-point').css('opacity', 1).css('font-weight', 'normal');
+}
+
+function clickMotor() {
+  var svg = $(this),
+      id, info;
+
+  id = svg.attr('id').replace(/[^-]*-/g, '');
+  if (id && (info = Motors[id]))
+    window.location = info.detailLink;
 }
 
 inlineSVG('#impulseBurnTime, #impulseAvgThrust', function(svg) {
   svg.find('g.motor-point')
-     .removeAttr('title').tooltip({
+     .removeAttr('title')
+     .css('cursor', 'pointer')
+     .popover({
        container: 'body',
+       trigger: 'hover',
        html: true,
        delay: 50,
-       title: formatToolTip,
+       title: popoverTitle,
+       content: popoverContent,
      })
-     .on('show.bs.tooltip', showToolTip)
-     .on('hide.bs.tooltip', hideToolTip);
+     .on('show.bs.popover', hoverMotor)
+     .on('hide.bs.popover', leaveMotor)
+     .click(clickMotor);
 });
 </script>
 

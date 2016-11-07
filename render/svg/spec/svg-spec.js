@@ -326,4 +326,83 @@ describe("svg", function() {
 	expect(xml.children[i].name).toBe('text');
     });
   });
+  describe("group simple", function() {
+    var image;
+    it("construct", function() {
+      image = new svg.Image(300, 200);
+      expect(image).toBeDefined();
+      expect(image.width).toBe(300);
+      expect(image.height).toBe(200);
+    });
+    it("beginG", function() {
+      image.beginG('g1', 'group one');
+    });
+    it("rects", function() {
+      image.strokeRect(25, 25, 275, 150);
+      image.fillRect(100, 100, 200, 100);
+    });
+    it("endG", function() {
+      image.endG();
+    });
+    it("render", function() {
+      var text = image.render();
+      expect(text).toBeDefined();
+      var xml = xmlparser(text).root;
+      expect(xml.name).toBe('svg');
+      expect(xml.attributes.width).toBe('300');
+      expect(xml.attributes.height).toBe('200');
+      expect(xml.attributes.viewBox).toBe('0 0 300 200');
+      expect(xml.children.length).toBe(1);
+      var child = xml.children[0];
+      expect(child.name).toBe('g');
+      expect(child.attributes.id).toBe('g1');
+      expect(child.attributes.title).toBe('group one');
+      expect(child.children.length).toBe(2);
+      expect(child.children[0].name).toBe('rect');
+      expect(child.children[1].name).toBe('rect');
+    });
+  });
+  describe("group complete", function() {
+    var image;
+    it("construct", function() {
+      image = new svg.Image(300, 200);
+      expect(image).toBeDefined();
+      expect(image.width).toBe(300);
+      expect(image.height).toBe(200);
+    });
+    it("beginG", function() {
+      image.beginG({
+	id: 'g2',
+	title: 'group two',
+	class: 'grpcls',
+	style: 'color: blue'
+      );
+    });
+    it("rects", function() {
+      image.strokeRect(25, 25, 275, 150);
+      image.fillRect(100, 100, 200, 100);
+    });
+    it("endG", function() {
+      image.endG();
+    });
+    it("render", function() {
+      var text = image.render();
+      expect(text).toBeDefined();
+      var xml = xmlparser(text).root;
+      expect(xml.name).toBe('svg');
+      expect(xml.attributes.width).toBe('300');
+      expect(xml.attributes.height).toBe('200');
+      expect(xml.attributes.viewBox).toBe('0 0 300 200');
+      expect(xml.children.length).toBe(1);
+      var child = xml.children[0];
+      expect(child.name).toBe('g');
+      expect(child.attributes.id).toBe('g2');
+      expect(child.attributes.title).toBe('group two');
+      expect(child.attributes.class).toBe('grpcls');
+      expect(child.attributes.style).toBe('color: blue');
+      expect(child.children.length).toBe(2);
+      expect(child.children[0].name).toBe('rect');
+      expect(child.children[1].name).toBe('rect');
+    });
+  });
 });

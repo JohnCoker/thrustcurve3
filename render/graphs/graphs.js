@@ -491,7 +491,7 @@ function impulseComparison(spec) {
       if (x > layout.chart.right)
 	break;
   
-      if (i == 0) {
+      if (i === 0) {
 	image.beginPath();
 	image.moveTo(layout.chart.left, layout.chart.top);
 	image.lineTo(layout.chart.left, y1);
@@ -541,17 +541,20 @@ function impulseComparison(spec) {
     motor = spec.motors[i];
     yv = motor[spec.stat];
     if (motor.totalImpulse > 0 && yv > 0) {
+      label = motorLabel(motor);
+      image.beginG('impulse-' + spec.stat + '-' + motor._id, label, 'motor-point motor-point-' + motor._id);
+
       x = layout.plotX(motor.totalImpulse);
       y = layout.plotY(yv);
       image.fillStyle = PointFill;
-      image.fillCircle(x, y, PointRadius, motor.commonName);
-      image.strokeCircle(x, y, PointRadius, motor.commonName);
+      image.fillCircle(x, y, PointRadius);
+      image.strokeCircle(x, y, PointRadius);
 
-      label = motorLabel(motor);
       if (label) {
 	image.fillStyle = TitleFill;
 	image.fillText(label, x + 6, y + layout.em / 3);
       }
+      image.endG();
     }
   }
 

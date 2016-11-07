@@ -47,6 +47,7 @@ class Image {
     this._fontSize = '10pt';
     this._fontFamily = 'Helvetica';
     this._path = [];
+    this._indent = ' ';
     this._text = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1"' +
                  ' width=' + attributeXML(width) + ' height=' + attributeXML(height) +
                  ' viewBox=' + attributeXML('0 0 ' + width + ' ' + height) +
@@ -183,7 +184,8 @@ class Image {
   }
 
   strokeRect(x, y, width, height) {
-    this._text += (' <rect x=' + attributeXML(x) +
+    this._text += (this._indent +
+		   '<rect x=' + attributeXML(x) +
 		   ' y=' + attributeXML(y) +
 		   ' width=' + attributeXML(width) +
 		   ' height=' + attributeXML(height));
@@ -197,7 +199,8 @@ class Image {
   }
 
   fillRect(x, y, width, height) {
-    this._text += (' <rect x=' + attributeXML(x) +
+    this._text += (this._indent +
+		   '<rect x=' + attributeXML(x) +
 		   ' y=' + attributeXML(y) +
 		   ' width=' + attributeXML(width) +
 		   ' height=' + attributeXML(height));
@@ -209,7 +212,8 @@ class Image {
   }
 
   strokeCircle(x, y, r, title) {
-    this._text += (' <circle cx=' + attributeXML(x) +
+    this._text += (this._indent +
+		   '<circle cx=' + attributeXML(x) +
 		   ' cy=' + attributeXML(y) +
 		   ' r=' + attributeXML(r));
 
@@ -227,7 +231,8 @@ class Image {
   }
 
   fillCircle(x, y, r, title) {
-    this._text += (' <circle cx=' + attributeXML(x) +
+    this._text += (this._indent +
+		   '<circle cx=' + attributeXML(x) +
 		   ' cy=' + attributeXML(y) +
 		   ' r=' + attributeXML(r));
 
@@ -272,7 +277,7 @@ class Image {
     start = 0;
     while (start < this._path.length) {
       // draw next shape (up to next moveTo)
-      this._text += ' <polyline points="';
+      this._text += this._indent + '<polyline points="';
       for (i = start; i < this._path.length && (i == start || this._path[i].c == 'l'); i++) {
         if (i > start)
           this._text += ' ';
@@ -298,7 +303,7 @@ class Image {
     start = 0;
     while (start < this._path.length) {
       // draw next shape (up to next moveTo)
-      this._text += ' <polyline points="';
+      this._text += this._indent + '<polyline points="';
       for (i = start; i < this._path.length && (i == start || this._path[i].c == 'l'); i++) {
         if (i > start)
           this._text += ' ';
@@ -317,7 +322,7 @@ class Image {
   }
 
   fillText(str, x, y) {
-    this._text += ' <text x=' + attributeXML(x) + ' y=' + attributeXML(y);
+    this._text += this._indent + '<text x=' + attributeXML(x) + ' y=' + attributeXML(y);
 
     if (this._align)
       this._text += ' text-anchor=' + attributeXML(this._align);
@@ -338,7 +343,8 @@ class Image {
   }
 
   fillTextVert(str, x, y) {
-    this._text += (' <text x=' + attributeXML(x) +
+    this._text += (this._indent +
+		   '<text x=' + attributeXML(x) +
 		   ' y=' + attributeXML(y) +
 		   ' transform="rotate(-90 ' + x + ',' + y + ')"');
 
@@ -358,6 +364,33 @@ class Image {
     this._text += '>';
     this._text += contentXML(str);
     this._text += '</text>\n';
+  }
+
+  beginG(id, title, cls) {
+    var style;
+    if (arguments.length == 1 && typeof arguments[0] == 'object') {
+      id = arguments[0].id;
+      title = arguments[0].title;
+      cls = arguments[0].class;
+      style = arguments[0].style;
+    }
+
+    this._text += this._indent + '<g';
+    if (id)
+      this._text += ' id=' + attributeXML(id);
+    if (title)
+      this._text += ' title=' + attributeXML(title);
+    if (cls)
+      this._text += ' class=' + attributeXML(cls);
+    if (style)
+      this._text += ' style=' + attributeXML(style);
+    this._text += '>\n';
+    this._indent += ' ';
+  }
+
+  endG() {
+    this._indent = this._indent.replace(/ $/, '');
+    this._text += this._indent + '</g>\n';
   }
 
   render() {

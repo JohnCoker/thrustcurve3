@@ -14,6 +14,7 @@ const _ = require('underscore'),
       ranking = require('../database/ranking'),
       parsers = require('../simulate/parsers'),
       analyze = require('../simulate/analyze'),
+      graphs = require('../render/graphs'),
       svg = require('../render/svg'),
       locals = require('./locals.js'),
       authorized = require('./authorized.js');
@@ -705,11 +706,36 @@ router.get('/motors/popular.html', function(req, res, next) {
  * /motors/recent.html
  * Most recently viewed motors, renders with motors/recent.hbs template.
  */
+function extractClasses(motors) {
+  var counts = {}, classes = [],
+      cls, i;
+
+  // group motors by impulse class
+  for (i = 0; i < motors.length; i++) {
+    cls = motors[i].impulseClass;
+    if (counts.hasOwnProperty(cls))
+      counts[cls]++;
+    else
+      counts[cls] = 1;
+  }
+  for (i = 'A'.charCodeAt(0); i < 'Z'.charCodeAt(0); i++) {
+    cls = String.fromCharCode(i);
+    if (counts.hasOwnProperty(cls)) {
+      classes.push({
+	letter: cls,
+	count: counts[cls],
+	multi: counts[cls] > 1,
+      });
+    }
+  }
+  return classes;
+}
+
 router.get('/motors/recent.html', function(req, res, next) {
   if (req.session.motorsViewed && req.session.motorsViewed.length > 0) {
     req.db.Motor.find({ _id: { $in: req.session.motorsViewed } }).populate('_manufacturer').exec(req.success(function(motors) {
-      var counts = {}, classes = [], suggestions = [],
-	  cls, i;
+      var classes = extractClasses(motors), suggestions = [],
+	  i;
 
       // provide sorting key
       for (i = 0; i < motors.length; i++)
@@ -717,25 +743,6 @@ router.get('/motors/recent.html', function(req, res, next) {
       motors.sort(function(a, b) {
 	return a.recentOrder - b.recentOrder;
       });
-
-      // group motors by impulse class
-      for (i = 0; i < motors.length; i++) {
-        cls = motors[i].impulseClass;
-        if (counts.hasOwnProperty(cls))
-          counts[cls]++;
-        else
-          counts[cls] = 1;
-      }
-      for (i = 'A'.charCodeAt(0); i < 'Z'.charCodeAt(0); i++) {
-        cls = String.fromCharCode(i);
-        if (counts.hasOwnProperty(cls)) {
-          classes.push({
-            letter: cls,
-            count: counts[cls],
-	    multi: counts[cls] > 1,
-          });
-        }
-      }
 
       // suggest classes to compare
       if (classes.length > 1) {
@@ -766,6 +773,80 @@ router.get('/motors/recent.html', function(req, res, next) {
       impulseClasses: [],
       suggestClasses: [],
     }));
+  }
+});
+
+
+/*
+ * /motors/compare.html
+ * Compare different motors, renders with motors/compare.hbs template.
+ */
+const impulseBurnTimeImg = '/motors/compare-impulseBurnTime.svg',
+      impulseAvgThrustImg = '/motors/compare-impulseAvgThrust.svg';
+
+function compare(req, res, ids) {
+  if (ids && ids.length > 0) {
+    req.db.Motor.find({ _id: { $in: ids } }).populate('_manufacturer').exec(req.success(function(motors) {
+      var classes = extractClasses(motors),
+	  query = '?', i;
+
+      for (i = 0; i < motors.length; i++) {
+	if (i > 0)
+	  query += '&';
+	query += 'motors=' + motors[i]._id;
+      }
+
+      res.render('motors/compare', locals(defaults, {
+	title: 'Compare Motors',
+	motors: motors,
+	impulseClasses: classes,
+	multiClasses: classes.length > 1,
+	singleClass: classes.length == 1 ? classes[0].letter : undefined,
+	impulseBurnTimeImg: impulseBurnTimeImg + query,
+	impulseAvgThrustImg: impulseAvgThrustImg + query,
+      }));
+    }));
+  } else {
+    res.render('motors/compare', locals(defaults, {
+      title: 'Compare Motors',
+      motors: [],
+      impulseClasses: [],
+      multiClasses: false,
+    }));
+  }
+}
+router.get('/motors/compare.html', function(req, res, next) {
+  compare(req, res, req.query.motors);
+});
+router.post('/motors/compare.html', function(req, res, next) {
+  compare(req, res, req.body.motors);
+});
+
+router.get(impulseBurnTimeImg, function(req, res, next) {
+  var ids = req.query.motors;
+  if (ids && ids.length > 0) {
+    req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName impulseClass totalImpulse burnTime').exec(req.success(function(motors) {
+      graphs.sendImpulseComparison(res, {
+	motors: motors,
+	stat: 'burnTime'
+      });
+    }));
+  } else {
+    res.status(400).send('no motors to compare');
+  }
+});
+
+router.get(impulseAvgThrustImg, function(req, res, next) {
+  var ids = req.query.motors;
+  if (ids && ids.length > 0) {
+    req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName impulseClass totalImpulse avgThrust').exec(req.success(function(motors) {
+      graphs.sendImpulseComparison(res, {
+	motors: motors,
+	stat: 'avgThrust'
+      });
+    }));
+  } else {
+    res.status(400).send('no motors to compare');
   }
 });
 

@@ -1,0 +1,34 @@
+<h1>{{title}}</h1>
+
+{{#unless motors}}
+<p>
+You haven't selected any motors for comparison.
+As you view details of different motors, the ones you've seen most recently will be visible in
+<a href="/motors/recent.html">Recently Viewed</a> and you can compare them.
+</p>
+{{/unless}}
+
+{{#if motors}}
+<p>
+You selected {{length motors}}
+{{#if multiClasses}}(in {{length impulseClasses}} impulse classes){{/if}}
+{{#if singleClass}}({{singleClass}} impulse){{/if}}
+motors for comparison.
+</p>
+
+<div class="row">
+  <div class="col-md-6">
+    <h2>Burn Time vs Impulse</h2>
+    {{#if impulseBurnTimeImg}}
+    <img src="{{impulseBurnTimeImg}}" />
+    {{/if}}
+  </div>
+  <div class="col-md-6">
+    <h2>Avg Thrust vs Impulse</h2>
+    {{#if impulseAvgThrustImg}}
+    <img src="{{impulseAvgThrustImg}}" />
+    {{/if}}
+  </div>
+</div>
+
+{{/if}}

@@ -442,6 +442,10 @@ function impulseComparison(spec) {
     yMin: stats.minYStat,
     yMax: stats.maxYStat,
   });
+  layout.plotX = function(v) {
+    // use entire chart for impulse classes (ignore ticks)
+    return layout.chart.left + layout.chart.width * ((v - xMin) / (xMax - xMin));
+  };
 
   image = new svg.Image(width, height);
   image.font = layout.em + 'px Helvetica';
@@ -480,25 +484,32 @@ function impulseComparison(spec) {
   image.textAlign = 'center';
   y1 = layout.chart.bottom + layout.em / 3;
   xv = AImpulseN;
-  for (i = 0; i < layout.xAxis.length; i++) {
-    x = layout.plotX(xv);
-    if (x > layout.chart.right)
-      break;
-
-    if (i > 0 && x >= layout.chart.left) {
-      image.beginPath();
-      image.moveTo(x, layout.chart.top);
-      image.lineTo(x, y1);
-      image.stroke();
-    }
-
-    if (i === 0) {
-      if (x > layout.chart.left)
-        image.fillText(String.fromCharCode(65 + i), x, y1 + layout.ascender);
-    } else {
-      x = layout.plotX(xv + xv / 2);
-      if (x > layout.chart.left && x < layout.chart.right)
-        image.fillText(String.fromCharCode(65 + i), x, y1 + layout.ascender);
+  for (i = 0; ; i++) {
+    if (xv >= xMin) {
+      label = String.fromCharCode(65 + i);
+      x = layout.plotX(xv);
+      if (x > layout.chart.right)
+	break;
+  
+      if (i == 0) {
+	image.beginPath();
+	image.moveTo(layout.chart.left, layout.chart.top);
+	image.lineTo(layout.chart.left, y1);
+	image.stroke();
+      } else if (x >= layout.chart.left) {
+	image.beginPath();
+	image.moveTo(x, layout.chart.top);
+	image.lineTo(x, y1);
+	image.stroke();
+      }
+  
+      if (i === 0) {
+	image.fillText(label, x, y1 + layout.ascender);
+      } else {
+	x = layout.plotX(xv + xv / 2);
+	if (x < layout.chart.right)
+	  image.fillText(label, x, y1 + layout.ascender);
+      }
     }
 
     xv *= 2;

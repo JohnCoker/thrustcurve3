@@ -1,0 +1,10 @@
+{
+  "name": "thrustcurve",
+  "description": "ThrustCurve Hobby Rocket Motor Data",
+  "website": "http://www.thrustcurve.org/",
+  "logo": "http://www.thrustcurve.org/images/icon.png",
+  "repository": "https://github.com/JohnCoker/thrustcurve3",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["rocketry", "rockets", "motors", "thrust curve", "motor data", "engine data"],
+  "image": "heroku/nodejs"
+}

@@ -31,6 +31,14 @@ If this isn't right, <a href="/motors/recent.html">go back to Recent Motors</a> 
     {{/if}}
   </div>
 </div>
+<div class="row">
+  <div class="col-md-12">
+    <h2>Thrust Curve Overlay</h2>
+    {{#if thrustCurveImg}}
+    <img id="thrustCurve" src="{{thrustCurveImg}}" />
+    {{/if}}
+  </div>
+</div>
 
 <script type="text/javascript">
 var Motors = {
@@ -85,11 +93,14 @@ function hoverMotor() {
   if (id) {
     $('.motor-point:not(.motor-point-' + id + ')').css('opacity', 0.35)
     $('.motor-point-' + id).css('font-weight', 'bold')
+    $('.motor-curve:not(.motor-curve-' + id + ')').css('opacity', 0.35)
+    $('.motor-curve-' + id).css('font-weight', 'bold')
   }
 }
 
 function leaveMotor() {
   $('.motor-point').css('opacity', 1).css('font-weight', 'normal');
+  $('.motor-curve').css('opacity', 1).css('font-weight', 'normal');
 }
 
 function clickMotor() {
@@ -101,8 +112,8 @@ function clickMotor() {
     window.location = info.detailLink;
 }
 
-inlineSVG('#impulseBurnTime, #impulseAvgThrust', function(svg) {
-  svg.find('g.motor-point')
+inlineSVG('#impulseBurnTime, #impulseAvgThrust, #thrustCurve', function(svg) {
+  svg.find('g.motor-point, g.motor-curve')
      .removeAttr('title')
      .css('cursor', 'pointer')
      .popover({

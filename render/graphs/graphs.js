@@ -17,6 +17,7 @@ const SVG = svg.contentType,
       GridStroke = '#aaa',
       CurveStroke = '#9e1a20',
       CurveFill = '#e7e7e7',
+      CurveWidth = 3,
       PointStroke = '#9e1a20',
       PointFill = 'white',
       PointWidth = 2,
@@ -234,7 +235,7 @@ function thrustCurve(spec) {
   if (spec.unit)
     unit = units.force.get(spec.unit);
   if (unit == null)
-    unit = units.force.get('N');
+    unit = units.getUnitPref('force');
   yConvert = 1 / unit.toMKS;
 
   layout = layoutGraph({
@@ -335,7 +336,7 @@ function thrustCurve(spec) {
       image.moveTo(x, layout.chart.top);
       image.lineTo(x, layout.chart.bottom);
       image.stroke();
-  
+
       image.textAlign = 'right';
       label = 'start ' + stats.burnStart.toFixed(2) + 's';
       image.fillTextVert(label, x - layout.descender, layout.chart.top + layout.em / 4);
@@ -355,7 +356,7 @@ function thrustCurve(spec) {
 
   // draw the thrust curve line
   image.strokeStyle = CurveStroke;
-  image.lineWidth = 3;
+  image.lineWidth = CurveWidth;
   image.beginPath();
   image.moveTo(layout.plotX(0), layout.plotY(0));
   for (i = 0; i < spec.data.points.length; i++) {
@@ -490,7 +491,7 @@ function impulseComparison(spec) {
       x = layout.plotX(xv);
       if (x > layout.chart.right)
         break;
-  
+
       if (i === 0) {
         image.beginPath();
         image.moveTo(layout.chart.left, layout.chart.top);
@@ -502,7 +503,7 @@ function impulseComparison(spec) {
         image.lineTo(x, y1);
         image.stroke();
       }
-  
+
       if (i === 0) {
         image.fillText(label, x, y1 + layout.ascender);
       } else {
@@ -561,6 +562,145 @@ function impulseComparison(spec) {
       }
       image.endG();
     }
+  }
+
+  return image;
+}
+
+function thrustCurveComparison(spec) {
+  var image, width, height, maxThrust, maxTime, unit, layout, yConvert, stats, motor, points, x0, y1, x, y, label, i, j;
+
+  if (spec == null || spec.motors == null)
+    return;
+  maxThrust = maxTime = 0;
+  for (i = 0; i < spec.motors.length; i++) {
+    stats = analyze.stats(spec.motors[i].data);
+    if (stats != null) {
+      if (stats.maxTime > maxTime)
+        maxTime = stats.maxTime;
+      if (stats.maxThrust > maxThrust)
+        maxThrust = stats.maxThrust;
+    }
+  }
+  if (maxThrust <= 0 || maxTime <= 0)
+    return;
+
+  if (spec.width >= 1 && spec.height >= 1) {
+    width = spec.width;
+    height = spec.height;
+  } else {
+    width = DefaultWidth;
+    height = DefaultHeight;
+  }
+
+  if (spec.unit)
+    unit = units.force.get(spec.unit);
+  if (unit == null)
+    unit = units.getUnitPref('force');
+  yConvert = 1 / unit.toMKS;
+
+  layout = layoutGraph({
+    width: width,
+    height: height,
+    xMin: 0,
+    xMax: maxTime,
+    yMin: 0,
+    yMax: maxThrust * yConvert
+  });
+
+  image = new svg.Image(width, height);
+  image.font = layout.em + 'px Helvetica';
+
+  // fill the chart area
+  image.fillStyle = 'white';
+  image.fillRect(layout.chart.left, layout.chart.top, layout.chart.width, height);
+
+  // draw the title and copyright
+  image.fillStyle = TitleFill;
+  if (spec.title) {
+    image.textAlign = 'left';
+    image.fillText(spec.title, layout.chart.left, layout.ascender);
+  }
+  image.textAlign = 'right';
+  image.fillText(copyright(), layout.chart.right, layout.ascender);
+
+  // draw the X axis legend
+  image.textAlign = 'center';
+  image.fillText('Time (seconds)', (layout.chart.left + layout.chart.right) / 2, height - layout.descender);
+
+  // draw the Y axis legend
+  image.textAlign = 'center';
+  image.fillTextVert('Thrust (' + unit.description + ')', layout.ascender, (layout.chart.top + layout.chart.bottom) / 2);
+
+  // draw the X axis labels
+  image.strokeStyle = GridStroke;
+  image.textAlign = 'center';
+  y1 = layout.chart.bottom + layout.em / 3;
+  for (i = 0; i < layout.xAxis.length; i++) {
+    x = layout.plotX(layout.xAxis[i].value);
+    image.beginPath();
+    image.moveTo(x, layout.chart.top);
+    image.lineTo(x, y1);
+    image.stroke();
+
+    image.fillText(layout.xAxis[i].label, x, y1 + layout.ascender);
+  }
+
+  // draw the Y axis labels and grid lines
+  i = layout.yAxis.length - 1;
+  image.textAlign = 'right';
+  x0 = layout.chart.left - layout.em / 3;
+  for (i = 0; i < layout.yAxis.length; i++) {
+    y = layout.plotY(layout.yAxis[i].value);
+
+    image.beginPath();
+    image.moveTo(x0, y);
+    image.lineTo(layout.chart.right, y);
+    image.stroke();
+
+    image.fillText(layout.yAxis[i].label, x0 - layout.em / 10, y + layout.em / 3);
+  }
+
+  // draw each thrust curve
+  image.textAlign = 'left';
+  for (j = 0; j < spec.motors.length; j++) {
+    motor = spec.motors[j];
+    if (Array.isArray(motor.data))
+      points = motor.data;
+    else
+      points = motor.data.points;
+    if (points == null || points.length < 2)
+      continue;
+
+    label = motorLabel(motor);
+    image.beginG('thrustcurve-' + '-' + motor._id, label, 'motor-curve motor-curve-' + motor._id);
+
+    // draw the thrust curve line
+    image.strokeStyle = CurveStroke;
+    image.lineWidth = CurveWidth;
+    image.beginPath();
+    image.moveTo(layout.plotX(0), layout.plotY(0));
+    for (i = 0; i < points.length; i++) {
+      if (points[i].time > 0)
+        image.lineTo(layout.plotX(points[i].time), layout.plotY(points[i].thrust * yConvert));
+    }
+    image.stroke();
+
+    // draw the thrust curve points
+    image.fillStyle = PointStroke;
+    for (i = 0; i < points.length; i++) {
+      x = layout.plotX(points[i].time);
+      y = layout.plotY(points[i].thrust * yConvert);
+      image.fillCircle(x, y, (CurveWidth + 1) / 2);
+    }
+
+    // draw the motor name
+    if (label) {
+      image.fillStyle = TitleFill;
+      image.fillText(label, x + CurveWidth, layout.chart.bottom - layout.em / 3);
+    }
+
+    image.endG();
   }
 
   return image;
@@ -642,6 +782,39 @@ module.exports = {
    */
   sendImpulseComparison: function(res, spec) {
     var image = impulseComparison(spec);
+    if (image == null) {
+      res.status(500).send();
+      return false;
+    } else {
+      res.type(image.format).send(image.render());
+      return true;
+    }
+  },
+
+  /**
+   * Build a thrust curve comparison graph for multiple motors and return it.
+   * If an error occurs, null is returned.
+   * @function
+   * @param {object} spec graph information
+   * @param {object[]} spec.motors motor info with data
+   * @param {number} spec.width target image width
+   * @param {height} spec.height target image width
+   * @param {string} [spec.title] graph title
+   * @param {string} [spec.unit] force unit to use
+   * @return {object} constructed image object
+   */
+  thrustCurveComparison: thrustCurveComparison,
+
+  /**
+   * Build a thrust curve comparison graph for multiple motors and send it to the response.
+   * If an error occurs, 500 status is sent.
+   * @function
+   * @param {object} res Express response object
+   * @param {object} spec graph information (see #thrustCurveComparison)
+   * @return {boolean} true if image sent
+   */
+  sendThrustCurveComparison: function(res, spec) {
+    var image = thrustCurveComparison(spec);
     if (image == null) {
       res.status(500).send();
       return false;

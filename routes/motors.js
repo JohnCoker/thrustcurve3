@@ -782,7 +782,8 @@ router.get('/motors/recent.html', function(req, res, next) {
  * Compare different motors, renders with motors/compare.hbs template.
  */
 const impulseBurnTimeImg = '/motors/compare-impulseBurnTime.svg',
-      impulseAvgThrustImg = '/motors/compare-impulseAvgThrust.svg';
+      impulseAvgThrustImg = '/motors/compare-impulseAvgThrust.svg',
+      thrustCurveImg = '/motors/compare-thrustCurve.svg';
 
 function compare(req, res, ids) {
   if (ids && ids.length > 0) {
@@ -804,6 +805,7 @@ function compare(req, res, ids) {
         singleClass: classes.length == 1 ? classes[0].letter : undefined,
         impulseBurnTimeImg: impulseBurnTimeImg + query,
         impulseAvgThrustImg: impulseAvgThrustImg + query,
+        thrustCurveImg: thrustCurveImg + query,
       }));
     }));
   } else {
@@ -844,6 +846,33 @@ router.get(impulseAvgThrustImg, function(req, res, next) {
         motors: motors,
         stat: 'avgThrust'
       });
+    }));
+  } else {
+    res.status(400).send('no motors to compare');
+  }
+});
+
+router.get(thrustCurveImg, function(req, res, next) {
+  var ids = req.query.motors;
+  if (ids && ids.length > 0) {
+    req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName').exec(req.success(function(motors) {
+      req.db.SimFile.find({ _motor: { $in: ids } }, undefined, { sort: { updatedAt: -1 } }).exec(req.success(function(simfiles) {
+        var i, j;
+
+        for (i = 0; i < motors.length; i++) {
+          for (j = 0; j < simfiles.length; j++) {
+            if (simfiles[j]._motor.toString() == motors[i]._id.toString()) {
+              motors[i].data = parsers.parseData(simfiles[j].format, simfiles[j].data, new errors.Collector());
+              break;
+            }
+          }
+        }
+        graphs.sendThrustCurveComparison(res, {
+          motors: motors,
+          width: 600,
+          height: 400,
+        });
+      }));
     }));
   } else {
     res.status(400).send('no motors to compare');

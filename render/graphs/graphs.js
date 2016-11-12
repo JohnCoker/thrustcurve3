@@ -382,7 +382,8 @@ function thrustCurve(spec) {
 }
 
 function impulseComparison(spec) {
-  var stats, image, width, height, motor, xMin, xMax, layout, x0, y1, xv, yv, x, y, label, i;
+  var stats, image, width, height, unit, yConvert,
+      motor, xMin, xMax, layout, x0, y1, xv, yv, x, y, label, i;
 
   if (spec == null || spec.motors == null || spec.motors.length < 1)
     return;
@@ -422,6 +423,12 @@ function impulseComparison(spec) {
     width = DefaultWidth;
     height = DefaultHeight;
   }
+  if (spec.stat == 'burnTime')
+    yConvert = 1;
+  else {
+    unit = units.getUnitPref('force');
+    yConvert = 1 / unit.toMKS;
+  }
 
   if (stats.minImpulse < AImpulseN)
     xMin = 0;
@@ -440,8 +447,8 @@ function impulseComparison(spec) {
     height: height,
     xMin: xMin,
     xMax: xMax,
-    yMin: stats.minYStat,
-    yMax: stats.maxYStat,
+    yMin: stats.minYStat * yConvert,
+    yMax: stats.maxYStat * yConvert,
   });
   layout.plotX = function(v) {
     // use entire chart for impulse classes (ignore ticks)
@@ -475,7 +482,7 @@ function impulseComparison(spec) {
   else {
     label = spec.stat.substring(0, 1).toUpperCase() +
             spec.stat.substring(1).replace(/([A-Z])/g, ' $1') +
-            ' (newtons)';
+            ' (' + unit.description + ')';
   }
   image.fillTextVert(label, layout.ascender, (layout.chart.top + layout.chart.bottom) / 2);
 
@@ -545,7 +552,7 @@ function impulseComparison(spec) {
       image.beginG('impulse-' + spec.stat + '-' + motor._id, label, 'motor-point motor-point-' + motor._id);
 
       x = layout.plotX(motor.totalImpulse);
-      y = layout.plotY(yv);
+      y = layout.plotY(yv * yConvert);
       image.fillStyle = PointFill;
       image.fillCircle(x, y, PointRadius);
       image.strokeCircle(x, y, PointRadius);

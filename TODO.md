@@ -5,7 +5,6 @@
  * flag motors favorited by other users
  * add Like, +1, Flattr, etc for motor pages
  * outbox feature?
- * compare selected motors?
 
 ## Search
 

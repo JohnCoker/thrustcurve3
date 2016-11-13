@@ -13,15 +13,18 @@ const SVG = svg.contentType,
       DefaultWidth = 300,
       DefaultHeight = 200,
       AImpulseN = 1.25,
+      ChartFill = 'white',
       TitleFill = 'black',
       GridStroke = '#aaa',
       CurveStroke = '#9e1a20',
       CurveFill = '#e7e7e7',
       CurveWidth = 3,
+      ShadowStroke = 'rgba(255, 255, 255, 0.8)',
+      ShadowWidth = CurveWidth + 2,
       PointStroke = '#9e1a20',
       PointFill = 'white',
       PointWidth = 2,
-      PointRadius = 3,
+      PointRadius = 4,
       AnnotationStroke = '#2e448c',
       AnnotationWidth = 0.5;
 
@@ -251,7 +254,7 @@ function thrustCurve(spec) {
   image.font = layout.em + 'px Helvetica';
 
   // fill the chart area
-  image.fillStyle = 'white';
+  image.fillStyle = ChartFill;
   image.fillRect(layout.chart.left, layout.chart.top, layout.chart.width, height);
 
   // fill under the thrust curve
@@ -382,8 +385,8 @@ function thrustCurve(spec) {
 }
 
 function impulseComparison(spec) {
-  var stats, image, width, height, unit, yConvert,
-      motor, xMin, xMax, layout, x0, y1, xv, yv, x, y, label, i;
+  var stats, image, width, height, unit, yConvert, layout,
+      motor, xMin, xMax, x0, y1, xv, yv, x, y, label, i;
 
   if (spec == null || spec.motors == null || spec.motors.length < 1)
     return;
@@ -415,6 +418,21 @@ function impulseComparison(spec) {
     // not enough info
     return;
   }
+
+  // sort motors by ascending total impulse, name
+  spec.motors.sort(function(a, b) {
+    if (a.totalImpulse > 0 && b.totalImpulse > 0) {
+      if (a.totalImpulse < b.totalImpulse)
+	return -1;
+      if (a.totalImpulse > b.totalImpulse)
+	return 1;
+    }
+    if (a.commonName < b.commonName)
+      return -1;
+    if (a.commonName > b.commonName)
+      return 1;
+    return 0;
+  });
 
   if (spec.width >= 1 && spec.height >= 1) {
     width = spec.width;
@@ -459,7 +477,7 @@ function impulseComparison(spec) {
   image.font = layout.em + 'px Helvetica';
 
   // fill the chart area
-  image.fillStyle = 'white';
+  image.fillStyle = ChartFill;
   image.fillRect(layout.chart.left, layout.chart.top, layout.chart.width, height);
 
   // draw the title and copyright
@@ -575,13 +593,17 @@ function impulseComparison(spec) {
 }
 
 function thrustCurveComparison(spec) {
-  var image, width, height, maxThrust, maxTime, unit, layout, yConvert, stats, motor, points, x0, y1, x, y, label, i, j;
+  var image, width, height, maxThrust, maxTime, unit, yConvert, layout,
+      stats, motor, points, x0, y1, x, y, label, i, j;
 
   if (spec == null || spec.motors == null)
     return;
   maxThrust = maxTime = 0;
   for (i = 0; i < spec.motors.length; i++) {
-    stats = analyze.stats(spec.motors[i].data);
+    if (spec.motors[i].data)
+      stats = analyze.stats(spec.motors[i].data);
+    else
+      stats = undefined;
     if (stats != null) {
       if (stats.maxTime > maxTime)
         maxTime = stats.maxTime;
@@ -591,6 +613,21 @@ function thrustCurveComparison(spec) {
   }
   if (maxThrust <= 0 || maxTime <= 0)
     return;
+
+  // sort motors by descending burn time, name
+  spec.motors.sort(function(a, b) {
+    if (a.burnTime > 0 && b.burnTime > 0) {
+      if (a.burnTime < b.burnTime)
+	return 1;
+      if (a.burnTime > b.burnTime)
+	return -1;
+    }
+    if (a.commonName < b.commonName)
+      return -1;
+    if (a.commonName > b.commonName)
+      return 1;
+    return 0;
+  });
 
   if (spec.width >= 1 && spec.height >= 1) {
     width = spec.width;
@@ -619,7 +656,7 @@ function thrustCurveComparison(spec) {
   image.font = layout.em + 'px Helvetica';
 
   // fill the chart area
-  image.fillStyle = 'white';
+  image.fillStyle = ChartFill;
   image.fillRect(layout.chart.left, layout.chart.top, layout.chart.width, height);
 
   // draw the title and copyright
@@ -672,6 +709,8 @@ function thrustCurveComparison(spec) {
   image.textAlign = 'left';
   for (j = 0; j < spec.motors.length; j++) {
     motor = spec.motors[j];
+    if (motor.data == null)
+      continue;
     if (Array.isArray(motor.data))
       points = motor.data;
     else
@@ -681,6 +720,19 @@ function thrustCurveComparison(spec) {
 
     label = motorLabel(motor);
     image.beginG('thrustcurve-' + '-' + motor._id, label, 'motor-curve motor-curve-' + motor._id);
+
+    // draw a shadow line underneath later paths
+    if (i > 0) {
+      image.strokeStyle = ShadowStroke;
+      image.lineWidth = ShadowWidth;
+      image.beginPath();
+      image.moveTo(layout.plotX(0), layout.plotY(0));
+      for (i = 0; i < points.length; i++) {
+	if (points[i].time > 0)
+	  image.lineTo(layout.plotX(points[i].time), layout.plotY(points[i].thrust * yConvert));
+      }
+      image.stroke();
+    }
 
     // draw the thrust curve line
     image.strokeStyle = CurveStroke;
@@ -693,16 +745,11 @@ function thrustCurveComparison(spec) {
     }
     image.stroke();
 
-    // draw the thrust curve points
-    image.fillStyle = PointStroke;
-    for (i = 0; i < points.length; i++) {
-      x = layout.plotX(points[i].time);
-      y = layout.plotY(points[i].thrust * yConvert);
-      image.fillCircle(x, y, (CurveWidth + 1) / 2);
-    }
-
     // draw the motor name
     if (label) {
+      i = points.length - 1;
+      x = layout.plotX(points[i].time);
+      y = layout.plotY(points[i].thrust * yConvert);
       image.fillStyle = TitleFill;
       image.fillText(label, x + CurveWidth, layout.chart.bottom - layout.em / 3);
     }

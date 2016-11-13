@@ -855,7 +855,7 @@ router.get(impulseAvgThrustImg, function(req, res, next) {
 router.get(thrustCurveImg, function(req, res, next) {
   var ids = req.query.motors;
   if (ids && ids.length > 0) {
-    req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName').exec(req.success(function(motors) {
+    req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName burnTime').exec(req.success(function(motors) {
       req.db.SimFile.find({ _motor: { $in: ids } }, undefined, { sort: { updatedAt: -1 } }).exec(req.success(function(simfiles) {
         var i, j;
 

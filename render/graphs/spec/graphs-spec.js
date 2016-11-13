@@ -122,7 +122,7 @@ describe("graphs", function() {
   });
 
   var thrustCurveMotors = [
-    { _id: "580ee54e000231000000000c", commonName: "A10",
+    { _id: "580ee54e000231000000000c", burnTime: 0.85, commonName: "A10",
       data: [
 	{ time: 0.026, thrust: 0.478 },
 	{ time: 0.055, thrust: 1.919 },
@@ -146,7 +146,7 @@ describe("graphs", function() {
 	{ time: 0.85, thrust: 0 },
       ]
     },
-    { _id: "580ee54e000231000000000e", commonName: "B4",
+    { _id: "580ee54e000231000000000e", burnTime: 1.03, commonName: "B4",
       data: [
 	{ time: 0.058, thrust: 2.361 },
 	{ time: 0.102, thrust: 2.921 },
@@ -179,6 +179,7 @@ describe("graphs", function() {
 	{ time: 1.049, thrust: 0.0 },
       ]
     },
+    { _id: "580ee54e0002310000000020", burnTime: 1.65, commonName: "D12" },
   ];
   describe("thrustCurveComparison", function() {
     var image;

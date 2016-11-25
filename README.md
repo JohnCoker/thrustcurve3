@@ -55,9 +55,10 @@ The data on motors, simulator files, contributors and other miscellany were stor
 
 For an app like this, Node.js is a natural platform for the server side.
 
-The database will switch to [MongoDB](https://www.mongodb.com/).
-While I remain skeptical in general and it does seem harder to use and less functional than SQL,
-I have been able to make a good start at building out the site with MongoDB.
+This time, the database is [MongoDB](https://www.mongodb.com/).
+While harder to use and less functional than SQL,
+I have been able to make it work by bridging some of its deficiencies with
+[Mongoose](http://mongoosejs.com/).
 
 I didn't want to go entirely client-side rendering because I wanted the site to be SEO-friendly,
 but I did want to have the option of higher interactivity in the browser.
@@ -77,6 +78,7 @@ The top-level directory is the web application that powers the site, using the
 
 Other directories contain small Node.js modules that implement the logic behind the routes.
 Most modules are quite small (with a single file being typical).
+Jasmine tests are located within each module, and all tests can be run with `npm test` at the top level.
 
 ```
 thrustcurve3
@@ -111,6 +113,7 @@ thrustcurve3
 │   ├── flightsim
 │   └── parsers
 └── views
+    ├── admin
     ├── browser
     ├── contributors
     ├── guide

@@ -54,37 +54,57 @@ Compare button at the bottom.
 </form>
 
 <script type="text/javascript">
-setupTable('#recent-list', {
-  order: [[0, 'asc']],
-  expand: true
-});
+var resultDT;
+
 function buttonState() {
-  var count = $('#recent-list tbody input[type=checkbox]:checked').length;
+  var cells = $(resultDT.cells().nodes()),
+      count = cells.find('input[type=checkbox]:checked').length;
   if (count > 1)
     $('#compare').removeProp('disabled');
   else
     $('#compare').prop('disabled', 'disabled');
 }
-buttonState();
 
-$('#recent-list thead input[type=checkbox]').change(function(e) {
-  var all = $(this).is(':checked');
-  $('#recent-list tbody input[type=checkbox]').prop('checked', all);
-  buttonState();
-});
-$('#recent-list tbody input[type=checkbox]').change(function(e) {
-  var one = $(this).is(':checked');
-  if (!one)
-    $('#recent-list thead input[type=checkbox]').prop('checked', false);
-  buttonState();
-});
 $('a.impulseClass').click(function(e) {
   e.preventDefault();
-  var letter = $(this).attr('href').replace(/^[^#]*#/, '');
+  var letter = $(this).attr('href').replace(/^[^#]*#/, ''),
+      cells = $(resultDT.cells().nodes());
   $('#recent-list thead input[type=checkbox]').prop('checked', false);
-  $('#recent-list tbody input[type=checkbox]').prop('checked', false);
-  $('#recent-list tbody tr[data-class=' + letter + '] input[type=checkbox]').prop('checked', true);
+  cells.find('input[type=checkbox]').each(function() {
+    var input = $(this);
+    input.prop('checked', input.closest('tr').data('class') == letter);
+  });
   buttonState();
+});
+
+setupTable('#recent-list', {
+  order: [[0, 'asc']],
+  bPaginate: false
+}, function(dt) {
+  resultDT = dt;
+  buttonState();
+
+  var table = $('#recent-list');
+  table.find('thead input[type=checkbox]').change(function(e) {
+    var all = $(this).is(':checked');
+    table.find('tbody input[type=checkbox]').prop('checked', all);
+    buttonState();
+  });
+
+  var change = function(e) {
+    var one = $(this).is(':checked');
+    if (!one)
+      table.find('thead input[type=checkbox]').prop('checked', false);
+    buttonState();
+  };
+
+  table.find('tbody input[type=checkbox]').change(change);
+  dt.on('page.dt', function(e) {
+    var cells = $(dt.cells().nodes()),
+        count = cells.find('input[type=checkbox]:checked').length;
+    table.find('tbody input[type=checkbox]').unbind().change(change);
+    table.find('thead input[type=checkbox]').prop('checked', count == cells.length);
+  });
 });
 </script>
 {{/if}}

@@ -4,19 +4,22 @@
  * @param {string} selector CSS selector for table
  * @param {object} [options] optional config for DataTable plugin
  * @param {boolean} [options.expand] double number of displayed rows for tall browser
+ * @param {function} [next] function called after table is set up
  */
-function setupTable(selector, options) {
+function setupTable(selector, options, next) {
   $(document).ready(function() {
     if (!options) options = {};
 
     var table = $(selector),
         pageLength = (options.expand && $(window).height() > 900) ? 20 : 10,
         numRows = table.find('tbody tr').length,
-        gadgets = numRows > pageLength;
+        gadgets = options.bPaginate === false ? false : numRows > pageLength,
+        dt;
 
     var opts = _.extend({
       columnDefs: [{targets: 'no-sort', orderable: false}],
 
+      bPaginate: true,
       lengthMenu: [
         [ 10, 20, 50, -1 ],
         [ '10', '20', '50', 'all' ]
@@ -28,7 +31,10 @@ function setupTable(selector, options) {
       paging: gadgets,
     }, options);
 
-    table.DataTable(opts);
+    dt = table.DataTable(opts);
+
+    if (next)
+      next(dt);
   });
 }
 
@@ -43,24 +49,24 @@ function inlineSVG(selector, loaded) {
   $(document).ready(function() {
     $(selector).each(function() {
       var img = $(this),
-	  imgID = img.attr('id'),
-	  imgClass = img.attr('class'),
-	  imgURL = img.attr('src');
+          imgID = img.attr('id'),
+          imgClass = img.attr('class'),
+          imgURL = img.attr('src');
 
       $.get(imgURL, function(data) {
-	// get the SVG root element
-	var svg = $(data).find('svg');
-	if (svg.length > 0) {
-	  if (typeof imgID == 'string')
-	    svg = svg.attr('id', imgID);
-	  if (typeof imgClass == 'string')
-	    svg = svg.attr('class', imgClass + ' replaced-svg');
+        // get the SVG root element
+        var svg = $(data).find('svg');
+        if (svg.length > 0) {
+          if (typeof imgID == 'string')
+            svg = svg.attr('id', imgID);
+          if (typeof imgClass == 'string')
+            svg = svg.attr('class', imgClass + ' replaced-svg');
 
-	  img.replaceWith(svg);
+          img.replaceWith(svg);
 
-	  if (loaded)
-	    loaded(svg);
-	}
+          if (loaded)
+            loaded(svg);
+        }
       });
     });
   });

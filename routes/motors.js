@@ -733,18 +733,23 @@ function extractClasses(motors) {
 
 router.get('/motors/recent.html', function(req, res, next) {
   if (req.session.motorsViewed && req.session.motorsViewed.length > 0) {
-    req.db.Motor.find({ _id: { $in: req.session.motorsViewed } }).populate('_manufacturer').exec(req.success(function(motors) {
-      var classes = extractClasses(motors), suggestions = [],
-          i;
+    req.db.Motor.find({ _id: { $in: req.session.motorsViewed } })
+                .populate('_manufacturer')
+                .exec(req.success(function(motors) {
+      var classes, suggestions, i;
 
-      // provide sorting key
+      // sort and limit length
       for (i = 0; i < motors.length; i++)
         motors[i].recentOrder = req.session.motorsViewed.indexOf(motors[i]._id.toString());
       motors.sort(function(a, b) {
         return a.recentOrder - b.recentOrder;
       });
+      if (motors.length > LastViewed)
+        motors.length = LastViewed;
 
       // suggest classes to compare
+      classes = extractClasses(motors);
+      suggestions = [];
       if (classes.length > 1) {
         for (i = 0; i < classes.length; i++) {
           if (classes[i].count > 2)

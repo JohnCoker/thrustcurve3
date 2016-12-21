@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "find . -name node_modules -prune -o -name spec -type d -print | xargs -n1 -t jasmine-node",
+    "test": "node_modules/jasmine/bin/jasmine.js",
     "lint": "jshint `find . -name node_modules -prune -o -name out -prune -o -name tmp -prune -o -name public -prune -o -name '*.js' -print` public/javascripts/main.js"
   },
   "dependencies": {
     "async": "^1.5.2",
     "bcrypt-nodejs": "^0.0.3",
+    "bluebird": "^3.4.6",
     "body-parser": "~1.13.2",
     "connect-mongo": "^1.1.0",
     "continuation-local-storage": "^3.1.7",
@@ -17,6 +18,7 @@
     "crypto": "0.0.3",
     "date-format-lite": "^0.7.4",
     "debug": "~2.2.0",
+    "expect": "^1.20.2",
     "exphbs": "^1.0.1",
     "express": "~4.13.1",
     "express-session": "^1.13.0",
@@ -46,6 +48,7 @@
     "yamljs": "^0.2.6"
   },
   "devDependencies": {
-    "jasmine-node": "latest"
+    "jasmine": "^2.5.2",
+    "mockgoose": "^6.0.8"
   }
 }

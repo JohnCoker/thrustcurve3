@@ -42,6 +42,7 @@
    * motorguide
  * documentation page
  * demonstration page
+ * add support for bi-directional sync in phone app
 
 # Old Site Pages
 

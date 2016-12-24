@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 var schema = require('..');
 
-mongoose.Promise = require('bluebird')
-var mockgoose = require('mockgoose')
+mongoose.Promise = require('bluebird');
+var mockgoose = require('mockgoose');
 
 describe('schemas', function() {
   var startTime;
@@ -93,7 +93,7 @@ describe('schemas', function() {
     });
 
     it('update', function( done) {
-      var queryTime, createTime, found, updated;
+      var queryTime;
 
       queryTime = new Date();
       ManufacturerModel.findOne({ abbrev: 'RRU' }).exec()

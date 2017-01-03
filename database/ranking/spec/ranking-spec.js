@@ -45,6 +45,7 @@ describe("ranking", function() {
   });
 
   afterAll( function( done) {
+    mongoose.models = {};
     mongoose.disconnect();
     done();
   });
@@ -138,7 +139,7 @@ describe("ranking", function() {
         expect( result.categories.length).toBe(5);
         for (index = 0; index < result.categories.length; index++) {
           let category = result.categories[index];
-          
+
           expect( category).toBeTruthy();
           expect( category.label).toBeDefined();
           expect( category.classes).toBeDefined();

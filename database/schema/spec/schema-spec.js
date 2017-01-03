@@ -18,6 +18,7 @@ describe('schemas', function() {
   });
 
   afterAll( function( done) {
+    mongoose.models = {};
     mongoose.disconnect();
     done();
   });

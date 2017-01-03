@@ -1,146 +1,159 @@
-const mongoose = require('mongoose'),
-      schema = require('../../schema'),
-      ranking = require('..');
+const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
+var mockgoose = require('mockgoose');
 
-/* jshint loopfunc:true */
+const schema = require('../../schema');
+const ranking = require('..');
+
+
 describe("ranking", function() {
-  var db;
+  let db;
+  var manufacturer = null;
 
-  it('connect', function() {
-    mongoose.Promise = global.Promise;
-    mongoose.connect('mongodb://localhost/test', function(err) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      db = {
-        mongoose: mongoose,
-        Manufacturer: schema.ManufacturerModel(mongoose),
-        Motor: schema.MotorModel(mongoose),
-        MotorView: schema.MotorViewModel(mongoose),
-        MotorRanking: schema.MotorRankingModel(mongoose),
-      };
-      Object.freeze(db);
-      mongoose.connection.db.dropDatabase();
+  beforeAll( function(done) {
+    mockgoose(mongoose).then(function() {
+      mongoose.connect('mongodb://localhost/test')
+      .then( function( err) {
+        if (err){ console.error(err); }
+        expect( err).toBeFalsy();
+
+        startTime = new Date();
+        db = {
+          mongoose: mongoose,
+          Manufacturer: schema.ManufacturerModel(mongoose),
+          Motor: schema.MotorModel(mongoose),
+          MotorView: schema.MotorViewModel(mongoose),
+          MotorRanking: schema.MotorRankingModel(mongoose),
+        };
+        Object.freeze(db);
+
+        var mfr = new db.Manufacturer({
+          name: 'Rockets R Us',
+          abbrev: 'RRU',
+          aliases: ['RocketsRUs', 'RRUS'],
+          website: 'http://rocketsrus.com/'
+        })
+        mfr.save()
+        .then( function( saved) {
+          expect( saved).toBeTruthy();
+          manufacturer = saved;
+          done();
+        });
+
+      });
     });
   });
 
-  it("build", function() {
-    var manufacturer, motors;
+  afterAll( function( done) {
+    mongoose.disconnect();
+    done();
+  });
 
-    waits(100);
-    runs(function() {
-      var inst = new db.Manufacturer({
-        name: 'Rockets R Us',
-        abbrev: 'RRU',
-        aliases: ['RocketsRUs', 'RRUS'],
-        website: 'http://rocketsrus.com/'
-      });
-      inst.save(function(err, saved) {
-        if (err)
-          console.error(err);
-        expect(saved).toBeDefined();
-        manufacturer = saved;
-      });
+  afterEach( function(done){
+    mockgoose.reset(function() {
+      done();
     });
+  });
 
-    waits(200);
-    runs(function() {
-      var inst, cls, desig, avg, i;
+  it("build", function( done) {
+    expect(manufacturer).toBeDefined();
 
-      expect(manufacturer).toBeDefined();
+    var motorIds = [];
+    var promises = [];
+    const impulseClassCount = 15;
+    var avg = 0.5;
+    // Impulse numbers here match NAR motor code impulse limits:
+    //   http://www.nar.org/standards-and-testing-committee/standard-motor-codes/
+    for (var i = 0; i < impulseClassCount; i++) {
+      var cls = String.fromCharCode('A'.charCodeAt(0) + i).toUpperCase();
+      var desig = cls + avg.toFixed();
 
-      motors = [];
-      avg = 3;
-      for (i = 0; i < 15; i++) {
-        cls = String.fromCharCode('A'.charCodeAt(0) + i);
-        desig = cls + avg.toFixed();
+      promises.push( db.Motor.create({
+        _manufacturer: manufacturer,
+        designation: desig,
+        commonName: desig,
+        type: 'SU',
+        impulseClass: cls,
+        diameter: 18,
+        length: 100,
+        avgThrust: avg,
+        totalImpulse: avg * 3,
+        availability: 'regular'
+      })
+      .then( function( saved){
+        motorIds.push( saved._id);
+      }));
+      avg *= 2.0;
+    }
 
-        inst = new db.Motor({
-          _manufacturer: manufacturer,
-          designation: desig,
-          commonName: desig,
-          type: 'SU',
-          impulseClass: cls,
-          diameter: 18,
-          length: 100,
-          avgThrust: avg,
-          totalImpulse: avg * 3,
-          availability: 'regular'
-        });
-        db.Motor.create(inst, function(err, created) {
-          if (err)
-            console.err(err);
-          expect(created).toBeDefined();
-          if (created)
-            motors.push(created);
-        });
+    Promise.all(promises)
+    .then( function(){
+      expect(motorIds.length).toBe( impulseClassCount);
+      promises = [];
+    })
+    .then( function(){
+      // this needs to be >= 101, or else the ranker will reject.
+      let sampleSize = 200;
+      let sequentialViews = 50;
+      let creationTimeVariation = 5000; // unix seconds
 
-        avg *= 1.667;
-      }
-    });
+      let loopStartTime = new Date().getTime(); // magic numbers #2,3
+      for (var index = 0; index < sampleSize; index++) {
+        let viewTime = new Date(loopStartTime + Math.random() * 500);
 
-    waits(400);
-    runs(function() {
-      var inst, n, t, d, m, i;
-
-      expect(motors.length).toBe(15);
-
-      n = 1000;
-      t = new Date().getTime() - n * 550;
-      for (i = 0; i < 1000; i++) {
-        d = new Date(t);
-        if (i < 100)
-          m = motors[i % motors.length];
-        else
-          m = motors[Math.floor(Math.random() * motors.length)];
-        inst = new db.MotorView({
-          createdAt: d,
-          updateAt: d,
-          _motor: m._id
-        });
-        db.MotorView.create(inst, function(err, created) {
-          if (err)
-            console.err(err);
-          expect(created).toBeDefined();
-        });
-
-        t += Math.round(Math.random() * 500);
-      }
-    });
-
-    waits(1000);
-    runs(function() {
-      ranking.build(db, function(err, result) {
-        var p, i;
-
-        if (err)
-          console.err(err);
-        expect(result).toBeDefined();
-
-        p = result.overall;
-        expect(p).toBeDefined();
-        expect(p.motors).toBeDefined();
-        expect(p.motors.length).toBe(15);
-
-        expect(result.categories).toBeDefined();
-        expect(result.categories.length).toBe(5);
-        for (i = 0; i < result.categories.length; i++) {
-          p = result.categories[i];
-          expect(p).toBeDefined();
-          expect(p.label).toBeDefined();
-          expect(p.classes).toBeDefined();
-          expect(p.motors).toBeDefined();
-          expect(p.motors.length).toBe(p.classes.length);
+        let currentMotor = null;
+        if (index < sequentialViews){
+           currentMotor = motorIds[i % motorIds.length];
+        }else{
+          currentMotor  = motorIds[Math.floor(Math.random() * motorIds.length)];
         }
-      });
-    });
-  });
+        expect(currentMotor).not.toBeNull();
 
-  it("shutdown", function() {
-    waits(2000);
-    runs(function() {
-      mongoose.disconnect();
+        promises.push(
+          db.MotorView.create({
+            _motor: currentMotor,
+            createdAt: viewTime,
+            updateAt: viewTime,
+          }, function( err, currentView){
+            expect(err).toBeNull();
+          })
+        );
+      }
+      return Promise.all( promises);
+    })
+    .then( function(){
+      ranking.build(db, function(err, result) {
+        expect( err).toBeFalsy();
+        if( err){
+          console.log(err);
+          done();
+        }
+        expect( result).toBeTruthy();
+
+        expect( result.overall ).toBeTruthy();
+        expect( result.overall.motors).toBeTruthy();
+        expect( result.overall.motors.length).toBe(15);
+
+        expect( result.categories).toBeTruthy();
+        expect( result.categories.length).toBe(5);
+        for (index = 0; index < result.categories.length; index++) {
+          let category = result.categories[index];
+          
+          expect( category).toBeTruthy();
+          expect( category.label).toBeDefined();
+          expect( category.classes).toBeDefined();
+          expect( category.motors).toBeDefined();
+          expect( category.motors.length).toBe( category.classes.length);
+        }
+
+        done();
+      });
+
+    })
+    .catch( function(err){
+      console.error("catch-all error block!");
+      fail(err);
+      done();
     });
   });
 });

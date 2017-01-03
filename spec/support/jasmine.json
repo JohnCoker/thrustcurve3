@@ -1,11 +1,10 @@
 {
   "spec_dir": ".",
   "spec_files": [
-    "database/schema/spec/schema-spec.js"
+    "database/**/*spec.js"
   ],
   "helpers": [
     "helpers/**/*.js"
   ],
-  "stopSpecOnExpectationFailure": false,
-  "random": false
+  "stopSpecOnExpectationFailure": false
 }

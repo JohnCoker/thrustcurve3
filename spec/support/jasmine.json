@@ -2,7 +2,9 @@
   "spec_dir": ".",
   "spec_files": [
     "database/**/*spec.js",
-    "lib/**/*spec.js"
+    "lib/**/*spec.js",
+    "render/**/*spec.js",
+    "simulate/**/*spec.js"
   ],
   "helpers": [
     "helpers/**/*.js"

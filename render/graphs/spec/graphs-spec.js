@@ -1,3 +1,5 @@
+"use strict";
+
 const errors = require('../../../lib/errors'),
       parsers = require('../../../simulate/parsers'),
       graphs = require('..');

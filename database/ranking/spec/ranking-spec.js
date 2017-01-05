@@ -1,3 +1,5 @@
+"use strict";
+
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 var mockgoose = require('mockgoose');
@@ -17,7 +19,6 @@ describe("ranking", function() {
         if (err){ console.error(err); }
         expect( err).toBeFalsy();
 
-        startTime = new Date();
         db = {
           mongoose: mongoose,
           Manufacturer: schema.ManufacturerModel(mongoose),
@@ -32,7 +33,7 @@ describe("ranking", function() {
           abbrev: 'RRU',
           aliases: ['RocketsRUs', 'RRUS'],
           website: 'http://rocketsrus.com/'
-        })
+        });
         mfr.save()
         .then( function( saved) {
           expect( saved).toBeTruthy();
@@ -96,7 +97,6 @@ describe("ranking", function() {
       // this needs to be >= 101, or else the ranker will reject.
       let sampleSize = 200;
       let sequentialViews = 50;
-      let creationTimeVariation = 5000; // unix seconds
 
       let loopStartTime = new Date().getTime(); // magic numbers #2,3
       for (var index = 0; index < sampleSize; index++) {
@@ -124,6 +124,8 @@ describe("ranking", function() {
     })
     .then( function(){
       ranking.build(db, function(err, result) {
+        let index;
+
         expect( err).toBeFalsy();
         if( err){
           console.log(err);

@@ -1,3 +1,5 @@
+"use strict";
+
 var analyze = require("..");
 
 describe("analyze", function() {

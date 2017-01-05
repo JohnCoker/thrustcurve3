@@ -1,3 +1,5 @@
+"use strict";
+
 const data = require('..'),
       XMLFormat = data.XMLFormat,
       JSONFormat = data.JSONFormat;

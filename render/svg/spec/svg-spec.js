@@ -1,3 +1,5 @@
+"use strict";
+
 const xmlparser = require("xml-parser"),
       svg = require("..");
 

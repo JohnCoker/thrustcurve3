@@ -1,3 +1,5 @@
+"use strict";
+
 const csv = require('..');
 
 describe("csv", function() {

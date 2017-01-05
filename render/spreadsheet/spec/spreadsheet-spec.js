@@ -1,3 +1,5 @@
+"use strict";
+
 const spreadsheet = require('..');
 
 describe("spreadsheet", function() {

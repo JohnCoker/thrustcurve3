@@ -1,3 +1,5 @@
+"use strict";
+
 const bbcode = require('..');
 
 describe("bbcode", function() {

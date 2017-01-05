@@ -8,5 +8,12 @@
   "unused": "vars",
   "evil": "true",
   "loopfunc": "true",
-  "esnext": "true"
+  "esnext": "true",
+  "predef": [
+    "beforeAll",
+    "afterAll",
+    "fail",
+    "fdescribe",
+    "fit"
+  ]
 }

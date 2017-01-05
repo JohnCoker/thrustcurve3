@@ -1,3 +1,5 @@
+"use strict";
+
 var errors = require("../../../lib/errors"),
     analyze = require("../../analyze"),
     parsers = require("../../parsers"),

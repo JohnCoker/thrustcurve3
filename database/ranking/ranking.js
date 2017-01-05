@@ -309,7 +309,7 @@ function calculate(options, cb) {
         motors.on('error', function(err) {
           cb(err, undefined);
         });
-        motors.on('close', function() {
+        motors.on('end', function() {
           var badCount = 0,
               i, j;
 
@@ -376,8 +376,6 @@ function build(options, cb) {
     }
 
     calculate(options, function(err, doc) {
-      var model;
-
       if (err || doc == null) {
         cb(err, undefined);
         return;
@@ -389,8 +387,8 @@ function build(options, cb) {
         existing.save(cb);
       } else {
         doc.asOf = today;
-        model = new options.MotorRanking(doc);
-        options.MotorRanking.create(doc, cb);
+        let instance = new options.MotorRanking(doc);
+        instance.save( cb);
       }
     });
   });

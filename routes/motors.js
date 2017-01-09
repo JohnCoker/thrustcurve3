@@ -365,6 +365,8 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
 function doSearch(req, res, params) {
   metadata.getMotors(req, function(all, available) {
     var query = {},
+        sort = { totalImpulse: 1, designation: 1 },
+        options,
         hasParams, failed, isFresh,
         keys, k, v, m, i;
 
@@ -440,6 +442,12 @@ function doSearch(req, res, params) {
           else
             failed = true;
 
+        } else if (k == 'text') {
+          if (v)
+            query.$text = { $search: v };
+          else
+            failed = true;
+
         } else if (k == 'availability') {
           if (v == null || v == 'available')
             query.availability = { $in: req.db.schema.MotorAvailableEnum };
@@ -489,7 +497,7 @@ function doSearch(req, res, params) {
       }));
     } else if (hasParams) {
       // perform search
-      req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } }).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
+      req.db.Motor.find(query, options).sort(sort).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
         if (results.length == 1) {
           // record this as a search view
           recordView(req, results[0], 'search');

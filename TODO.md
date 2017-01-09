@@ -8,11 +8,10 @@
 
 ## Search
 
- * make search word-based (i.e., not exact match)
  * search by motor case
  * search by propellant type
- * diagnose search query when no matches found
  * search by propellant color
+ * diagnose search query when no matches found
 
 ## Motor Guide
 

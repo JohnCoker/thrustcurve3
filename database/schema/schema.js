@@ -148,6 +148,7 @@ function makeMotorModel(mongoose) {
     _certOrg: { type: mongoose.Schema.Types.ObjectId, ref: 'CertOrg' },
     designation: { type: String, required: true, uppercase: true, match: MotorDesignationRegex },
     altDesignation: { type: String, uppercase: true, match: MotorDesignationRegex },
+    searchDesignation: { type: String },
     commonName: { type: String, required: true, uppercase: true, match: MotorNameRegex },
     altName: { type: String, uppercase: true, match: MotorNameRegex },
     impulseClass: { type: String, required: true, uppercase: true, match: /^[A-O]$/ },
@@ -177,13 +178,73 @@ function makeMotorModel(mongoose) {
     }
   });
   schema.index({ _manufacturer: 1, designation: 1 }, { unique: true });
+  schema.index({
+    designation: 'text',
+    altDesignation: 'text',
+    searchDesignation: 'text',
+    commonName: 'text',
+    altName: 'text',
+    caseInfo: 'text',
+    propellantInfo: 'text'
+  }, {
+    weights: {
+      designation: 10,
+      commonName: 10,
+      altDesignation: 5,
+      altName: 5
+    },
+    name: 'text'
+  });
 
+  // simple availability check
   schema.virtual('isAvailable').get(function() {
     return this.availability != null && MotorAvailableEnum.indexOf(this.availability) >= 0;
   });
 
+  // synthesize the searchDesignation field
+  schema.pre('save', function(next) {
+    if (!this.isModified('designation') && !this.isModified('altDesignation'))
+      return next();
+
+    this.searchDesignation = designationToSearch(this.designation);
+    if (this.altDesignation)
+      this.searchDesignation += ' ' + designationToSearch(this.altDesignation);
+
+    next();
+  });
+
   schemaOptions(schema);
   return mongoose.model('Motor', schema);
+}
+
+function designationToSearch(desig) {
+  var all, parts, i, j;
+
+  if (desig == null || desig === '')
+    return '';
+
+  // the whole thing as-is
+  all = desig;
+
+  // underscores as spaces
+  if (/_/.test(desig))
+    all += ' ' + desig.replace(/_+/g, ' ');
+
+  // dashes as spaces, and as sub-words
+  if (/-/.test(desig)) {
+    all += ' ' + desig.replace(/-+/g, ' ');
+
+    parts = desig.split(/-+/);
+    if (parts.length > 2) {
+      for (i = 1; i < parts.length - 1; i++) {
+	all += ' ' + parts[0];
+	for (j = 1; j <= i; j++)
+	  all += '-' + parts[j];
+      }
+    }
+  }
+
+  return all;
 }
 
 function makeContributorModel(mongoose) {

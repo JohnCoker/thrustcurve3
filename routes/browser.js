@@ -57,7 +57,7 @@ const dimensions = [
             no++;
         }
         if (yes > 0 && no > 0)
-          match.push(categories[j]);
+          match.push({ label: categories[j].label, value: categories[j].value });
       }
       return match;
     },

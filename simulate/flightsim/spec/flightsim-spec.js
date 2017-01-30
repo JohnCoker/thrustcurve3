@@ -7,13 +7,34 @@ var errors = require("../../../lib/errors"),
 
 describe("flightsim", function() {
   describe("params", function() {
-    it("STP", function() {
-      var params = flightsim.STP;
+    it("DefaultParams", function() {
+      var params = flightsim.DefaultParams;
       expect(params).toBeDefined();
       expect(params.G).toBeCloseTo(9.807, 3);
-      expect(params.rho).toBeCloseTo(1.225, 3);
+      expect(params.rho).toBeCloseTo(1.204, 3);
+    });
+    describe("calculateParams", function() {
+      it("MSL, 20℃", function() {
+        var params;
+        expect(function() {
+          params = flightsim.calculateParams(0, 20);
+        }).not.toThrow();
+        expect(params).toBeDefined();
+        expect(params.G).toBeCloseTo(flightsim.DefaultParams.G, 3);
+        expect(params.rho).toBeCloseTo(flightsim.DefaultParams.rho, 3);
+      });
+      it("Black Rock", function() {
+        var params;
+        expect(function() {
+          params = flightsim.calculateParams(1207, 25);
+        }).not.toThrow();
+        expect(params).toBeDefined();
+        expect(params.G).toBeCloseTo(9.803, 3);
+        expect(params.rho).toBeCloseTo(1.024, 3);
+      });
     });
   });
+
   describe("motorInitialMass", function() {
     it("both", function() {
       var m = {
@@ -66,7 +87,7 @@ describe("flightsim", function() {
   });
 
   describe("Generic Rocket on M1939", function() {
-    var rocket, motor, data, result;
+    var rocket, motor, data;
     it("rocket", function() {
       rocket = {
         bodyDiameter: 6.2,
@@ -124,32 +145,73 @@ describe("flightsim", function() {
       expect(stats.totalImpulse).toBeCloseTo(10339.8, 1);
       expect(stats.burnTime).toBeCloseTo(6.5, 1);
     });
-    it("simulateRocket", function() {
-      expect(function() {
-        result = flightsim.simulateRocket(rocket, motor, data, errors.print);
-      }).not.toThrow();
-      expect(result).toBeDefined();
+    describe("simulation, standard params", function() {
+      var result;
+      it("simulateRocket", function() {
+        expect(function() {
+          result = flightsim.simulateRocket(rocket, motor, data, errors.print);
+        }).not.toThrow();
+        expect(result).toBeDefined();
+      });
+      it("inputs", function() {
+        expect(result.inputs).toBeDefined();
+        expect(result.inputs.bodyDiameter).toBeCloseTo(0.157, 3);
+        expect(result.inputs.cd).toBe(0.5);
+        expect(result.inputs.guideLength).toBeCloseTo(3.66, 2);
+        expect(result.inputs.motorInitialMass).toBeCloseTo(motor.totalWeight, 2);
+        expect(result.inputs.motorBurnoutMass).toBeCloseTo(motor.totalWeight - motor.propellantWeight, 2);
+        expect(result.inputs.loadedInitialMass).toBeCloseTo(12.247 + motor.totalWeight, 2);
+        expect(result.inputs.motorTotalImpulse).toBeCloseTo(10339.8, 1);
+      });
+      it("result", function() {
+        expect(result.liftoffTime).toBeCloseTo(0.0, 1);
+        expect(result.burnoutTime).toBeCloseTo(7.0, 1);
+        expect(result.apogeeTime).toBeCloseTo(27.1, 1);
+        expect(result.guideVelocity).toBeCloseTo(23.3, 1);
+        expect(result.maxAcceleration).toBeCloseTo(76.8, 1);
+        expect(result.maxVelocity).toBeCloseTo(311.1, 1);
+        expect(result.burnoutAltitude).toBeCloseTo(1475.9, 1);
+        expect(result.maxAltitude).toBeCloseTo(3828.4, 1);
+        expect(result.integratedImpulse).toBeCloseTo(result.inputs.motorTotalImpulse, 1);
+      });
     });
-    it("inputs", function() {
-      expect(result.inputs).toBeDefined();
-      expect(result.inputs.bodyDiameter).toBeCloseTo(0.157, 3);
-      expect(result.inputs.cd).toBe(0.5);
-      expect(result.inputs.guideLength).toBeCloseTo(3.66, 2);
-      expect(result.inputs.motorInitialMass).toBeCloseTo(motor.totalWeight, 2);
-      expect(result.inputs.motorBurnoutMass).toBeCloseTo(motor.totalWeight - motor.propellantWeight, 2);
-      expect(result.inputs.loadedInitialMass).toBeCloseTo(12.247 + motor.totalWeight, 2);
-      expect(result.inputs.motorTotalImpulse).toBeCloseTo(10339.8, 1);
-    });
-    it("result", function() {
-      expect(result.liftoffTime).toBeCloseTo(0.0, 1);
-      expect(result.burnoutTime).toBeCloseTo(7.0, 1);
-      expect(result.apogeeTime).toBeCloseTo(27.0, 1);
-      expect(result.guideVelocity).toBeCloseTo(23.3, 1);
-      expect(result.maxAcceleration).toBeCloseTo(76.8, 1);
-      expect(result.maxVelocity).toBeCloseTo(310.2, 1);
-      expect(result.burnoutAltitude).toBeCloseTo(1473.0, 1);
-      expect(result.maxAltitude).toBeCloseTo(3798.5, 1);
-      expect(result.integratedImpulse).toBeCloseTo(result.inputs.motorTotalImpulse, 1);
+    describe("simulation, Black Rock", function() {
+      // temperature: 35℃, altitude: 1207m, humidity: 5%
+      var params,
+          result;
+      it("calculateParams", function() {
+        expect(function() {
+          params = flightsim.calculateParams(1207, 25);
+        }).not.toThrow();
+        expect(params).toBeDefined();
+      });
+      it("simulateRocket", function() {
+        expect(function() {
+          result = flightsim.simulateRocket(rocket, motor, data, params, errors.print);
+        }).not.toThrow();
+        expect(result).toBeDefined();
+      });
+      it("inputs", function() {
+        expect(result.inputs).toBeDefined();
+        expect(result.inputs.bodyDiameter).toBeCloseTo(0.157, 3);
+        expect(result.inputs.cd).toBe(0.5);
+        expect(result.inputs.guideLength).toBeCloseTo(3.66, 2);
+        expect(result.inputs.motorInitialMass).toBeCloseTo(motor.totalWeight, 2);
+        expect(result.inputs.motorBurnoutMass).toBeCloseTo(motor.totalWeight - motor.propellantWeight, 2);
+        expect(result.inputs.loadedInitialMass).toBeCloseTo(12.247 + motor.totalWeight, 2);
+        expect(result.inputs.motorTotalImpulse).toBeCloseTo(10339.8, 1);
+      });
+      it("result", function() {
+        expect(result.liftoffTime).toBeCloseTo(0.0, 1);
+        expect(result.burnoutTime).toBeCloseTo(7.0, 1);
+        expect(result.apogeeTime).toBeCloseTo(28.3, 1);
+        expect(result.guideVelocity).toBeCloseTo(23.3, 1);
+        expect(result.maxAcceleration).toBeCloseTo(77.2, 1);
+        expect(result.maxVelocity).toBeCloseTo(319.0, 1);
+        expect(result.burnoutAltitude).toBeCloseTo(1501.7, 1);
+        expect(result.maxAltitude).toBeCloseTo(4115.8, 1);
+        expect(result.integratedImpulse).toBeCloseTo(result.inputs.motorTotalImpulse, 1);
+      });
     });
   });
 });

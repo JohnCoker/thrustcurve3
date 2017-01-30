@@ -356,7 +356,7 @@ function doRunGuide(req, res, rocket) {
                       result = {
                         _motor: motor._id,
                         mmt: mmt.name,
-                        thrustWeight: (cluster * motor.avgThrust / flightsim.STP.G) / (mmtInputs.rocketMass + simInputs.motorInitialMass)
+                        thrustWeight: (cluster * motor.avgThrust / flightsim.GravityMSL) / (mmtInputs.rocketMass + simInputs.motorInitialMass)
                       };
 
                       // for each motor, run the first simulation we can

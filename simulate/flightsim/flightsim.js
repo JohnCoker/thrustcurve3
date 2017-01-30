@@ -4,15 +4,19 @@
  */
 'use strict';
 
-var errors = require('../../lib/errors'),
-    units = require('../../lib/units'),
-    analyze = require('../analyze');
+const errors = require('../../lib/errors'),
+      units = require('../../lib/units'),
+      analyze = require('../analyze');
 
-var STP = {
-  G: 9.80665,
-  rho: 1.225
+const GravityMSL = 9.80665;
+
+const DefaultParams = {
+  // https://en.wikipedia.org/wiki/Standard_gravity
+  G: GravityMSL,
+  // https://en.wikipedia.org/wiki/Density_of_air
+  rho: 1.2041
 };
-Object.freeze(STP);
+Object.freeze(DefaultParams);
 
 function simulateRocket(rocket, motor, data, params, error) {
   var inputs;
@@ -44,7 +48,7 @@ function simulate(inputs, data, params, error) {
     params = undefined;
   }
   if (params == null)
-    params = STP;
+    params = DefaultParams;
   if (error == null)
     error = function() {};
 
@@ -98,7 +102,7 @@ function simulate(inputs, data, params, error) {
   }
   inputs.loadedInitialMass = mass;
 
-  // calculate drag at STP
+  // calculate drag at launch
   inputs.standardDrag = standardDrag(inputs.bodyDiameter, inputs.cd, params);
 
   // simulate through motor burn
@@ -183,6 +187,47 @@ function simulate(inputs, data, params, error) {
     maxAltitude: altMax,
     integratedImpulse: impulse,
   };
+}
+
+const EarthRadius = 6400000,
+      DefaultAltitude = 0,
+      MinAltitude = -500,
+      MaxAltitude = 9000,
+      DefaultTemperature = 20,
+      MinTemperature = -50,
+      MaxTemperature = 60;
+
+function sqr(n) {
+  return n * n;
+}
+
+function calculateParams(altitude, temperature) {
+  var G, rho, Pd;
+
+  // bound altitude
+  if (typeof altitude != 'number' || isNaN(altitude))
+    altitude = DefaultAltitude;
+  else if (altitude < MinAltitude)
+    altitude = MinAltitude;
+  else if (altitude > MaxAltitude)
+    altitude = MaxAltitude;
+
+  // bound temperature
+  if (typeof temperature != 'number' || isNaN(temperature))
+    temperature = DefaultTemperature;
+  if (temperature < MinTemperature)
+    temperature = MinTemperature;
+  if (temperature > MaxTemperature)
+    temperature = MaxTemperature;
+
+  // G is calculated from just altitude
+  G = GravityMSL * (sqr(EarthRadius) / sqr(EarthRadius + altitude));
+
+  // https://en.wikipedia.org/wiki/Barometric_formula
+  Pd = 101325 * Math.pow(1 - 2.25577e-5 * altitude, 5.25588);
+  rho = (Pd * 0.0289644) / (8.31447 * (temperature + 273.15));
+
+  return { G: G, rho: rho };
 }
 
 function motorInitialMass(motor) {
@@ -291,10 +336,29 @@ function standardDrag(diameter, cd, params) {
  */
 module.exports = {
   /**
-   * <p>The simulation parameters for standard temperature and pressure.</p>
-   * @member {object} STP
+   * <p>The acceleration due to gravity at sea level (~9.8m/s²).</p>
+   * @member {number} GravityMSL
    */
-  STP: STP,
+  GravityMSL: GravityMSL,
+
+  /**
+   * <p>The default simulation parameters (20℃ at sea level).</p>
+   * @member {object} DefaultParams
+   */
+  DefaultParams: DefaultParams,
+
+  /**
+   * <p>Calculate simulation parameters from altitude and temperature,
+   * using the standard atmospheric model.</p>
+   * <p>If unspecified, altitude is taken as 0m (MSL) and temperature as 20℃.
+   * Individual values are bounded by conditions found on Earth;
+   * altitude is bounded to 9km, utilizing 𝝆₀ of the atmospheric model table.</p>
+   * @function
+   * @param {number} altitude altitude above MSL in meters
+   * @param {number} temperature ground temperature in ℃
+   * @return {object} simulation parameters
+   */
+  calculateParams: calculateParams,
 
   /**
    * Run a single flight simulation on a saved rocket and motor.

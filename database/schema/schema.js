@@ -267,7 +267,8 @@ function makeContributorModel(mongoose) {
       forceUnit: { type: String, enum: units.force.labels },
       velocityUnit: { type: String, enum: units.velocity.labels },
       accelerationUnit: { type: String, enum: units.acceleration.labels },
-      altitudeUnit: { type: String, enum: units.altitude.labels }
+      altitudeUnit: { type: String, enum: units.altitude.labels },
+      temperatureUnit: { type: String, enum: units.temperature.labels }
     },
     permissions: {
       editMetadata: Boolean,

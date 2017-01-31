@@ -832,7 +832,8 @@ router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req
     'force',
     'velocity',
     'acceleration',
-    'altitude'
+    'altitude',
+    'temperature'
   ].forEach(function(unit) {
     var prefName = unit + 'Unit',
         prefValue = req.user.preferences[prefName],
@@ -863,7 +864,8 @@ router.post([preferencesLink], authenticated, function(req, res, next) {
     'forceUnit',
     'velocityUnit',
     'accelerationUnit',
-    'altitudeUnit'
+    'altitudeUnit',
+    'temperatureUnit'
   ].forEach(function(pref) {
     var value = req.body[pref];
     if (value != null && value !== '' && value != req.user.preferences[pref]) {

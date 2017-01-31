@@ -316,10 +316,11 @@ var tables = [
       else if (output["preferences.lengthUnit"] == 'm' && output["preferences.massUnit"] == 'kg')
         output["preferences.defaultUnits"] = 'MKS';
 
-      // fill in velocity and acceleration
+      // fill in new units
       if (output["preferences.altitudeUnit"] == 'ft' || output["preferences.altitudeUnit"] == 'mi') {
         output["preferences.velocityUnit"] = 'ft/s';
         output["preferences.accelerationUnit"] = 'ft/s²';
+        output["preferences.temperatureUnit"] = '℉';
       }
 
       // new admin new permissions

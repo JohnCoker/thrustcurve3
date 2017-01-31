@@ -19,7 +19,7 @@
     <div class="col-sm-9">
       <select name="lengthUnit" class="form-control" required>
         {{#each units.length}}
-        <option value="{{label}}" {{#equal label ../prefs.lengthUnit}}selected{{/equal}}>{{description}}</option>
+        <option value="{{label}}" {{#equal label ../prefs.lengthUnit}}selected{{/equal}}>{{description}} ({{label}})</option>
         {{/each}}
       </select>
       <span class="help-block with-errors"></span>
@@ -30,7 +30,7 @@
     <div class="col-sm-9">
       <select name="massUnit" class="form-control" required>
         {{#each units.mass}}
-        <option value="{{label}}" {{#equal label ../prefs.massUnit}}selected{{/equal}}>{{description}}</option>
+        <option value="{{label}}" {{#equal label ../prefs.massUnit}}selected{{/equal}}>{{description}} ({{label}})</option>
         {{/each}}
       </select>
       <span class="help-block with-errors"></span>
@@ -41,7 +41,7 @@
     <div class="col-sm-9">
       <select name="forceUnit" class="form-control" required>
         {{#each units.force}}
-        <option value="{{label}}" {{#equal label ../prefs.forceUnit}}selected{{/equal}}>{{description}}</option>
+        <option value="{{label}}" {{#equal label ../prefs.forceUnit}}selected{{/equal}}>{{description}} ({{label}})</option>
         {{/each}}
       </select>
       <span class="help-block with-errors"></span>
@@ -52,7 +52,7 @@
     <div class="col-sm-9">
       <select name="velocityUnit" class="form-control" required>
         {{#each units.velocity}}
-        <option value="{{label}}" {{#equal label ../prefs.velocityUnit}}selected{{/equal}}>{{description}}</option>
+        <option value="{{label}}" {{#equal label ../prefs.velocityUnit}}selected{{/equal}}>{{description}} ({{label}})</option>
         {{/each}}
       </select>
       <span class="help-block with-errors"></span>
@@ -63,7 +63,7 @@
     <div class="col-sm-9">
       <select name="accelerationUnit" class="form-control" required>
         {{#each units.acceleration}}
-        <option value="{{label}}" {{#equal label ../prefs.accelerationUnit}}selected{{/equal}}>{{description}}</option>
+        <option value="{{label}}" {{#equal label ../prefs.accelerationUnit}}selected{{/equal}}>{{description}} ({{label}})</option>
         {{/each}}
       </select>
       <span class="help-block with-errors"></span>
@@ -74,7 +74,18 @@
     <div class="col-sm-9">
       <select name="altitudeUnit" class="form-control" required>
         {{#each units.altitude}}
-        <option value="{{label}}" {{#equal label ../prefs.altitudeUnit}}selected{{/equal}}>{{description}}</option>
+        <option value="{{label}}" {{#equal label ../prefs.altitudeUnit}}selected{{/equal}}>{{description}} ({{label}})</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Temperature Unit</label>
+    <div class="col-sm-9">
+      <select name="temperatureUnit" class="form-control" required>
+        {{#each units.temperature}}
+        <option value="{{label}}" {{#equal label ../prefs.temperatureUnit}}selected{{/equal}}>{{description}} ({{label}})</option>
         {{/each}}
       </select>
       <span class="help-block with-errors"></span>
@@ -100,6 +111,7 @@ $('form select[name=defaultUnits]').change(function(e) {
     $('form select[name=velocityUnit]').val('{{velocity}}');
     $('form select[name=accelerationUnit]').val('{{acceleration}}');
     $('form select[name=altitudeUnit]').val('{{altitude}}');
+    $('form select[name=temperatureUnit]').val('{{temperature}}');
     break;
   {{/each}}
   }

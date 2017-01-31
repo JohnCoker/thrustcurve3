@@ -239,7 +239,7 @@ function thrustCurve(spec) {
     unit = units.force.get(spec.unit);
   if (unit == null)
     unit = units.getUnitPref('force');
-  yConvert = 1 / unit.toMKS;
+  yConvert = unit.fromMKS(1);
 
   layout = layoutGraph({
     width: width,
@@ -445,7 +445,7 @@ function impulseComparison(spec) {
     yConvert = 1;
   else {
     unit = units.getUnitPref('force');
-    yConvert = 1 / unit.toMKS;
+    yConvert = unit.fromMKS(1);
   }
 
   if (stats.minImpulse < AImpulseN)
@@ -641,7 +641,7 @@ function thrustCurveComparison(spec) {
     unit = units.force.get(spec.unit);
   if (unit == null)
     unit = units.getUnitPref('force');
-  yConvert = 1 / unit.toMKS;
+  yConvert = unit.fromMKS(1);
 
   layout = layoutGraph({
     width: width,

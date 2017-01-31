@@ -81,7 +81,7 @@ class File {
       this.colNumber(num, 1);
     else {
       unit = units.getUnitPref(unit);
-      this.colNumber(num / unit.toMKS, unit.digits);
+      this.colNumber(unit.fromMKS(num), unit.digits);
     }
   }
 

@@ -1,1 +1,32 @@
 <h1>{{title}}</h1>
+
+<p>
+{{formatInt contributors.length}} people have contributed {{formatInt total}} rocket motor data files for the benefit of the entire rocketry community.
+Thank you!
+<a href="/info/contribute.html">Find out how you can join them.</a>
+</p>
+
+<table id="contributor-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Name</th>
+     <th>Organization</th>
+     <th class="number">Data Files</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each contributors}}
+    <tr data-id="{{_id}}" data-class="{{impulseClass}}">
+      <td><a href="{{contributorLink this}}">{{name}}</a></td>
+      <td>{{organization}}</td>
+      <td class="number" data-sort="{{count}}">{{formatInt count}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#contributor-list', {
+  order: [[2, 'desc']],
+  expand: true
+});
+</script>

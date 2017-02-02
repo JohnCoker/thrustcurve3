@@ -1,0 +1,106 @@
+<h1>{{title}}</h1>
+
+{{#unless contributor}}
+<div class="alert alert-danger" role="alert">
+No such contributor found!
+</div>
+{{/unless}}
+
+<div class="row">
+  <div role="form" class="form-horizontal form-condensed">
+    <div class="form-group">
+      <label class="col-sm-3 control-label">Name</label>
+      <div class="col-sm-9">
+        <p class="form-control-static">{{contributor.name}}</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-3 control-label">Registered</label>
+      <div class="col-sm-9">
+        <p class="form-control-static">{{formatDate contributor.createdAt}}</p>
+      </div>
+    </div>
+    {{#if contributor.showEmail}}
+    <div class="form-group">
+      <label class="col-sm-3 control-label">Email</label>
+      <div class="col-sm-9">
+        <p class="form-control-static"><a href="mailto:{{contributor.email}}">{{contributor.email}}</a></p>
+      </div>
+    </div>
+    {{/if}}
+    {{#if contributor.organization}}
+    <div class="form-group">
+      <label class="col-sm-3 control-label">Organization</label>
+      <div class="col-sm-9">
+        <p class="form-control-static">{{contributor.organization}}</p>
+      </div>
+    </div>
+    {{/if}}
+    {{#if contributor.website}}
+    <div class="form-group">
+      <label class="col-sm-3 control-label">Web Site</label>
+      <div class="col-sm-9">
+        <p class="form-control-static"><a href="{{contributor.website}}" target="_blank">{{websiteAnchor contributor.website}}</a></p>
+      </div>
+    </div>
+    {{/if}}
+    {{#if simfiles}}
+    <div class="form-group">
+      <label class="col-sm-3 control-label">Contributed</label>
+      <div class="col-sm-9">
+        <p class="form-control-static">{{formatInt simfiles.length}} data files</p>
+      </div>
+    </div>
+    {{/if}}
+  </div>
+</div>
+
+{{#if simfiles}}
+<h2>Data Files Contributed</h2>
+<table id="simfile-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Motor</th>
+     <th>Format</th>
+     <th>Source</th>
+     <th>Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each simfiles}}
+    <tr data-id="{{_id}}">
+      <td><a href="{{motorLink _motor}}">{{motorFullName _motor}}</a></td>
+      <td><a href="{{simfileLink this}}">{{format}}</a></td>
+      <td>{{dataSource}}</td>
+      <td>{{formatDate updatedAt}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+{{/if}}
+
+{{#if rockets}}
+<h2>Rockets Entered</h2>
+<table id="rocket-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Name</th>
+     <th class="number">Body Diam</th>
+     <th class="number">Weight</th>
+     <th class="number">MMT Diam</th>
+     <th class="number">MMT Len</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each rockets}}
+    <tr data-id="{{_id}}">
+      <td><a href="/contributors/{{../contributor._id}}/rockets/{{id}}/">{{name}}</a></td>
+      <td class="number" data-sort="{{formatSort bodyDiameter 'length' bodyDiameterUnit}}">{{formatLength bodyDiameter bodyDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort weight 'mass' weightUnit}}">{{formatMass weight weightUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtDiameter 'length' mmtDiameterUnit}}">{{formatLength mmtDiameter mmtDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtLength 'length' mmtLengthUnit}}">{{formatLength mmtLength mmtLengthUnit}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+{{/if}}

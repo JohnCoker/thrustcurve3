@@ -21,7 +21,8 @@
 
 ## Account
 
- * search and display of users
+ * search other contributors?
+ * search for entered rockets
  * add/edit/delete notes
 
 ## Administration

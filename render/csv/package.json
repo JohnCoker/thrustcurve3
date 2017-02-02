@@ -4,7 +4,7 @@
   "description": "support for writing comma-separated values files",
   "main": "csv.js",
   "scripts": {
-    "test": "jasmine-node spec"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",

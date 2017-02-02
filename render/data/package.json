@@ -4,7 +4,7 @@
   "description": "build data responses in XML and JSON",
   "main": "data.js",
   "scripts": {
-    "test": "jasmine-node spec",
+    "test": "jasmine",
     "lint": "jshint *.js spec/*.js"
   },
   "repository": {

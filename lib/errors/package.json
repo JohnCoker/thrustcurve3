@@ -4,7 +4,7 @@
   "description": "error codes and message formatting",
   "main": "errors.js",
   "scripts": {
-    "test": "jasmine-node spec",
+    "test": "jasmine",
     "lint": "jshint *.js spec/*.js"
   },
   "repository": {

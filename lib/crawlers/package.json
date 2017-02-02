@@ -4,7 +4,7 @@
   "description": "detect web robot user agents",
   "main": "crawlers.js",
   "scripts": {
-    "test": "jasmine-node spec",
+    "test": "jasmine",
     "lint": "jshint *.js spec/*.js"
   },
   "repository": {

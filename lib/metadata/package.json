@@ -4,7 +4,7 @@
   "description": "collect meta-information about motors",
   "main": "metadata.js",
   "scripts": {
-    "test": "jasmine-node spec",
+    "test": "jasmine",
     "lint": "jshint *.js spec/*.js"
   },
   "repository": {

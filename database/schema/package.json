@@ -4,7 +4,7 @@
   "description": "MongoDB schema for ThrustCurve.org",
   "main": "schema.js",
   "scripts": {
-    "test": "jasmine-node spec",
+    "test": "jasmine",
     "lint": "jshint *.js spec/*.js"
   },
   "repository": {

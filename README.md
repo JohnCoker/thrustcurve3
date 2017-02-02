@@ -78,7 +78,6 @@ The top-level directory is the web application that powers the site, using the
 
 Other directories contain small Node.js modules that implement the logic behind the routes.
 Most modules are quite small (with a single file being typical).
-Jasmine tests are located within each module, and all tests can be run with `npm test` at the top level.
 
 ```
 thrustcurve3
@@ -125,6 +124,10 @@ thrustcurve3
     └── simfiles
 ```
 
+Jasmine 2 tests are located within each module and can be run at any level with the
+[jasmine](https://www.npmjs.com/package/jasmine) command.
+`npm test` at the root level can be run without a global installation of jasmine
+(as long as the devDependencies are installed).
 
 ## License
 

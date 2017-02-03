@@ -14,7 +14,7 @@ const defaults = {
   layout: 'info',
 };
 
-const listLink = '/contributors/list.html';
+const listLink = '/contributors/';
 
 /*
  * /contributors/list.html

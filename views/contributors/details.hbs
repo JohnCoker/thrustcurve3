@@ -77,6 +77,12 @@ No such contributor found!
   {{/each}}
   </tbody>
 </table>
+<script type="text/javascript">
+setupTable('#simfile-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>
 {{/if}}
 
 {{#if rockets}}
@@ -103,4 +109,10 @@ No such contributor found!
   {{/each}}
   </tbody>
 </table>
+<script type="text/javascript">
+setupTable('#rocket-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>
 {{/if}}

@@ -63,7 +63,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | browser.jsp         | motors/browser.html          | ✓ | motor browser |
 | browser.shtml       | motors/browser.html          | ✓ | motor browser |
 | certification.shtml | info/certification.html      | ✓ | general info |
-| contribsearch.jsp   |                              |   | contribution |
+| contribsearch.jsp   | contributors/list.html       | ✓ | contribution |
 | contribute.shtml    | info/contribute.html         | ✓ | general info |
 | deletenote.jsp      |                              |   | contribution |
 | deleterocket.jsp    | mystuff/rocket/*/delete.html | ✓ | account |

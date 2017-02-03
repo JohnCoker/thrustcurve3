@@ -2,12 +2,12 @@
 
 {{#if isSaved}}
 <div class="alert alert-success" role="alert">
-Changes to manufacturer saved.
+Changes to motor saved.
 </div>
 {{/if}}
 {{#if isCreated}}
 <div class="alert alert-success" role="alert">
-New manufacturer created.
+New motor created.
 </div>
 {{/if}}
 {{#if isUnchanged}}
@@ -16,21 +16,22 @@ No changes to save.
 </div>
 {{/if}}
 
-<form role="form" class="form-horizontal" name="edit-manufacturer" action="{{submitLink}}" method="post" data-toggle="validator">
+<form role="form" class="form-horizontal" name="edit-certorg" action="{{submitLink}}" method="post" data-toggle="validator">
   {{#unless isNew}}
   <div class="form-group">
     <label for="id" class="col-sm-3 control-label">ID</label>
     <div class="col-sm-9">
-      <p class="id form-control-static">{{manufacturer._id}} {{#if manufacturer.migratedId}}(migrated {{manufacturer.migratedId}}){{/if}}</p>
+      <p class="id form-control-static">{{certorg._id}} {{#if certorg.migratedId}}(migrated {{certorg.migratedId}}){{/if}}</p>
+      <input type="hidden" name="id" value="{{certorg._id}}">
     </div>
   </div>
   {{/unless}}
   <div class="form-group">
-    <label for="name" class="col-sm-3 control-label">Company</label>
+    <label for="name" class="col-sm-3 control-label">Full Name</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="name"
              pattern="^[A-Z][A-Za-z0-9/,. -]+$" required data-error="full name, no special characters"
-             placeholder="company name" value="{{{manufacturer.name}}}">
+             value="{{{certorg.name}}}">
       <span class="help-block with-errors"></span>
     </div>
   </div>
@@ -39,7 +40,7 @@ No changes to save.
     <div class="col-sm-9">
       <input type="text" class="form-control" name="abbrev"
              pattern="^[A-Z][A-Za-z0-9/-]+$" required data-error="single word, no special characters"
-             placeholder="CN" value="{{{manufacturer.abbrev}}}">
+             value="{{{certorg.abbrev}}}">
       <span class="help-block with-errors"></span>
     </div>
   </div>
@@ -47,8 +48,8 @@ No changes to save.
     <label for="aliases" class="col-sm-3 control-label">Aliases</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="aliases"
-             pattern="^[A-Z][A-Za-z0-9/ -]*( *, *[A-Z][A-Za-z0-9/ -]*)*$" data-error="letters or words, separated by commas"
-             placeholder="a1, a2, ...", value="{{{manufacturer.aliases}}}">
+             pattern="^[A-Z][A-Za-z0-9/ &-]*( *, *[A-Z][A-Za-z0-9/ &-]*)*$" data-error="letters or words, separated by commas"
+             placeholder="a1, a2, ...", value="{{{certorg.aliases}}}">
       <span class="help-block with-errors"></span>
     </div>
   </div>
@@ -57,7 +58,7 @@ No changes to save.
     <div class="col-sm-9">
       <div class="input-group">
         <input type="url" class="form-control" name="website"
-               placeholder="http://..." value="{{manufacturer.website}}">
+               placeholder="http://..." value="{{certorg.website}}">
         <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
       </div>
       <span class="help-block with-errors"></span>
@@ -65,9 +66,18 @@ No changes to save.
   </div>
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9">
-      <input type="checkbox" name="active" {{#if manufacturer.active}}checked{{/if}}> Active
+      <input type="checkbox" name="active" {{#if certorg.active}}checked{{/if}}> Active
+    </div><
+  </div>
+  {{#if motors}}
+  <div class="form-group">
+    <label for="motors" class="col-sm-3 control-label">Motors</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{formatInt motors}}</p>
     </div>
   </div>
+  {{/if}}
+
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 form-submit">
       <button type="submit" class="btn btn-primary">Submit</button>
@@ -75,15 +85,3 @@ No changes to save.
     </div>
   </div>
 </form>
-
-<script type="text/javascript">
-$('.website .test').click(function(e) {
-  var site, a;
-
-  e.preventDefault();
-
-  site = $.trim($(this).closest('div.input-group').find('input').val());
-  if (site)
-    window.open(site, "_blank");
-});
-</script>

@@ -1,0 +1,30 @@
+<h1>{{title}}</h1>
+
+<table id="certorg-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Full Name</th>
+     <th>Abbrev</th>
+     <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each certorgs}}
+    <tr data-id="{{_id}}">
+      <td><a href="/admin/certorgs/{{_id}}">{{name}}</a></td>
+      <td>{{abbrev}}</td>
+      <td>{{#if active}}active{{/if}}{{#unless active}}&mdash;{{/unless}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#certorg-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>
+
+<p>
+<a href="{{newLink}}">Add a new organization</a>.
+</p>

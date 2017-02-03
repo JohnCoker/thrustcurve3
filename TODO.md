@@ -28,7 +28,6 @@
 ## Administration
 
  * new motor entry
- * certification org editing
  * manufacturer editing
  * user administration
  * delete data files

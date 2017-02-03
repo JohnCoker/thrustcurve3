@@ -162,13 +162,20 @@ var tables = [
         field: 'abbrev'
       },
       {
-        name: 'test_name',
-        field: false
+        name: /^test_/,
+        field: 'aliases',
+        mapper: function() {
+          var all = [],
+              i;
+
+          for (i = 0; i < arguments.length; i++) {
+            if (typeof arguments[i] == 'string' && arguments[i] !== '')
+              all.push(arguments[i]);
+          }
+          if (all.length > 0)
+            return all;
+        }
       },
-      {
-        name: 'test_abbrev',
-        field: false
-      }
     ]
   },
   {

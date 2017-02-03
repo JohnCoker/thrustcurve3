@@ -89,6 +89,9 @@
             <li class="dropdown" title="site administration">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
               <ul class="dropdown-menu">
+                {{#hasPerm 'metadata'}}
+                <li><a href="/admin/certorgs/">Certification Orgs.</a></li>
+                {{/hasPerm}}
                 <li><a href="/motors/missingdata.html">Motors Without Data</a></li>
                 <li><a href="/motors/missingstats.html">Motors Missing Stats</a></li>
               </ul>

@@ -4,15 +4,17 @@
  */
 'use strict';
 
-var express = require('express'),
-    router = express.Router(),
-    metadata = require('../lib/metadata'),
-    locals = require('./locals.js'),
-    authorized = require('./authorized.js');
+const express = require('express'),
+      router = express.Router(),
+      metadata = require('../lib/metadata'),
+      locals = require('./locals.js'),
+      authorized = require('./authorized.js');
 
-var defaults = {
-  layout: 'index',
+const defaults = {
+  layout: 'admin',
 };
+
+const certOrgList = '/admin/certorgs/';
 
 /*
  * /sitemap.xml
@@ -79,7 +81,7 @@ router.get('/sitemap.xml', function(req, res, next) {
     req.db.Motor.find(q, undefined, { sort: { _manufacturer: 1, designation: 1 } })
                 .select('_manufacturer designation updatedAt')
                 .exec(req.success(function(motors) {
-      var s = '', info, i;
+      var s = '', i;
 
       s += '<?xml version="1.0" encoding="UTF-8"?>\n';
       s += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
@@ -116,6 +118,128 @@ router.get('/sitemap.xml', function(req, res, next) {
       res.status(200).type('text/xml').send(s);
     }));
   });
+});
+
+
+/*
+ * /admin/certorgs/
+ * List the certification organizations, renders with admin/certorglist.hbs template
+ */
+router.get(certOrgList, authorized('metadata'), function(req, res, next) {
+  req.db.CertOrg.find(req.success(function(certorgs) {
+    res.render('admin/certorglist', locals(defaults, {
+      title: 'Certification Organizations',
+      certorgs: certorgs,
+      newLink: '/admin/certorgs/new'
+    }));
+  }));
+});
+
+
+/*
+ * /admin/certorgs/:id
+ * Edit a certification organizations, renders with admin/certorgedit.hbs template
+ */
+router.get('/admin/certorgs/:id', authorized('metadata'), function(req, res, next) {
+  var id;
+  if (req.db.isId(req.params.id))
+    id = req.params.id;
+  else {
+    res.render('admin/certorgedit', locals(defaults, {
+      title: 'New Certification Org',
+      isNew: true,
+      submitLink: '/admin/certorgs/new'
+    }));
+    return;
+  }
+
+  req.db.CertOrg.findOne({ _id: id }, req.success(function(certorg) {
+    if (!certorg) {
+      res.redirect(certOrgList, 302);
+      return;
+    }
+    req.db.Motor.count({ _certOrg: id }, req.success(function(motors) {
+      res.render('admin/certorgedit', locals(defaults, {
+        title: 'Edit Certification Org',
+        certorg: certorg,
+        motors: motors,
+        isCreated: req.query.result == 'created',
+        isSaved: req.query.result == 'saved',
+        isUnchanged: req.query.result == 'unchanged',
+        submitLink: '/admin/certorgs/' + id
+      }));
+    }));
+  }));
+});
+
+router.post('/admin/certorgs/:id', authorized('metadata'), function(req, res, next) {
+  var id;
+  if (req.db.isId(req.body.id))
+    id = req.body.id;
+  else if (req.db.isId(req.params.id))
+    id = req.param.id;
+  console.log('--- params');
+  console.log(req.params);
+  console.log('--- body');
+  console.log(req.body);
+  req.db.CertOrg.findOne({ _id: id }, req.success(function(certorg) {
+    var isNew = false, isChanged = false,
+        aliases;
+
+    if (certorg == null) {
+      if (id != null && id != 'new') {
+        res.redirect(303, certOrgList);
+        return;
+      }
+      certorg = {
+        aliases: [],
+        active: true
+      };
+      isNew = true;
+    }
+
+    ['name', 'abbrev', 'website'].forEach(function(p) {
+      if (req.body.hasOwnProperty(p) && req.body[p] != certorg[p]) {
+        certorg[p] = req.body[p];
+        isChanged = true;
+      }
+    });
+
+    if (req.body.aliases) {
+      aliases = req.body.aliases.split(/ *,[ ,]*/);
+      if (aliases.join() != certorg.aliases.join()) {
+        certorg.aliases = aliases;
+        isChanged = true;
+      }
+    }
+
+    if (req.body.active) {
+      if (!certorg.active) {
+        certorg.active = true;
+        isChanged = true;
+      }
+    } else {
+      if (certorg.active) {
+        certorg.active = false;
+        isChanged = true;
+      }
+    }
+
+    if (isNew) {
+      req.db.CertOrg.create(new req.db.CertOrg(certorg), req.success(function(updated) {
+        res.redirect(303, '/admin/certorgs/' + updated._id + '?result=created');
+      }));
+    } else if (isChanged) {
+      certorg.save(req.success(function() {
+        res.redirect(303, '/admin/certorgs/' + certorg._id + '?result=saved');
+      }));
+    } else {
+      res.redirect(303, '/admin/certorgs/' + certorg._id + '?result=unchanged');
+    }
+
+    if (isNew || isChanged)
+      metadata.flush();
+  }));
 });
 
 module.exports = router;

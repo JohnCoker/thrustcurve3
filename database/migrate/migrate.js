@@ -101,13 +101,23 @@ function mapMMGStoMKS(value) {
 }
 
 function mapWebsite(value) {
-  if (!value || value == '-' || value == '--' || value.toLowerCase() == 'na')
+  value = mapText(value);
+  if (!value)
     return;
+
   if (value && !/^https?:\/\//.test(value))
     value = 'http://' + value;
-
   if (schema.UrlRegex.test(value))
     return value;
+}
+
+function mapText(value) {
+  if (value == null)
+    return;
+  value = value.trim();
+  if (value === '' || /^-+$/.test(value) || value.toLowerCase() == 'na' || value.toLowerCase() == 'n/a')
+    return;
+  return value;
 }
 
 function mapDesignation(value) {
@@ -262,6 +272,11 @@ var tables = [
         field: '_representsMfr'
       },
       {
+        name: 'org',
+        field: 'organization',
+        mapper: mapText
+      },
+      {
         name: 'website',
         field: 'website',
         mapper: mapWebsite
@@ -269,11 +284,6 @@ var tables = [
       {
         name: 'pref_dimen_u',
         field: 'preferences.lengthUnit',
-        mapper: mapUnit
-      },
-      {
-        name: 'org',
-        field: 'organization',
         mapper: mapUnit
       },
       {

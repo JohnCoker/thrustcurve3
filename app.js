@@ -131,6 +131,14 @@ app.use(function(req, res, next) {
     return req.session.bot;
   };
 
+  // check if a property is specified in the body/query
+  req.hasBodyProperty = function(p) {
+    return this.body != null && Object.prototype.hasOwnProperty.call(this.body, p);
+  };
+  req.hasQueryProperty = function(p) {
+    return this.query != null && Object.prototype.hasOwnProperty.call(this.query, p);
+  };
+
   // make request and prefs available throughout processing
   clsNamespace.bindEmitter(req);
   clsNamespace.bindEmitter(res);

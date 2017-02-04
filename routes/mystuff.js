@@ -589,7 +589,7 @@ function doSubmitRocket(req, res, rocket) {
     'comments',
   ].forEach(function(p) {
     var s;
-    if (req.body.hasOwnProperty(p)) {
+    if (req.hasBodyProperty(p)) {
       s = req.body[p].trim();
       if (s === '') {
         if (rocket[p] != null) {
@@ -628,7 +628,7 @@ function doSubmitRocket(req, res, rocket) {
     var unitProp = valueProp + 'Unit',
         u, v;
 
-    if (req.body.hasOwnProperty(valueProp)) {
+    if (req.hasBodyProperty(valueProp)) {
       v = parseFloat(req.body[valueProp]);
       u = req.body[unitProp];
 
@@ -652,7 +652,7 @@ function doSubmitRocket(req, res, rocket) {
     'cd',
   ].forEach(function(p) {
     var v;
-    if (req.body.hasOwnProperty(p)) {
+    if (req.hasBodyProperty(p)) {
       v = parseFloat(req.body[p]);
       if (isNaN(v) || v <= 0)
         errors.push('Rocket ' + p + ' is required.');
@@ -749,7 +749,7 @@ router.post('/mystuff/rocket/:id/adapter.html', authenticated, function(req, res
         var unitProp = valueProp + 'Unit',
             u, v;
 
-        if (req.body.hasOwnProperty(valueProp)) {
+        if (req.hasBodyProperty(valueProp)) {
           v = parseFloat(req.body[valueProp]);
           u = req.body[unitProp];
 
@@ -768,7 +768,7 @@ router.post('/mystuff/rocket/:id/adapter.html', authenticated, function(req, res
         }
       });
 
-      if (req.body.hasOwnProperty('remove')) {
+      if (req.hasBodyProperty('remove')) {
         // remove an adapter
         if (index >= 0 && index < rocket.adapters.length) {
           rocket.adapters.splice(index, 1);
@@ -916,7 +916,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
       change = false, changeEmail = false,
       v;
 
-  if (req.body.hasOwnProperty('name')) {
+  if (req.hasBodyProperty('name')) {
     v = req.body.name.trim();
     if (v === '') {
       errors.push('Please enter your name for public display.');
@@ -928,7 +928,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
     }
   }
 
-  if (req.body.hasOwnProperty('email')) {
+  if (req.hasBodyProperty('email')) {
     v = req.body.email.trim();
     if (v === '' || !schema.EmailRegex.test(v)) {
       errors.push('Please enter your email address as your login name.');
@@ -946,7 +946,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
     }
   }
 
-  if (req.body.hasOwnProperty('organization')) {
+  if (req.hasBodyProperty('organization')) {
     v = req.body.organization.trim();
     if (v == null || v === '' || v == '-') {
       if (info.organization != null) {
@@ -959,7 +959,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
     }
   }
 
-  if (req.body.hasOwnProperty('website')) {
+  if (req.hasBodyProperty('website')) {
     v = req.body.website.trim();
     if (v == null || v === '' || v == '-') {
       if (info.website != null) {
@@ -976,7 +976,7 @@ router.post(profileLink, authenticated, function(req, res, next) {
     }
   }
 
-  if (req.body.hasOwnProperty('password')) {
+  if (req.hasBodyProperty('password')) {
     v = req.body.password;
     if (v == null || v === '') {
       errors.push('A password is required to protect your account.');

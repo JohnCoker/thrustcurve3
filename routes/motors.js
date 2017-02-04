@@ -1065,7 +1065,7 @@ function doSubmit(req, res, motor) {
     'availability',
   ].forEach(function(p) {
     var s;
-    if (req.body.hasOwnProperty(p)) {
+    if (req.hasBodyProperty(p)) {
       s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {
@@ -1085,7 +1085,7 @@ function doSubmit(req, res, motor) {
   [ 'certDate',
   ].forEach(function(p) {
     var s, d;
-    if (req.body.hasOwnProperty(p)) {
+    if (req.hasBodyProperty(p)) {
       s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {
@@ -1110,7 +1110,7 @@ function doSubmit(req, res, motor) {
     'isp',
   ].forEach(function(p) {
     var s, n;
-    if (req.body.hasOwnProperty(p)) {
+    if (req.hasBodyProperty(p)) {
       s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {
@@ -1134,7 +1134,7 @@ function doSubmit(req, res, motor) {
     'propellantWeight',
   ].forEach(function(p) {
     var s, n;
-    if (req.body.hasOwnProperty(p)) {
+    if (req.hasBodyProperty(p)) {
       s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {

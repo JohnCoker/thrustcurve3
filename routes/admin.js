@@ -178,10 +178,6 @@ router.post('/admin/certorgs/:id', authorized('metadata'), function(req, res, ne
     id = req.body.id;
   else if (req.db.isId(req.params.id))
     id = req.param.id;
-  console.log('--- params');
-  console.log(req.params);
-  console.log('--- body');
-  console.log(req.body);
   req.db.CertOrg.findOne({ _id: id }, req.success(function(certorg) {
     var isNew = false, isChanged = false,
         aliases;
@@ -199,7 +195,7 @@ router.post('/admin/certorgs/:id', authorized('metadata'), function(req, res, ne
     }
 
     ['name', 'abbrev', 'website'].forEach(function(p) {
-      if (req.body.hasOwnProperty(p) && req.body[p] != certorg[p]) {
+      if (req.hasBodyProperty(p) && req.body[p] != certorg[p]) {
         certorg[p] = req.body[p];
         isChanged = true;
       }

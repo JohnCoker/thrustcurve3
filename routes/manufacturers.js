@@ -72,7 +72,7 @@ router.get('/manufacturers/:name/details.html', function(req, res, next) {
 
     // only for available motors unless requested
     unavailable = false;
-    if (req.query.hasOwnProperty('unavailable')) {
+    if (req.hasQueryProperty('unavailable')) {
       if (req.query.unavailable === '' || req.query.unavailable == 'true')
         unavailable = true;
     } else {
@@ -148,14 +148,14 @@ router.get('/manufacturers/:name/motors.html', function(req, res, next) {
     };
 
     // optionally for a single impulse class
-    if (req.query.hasOwnProperty('impulseClass') && /^[A-Z]$/i.test(req.query.impulseClass)) {
+    if (req.hasQueryProperty('impulseClass') && /^[A-Z]$/i.test(req.query.impulseClass)) {
       impulseClass = req.query.impulseClass.toUpperCase();
       motorsQuery.impulseClass = impulseClass;
     }
 
     // only for available motors unless requested
     unavailable = false;
-    if (req.query.hasOwnProperty('unavailable')) {
+    if (req.hasQueryProperty('unavailable')) {
       if (req.query.unavailable === '' || req.query.unavailable == 'true')
         unavailable = true;
     }
@@ -217,7 +217,7 @@ router.post('/manufacturers/:id/edit.html', authorized('metadata'), function(req
     }
 
     ['name', 'abbrev', 'website'].forEach(function(p) {
-      if (req.body.hasOwnProperty(p) && req.body[p] != manufacturer[p]) {
+      if (req.hasBodyProperty(p) && req.body[p] != manufacturer[p]) {
         manufacturer[p] = req.body[p];
         isChanged = true;
       }

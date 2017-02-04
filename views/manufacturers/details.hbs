@@ -3,7 +3,7 @@
 <div class="row">
   <!-- left col -->
   <div class="col-md-3">
-    <img src="/images/manufacturers/{{manufacturer.abbrev}}.png">
+    <img style="max-width: 100%;" src="/images/manufacturers/{{manufacturer.abbrev}}.png">
   </div> <!-- left col -->
 
   <!-- right col -->
@@ -62,11 +62,11 @@
   </div> <!-- right col -->
 </div> <!-- row -->
 
-{{#if editLink}}
+{{#hasPerm 'metadata'}}
 <p>
 <a href="{{editLink}}">Edit this manufacturer.</a>
 </p>
-{{/if}}
+{{/hasPerm}}
 
 {{#if impulseClasses}}
 <h2>Motors by Class</h2>

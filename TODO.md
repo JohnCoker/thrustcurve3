@@ -4,7 +4,12 @@
 
  * flag motors favorited by other users
  * add Like, +1, Flattr, etc for motor pages
- * outbox feature?
+ * outbox feature
+
+## Contribution
+
+ * add/edit/delete simfiles
+ * add/edit/delete motor and simfile notes
 
 ## Search
 
@@ -17,13 +22,12 @@
 
  * format numbers consistently in spreadsheets
  * use visual styles in spreadsheets
- * varying launch conditions (ground altitude, temperature)?
+ * varying launch conditions (ground altitude, temperature)
 
 ## Account
 
- * search other contributors?
+ * search other contributors
  * search for entered rockets
- * add/edit/delete notes
 
 ## Administration
 

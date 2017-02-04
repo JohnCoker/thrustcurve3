@@ -278,11 +278,11 @@
 
 </div> <!-- row -->
 
-{{#if editLink}}
+{{#hasPerm 'motors'}}
 <p>
 <a href="{{editLink}}">Edit this motor.</a>
 </p>
-{{/if}}
+{{/hasPerm}}
 
 <a name="simfiles"></a>
 <h2>Simulator Files</h2>

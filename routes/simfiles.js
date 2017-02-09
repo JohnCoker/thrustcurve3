@@ -8,9 +8,11 @@ const express = require('express'),
       router = express.Router(),
       errors = require('../lib/errors'),
       units = require('../lib/units'),
+      schema = require('../database/schema'),
       parsers = require('../simulate/parsers'),
       analyze = require('../simulate/analyze'),
       graphs = require('../render/graphs'),
+      authenticated = require('./authenticated.js'),
       locals = require('./locals.js');
 
 var defaults = {
@@ -197,6 +199,102 @@ router.get('/simfiles/:id/download/:file', function(req, res, next) {
        .header('Content-Disposition', 'attachment; filename=' + simFileName(simfile))
        .send(simfile.data);
   });
+});
+
+
+/*
+ * /simfiles/:id/create.html
+ * Create a data file for the specified motor; renders with simfiles/edit.hbs template.
+ */
+router.get('/simfiles/:id/create.html', authenticated, function(req, res, next) {
+  req.db.Motor.findOne({ _id: req.params.id }).populate('_manufacturer').exec(req.success(function(motor) {
+    if (motor == null) {
+      res.redirect(303, req.header('Referer') || '/');
+      return;
+    }
+    res.render('simfiles/edit', locals(defaults, {
+      title: 'Contribute Data File',
+      isNew: true,
+      motor: motor,
+      simfile: {
+        _contributor: req.user,
+        _motor: motor
+      },
+      formats: schema.SimFileFormatEnum,
+      dataSources: schema.SimFileDataSourceEnum,
+      licenses: schema.SimFileLicenseEnum,
+      submitLink: '/simfiles/new/edit.html'
+    }));
+  }));
+});
+
+/*
+ * /simfiles/:id/edit.html
+ * Create or edit a data file; renders with simfiles/edit.hbs template.
+ */
+function simFileQuery(req) {
+  if (req.db.isId(req.body.id))
+    return { _id: req.body.id };
+
+  if (req.db.isId(req.params.id))
+    return { _id: req.params.id };
+
+  return { _id: 'none' };
+}
+
+router.get('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
+  req.db.SimFile.findOne(simFileQuery(req)).populate('_motor _contributor').exec(req.success(function(simfile) {
+    if (simfile == null) {
+      res.redirect(303, req.header('Referer') || '/');
+      return;
+    }
+    simfile._motor.populate('_manufacturer', req.success(function() {
+      res.render('simfiles/edit', locals(defaults, {
+        title: 'Edit Data File',
+        motor: simfile._motor,
+        simfile: simfile,
+        submitLink: '/simfiles/' + simfile._id + '/edit.html'
+      }));
+    }));
+  }));
+});
+
+function updateSimFile(req, res, simfile) {
+}
+
+router.post('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
+  var q = simFileQuery(req);
+  if (q == null) {
+    // create new file for specified motor
+    req.db.Motor.findOne({ _id: req.body.motorId }).populate('_manufacturer').exec(req.success(function(motor) {
+      if (motor == null) {
+        res.redirect(303, req.header('Referer') || '/');
+      } else {
+        updateSimFile(req, res, {
+          _contributor: req.user,
+          _motor: motor
+        });
+      }
+    }));
+  } else {
+    // edit this file
+    req.db.SimFile.findOne(q, req.success(function(simfile) {
+      if (simfile == null) {
+        res.redirect(303, req.header('Referer') || '/');
+      } else {
+        simfile._motor.populate('_manufacturer', req.success(function(motor) {
+          updateSimFile(req, res, simfile);
+        }));
+      }
+    }));
+  }
+});
+
+/*
+ * /simfiles/:id/delete.html
+ * Delete a data file.
+ */
+router.get('/simfiles/:id/delete.html', authenticated, function(req, res, next) {
 });
 
 module.exports = router;

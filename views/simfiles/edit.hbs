@@ -1,0 +1,125 @@
+<h1>{{title}}</h1>
+
+<form role="form" class="form-horizontal" name="edit-simfile" action="{{submitLink}}" method="post" data-toggle="validator">
+  {{#unless isNew}}
+  <div class="form-group" style="margin-bottom: 0">
+    <label for="id" class="col-sm-3 control-label">ID</label>
+    <div class="col-sm-9">
+      <p class="id form-control-static">{{simfile._id}} {{#if simfile.migratedId}}(migrated {{simfile.migratedId}}){{/if}}</p>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom: 0">
+    <label for="contributor" class="col-sm-3 control-label">Contributor</label>
+    <div class="col-sm-9">
+      <p class="form-control-static" name="contributor"><a href="{{contributorLink simfile._contributor}}">{{simfile._contributor.name}}</a></p>
+    </div>
+  </div>
+  {{/unless}}
+  <div class="form-group">
+    <label for="motor" class="col-sm-3 control-label">Motor</label>
+    <div class="col-sm-9">
+      <p class="form-control-static" name="motor"><a href="{{motorLink motor}}">{{motorFullName motor}}</a></p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Format</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="format" required>
+        <option value="">(select format)</option>
+        <option value="RASP" {{#equal simfile.format 'RASP'}}selected{{/equal}}>RASP (.eng)</option>
+        <option value="RockSim" {{#equal simfile.format 'RockSim'}}selected{{/equal}}>RockSim (.rse)</option>
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="source" class="col-sm-3 control-label">Data Source</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="source" required>
+        <option value="">(select source)</option>
+        <option value="cert" {{#equal simfile.dataSource 'cert'}}selected{{/equal}}>Certification Org.</option>
+        <option value="mfr" {{#equal simfile.dataSource 'mfr'}}selected{{/equal}}>Manufacturer</option>
+        <option value="user" {{#equal simfile.dataSource 'user'}}selected{{/equal}}>User-created</option>
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="source" class="col-sm-3 control-label">License</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="license">
+        <option value="">(unknown)</option>
+        <option value="PD" {{#equal simfile.license 'PD'}}selected{{/equal}}>public domain</option>
+        <option value="free" {{#equal simfile.license 'free'}}selected{{/equal}}>free software</option>
+        <option value="other" {{#equal simfile.license 'other'}}selected{{/equal}}>other license</option>
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group content">
+    <label for="data" class="col-sm-3 control-label">Paste/Drag File</label>
+    <div class="col-sm-9">
+      <textarea class="form-control" name="data" rows="8" required>{{simfile.data}}</textarea>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="upload" class="col-sm-3 control-label">Upload File</label>
+    <div class="col-sm-9">
+      <label class="btn btn-default btn-file">
+        Browse <input type="file" hidden style="display: none">
+      </label>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+function loadFile(files, how) {
+  if (files == null || files.length != 1) {
+    alert('Please ' + how + ' a single file.');
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = reader.result,
+        format;
+
+    $('textarea').val(text).trigger('input');
+
+    if (/\.eng$/i.test(files[0].name))
+      format = 'RASP';
+    else if (/\.rse$/i.test(files[0].name))
+      format = 'RockSim';
+    if (format)
+      $('select[name=format]').val(format).trigger('input');
+  };
+  reader.readAsText(files[0]);
+}
+
+$('body').on('dragover', function(e) {
+  e.preventDefault();
+  $('form textarea').css('border', '2px solid #9e1a20');
+});
+$('body').on('dragend dragleave', function(e) {
+  e.preventDefault();
+  $('form textarea').css('border', '1px solid #ccc');
+});
+$('body').on('drop', function(e) {
+  e.preventDefault();
+  $('form textarea').css('border', '1px solid #ccc');
+  var dt = e.dataTransfer || e.originalEvent.dataTransfer;
+  loadFile(dt.files, 'drag');
+});
+$('input[type=file]').change(function(e) {
+  e.preventDefault();
+  loadFile(this.files, 'upload');
+});
+</script>

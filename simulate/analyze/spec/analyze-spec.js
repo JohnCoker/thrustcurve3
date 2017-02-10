@@ -1,6 +1,8 @@
 "use strict";
 
-var analyze = require("..");
+const analyze = require(".."),
+      fs = require('fs'),
+      _ = require('underscore');
 
 describe("analyze", function() {
   describe("normalize", function() {
@@ -370,79 +372,148 @@ describe("analyze", function() {
     });
 
     describe("AT K550", function() {
-      var func;
-      it("create", function() {
-	expect(function() {
-	  func = analyze.fit([
-	    { time: 0.065, thrust: 604.264 },
-	    { time: 0.196, thrust: 642.625 },
-	    { time: 0.327, thrust: 682.197 },
-	    { time: 0.458, thrust: 732.995 },
-	    { time: 0.591, thrust: 758.236 },
-	    { time: 0.723, thrust: 780.289 },
-	    { time: 0.854, thrust: 794.452 },
-	    { time: 0.985, thrust: 797.939 },
-	    { time: 1.117, thrust: 797.601 },
-	    { time: 1.249, thrust: 773.842 },
-	    { time: 1.381, thrust: 711.608 },
-	    { time: 1.512, thrust: 646.522 },
-	    { time: 1.644, thrust: 590.724 },
-	    { time: 1.775, thrust: 537.505 },
-	    { time: 1.907, thrust: 491.012 },
-	    { time: 2.040, thrust: 445.836 },
-	    { time: 2.171, thrust: 401.461 },
-	    { time: 2.302, thrust: 364.291 },
-	    { time: 2.433, thrust: 319.614 },
-	    { time: 2.566, thrust: 255.577 },
-	    { time: 2.698, thrust: 172.573 },
-	    { time: 2.829, thrust: 103.501 },
-	    { time: 2.960, thrust: 51.795 },
-	    { time: 3.092, thrust: 26.814 },
-	    { time: 3.224, thrust: 15.203 },
-	    { time: 3.356, thrust: 0.000 },
-	  ]);
-	}).not.toThrow();
-	expect(typeof func).toBe('function');
+      var data = [
+            { time: 0.065, thrust: 604.264 },
+            { time: 0.196, thrust: 642.625 },
+            { time: 0.327, thrust: 682.197 },
+            { time: 0.458, thrust: 732.995 },
+            { time: 0.591, thrust: 758.236 },
+            { time: 0.723, thrust: 780.289 },
+            { time: 0.854, thrust: 794.452 },
+            { time: 0.985, thrust: 797.939 },
+            { time: 1.117, thrust: 797.601 },
+            { time: 1.249, thrust: 773.842 },
+            { time: 1.381, thrust: 711.608 },
+            { time: 1.512, thrust: 646.522 },
+            { time: 1.644, thrust: 590.724 },
+            { time: 1.775, thrust: 537.505 },
+            { time: 1.907, thrust: 491.012 },
+            { time: 2.040, thrust: 445.836 },
+            { time: 2.171, thrust: 401.461 },
+            { time: 2.302, thrust: 364.291 },
+            { time: 2.433, thrust: 319.614 },
+            { time: 2.566, thrust: 255.577 },
+            { time: 2.698, thrust: 172.573 },
+            { time: 2.829, thrust: 103.501 },
+            { time: 2.960, thrust: 51.795 },
+            { time: 3.092, thrust: 26.814 },
+            { time: 3.224, thrust: 15.203 },
+            { time: 3.356, thrust: 0.000 },
+          ];
+
+      function graph(func, type) {
+        var body = '', file, i;
+
+        body += 'set title "' + type + ' interpolation"\n';
+        body += 'plot "-" with lines title "fit", "-" with points\n';
+	for (i = 0; i <= 360; i++)
+	  body += i / 100 + ' ' + func(i / 100) + '\n';
+        body += 'e\n';
+	for (i = 0; i < data.length; i++)
+	  body += data[i].time + ' ' + data[i].thrust + '\n';
+        body += 'e\n';
+
+        file = '/tmp/fit-' + type + '.plot';
+        fs.writeFileSync(file, body);
+      }
+
+      describe('default', function() {
+        var func;
+        it("create", function() {
+          expect(function() {
+            func = analyze.fit(data);
+          }).not.toThrow();
+          expect(typeof func).toBe('function');
+        });
+        it("graph", function() {
+          graph(func, 'linear');
+        });
+        it("time before", function() {
+          expect(func(-1)).toBe(0);
+        });
+        it("time after", function() {
+          expect(func(4.0)).toBe(0);
+        });
+        it("time at start", function() {
+          expect(func(0)).toBe(0);
+        });
+        it("time at end", function() {
+          expect(func(3.356)).toBe(0);
+        });
+        it("rising", function() {
+          var lastThrust, nextThrust, i, t;
+          lastThrust = 0;
+          for (i = 1; i < 99; i++) {
+            t = i / 100;
+            nextThrust = func(t);
+            expect(nextThrust).toBeGreaterThan(lastThrust);
+            lastThrust = nextThrust;
+          }
+          expect(lastThrust).toBeCloseTo(797.8, 1);
+        });
+        it("falling", function() {
+          var lastThrust, nextThrust, i, t;
+          lastThrust = func(0.985);
+          for (i = 99; i <= 336; i++) {
+            t = i / 100;
+            nextThrust = func(t);
+            expect(nextThrust).toBeLessThan(lastThrust);
+            lastThrust = nextThrust;
+          }
+          expect(lastThrust).toBe(0);
+        });
       });
-      xit("graph", function() {
-	console.log('plot "-" with lines');
-	for (var i = 0; i <= 360; i++) {
-	  console.log(i / 100 + ' ' + func(i / 100));
-	}
-      });
-      it("time before", function() {
-	expect(func(-1)).toBe(0);
-      });
-      it("time after", function() {
-	expect(func(4.0)).toBe(0);
-      });
-      it("time at start", function() {
-	expect(func(0)).toBe(0);
-      });
-      it("time at end", function() {
-	expect(func(3.356)).toBe(0);
-      });
-      it("rising", function() {
-	var lastThrust, nextThrust, i, t;
-	lastThrust = 0;
-	for (i = 1; i < 99; i++) {
-	  t = i / 100;
-	  nextThrust = func(t);
-	  expect(nextThrust).toBeGreaterThan(lastThrust);
-	  lastThrust = nextThrust;
-	}
-	expect(lastThrust).toBeCloseTo(797.8, 1);
-      });
-      it("falling", function() {
-	var lastThrust, nextThrust, i, t;
-	lastThrust = func(0.985);
-	for (i = 99; i <= 336; i++) {
-	  t = i / 100;
-	  nextThrust = func(t);
-	  expect(nextThrust).toBeLessThan(lastThrust);
-	  lastThrust = nextThrust;
-	}
-	expect(lastThrust).toBe(0);
+
+      describe('smooth', function() {
+        var func;
+        it("create", function() {
+          expect(function() {
+            var params = _.extend({},
+                                  analyze.StdParams,
+                                  {
+                                    interpolation: 'smooth'
+                                  });
+            func = analyze.fit(data, params);
+          }).not.toThrow();
+          expect(typeof func).toBe('function');
+        });
+        it("graph", function() {
+          graph(func, 'smooth');
+        });
+        it("time before", function() {
+          expect(func(-1)).toBe(0);
+        });
+        it("time after", function() {
+          expect(func(4.0)).toBe(0);
+        });
+        it("time at start", function() {
+          expect(func(0)).toBe(0);
+        });
+        it("time at end", function() {
+          expect(func(3.356)).toBe(0);
+        });
+        it("rising", function() {
+          var lastThrust, nextThrust, i, t;
+          lastThrust = 0;
+          for (i = 1; i < 99; i++) {
+            t = i / 100;
+            nextThrust = func(t);
+            expect(nextThrust).toBeGreaterThan(lastThrust - 2);
+            lastThrust = nextThrust;
+          }
+          expect(lastThrust).toBeCloseTo(797.8, 0);
+        });
+        it("falling", function() {
+          var lastThrust, nextThrust, i, t;
+          lastThrust = func(0.985);
+          for (i = 99; i <= 336; i++) {
+            t = i / 100;
+            nextThrust = func(t);
+            expect(nextThrust).toBeLessThan(lastThrust + 2);
+            lastThrust = nextThrust;
+          }
+          expect(lastThrust).toBe(0);
+        });
       });
     });
   });

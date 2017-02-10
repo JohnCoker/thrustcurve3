@@ -7,10 +7,11 @@
 var errors = require('../../lib/errors');
 
 var StdParams = {
-  burnTimeCutoff: 0.05,  // percent
-  timeEpsilon: 0.00005,  // seconds
-  thrustEpsilon: 0.0005, // Newtons
-  initialTimeCutoff: 0.5 // seconds
+  burnTimeCutoff: 0.05,   // percent
+  timeEpsilon: 0.00005,   // seconds
+  thrustEpsilon: 0.0005,  // Newtons
+  initialTimeCutoff: 0.5, // seconds
+  interpolation: 'linear'
 };
 Object.freeze(StdParams);
 
@@ -236,8 +237,27 @@ function stats(data, params, error) {
   };
 }
 
+/*
+ * http://paulbourke.net/miscellaneous/interpolation/
+ */
+const interpolate_linear = function(y0, y1, y2, y3, mu) {
+  return y1 * (1-mu) + y2 * mu;
+}
+
+const interpolate_cubic = function(y0, y1, y2, y3, mu) {
+  var a0, a1, a2, a3, mu2;
+
+  mu2 = mu * mu;
+  a0 = -0.5*y0 + 1.5*y1 - 1.5*y2 + 0.5*y3;
+  a1 = y0 - 2.5*y1 + 2*y2 - 0.5*y3;
+  a2 = -0.5*y0 + 0.5*y2;
+  a3 = y1;
+
+  return (a0 * mu * mu2) + (a1 * mu2) + (a2 * mu) + a3;
+}
+
 function fit(data, params, error) {
-  var points, source, i;
+  var points, interpolate, source, i;
 
   // optional arguments
   if (arguments.length == 2 && typeof arguments[1] == 'function') {
@@ -255,29 +275,46 @@ function fit(data, params, error) {
   else
     points = data.points;
 
+  if (params.interpolation == 'cubic' || params.interpolation == 'smooth')
+    interpolate = interpolate_cubic;
+  else
+    interpolate = interpolate_linear;
+
   // normalize data points
   points = normalize(points, params, error);
   if (points == null || points.length < 1)
     return;
 
-  // start source code generation
-  source = 'if (time < 0) return 0;\n';
+  // interpolation implementation
+  source = "var interpolate = " + interpolate.toString() + ";\n";
+
+  // lower bounds checking
+  source += 'if (time < 0)\n  return 0;\n';
 
   if (points[0].time > 0) {
     // thrust between zero and first point value
-    source += ('if (time < ' + points[0].time + ') return ' +
-	       'time / ' + points[0].time + ' * ' + points[0].thrust + ';\n');
+    source += ('if (time < ' + points[0].time + ')\n' +
+               '  return interpolate(' +
+               '-' + (points[0].thrust / 10) +
+               ', 0' +
+               ', ' + points[0].thrust +
+               ', ' + points[1].thrust +
+               ', time / ' + points[0].time +
+               ');\n');
   }
   for (i = 1; i < points.length; i++) {
-    // thrust between prior and next point values
-    source += ('if (time < ' + points[i].time + ') return ' +
-	       ('((' + points[i].time + ' - time) / ' +
-		(points[i].time - points[i - 1].time) + ' * ' + points[i - 1].thrust + ')') +
-	       ' + ' +
-	       ('((time - ' + points[i - 1].time + ') / ' +
-		(points[i].time - points[i - 1].time) + ' * ' + points[i].thrust + ')') +
-	      ';\n');
+    // thrust between prior and current point values
+    source += ('if (time < ' + points[i].time + ')\n' +
+               '  return interpolate(' +
+               (i > 1 ? points[i-2].thrust : points[0].thrust * 0.85) +
+               ', ' + points[i-1].thrust +
+               ', ' + points[i].thrust +
+               ', ' + (i + 1 < points.length ? points[i+1].thrust : -points[i].thrust / 10) +
+               ', (time - ' + points[i-1].time + ') / ' + (points[i].time - points[i - 1].time) +
+	       ');\n');
   }
+
+  // upper bounds checking
   source += 'return 0;';
 
   return new Function('time', source);
@@ -316,6 +353,8 @@ module.exports = {
    * <li>burnTimeCutoff: 5% (<code>0.05</code>)</li>
    * <li>timeEpsilon: 50µs (<code>0.00005</code>)</li>
    * <li>thrustEpsilon: 500µN (<code>0.0005</code>)</li>
+   * <li>initialTimeCutoff: 0.5s</li>
+   * <li>interpolation: linear</li>
    * </ul>
    *
    * @member {object}
@@ -409,7 +448,8 @@ module.exports = {
    *
    * <p>This function uses linear interpolation between the original data points
    * so that the simple integration of any curve produced by higher-frequency
-   * sampling will closely match that produced from the original data.</p>
+   * sampling will closely match that produced from the original data.
+   * If a more pleasing shape is desired, set params.interpolation to "smooth".</p>
    *
    * @function
    * @param {object} data a parsed data file

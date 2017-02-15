@@ -138,6 +138,9 @@ app.use(function(req, res, next) {
   req.hasQueryProperty = function(p) {
     return this.query != null && Object.prototype.hasOwnProperty.call(this.query, p);
   };
+  req.hasParamsProperty = function(p) {
+    return this.params != null && Object.prototype.hasOwnProperty.call(this.params, p);
+  };
 
   // make request and prefs available throughout processing
   clsNamespace.bindEmitter(req);

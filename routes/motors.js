@@ -478,7 +478,7 @@ function doSearch(req, res, params) {
     }
 
     // always create an availability parameter
-    if (!params.hasOwnProperty('availability')) {
+    if (!req.hasParamsProperty('availability')) {
       params.availability = 'available';
       if (hasParams)
         query.availability = { $in: req.db.schema.MotorAvailableEnum };

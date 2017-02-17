@@ -489,7 +489,7 @@ function doSearch(req, res, params) {
         title: 'Search Results',
         allMotors: all,
         availableMotors: available,
-        params: params,
+        params: _.extend({}, params),
         results: [],
         isFresh: isFresh,
         isSearchDone: true,
@@ -510,7 +510,7 @@ function doSearch(req, res, params) {
             title: 'Search Results',
             allMotors: all,
             availableMotors: available,
-            params: params,
+            params: _.extend({}, params),
             results: results,
             isFresh: isFresh,
             isSearchDone: true,
@@ -524,7 +524,7 @@ function doSearch(req, res, params) {
         title: 'Attribute Search',
         allMotors: all,
         availableMotors: available,
-        params: params,
+        params: _.extend({}, params),
         isFresh: isFresh,
         isSearchDone: false
       }));

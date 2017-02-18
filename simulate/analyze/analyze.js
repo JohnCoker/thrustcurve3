@@ -242,7 +242,7 @@ function stats(data, params, error) {
  */
 const interpolate_linear = function(y0, y1, y2, y3, mu) {
   return y1 * (1-mu) + y2 * mu;
-}
+};
 
 const interpolate_cubic = function(y0, y1, y2, y3, mu) {
   var a0, a1, a2, a3, mu2;
@@ -254,7 +254,7 @@ const interpolate_cubic = function(y0, y1, y2, y3, mu) {
   a3 = y1;
 
   return (a0 * mu * mu2) + (a1 * mu2) + (a2 * mu) + a3;
-}
+};
 
 function fit(data, params, error) {
   var points, interpolate, source, i;

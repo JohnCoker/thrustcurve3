@@ -4,6 +4,12 @@
 <div class="alert alert-warning" role="alert">
 No motors matched the search criteria.
 </div>
+{{#if multiParams}}
+<p>
+Simplify or adjust the search and try again
+(you searched for: {{paramNames}}).
+</p>
+{{/if}}
 {{/if}}
 
 {{#if isFresh}}
@@ -120,7 +126,7 @@ $('form input[type=text]').blur(function(e) {
 {{#if results}}
 <!--
 query parameters:
-  {{#each params}}
+{{#each params}}
   {{@key}}={{this}}
 {{/each}}
 results: {{length results}}

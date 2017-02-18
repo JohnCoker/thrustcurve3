@@ -367,129 +367,142 @@ function doSearch(req, res, params) {
     var query = {},
         sort = { totalImpulse: 1, designation: 1 },
         options,
-        hasParams, failed, isFresh,
+        hasParams, failed, isFresh, paramNames,
         keys, k, v, m, i;
 
+    params = _.extend({}, params);
     hasParams = false;
     failed = false;
     isFresh = true;
-    if (params) {
-      keys = Object.keys(params);
-      if (keys.length > 0)
-        isFresh = false;
-      for (i = 0; i < keys.length; i++) {
-        k = keys[i];
-        v = params[k];
-        if (v == null)
-          continue;
-        v = v.toString().trim();
-        if (v === '')
-          continue;
-
-        if (k == 'manufacturer' || k == 'mfr') {
-          m = all.manufacturers.byName(v);
-          if (m != null)
-            query._manufacturer = m._id;
-          else
-            failed = true;
-
-        } else if (k == 'certOrg' || k == 'cert') {
-          m = all.certOrgs.byName(v);
-          if (m != null)
-            query._certOrg = m._id;
-          else
-            failed = true;
-
-        } else if (k == 'designation') {
-          v = metadata.toDesignation(v);
-          query.$or = [
-            { designation: v },
-            { altDesignation: v },
-          ];
-
-        } else if (k == 'commonName') {
-          v = metadata.toCommonName(v);
-          query.$or = [
-            { commonName: v },
-            { altName: v },
-          ];
-
-        } else if (k == 'name') {
-          query.$or = [
-            { designation: metadata.toDesignation(v) },
-            { altDesignation: metadata.toDesignation(v) },
-            { commonName: metadata.toCommonName(v) },
-            { altName: metadata.toCommonName(v) },
-          ];
-
-        } else if (k == 'diameter') {
-          v = parseFloat(v);
-          if (v > 0) {
-            if (v > 1)
-              v /= 1000;
-            query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
-          } else
-            failed = true;
-
-        } else if (k == 'impulseClass') {
-          v = metadata.toImpulseClass(v);
-          query.impulseClass = v;
-
-        } else if (k == 'length') {
-          v = parseFloat(v);
-          if (v > 0)
-            query.length = { $lt: v + metadata.MotorDiameterTolerance };
-          else
-            failed = true;
-
-        } else if (k == 'text') {
-          if (v)
-            query.$text = { $search: v };
-          else
-            failed = true;
-
-        } else if (k == 'availability') {
-          if (v == null || v == 'available')
-            query.availability = { $in: req.db.schema.MotorAvailableEnum };
-          else if (v == 'all')
-            ; // no restriction
-          else
-            query.availability = v;
-
-        } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
-          if (req.db.Motor.schema.paths[k].instance == 'Number') {
-            v = parseFloat(v);
-            if (v > 0) {
-              query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
-            } else
-              failed = true;
-          } else {
-            query[k] = v;
-          }
-        }
+    keys = Object.keys(params);
+    if (keys.length > 0)
+      isFresh = false;
+    for (i = 0; i < keys.length; i++) {
+      k = keys[i];
+      v = params[k];
+      if (v == null) {
+        delete params[k];
+        continue;
+      }
+      v = v.toString().trim();
+      if (v === '') {
+        delete params[k];
+        continue;
       }
 
-      // see if we have any selective query parameters
-      keys = Object.keys(query);
-      if (keys.length > 1 || (keys.length == 1 && keys[0] != 'availability'))
-        hasParams = true;
-    } else {
-      params = {};
+      if (k == 'manufacturer' || k == 'mfr') {
+        m = all.manufacturers.byName(v);
+        if (m != null)
+          query._manufacturer = m._id;
+        else
+          failed = true;
+
+      } else if (k == 'certOrg' || k == 'cert') {
+        m = all.certOrgs.byName(v);
+        if (m != null)
+          query._certOrg = m._id;
+        else
+          failed = true;
+
+      } else if (k == 'designation') {
+        v = metadata.toDesignation(v);
+        query.$or = [
+          { designation: v },
+          { altDesignation: v },
+        ];
+
+      } else if (k == 'commonName') {
+        v = metadata.toCommonName(v);
+        query.$or = [
+          { commonName: v },
+          { altName: v },
+        ];
+
+      } else if (k == 'name') {
+        query.$or = [
+          { designation: metadata.toDesignation(v) },
+          { altDesignation: metadata.toDesignation(v) },
+          { commonName: metadata.toCommonName(v) },
+          { altName: metadata.toCommonName(v) },
+        ];
+
+      } else if (k == 'diameter') {
+        v = parseFloat(v);
+        if (v > 0) {
+          if (v > 1)
+            v /= 1000;
+          query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
+        } else
+          failed = true;
+
+      } else if (k == 'impulseClass') {
+        v = metadata.toImpulseClass(v);
+        query.impulseClass = v;
+
+      } else if (k == 'length') {
+        v = parseFloat(v);
+        if (v > 0)
+          query.length = { $lt: v + metadata.MotorDiameterTolerance };
+        else
+          failed = true;
+
+      } else if (k == 'text') {
+        if (v)
+          query.$text = { $search: v };
+        else
+          failed = true;
+
+      } else if (k == 'availability') {
+        if (v == null || v == 'available')
+          query.availability = { $in: req.db.schema.MotorAvailableEnum };
+        else if (v == 'all')
+          ; // no restriction
+        else
+          query.availability = v;
+
+      } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
+        if (req.db.Motor.schema.paths[k].instance == 'Number') {
+          v = parseFloat(v);
+          if (v > 0) {
+            query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
+          } else
+            failed = true;
+        } else {
+          query[k] = v;
+        }
+      } else {
+        delete params[k];
+      }
     }
 
+    // see if we have any selective query parameters
+    keys = Object.keys(query);
+    if (keys.length > 1 || (keys.length == 1 && keys[0] != 'availability'))
+      hasParams = true;
+
     // always create an availability parameter
-    if (!req.hasParamsProperty('availability')) {
+    if (!params.hasOwnProperty('availability')) {
       params.availability = 'available';
       if (hasParams)
         query.availability = { $in: req.db.schema.MotorAvailableEnum };
     }
 
+    keys = Object.keys(params);
+    paramNames = '';
+    for (i = 0; i < keys.length; i++) {
+      if (i > 0)
+        paramNames += ", ";
+      paramNames += keys[i].replace(/[A-Z]/, function(l) { return ' ' + l; })
+                           .replace(/^[a-z]/, function(l) { return l.toUpperCase(); });
+    }
     if (failed) {
       res.render('motors/search', locals(defaults, {
         title: 'Search Results',
         allMotors: all,
         availableMotors: available,
-        params: _.extend({}, params),
+        params: params,
+        multiParams: keys.length > 1,
+        paramNames: paramNames,
         results: [],
         isFresh: isFresh,
         isSearchDone: true,
@@ -510,7 +523,9 @@ function doSearch(req, res, params) {
             title: 'Search Results',
             allMotors: all,
             availableMotors: available,
-            params: _.extend({}, params),
+            params: params,
+            multiParams: keys.length > 1,
+            paramNames: paramNames,
             results: results,
             isFresh: isFresh,
             isSearchDone: true,
@@ -524,7 +539,9 @@ function doSearch(req, res, params) {
         title: 'Attribute Search',
         allMotors: all,
         availableMotors: available,
-        params: _.extend({}, params),
+        params: params,
+        multiParams: keys.length > 1,
+        paramNames: paramNames,
         isFresh: isFresh,
         isSearchDone: false
       }));

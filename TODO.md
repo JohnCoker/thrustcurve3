@@ -16,7 +16,6 @@
  * search by motor case
  * search by propellant type
  * search by propellant color
- * diagnose search query when no matches found
 
 ## Motor Guide
 

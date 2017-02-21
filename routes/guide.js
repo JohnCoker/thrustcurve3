@@ -635,7 +635,7 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     row++;
 
     rocketSheet.setLabel(row, 0, 'CD');
-    rocketSheet.setNumber(row, 1, result.inputs.cd);
+    rocketSheet.setNumber(row, 1, result.inputs.cd, -2);
     row++;
 
     rocketSheet.setLabel(row, 0, 'Guide Length', 'length');
@@ -644,12 +644,12 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
 
     if (result.inputs.cluster > 1) {
       rocketSheet.setLabel(row, 0, 'Cluster');
-      rocketSheet.setNumber(row, 1, result.inputs.cluster);
+      rocketSheet.setNumber(row, 1, result.inputs.cluster, 0);
       row++;
     }
 
     rocketSheet.setLabel(row, 0, 'Motors Searched');
-    rocketSheet.setNumber(row, 1, result.filtered);
+    rocketSheet.setNumber(row, 1, result.filtered, 0);
     row++;
 
     rocketSheet.setLabel(row, 0, 'Date Run');
@@ -673,18 +673,18 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
         rocketSheet.setString(row, 0, result.mmts[i].name);
       rocketSheet.setUnit  (row, 1, result.mmts[i].diameter, 'mmt');
       rocketSheet.setUnit  (row, 2, result.mmts[i].length, 'length');
-      rocketSheet.setNumber(row, 3, result.mmts[i].fit);
-      rocketSheet.setNumber(row, 4, result.mmts[i].sim);
-      rocketSheet.setNumber(row, 5, result.mmts[i].pass);
-      rocketSheet.setNumber(row, 6, result.mmts[i].fail);
+      rocketSheet.setNumber(row, 3, result.mmts[i].fit, 0);
+      rocketSheet.setNumber(row, 4, result.mmts[i].sim, 0);
+      rocketSheet.setNumber(row, 5, result.mmts[i].pass, 0);
+      rocketSheet.setNumber(row, 6, result.mmts[i].fail, 0);
       row++;
     }
     if (result.mmts.length > 1) {
       rocketSheet.setString(row, 0, 'total');
-      rocketSheet.setNumber(row, 3, result.fit);
-      rocketSheet.setNumber(row, 4, result.sim);
-      rocketSheet.setNumber(row, 5, result.pass);
-      rocketSheet.setNumber(row, 6, result.fail);
+      rocketSheet.setNumber(row, 3, result.fit, 0);
+      rocketSheet.setNumber(row, 4, result.sim, 0);
+      rocketSheet.setNumber(row, 5, result.pass, 0);
+      rocketSheet.setNumber(row, 6, result.fail, 0);
       row++;
     }
 
@@ -715,19 +715,19 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
       motorsSheet.setString(row,  1, r.manufacturer.abbrev);
       motorsSheet.setString(row,  2, r.mmt);
 
-      motorsSheet.setNumber(row,  4, r.thrustWeight);
+      motorsSheet.setNumber(row,  4, r.thrustWeight, 1);
       if (r.simulation) {
         motorsSheet.setUnit  (row,  3, r.simulation.inputs.loadedInitialMass, 'mass');
-        motorsSheet.setNumber(row,  5, r.simulation.liftoffTime);
+        motorsSheet.setNumber(row,  5, r.simulation.liftoffTime, 2);
         motorsSheet.setUnit  (row,  6, r.simulation.guideVelocity, 'velocity');
         motorsSheet.setUnit  (row,  7, r.simulation.burnoutAltitude, 'altitude');
-        motorsSheet.setNumber(row,  8, r.simulation.burnoutTime);
+        motorsSheet.setNumber(row,  8, r.simulation.burnoutTime, 1);
         motorsSheet.setUnit  (row,  9, r.simulation.maxAltitude, 'altitude');
-        motorsSheet.setNumber(row, 10, r.simulation.apogeeTime);
+        motorsSheet.setNumber(row, 10, r.simulation.apogeeTime, 1);
         motorsSheet.setUnit  (row, 11, r.simulation.maxVelocity, 'velocity');
         motorsSheet.setUnit  (row, 12, r.simulation.maxAcceleration, 'acceleration');
       }
-      motorsSheet.setNumber(row, 13, r.optimalDelay);
+      motorsSheet.setNumber(row, 13, r.optimalDelay, 1);
       motorsSheet.setString(row, 14, r.reason || 'good');
       row++;
     }

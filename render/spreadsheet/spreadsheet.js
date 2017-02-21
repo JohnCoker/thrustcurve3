@@ -4,7 +4,7 @@
  */
 'use strict';
 
-const xlsx = require('xlsx'),
+const xlsx = require('xlsx-style'),
       units = require('../../lib/units');
 
 const XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -49,28 +49,50 @@ class Worksheet {
   }
 
   setString(r, c, v) {
+    if (v == null || v === '')
+      return;
+
     this.setCell(r, c, {
       t: 's',
       v: v
     });
   }
 
-  setNumber(r, c, v) {
+  setNumber(r, c, v, d) {
+    var f, s, i;
+
     if (typeof v != 'number' || isNaN(v))
       return;
+
+    if (typeof d != 'number')
+      d = 4;
+    f = v.toFixed(Math.abs(d));
+    if (d < 0)
+      f = f.replace(/0+$/, '').replace(/\.$/, '');
+    else {
+      s = { numFmt: '0' };
+      if (d > 0) {
+        s.numFmt += '.';
+        for (i = 0; i < d; i++)
+          s.numFmt += '0';
+      }
+    }
+
     this.setCell(r, c, {
       t: 'n',
-      v: v.toFixed(4)
+      v: v.toFixed(Math.max(d, 4)),
+      w: f,
+      s: s
     });
   }
 
   setUnit(r, c, v, u) {
     if (u == 'mmt') {
-      this.setNumber(r, c, units.convertMMTFromMKS(v));
+      this.setNumber(r, c, units.convertMMTFromMKS(v), -1);
     } else if (u == 'duration') {
-      this.setNumber(r, c, v);
+      this.setNumber(r, c, v, 1);
     } else {
-      this.setNumber(r, c, units.convertPrefFromMKS(v, u));
+      this.setNumber(r, c, units.convertPrefFromMKS(v, u), units.getUnitPref(u).digits);
     }
   }
 
@@ -143,7 +165,6 @@ class Workbook {
     }
     return xlsx.write(wb, {
       bookType: 'xlsx',
-      bookSST: true,
       type: 'binary'
     });
   }

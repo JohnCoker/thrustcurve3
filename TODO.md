@@ -19,7 +19,6 @@
 
 ## Motor Guide
 
- * format numbers consistently in spreadsheets
  * use visual styles in spreadsheets
  * varying launch conditions (ground altitude, temperature)
 

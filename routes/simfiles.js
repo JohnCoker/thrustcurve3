@@ -62,6 +62,37 @@ function simFileName(simfile) {
   return file;
 }
 
+function simFileQuery(req) {
+  if (req.db.isId(req.body.id))
+    return { _id: req.body.id };
+
+  if (req.db.isId(req.params.id))
+    return { _id: req.params.id };
+
+  if (req.db.isId(req.query.id))
+    return { _id: req.query.id };
+}
+
+function noMotor(req, res) {
+  res.status(404);
+  res.render('notfound', locals(defaults, {
+    title: 'Motor Not Found',
+    url: req.url,
+    status: 404,
+    message: 'The requested motor does not exist.'
+  }));
+}
+
+function noSimFile(req, res) {
+  res.status(404);
+  res.render('notfound', locals(defaults, {
+    title: 'Data File Not Found',
+    url: req.url,
+    status: 404,
+    message: 'The requested data file does not exist.'
+  }));
+}
+
 /*
  * /simfiles/:id/
  * Specific file details, renders with simfiles/details.hbs template.
@@ -209,7 +240,7 @@ router.get('/simfiles/:id/download/:file', function(req, res, next) {
 router.get('/simfiles/:id/create.html', authenticated, function(req, res, next) {
   req.db.Motor.findOne({ _id: req.params.id }).populate('_manufacturer').exec(req.success(function(motor) {
     if (motor == null) {
-      res.redirect(303, req.header('Referer') || '/');
+      noMotor(req, res);
       return;
     }
     res.render('simfiles/edit', locals(defaults, {
@@ -232,20 +263,15 @@ router.get('/simfiles/:id/create.html', authenticated, function(req, res, next) 
  * /simfiles/:id/edit.html
  * Create or edit a data file; renders with simfiles/edit.hbs template.
  */
-function simFileQuery(req) {
-  if (req.db.isId(req.body.id))
-    return { _id: req.body.id };
-
-  if (req.db.isId(req.params.id))
-    return { _id: req.params.id };
-
-  return { _id: 'none' };
-}
-
 router.get('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
-  req.db.SimFile.findOne(simFileQuery(req)).populate('_motor _contributor').exec(req.success(function(simfile) {
+  var q = simFileQuery(req);
+  if (q == null) {
+    noSimFile(req, res);
+    return;
+  }
+  req.db.SimFile.findOne(q).populate('_motor _contributor').exec(req.success(function(simfile) {
     if (simfile == null) {
-      res.redirect(303, req.header('Referer') || '/');
+      noSimFile(req, res);
       return;
     }
     simfile._motor.populate('_manufacturer', req.success(function() {
@@ -259,7 +285,27 @@ router.get('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
   }));
 });
 
-function updateSimFile(req, res, simfile) {
+function canUpdateFile(req, simfile) {
+  if (req.user == null)
+    return false;
+  if (req.user._id.toString() == simfile._contributor._id.toString())
+    return true;
+  if (req.user.permissions.editSimFiles)
+    return true;
+  return false;
+}
+
+function noUpdatePerm(req, res) {
+  res.status(403);
+  res.render('error', locals(defaults, {
+    title: 'Unauthorized Access',
+    url: req.url,
+    status: 403,
+    message: 'The logged in user does not have permission to change the data file.'
+  }));
+}
+
+function updateFile(req, res, simfile) {
 }
 
 router.post('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
@@ -268,9 +314,9 @@ router.post('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
     // create new file for specified motor
     req.db.Motor.findOne({ _id: req.body.motorId }).populate('_manufacturer').exec(req.success(function(motor) {
       if (motor == null) {
-        res.redirect(303, req.header('Referer') || '/');
+        noMotor(req, res);
       } else {
-        updateSimFile(req, res, {
+        updateFile(req, res, {
           _contributor: req.user,
           _motor: motor
         });
@@ -280,10 +326,12 @@ router.post('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
     // edit this file
     req.db.SimFile.findOne(q, req.success(function(simfile) {
       if (simfile == null) {
-        res.redirect(303, req.header('Referer') || '/');
+        noSimFile(req, res);
+      } else if (!canUpdateFile(req, simfile)) {
+        noUpdatePerm(req, res);
       } else {
         simfile._motor.populate('_manufacturer', req.success(function(motor) {
-          updateSimFile(req, res, simfile);
+          updateFile(req, res, simfile);
         }));
       }
     }));
@@ -295,6 +343,25 @@ router.post('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
  * Delete a data file.
  */
 router.get('/simfiles/:id/delete.html', authenticated, function(req, res, next) {
+  var q = simFileQuery(req);
+  if (q == null) {
+    noSimFile(req, res);
+    return;
+  }
+  req.db.SimFile.findOne(q).populate('_motor _contributor').exec(req.success(function(simfile) {
+    if (simfile == null) {
+      noSimFile(req, res);
+    } else if (!canUpdateFile(req, simfile)) {
+      noUpdatePerm(req, res);
+    } else {
+      simfile._motor.populate('_manufacturer', req.success(function(motor) {
+        simfile.remove(req.success(function() {
+          // return to motor page
+          res.redirect(302, '/motors/' + motor._manufacturer.abbrev + '/' + motor.designation);
+        }));
+      }));
+    }
+  }));
 });
 
 module.exports = router;

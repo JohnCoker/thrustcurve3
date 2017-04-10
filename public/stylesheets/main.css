@@ -152,3 +152,12 @@ a.favorite i.fa {
 .popover-content td:first-child {
   padding-right: 0.5em;
 }
+
+img.compare {
+  width: 100%;
+  height: 90px;
+}
+p.compare-legend {
+  margin-top: 0;
+  text-align: center;
+}

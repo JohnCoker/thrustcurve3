@@ -240,37 +240,28 @@
 
   <!-- right col -->
   <div class="col-md-4">
-    <style type="text/css">
-    img.compare {
-      width: 100%;
-      height: 90px;
-    }
-    p.legend {
-      margin-top: 0;
-      text-align: center;
-    }
-    </style>
     {{#if isCompare}}
-    <p>Compared with all {{classCount}} <b>{{motor.impulseClass}}</b> motors:</p>
+    <p><a href="/info/motorstats.html#motor-comparison">Compared</a>
+    with all {{classCount}} <b>{{motor.impulseClass}}</b> motors:</p>
 
     {{#if motor.totalImpulse}}
     <img class="compare" src="{{motorLink manufacturer motor}}compare.svg?stat=totalImpulse"/>
-    <p class="legend">Total Impulse</p>
+    <p class="compare-legend">Total Impulse</p>
     {{/if}}
 
     {{#if motor.avgThrust}}
     <img class="compare" src="{{motorLink manufacturer motor}}compare.svg?stat=avgThrust"/>
-    <p class="legend">Average Thrust</p>
+    <p class="compare-legend">Average Thrust</p>
     {{/if}}
 
     {{#if motor.maxThrust}}
     <img class="compare" src="{{motorLink manufacturer motor}}compare.svg?stat=maxThrust"/>
-    <p class="legend">Maximum Thrust</p>
+    <p class="compare-legend">Maximum Thrust</p>
     {{/if}}
 
     {{#if motor.burnTime}}
     <img class="compare" src="{{motorLink manufacturer motor}}compare.svg?stat=burnTime"/>
-    <p class="legend">Burn Time</p>
+    <p class="compare-legend">Burn Time</p>
     {{/if}}
 
     {{/if}}

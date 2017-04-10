@@ -63,7 +63,55 @@ thrust is below 5% of the maximum; see <a href="#burn-time">Burn Time Normalizat
 </p>
 
 
-<H2>Other Information</H2>
+<a name="motor-comparison"></a>
+<h2>How a Motor Compares</h2>
+
+<p>
+When looking at a motor page, the statistics give you absolute values, but can be hard to put into context.
+The top section has two columns: the statistics and a set of graphs comparing this
+motor with others in the same impulse class (letter).
+Here are the comparison graphs for the <a href="/motors/AeroTech/K550W/">Aerotech K550</a>:
+</p>
+
+<div class="row">
+  <div class="col-md-1">&nbsp;</div>
+  <div class="col-md-4">
+    <p>Compared with all 161 <b>K</b> motors:</p>
+    <img class="compare" src="/motors/AeroTech/K550W/compare.svg?stat=totalImpulse">
+    <p class="compare-legend">Total Impulse</p>
+    <img class="compare" src="/motors/AeroTech/K550W/compare.svg?stat=avgThrust">
+    <p class="compare-legend">Average Thrust</p>
+  </div>
+  <div class="col-md-2">&nbsp;</div>
+  <div class="col-md-4">
+    <p>&nbsp;</p>
+    <img class="compare" src="/motors/AeroTech/K550W/compare.svg?stat=maxThrust">
+    <p class="compare-legend">Maximum Thrust</p>
+    <img class="compare" src="/motors/AeroTech/K550W/compare.svg?stat=burnTime">
+    <p class="compare-legend">Burn Time</p>
+  </div>
+  <div class="col-md-1">&nbsp;</div>
+</div>
+
+<p>
+First of all, the gray bars represent a histogram of all the motors in that impulse class.
+The height of the bar indicates the number of motors falling into that tenth of the range of values.
+For example, total impulse tends to cluster to the lower end of the range (the "baby Ks"),
+but there are a lot of motors right near the top (the "full Ks").
+</p>
+
+<p>
+The motor being viewed is indicated with a red line, which makes it easy to see where it fits.
+This makes it clear that the AT K550 is a standard "baby K" (a 20% K).
+</p>
+
+<p>
+The same goes for the other statistics, and we can see that the K550 is typical among K motors.
+For an example of a less-typical motor, take a look at the <a href="/motors/AeroTech/M750W/">AT M750</a>.
+Being a long-burn motor, it has lower thrust and much longer burn time than average.
+</p>
+
+<h2>Other Information</h2>
 
 <p>
 The <b>common name</b> of the motor is formed from the total impulse,
@@ -110,7 +158,7 @@ on this site and elsewhere.
 
 
 <a name="burn-time"></a>
-<H2>Burn Time Normalization</H2>
+<h2>Burn Time Normalization</h2>
 
 <p>
 Based on NFPA 1125:

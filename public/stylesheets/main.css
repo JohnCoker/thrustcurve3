@@ -161,3 +161,6 @@ p.compare-legend {
   margin-top: 0;
   text-align: center;
 }
+span.inaccurate {
+  font-weight: bold;
+}

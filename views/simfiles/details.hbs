@@ -82,6 +82,7 @@
          <th>&nbsp;</th>
          <th>This File</th>
          <th>Certified</th>
+         <th>&plusmn;</th>
         </tr>
       </thead>
       <tbody>
@@ -89,41 +90,49 @@
           <th>Diameter</th>
           <td>{{formatMMT info.diameter}}</td>
           <td>{{formatMMT motor.diameter}}</td>
+          <td>{{formatAccuracy info.diameter motor.diameter 1}}</td>
         </tr>
         <tr>
           <th>Length</th>
           <td>{{formatLength info.length}}</td>
           <td>{{formatLength motor.length}}</td>
+          <td>{{formatAccuracy info.length motor.length}}</td>
         </tr>
         <tr>
           <th>Prop. Weight</th>
           <td>{{formatMass info.propellantWeight}}</td>
           <td>{{formatMass motor.propellantWeight}}</td>
+          <td>{{formatAccuracy info.propellantWeight motor.propellantWeight}}</td>
         </tr>
         <tr>
           <th>Total Weight</th>
           <td>{{formatMass info.totalWeight}}</td>
           <td>{{formatMass motor.totalWeight}}</td>
+          <td>{{formatAccuracy info.totalWeight motor.totalWeight}}</td>
         </tr>
         <tr>
           <th>Avg. Thrust</th>
           <td>{{formatForce stats.avgThrust}}</td>
           <td>{{formatForce motor.avgThrust}}</td>
+          <td>{{formatAccuracy stats.avgThrust motor.avgThrust}}</td>
         </tr>
         <tr>
           <th>Max. Thrust</th>
           <td>{{formatForce stats.maxThrust}}</td>
           <td>{{formatForce motor.maxThrust}}</td>
+          <td>{{formatAccuracy stats.maxThrust motor.maxThrust}}</td>
         </tr>
         <tr>
           <th>Total Impulse</th>
           <td>{{formatImpulse stats.totalImpulse}}</td>
           <td>{{formatImpulse motor.totalImpulse}}</td>
+          <td>{{formatAccuracy stats.totalImpulse motor.totalImpulse}}</td>
         </tr>
         <tr>
           <th>Burn Time</th>
           <td>{{formatDuration stats.burnTime}}</td>
           <td>{{formatDuration motor.burnTime}}</td>
+          <td>{{formatAccuracy stats.burnTime motor.burnTime}}</td>
         </tr>
       </tbody>
     </table>

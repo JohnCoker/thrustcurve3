@@ -4,7 +4,8 @@
  */
 'use strict';
 
-const bcrypt = require('bcrypt-nodejs'),
+const async = require('async'),
+      bcrypt = require('bcrypt-nodejs'),
       SALT_WORK_FACTOR = 11,
       units = require('../../lib/units');
 
@@ -515,6 +516,95 @@ function makeGuideResultModel(mongoose) {
   return mongoose.model('GuideResult', schema);
 }
 
+function makeIntIdMapModel(mongoose) {
+  var counterSchema = new mongoose.Schema({
+    _id: { type: String, required: true },
+    seq: { type: Number, required: true }
+  });
+  var counterModel = mongoose.model('IntIdSeq', counterSchema);
+
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    collName: { type: String, required: true },
+    oid: { type: mongoose.Schema.Types.ObjectId, required: true },
+    int: { type: Number, required: true, min: 1 }
+  });
+  schema.index({ collName: 1, oid: 1 }, { unique: true });
+  schema.index({ collName: 1, int: 1 }, { unique: true });
+
+  var model = mongoose.model('IntIdMap', schema);
+
+  model.lookupOne = function(m, int, next) {
+    model.findOne({ collName: m.collection.collectionName, int: int }, function(err, map) {
+      if (err)
+        next(err);
+      else if (map)
+        m.findById(map.oid, next);
+      else
+        next(null, undefined);
+    });
+  };
+  model.lookup = function(m, ints, next) {
+    model.find({ collName: m.collection.collectionName, int: { $in: ints } }, function(err, maps) {
+      if (err)
+        next(err);
+      else {
+        var ids = [], i;
+        for (i = 0; i < maps.length; i++)
+          ids.push(maps[i].oid);
+        if (ids.length > 1)
+          m.find({ _id: { $in: ids } }, next);
+        else
+          next(null, []);
+      }
+    });
+  };
+  model.mapOne = function(doc, next) {
+    const collName = doc.constructor.collection.collectionName;
+    model.findOne({ collName: collName, oid: doc._id }, function(err, map) {
+      if (err)
+        return next(err);
+      if (map) {
+        next(null, map.int);
+      } else if (doc.migratedId > 0) {
+        model.create({ collName: collName, oid: doc._id, int: doc.migratedId }, function(err, map) {
+          if (err)
+            return next(err);
+          next(null, map.int);
+        });
+      } else {
+        counterModel.findByIdAndUpdate(collName, { $inc: { seq: 1 } }, { new: true, upsert: true }, function(err, seq) {
+          if (err) {
+            return next(err);
+          }
+          model.create({ collName: collName, oid: doc._id, int: 1000000 + seq.seq }, function(err, map) {
+            if (err)
+              return next(err);
+            next(null, map.int);
+          });
+        });
+      }
+    });
+  };
+  model.map = function(docs, next) {
+    const ints = [];
+    async.eachOf(docs,
+                 function(doc, i, cb) {
+                   model.mapOne(doc, function(err, int) {
+                     if (err)
+                       return cb(err);
+                     ints[i] = int;
+                     cb(null);
+                   });
+                 },
+                 function(err) {
+                   next(err, ints);
+                 });
+  };
+
+  return model;
+}
+
 
 /**
  * <p>The <b>schema</b> module contains the Mongoose schema used by the site.
@@ -654,6 +744,14 @@ module.exports = {
    * @return {object} Mongoose model
    */
   GuideResultModel: makeGuideResultModel,
+
+  /**
+   * Produce a Mongoose model for the <em>intIdMap</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
+  IntIdMapModel: makeIntIdMapModel,
 
   /**
    * The legal values for Motor.type.

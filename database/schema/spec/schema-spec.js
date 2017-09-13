@@ -1,10 +1,10 @@
 "use strict";
 
-var mongoose = require('mongoose');
-var schema = require('..');
-
+const async = require('async'),
+      mongoose = require('mongoose'),
+      mockgoose = require('mockgoose'),
+      schema = require('..');
 mongoose.Promise = require('bluebird');
-var mockgoose = require('mockgoose');
 
 describe('schemas', function() {
   var startTime;
@@ -34,7 +34,7 @@ describe('schemas', function() {
   describe('manufacturer', function() {
     var ManufacturerModel = null;
 
-    beforeAll( function(done){
+    beforeAll(function(done) {
       ManufacturerModel = schema.ManufacturerModel(mongoose);
       done();
     });
@@ -126,8 +126,8 @@ describe('schemas', function() {
   });
 
   // certorg (aka Certification Orginization )
+  var CertOrgModel = null;
   describe('certorg', function() {
-    var CertOrgModel = null;
 
     beforeAll( function(done){
       CertOrgModel = schema.CertOrgModel(mongoose);
@@ -266,6 +266,136 @@ describe('schemas', function() {
       .then( function( found) {
         expect( found.hasPermission('editMotors')).toBe(false);
         expect( found.hasPermission('noSuchPerm')).toBe(false);
+        done();
+      });
+    });
+  });
+
+  describe('intIdMap', function() {
+    var IntIdMapModel = null;
+    var orgs;
+
+    beforeAll(function(done) {
+      IntIdMapModel = schema.IntIdMapModel(mongoose);
+      done();
+    });
+
+    beforeEach(function(done) {
+      orgs = [];
+      async.series([
+        function(cb) {
+          new CertOrgModel({
+            name: 'Old Rocketry Association',
+            abbrev: 'ORA',
+            migratedId: 1,
+          }).save(function(err, doc) {
+            expect(err).toBeNull();
+            if (doc)
+              orgs[0] = doc;
+            cb();
+          });
+        },
+        function(cb) {
+          new CertOrgModel({
+            name: 'New Rocketry Association',
+            abbrev: 'NRA',
+          }).save(function(err, doc) {
+            expect(err).toBeNull();
+            if (doc)
+              orgs[1] = doc;
+            cb();
+          });
+        },
+        function(cb) {
+          new CertOrgModel({
+            name: 'Another Rocketry Association',
+            abbrev: 'ARA',
+          }).save(function(err, doc) {
+            expect(err).toBeNull();
+            if (doc)
+              orgs[2] = doc;
+            cb();
+          });
+        },
+        function(cb) {
+          expect(orgs.length).toBe(3);
+          for (var i = 0; i < orgs.length; i++)
+            expect(orgs[i].name).toBeDefined();
+          IntIdMapModel.map(orgs, function(err, ints) {
+            expect(err).toBeNull();
+            expect(ints.length).toBe(3);
+            expect(ints[0]).toBe(1);
+            for (var i = 1; i < ints.length; i++)
+              expect(ints[i]).toBeGreaterThan(1000000);
+
+            IntIdMapModel.count().exec().then(function(count) {
+              expect(count).toBe(3);
+              cb();
+            });
+          });
+        }
+      ], function(err) {
+        expect(err).toBeNull();
+        done();
+      });
+    });
+
+    it("count", function(done) {
+      IntIdMapModel.count(function(err, count) {
+        expect(err).toBe(null);
+        expect(count).toBe(3);
+        done();
+      });
+    });
+
+    it("lookupOne non-existent", function(done) {
+      IntIdMapModel.lookupOne(CertOrgModel, 3, function(err, doc) {
+        expect(err).toBeNull();
+        expect(doc).toBeUndefined();
+        done();
+      });
+    });
+    it("lookup non-existent", function(done) {
+      IntIdMapModel.lookup(CertOrgModel, [3, 2003, 1000003], function(err, docs) {
+        expect(err).toBeNull();
+        expect(docs).toBeDefined();
+        expect(docs.length).toBe(0);
+        done();
+      });
+    });
+
+    it("lookupOne", function(done) {
+      IntIdMapModel.lookupOne(CertOrgModel, 1, function(err, doc) {
+        expect(err).toBeNull();
+        expect(doc).toBeDefined();
+        expect(doc._id.toString()).toBe(orgs[0]._id.toString());
+        done();
+      });
+    });
+    it("lookup", function(done) {
+      IntIdMapModel.lookup(CertOrgModel, [1, 2002, 1000001], function(err, docs) {
+        expect(err).toBeNull();
+        expect(docs).toBeDefined();
+        expect(docs.length).toBe(2);
+        expect(docs[0]._id.toString()).toBe(orgs[0]._id.toString());
+        if (docs[1]._id.toString() != orgs[1]._id.toString() && docs[1]._id.toString() != orgs[2]._id.toString())
+          expect(docs[1]._id.toString()).toBe(orgs[1]._id.toString() + ' | ' + orgs[2]._id.toString());
+        done();
+      });
+    });
+
+    it("re-map old", function(done) {
+      IntIdMapModel.mapOne(orgs[0], function(err, int) {
+        expect(err).toBeNull();
+        expect(int).toBe(1);
+        done();
+      });
+    });
+
+    it("re-map new", function(done) {
+      IntIdMapModel.mapOne(orgs[1], function(err, int) {
+        expect(err).toBeNull();
+        expect(int).toBe(1000001);
         done();
       });
     });

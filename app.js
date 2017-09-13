@@ -111,6 +111,7 @@ const db = Object.create(null, {
   MotorRanking: { value: schema.MotorRankingModel(mongoose) },
   FavoriteMotor: { value: schema.FavoriteMotorModel(mongoose) },
   GuideResult: { value: schema.GuideResultModel(mongoose) },
+  IntIdMap: { value: schema.IntIdMapModel(mongoose) },
   isId: { value: function(v) {
     if (v == null)
       return false;

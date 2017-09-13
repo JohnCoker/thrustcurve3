@@ -42,7 +42,8 @@ Population.prototype.finalize = function(max) {
     max = 10;
 
   // calculate average and standard deviation
-  if (this.motors.length > 1) {
+  delete this.trendSD;
+  if (this.motors.length > 0) {
     sum = 0;
     for (i = 0; i < this.motors.length; i++)
       sum += this.motors[i].trendRatio;
@@ -55,6 +56,8 @@ Population.prototype.finalize = function(max) {
     }
     this.trendSD = Math.sqrt(sum / this.motors.length);
   }
+  if (isNaN(this.trendSD))
+    this.trendSD = 0;
 
   // sort and truncate
   this.motors.sort(function(a, b) {
@@ -64,9 +67,12 @@ Population.prototype.finalize = function(max) {
     this.motors.length = max;
 
   // calculate sigma for each trend
-  if (this.trendSD != null) {
+  if (this.trendSD > 0) {
     for (i = 0; i < this.motors.length; i++)
       this.motors[i].trendSigma = (this.motors[i].trendRatio - this.trendAvg) / this.trendSD;
+  } else {
+    for (i = 0; i < this.motors.length; i++)
+      this.motors[i].trendSigma = 0;
   }
 };
 Population.prototype.print = function() {

@@ -104,9 +104,9 @@ describe("ranking", function() {
 
         let currentMotor = null;
         if (index < sequentialViews){
-           currentMotor = motorIds[i % motorIds.length];
+          currentMotor = motorIds[Math.floor(impulseClassCount / 2)];
         }else{
-          currentMotor  = motorIds[Math.floor(Math.random() * motorIds.length)];
+          currentMotor = motorIds[Math.floor(Math.random() * motorIds.length)];
         }
         expect(currentMotor).not.toBeNull();
 

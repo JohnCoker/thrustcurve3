@@ -168,6 +168,7 @@ function makeMotorModel(mongoose) {
     propellantWeight: { type: Number, min: 0.0001 },
     caseInfo: String,
     propellantInfo: String,
+    sparky: { type: Boolean, default: false },
     dataSheet: { type: String, match: UrlRegex },
     availability: { type: String, required: true, enum: MotorAvailabilityEnum }
   }, {

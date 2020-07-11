@@ -27,7 +27,7 @@
     "handlebars-helper": "0.0.12",
     "less-middleware": "1.0.x",
     "mongodb": "^2.1.2",
-    "mongoose": "^4.5",
+    "mongoose": "^5.9",
     "mongoose-dateonly": "^1.0.3",
     "morgan": "^1.6.1",
     "mysql": "^2.10.0",

@@ -223,5 +223,9 @@ router.post(['/api/v1/metadata.xml', '/servlets/metadata'], xmlparser(), functio
   doMetadata(req, res, new data.XMLFormat());
 });
 
+/*
+ * /api/v1/search
+ * Search for motors, either as XML or JSON.
+ */
 
 module.exports = router;

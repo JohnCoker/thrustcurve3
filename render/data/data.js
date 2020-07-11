@@ -5,10 +5,18 @@
 'use strict';
 
 const _ = require('underscore'),
-      XMLWriter = require('xml-writer');
+      XMLWriter = require('xml-writer'),
+      IDmap2int = {},
+      IDmap2str = {};
+var IDmapNext = 1000001;
 
 class Format {
+
   type() {
+  }
+
+  compat() {
+    return false;
   }
 
   root(name) {
@@ -31,6 +39,14 @@ class Format {
     }));
   }
 
+  id(name, value) {
+    return this.element(name, value);
+  }
+
+  idList(listName, values) {
+    return this.elementList(listName, values);
+  }
+
   close() {
   }
 
@@ -39,6 +55,10 @@ class Format {
 
   send(res) {
     res.type(this.type()).send(this.toString());
+  }
+
+  toId(value) {
+    return value;
   }
 
   static singular(listName) {
@@ -52,12 +72,13 @@ class Format {
 }
 
 class XMLFormat extends Format {
-  constructor(root) {
+  constructor(options) {
     super();
     this._w = new XMLWriter(true);
     this._w.startDocument('1.0', 'UTF-8');
-    if (root)
-      this.root(root);
+    if (options && options.root)
+      this.root(options.root);
+    this._compat = options && options.compat;
   }
 
   root(name) {
@@ -71,6 +92,10 @@ class XMLFormat extends Format {
 
   type() {
     return 'text/xml';
+  }
+
+  compat() {
+    return this._compat;
   }
 
   element(name, value) {
@@ -113,6 +138,40 @@ class XMLFormat extends Format {
     return true;
   }
 
+  id(name, value) {
+    var str;
+
+    if (value == null)
+      return false;
+
+    if (typeof value == 'string' && this._compat) {
+      str = value;
+      value = IDmap2str[str];
+      if (value == null) {
+        value = IDmapNext++;
+        IDmap2int[str] = value;
+        IDmap2str[value.toFixed()] = str;
+      }
+    }
+    return this.element(name, value);
+  }
+
+  idList(listName, values) {
+    var eltName, i;
+
+    if (values == null || values.length < 1)
+      return false;
+
+    this._w.startElement(listName);
+
+    eltName = Format.singular(listName);
+    for (i = 0; i < values.length; i++)
+      this.id(eltName, values[i]);
+
+    this._w.endElement(listName);
+    return true;
+  }
+
   close() {
     if (this._open) {
       this._w.endDocument();
@@ -124,10 +183,16 @@ class XMLFormat extends Format {
     this.close();
     return this._w.toString();
   }
+
+  toId(value) {
+    if (typeof value == number && this._compat)
+      return IDmap2str[value.toFixed()];
+    return value;
+  }
 }
 
 class JSONFormat extends Format {
-  constructor(root) {
+  constructor(options) {
     super();
     this._obj = {};
   }
@@ -200,7 +265,7 @@ class JSONFormat extends Format {
  *
  * <p>The basic model is:</p>
  * <ol>
- * <li>create with root element, or call root() after creation</li>
+ * <li>create with root element on options, or call root() after creation</li>
  * <li>add single elements or list of elements</li>
  * <li>close</li>
  * <li>use toString or send</li>
@@ -228,6 +293,18 @@ class JSONFormat extends Format {
  *   "three
  * ]
  * </pre>
+ *
+ * <p>The constructor takes an options object, which for XML can include the root element name.
+ * This value is ignored for JSON.</p>
+ *
+ * <pre>
+ * var format = new XMLFormat({ root: 'metadata-response' });
+ * </pre>
+ *
+ * <p>In order to handle compatibility with the previous site API, where object IDs were integer values,
+ * the "compat" option may be specified, which maps the MongoDB ObjectId values to integers.
+ * Note that this is a partial solution because the mapping is only in-memory, but it's enough to make
+ * basic API sequences work (search then download).
  *
  * @module data
  */

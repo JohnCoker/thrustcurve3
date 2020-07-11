@@ -1,18 +1,20 @@
-swagger: "2.0"
+swagger: '2.0'
+
 info:
   title: ThrustCurve.org API
   description: Programmatic access to ThrustCurve.org motor and simulator file database.
   contact:
     name: John Coker
-    url: http://www.thrustcurve.org/api.html
+    url: 'http://www.thrustcurve.org/api.html'
     email: john@jcsw.com
   license:
-    name: ISC
-    url: https://opensource.org/licenses/ISC
+    name: ISC license
+    url: 'https://opensource.org/licenses/ISC'
   version: 1.0.0
 
-host: localhost:3000
+host: 'thrustcurve.org'
 basePath: /api/v1
+
 tags:
   - name: metadata
     description: Get metadata about all motors in the database.
@@ -25,53 +27,53 @@ paths:
   /metadata.json:
     get:
       tags:
-      - metadata
+        - metadata
       description: The GET method specifies search criteria as query parameters.
       consumes:
-      - application/x-www-form-urlencoded
+        - application/x-www-form-urlencoded
       produces:
-      - application/json
+        - application/json
       parameters:
-      - name: manufacturer
-        in: query
-        description: manufacturer name or abbreviation
-        type: string
-        required: false
-      - name: impulseClass
-        in: query
-        description: letter class of motor
-        type: string
-        required: false
-      - name: diameter
-        in: query
-        description: motor diameter in mm
-        type: number
-        required: false
-      - name: type
-        in: query
-        description: motor type
-        type: string
-        enum:
-        - SU
-        - reload
-        - hybrid
-        required: false
-      - name: certOrg
-        in: query
-        description: certification organization name or abbreviation
-        type: string
-        required: false
-      - name: availability
-        in: query
-        description: motor current availability
-        type: string
-        enum:
-        - regular
-        - occasional
-        - OOP
-        - available
-        - all
-        required: false
+        - name: manufacturer
+          in: query
+          description: manufacturer name or abbreviation
+          type: string
+          required: false
+        - name: impulseClass
+          in: query
+          description: letter class of motor
+          type: string
+          required: false
+        - name: diameter
+          in: query
+          description: motor diameter in mm
+          type: number
+          required: false
+        - name: type
+          in: query
+          description: motor type
+          type: string
+          enum:
+            - SU
+            - reload
+            - hybrid
+          required: false
+        - name: certOrg
+          in: query
+          description: certification organization name or abbreviation
+          type: string
+          required: false
+        - name: availability
+          in: query
+          description: motor current availability
+          type: string
+          enum:
+            - regular
+            - occasional
+            - OOP
+            - available
+            - all
+          required: false
       responses:
         '200':
           description: metadata response
@@ -79,53 +81,63 @@ paths:
             $ref: '#/definitions/MetadataResponse'
     post:
       tags:
-      - metadata
+        - metadata
       description: The POST method specifies JSON object with search criteria.
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       parameters:
-      - in: body
-        name: body
-        description: metadata query criteria
-        required: true
-        schema:
-          $ref: '#/definitions/MetadataRequest'
+        - in: body
+          name: body
+          description: Metadata query criteria. All fields are optional.
+          required: true
+          schema:
+            $ref: '#/definitions/MetadataRequest'
       responses:
         '200':
-          description: metadata response
+          description: Metadata response. A list of possible value is returned for each bounded search criterion.
           schema:
             $ref: '#/definitions/MetadataResponse'
-
   /search.json:
     post:
       tags:
-      - search
+        - search
       description: The POST method specifies a JSON object with search criteria.
       consumes:
-      - application/json
+        - application/json
       produces:
-      - application/json
+        - application/json
       parameters:
-      - in: body
-        name: body
-        description: metadata query criteria
-        required: true
-        schema:
-          $ref: '#/definitions/MetadataRequest'
+        - in: body
+          name: body
+          description: Search query criteria. All fields are optional, but at least one criterion must be specified.
+          required: true
+          schema:
+            $ref: '#/definitions/SearchRequest'
       responses:
         '200':
-          description: metadata response
+          description: Search response. Only fields with values will be returned.
           schema:
-            $ref: '#/definitions/MetadataResponse'
-
-paths:
+            $ref: '#/definitions/SearchResponse'
   /download.json:
     post:
       tags:
-      - search
-      description: POST method specifies JSON object with criteria
+        - search
+        - download
+      description: The POST method specifies JSON object with motor identifiers.
+      parameters:
+        - in: body
+          name: body
+          description: Motor identifier list. At least one must be specified.
+          required: true
+          schema:
+            $ref: '#/definitions/DownloadRequest'
+      responses:
+        '200':
+          description: Motor data downloads. One entry returned for each valid motor identifier.
+          schema:
+            $ref: '#/definitions/DownloadResponse'
 
 definitions:
   MetadataRequest:
@@ -148,9 +160,9 @@ definitions:
         description: motor type
         type: string
         enum:
-        - SU
-        - reload
-        - hybrid
+          - SU
+          - reload
+          - hybrid
         example: SU
       certOrg:
         description: certification organization name or abbreviation
@@ -160,13 +172,12 @@ definitions:
         description: motor current availability
         type: string
         enum:
-        - regular
-        - occasional
-        - OOP
-        - available
-        - all
+          - regular
+          - occasional
+          - OOP
+          - available
+          - all
         example: available
-
   MetadataResponse:
     type: object
     description: motor metadata
@@ -177,45 +188,44 @@ definitions:
         items:
           $ref: '#/definitions/NameAndAbbrev'
         example:
-        - name: Estes Industries
-          abbrev: Estes
+          - name: Estes Industries
+            abbrev: Estes
       certOrgs:
         type: array
         description: certification organizations
         items:
           $ref: '#/definitions/NameAndAbbrev'
         example:
-        - name: National Association of Rocketry
-          abbrev: NAR
+          - name: National Association of Rocketry
+            abbrev: NAR
       types:
         type: array
         description: motor types
         items:
           type: string
           enum:
-          - SU
-          - reload
-          - hybrid
+            - SU
+            - reload
+            - hybrid
         example:
-        - SU
+          - SU
       diameters:
         type: array
         description: motor diameters
         items:
           type: number
         example:
-        - 13
-        - 18
+          - 13
+          - 18
       impulseClasses:
         type: array
         description: total impulse letter classes
         items:
           type: string
         example:
-        - A
-        - B
-        - C
-
+          - A
+          - B
+          - C
   NameAndAbbrev:
     type: object
     description: full name and abbreviation
@@ -226,3 +236,164 @@ definitions:
       abbrev:
         type: string
         description: most common abbreviation
+  SearchRequest:
+    type: object
+    description: motor search query criteria
+    properties:
+      manufacturer:
+        description: manufacturer name or abbreviation
+        type: string
+        example: Estes
+      designation:
+        description: manufacturer designation of motor
+        type: string
+        example: C6
+      commonName:
+        description: standard name of motor
+        type: string
+        pattern: '(1/4A|1/2A|[A-Z])[0-9]+'
+        example: C6
+      impulseClass:
+        description: letter class of motor
+        type: string
+        example: C
+      diameter:
+        description: motor diameter in mm
+        type: number
+        example: 18
+      type:
+        description: motor type
+        type: string
+        enum:
+          - SU
+          - reload
+          - hybrid
+        example: SU
+      certOrg:
+        description: certification organization name or abbreviation
+        type: string
+        example: NAR
+      hasDataFiles:
+        description: only motors with data files
+        type: boolean
+        example: true
+      availability:
+        description: motor current availability
+        type: string
+        enum:
+          - regular
+          - occasional
+          - OOP
+          - available
+          - all
+        example: available
+      maxResults:
+        description: maximum number of motors to return
+        type: integer
+        example: 20
+  SearchResponse:
+    type: object
+    description: motor search results
+    properties:
+      criteria:
+        description: the search criteria plus number of matches
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              description: name of search criterion
+              type: string
+              example: commonName
+            value:
+              description: value of search criterion
+              type: string
+              example: C6
+            matches:
+              description: number of matches of this criterion
+              type: integer
+              example: 3
+            error:
+              description: errors in criteria specification
+              type: string
+              example:
+      results:
+        description: information on the motors matched
+        type: array
+        items:
+          type: object
+          properties:
+            motorId:
+              description: unique identifier of motor; used to download data
+              type: string
+              example: 5872d0980002310000000015
+            manufacturer:
+              type: string
+              example: Estes Industries
+            manufacturerAbbrev:
+              type: string
+              example: Estes
+            designation:
+              type: string
+              example: C6
+            commonName:
+              type: string
+              example: C6
+            impulseClass:
+              type: string
+              example: C
+            diameter:
+              type: number
+              example: 18
+            length:
+              type: number
+              example: 70
+            type:
+              type: string
+              example: SU
+            avgThrustN:
+              type: number
+              example: 4.7
+            maxThrustN:
+              type: number
+              example: 14.1
+            totImpulseNs:
+              type: number
+              example: 8.8
+            burnTimeS:
+              type: number
+              example: 1.9
+            dataFiles:
+              type: integer
+              example: 3
+            infoUrl:
+              type: string
+              format: url
+              example: 'http://nar.org/SandT/pdf/Estes/C6.pdf'
+            totalWeightG:
+              type: number
+              example: 24
+            propWeightG:
+              type: number
+              example: 11
+            delays:
+              type: string
+              example: '0,3,5,7'
+            caseInfo:
+              type: string
+              example: ''
+            propInfo:
+              type: string
+              example: ''
+            updatedOn:
+              type: string
+              format: date
+              example: '2014-12-02'
+  DownloadRequest:
+    type: object
+    description: motor identifier list
+    properties:
+  DownloadResponse:
+    type: object
+    description: motor data downloads
+    properties:

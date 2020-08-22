@@ -38,8 +38,35 @@ module.exports = function(req, defaults, custom) {
 
   for (p in custom) {
     if (custom.hasOwnProperty(p) && custom[p] != null)
-      merged[p] = custom[p];
+      merged[p] = sanitize(custom[p]);
   }
 
   return merged;
 };
+
+/**
+ * Make plain objects out of Mongoose models to send to the template engine
+ * and clip out methods and private state for security.
+ */
+function sanitize(o) {
+  if (o != null && typeof o === 'object' && !o._sanitized) {
+    if (Array.isArray(o)) {
+      let a = [];
+      Object.defineProperty(a, '_sanitized', { value: true });
+      o.forEach(e => a.push(sanitize(e)));
+      return a;
+    } else if (o.constructor && o.constructor.name === 'model') {
+      let s = {};
+      Object.defineProperty(s, '_sanitized', { value: true });
+      for (const p in o) {
+        let v = o[p];
+        if (/^\$/.test(p) || p === 'db' || p === 'opts' || p === 'conn' || p === 'schema' || p === 'collection')
+          continue;
+        if (typeof v !== 'function')
+          s[p] = sanitize(v);
+      }
+      return s;
+    }
+  }
+  return o;
+}

@@ -8,7 +8,11 @@ var express = require('express'),
     router = express.Router();
 
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'ThrustCurve Home', layout: 'home' });
+  res.render('index', {
+    title: 'ThrustCurve Home',
+    layout: 'home',
+    year: new Date().getFullYear(),
+  });
 });
 router.get(['/index.html', '/index.shtml'], function(req, res, next) {
   res.redirect(301, '/');

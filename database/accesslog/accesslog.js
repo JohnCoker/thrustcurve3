@@ -26,36 +26,65 @@ const process = require('process'),
  *
  * <p>The referer [sic] is used to guess at the source of the view.</p>
  *
+ * <p>The year can be adjusted to the current one to make old records current using the
+ * <code>--fixyear</code> option.</p>
+ *
  * @module accesslog
  */
 module.exports = {};
 
+const USAGE = 'usage: accesslog [ --fixyear ] filename ...';
+
 if (!process.argv || process.argv.length < 3) {
-  console.log('usage: accesslog filename ...');
+  console.log(USAGE);
   process.exit(0);
 }
-
-var LogRegex = /^([0-9a-f.:]+) - - \[([0-9]{2}\/[a-z]{3}\/[0-9]{4}:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] "((?:[^"\\]|\\.)*)" ([0-9]+) (-|[0-9]+) "((?:[^"\\]|\\.)*)" "((?:[^"\\]|\\.)*)"/i;
+let files = [];
+let fixyear = false;
+let badarg = false;
+process.argv.slice(2).forEach(arg => {
+  if (arg === '-y' || arg === '--fixyear') {
+    fixyear = true;
+  } else if (/^-/.test(arg)) {
+    badarg = true;
+  } else {
+    if (!fs.existsSync(arg) || !fs.statSync(arg).isFile()) {
+      console.error('accesslog: argument "' + arg + '" not a file"');
+      badarg = true;
+    }
+    files.push(arg);
+  }
+});
+if (files.length < 1 || badarg) {
+  console.error(USAGE);
+  process.exit(1);
+}
 
 function parseDate(s) {
-  var parts = /^0?([0-9]+)\/([A-Z][a-z]+)\/([0-9]+):0?([0-9]+):0?([0-9]+):0?([0-9]+) /i.exec(s);
+  let parts = /^0?([0-9]+)\/([A-Z][a-z]+)\/([0-9]+):0?([0-9]+):0?([0-9]+):0?([0-9]+) /i.exec(s);
   if (parts == null || parts.length < 7)
     return;
 
-  var m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(parts[2]);
+  let y = parseInt(parts[3]);
+  if (fixyear)
+    y = new Date().getFullYear();
+
+  let m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(parts[2]);
   if (m < 0)
     return;
 
-  return new Date(parseInt(parts[3]), m, parseInt(parts[1]),
+  return new Date(y, m, parseInt(parts[1]),
                   parseInt(parts[4]), parseInt(parts[5]), parseInt(parts[6]));
 }
 
-var Motor, MotorView;
-var motorCache = {};
-var total = 0;
+const LogRegex = /^([0-9a-f.:]+) - - \[([0-9]{2}\/[a-z]{3}\/[0-9]{4}:[0-9]{2}:[0-9]{2}:[0-9]{2}[^\]]*)\] "((?:[^"\\]|\\.)*)" ([0-9]+) (-|[0-9]+) "((?:[^"\\]|\\.)*)" "((?:[^"\\]|\\.)*)"/i;
+
+let Motor, MotorView;
+let motorCache = {};
+let total = 0;
 
 function load(fn, cb) {
-  var rl, entries, lineNum, bots, errors, badIds, inserted;
+  let rl, entries, lineNum, bots, errors, badIds, inserted;
 
   console.log('* reading file ' + fn + ' ...');
   rl = readline.createInterface({
@@ -65,11 +94,11 @@ function load(fn, cb) {
   });
   rl.resume();
 
-  var addView = function(entry, motor) {
+  let addView = function(entry, motor) {
     if (motor == null) {
       badIds++;
     } else {
-      var mv = new MotorView({
+      let mv = new MotorView({
         createdAt: entry.date,
         updatedAt: entry.date,
         _motor: motor._id,
@@ -83,7 +112,7 @@ function load(fn, cb) {
   entries = [];
   lineNum = errors = bots = badIds = inserted = 0;
   rl.on('line', function(line) {
-    var parsed, entry;
+    let parsed, entry;
 
     lineNum++;
     parsed = LogRegex.exec(line);
@@ -102,7 +131,7 @@ function load(fn, cb) {
       return;
 
     // parse date
-    var date = parseDate(parsed[2]);
+    let date = parseDate(parsed[2]);
     if (date == null) {
       errors++;
       if (errors > 10) {
@@ -114,12 +143,12 @@ function load(fn, cb) {
     }
 
     // make sure this is a motor display page
-    var get = /^GET \/motorsearch\.jsp\?id=([0-9]+)/.exec(parsed[3]);
+    let get = /^GET \/motorsearch\.jsp\?id=([0-9]+)/.exec(parsed[3]);
     if (get == null)
       return;
 
     // check the user agent
-    var agent = parsed[7];
+    let agent = parsed[7];
     if (agent === '' || agent === '-' || crawlers.match(agent)) {
       bots++;
       return;
@@ -133,7 +162,7 @@ function load(fn, cb) {
     entries.push(entry);
 
     // guess source from referer
-    var referer = parsed[6];
+    let referer = parsed[6];
     if (referer && referer != '-') {
       if (/thrustcurve\.org/.test(referer)) {
         if (/motorguide\.jsp/.test(referer))
@@ -179,7 +208,7 @@ function load(fn, cb) {
 }
 
 // open DB
-var steps = [
+let steps = [
   function(cb) {
     mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/thrustcurve', {
@@ -197,23 +226,11 @@ var steps = [
 ];
 
 // load each log file
-var badFiles = 0;
-process.argv.slice().forEach(function(fn, i) {
-  // first two in argv are node executable and module file
-  if (i < 2)
-    return;
-
-  // every argument must be a file name
-  if (!fs.existsSync(fn) || !fs.statSync(fn).isFile()) {
-    console.error('accesslog: argument "' + fn + '" not a file"');
-    badFiles++;
-  }
+files.forEach(fn => {
   steps.push(function(cb) {
     load(fn, cb);
   });
 });
-if (badFiles > 0)
-  process.exit(1);
 
 // close DB
 steps.push(function(cb) {
@@ -221,7 +238,7 @@ steps.push(function(cb) {
   cb(null, 'closed databases');
 });
 
-async.series(steps, function(err, result) {
+async.series(steps, function(err, _result) {
   if (err) {
     if (err !== true)
       console.error('! ' + err.message || err);

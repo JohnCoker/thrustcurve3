@@ -48,6 +48,15 @@ const index = require('./routes/index'),
       api_v1 = require('./routes/api_v1');
 
 const app = express();
+if (process.env.NODE_ENV === 'production') {
+  // force SSL in production
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https')
+      res.redirect(`https://${req.header('host')}${req.url}`);
+    else
+      next();
+  })
+}
 
 // view engine setup using Handlebars
 require('handlebars-helper').help(exphbs.handlebars);

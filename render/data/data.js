@@ -185,7 +185,7 @@ class XMLFormat extends Format {
   }
 
   toId(value) {
-    if (typeof value == number && this._compat)
+    if (typeof value == 'number' && this._compat)
       return IDmap2str[value.toFixed()];
     return value;
   }

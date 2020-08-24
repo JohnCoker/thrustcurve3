@@ -55,7 +55,7 @@ if (process.env.NODE_ENV === 'production') {
       res.redirect(`https://${req.header('host')}${req.url}`);
     else
       next();
-  })
+  });
 }
 
 // view engine setup using Handlebars

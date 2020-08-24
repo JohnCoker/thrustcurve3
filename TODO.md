@@ -1,5 +1,8 @@
 # To-Do
 
+All of the functionality of the old site should be avaiable in the new (plus more, of course).
+This page lists the things supported in the old site which haven't yet been reimplemented.
+
 ## General
 
  * flag motors favorited by other users

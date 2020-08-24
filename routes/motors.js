@@ -652,7 +652,7 @@ router.get('/motors/missingstats.html', function(req, res, next) {
         }
       }
       motor.missingStats = missing;
-      motor.missingStats.names = names;
+      motor.missingStatNames = names;
     }
 
     res.render('motors/missingstats', locals(defaults, {
@@ -694,7 +694,7 @@ router.get('/motors/popular.html', function(req, res, next) {
     // get all the motors in one query
     req.db.Motor.find({ _id: { $in: motorIds } }).populate('_manufacturer').exec(req.success(function(motors) {
       // populate motors manually
-      var get = function(id) {
+      function get(id) {
         if (id == null)
           return;
         id = id.toString();
@@ -702,8 +702,7 @@ router.get('/motors/popular.html', function(req, res, next) {
           if (motors[k]._id.toString() == id)
             return motors[k];
         }
-        return id;
-      };
+      }
       p = ranking.overall;
       for (i = 0; i < p.motors.length; i++) {
         p.motors[i].motor = get(p.motors[i]._motor);

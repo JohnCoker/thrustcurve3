@@ -427,7 +427,7 @@ function doRunGuide(req, res, rocket) {
         result = new req.db.GuideResult({
           _rocket: rocket._id,
           _contributor: req.user ? req.user._id : undefined,
-          public: !!rocket.public,
+          public: req.user == null || !!rocket.public,
           inputs: inputs,
           mmts: mmts,
           warnings: warnings,

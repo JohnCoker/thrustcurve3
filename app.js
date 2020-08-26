@@ -49,9 +49,9 @@ const index = require('./routes/index'),
 
 const app = express();
 if (process.env.NODE_ENV === 'production') {
-  // force SSL in production
+  // force SSL in production (except for API)
   app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https')
+    if (req.header('x-forwarded-proto') !== 'https' && !/^\/(servlets|api)\//.test(req.url))
       res.redirect(`https://${req.header('host')}${req.url}`);
     else
       next();

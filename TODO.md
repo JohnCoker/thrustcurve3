@@ -6,7 +6,6 @@ This page lists the things supported in the old site which haven't yet been reim
 ## General
 
  * flag motors favorited by other users
- * add Like, +1, Flattr, etc for motor pages
  * outbox feature
 
 ## Contribution
@@ -24,6 +23,7 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * use visual styles in spreadsheets
  * varying launch conditions (ground altitude, temperature)
+ * add info to rockets on performance of actual flights
 
 ## Account
 

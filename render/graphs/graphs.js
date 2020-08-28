@@ -6,7 +6,8 @@
 
 const units = require('../../lib/units'),
       analyze = require('../../simulate/analyze'),
-      svg = require('../svg');
+      svg = require('../svg'),
+      { hueCircle } = require('../../lib/color');
 
 const SVG = svg.contentType,
       AllFormats = [SVG],
@@ -21,12 +22,15 @@ const SVG = svg.contentType,
       CurveWidth = 3,
       ShadowStroke = 'rgba(255, 255, 255, 0.8)',
       ShadowWidth = CurveWidth + 2,
-      PointStroke = '#9e1a20',
       PointFill = 'white',
       PointWidth = 2,
       PointRadius = 4,
       AnnotationStroke = '#2e448c',
       AnnotationWidth = 0.5;
+
+function lineColors(n) {
+  return hueCircle(CurveStroke, n);
+}
 
 function copyright() {
   return '© ThrustCurve.org ' + new Date().getFullYear();
@@ -370,7 +374,7 @@ function thrustCurve(spec) {
 
   // draw the thrust curve points
   image.fillStyle = PointFill;
-  image.strokeStyle = PointStroke;
+  image.strokeStyle = CurveStroke;
   image.lineWidth = PointWidth;
   for (i = 0; i < spec.data.points.length; i++) {
     x = layout.plotX(spec.data.points[i].time);
@@ -391,6 +395,7 @@ function impulseComparison(spec) {
   if (spec == null || spec.motors == null || spec.motors.length < 1)
     return;
   stats = {};
+  const colors = lineColors(spec.motors.length);
   for (i = 0; i < spec.motors.length; i++) {
     motor = spec.motors[i];
     if (motor.totalImpulse > 0) {
@@ -412,6 +417,7 @@ function impulseComparison(spec) {
         stats.maxYStat = yv;
       }
     }
+    motor.color = colors[i];
   }
   /* jshint -W018 */
   if (!(stats.minImpulse > 0) || !(stats.minYStat > 0)) {
@@ -560,10 +566,10 @@ function impulseComparison(spec) {
 
   // draw each motor's dot
   image.fillStyle = PointFill;
-  image.strokeStyle = PointStroke;
   image.lineWidth = PointWidth;
   for (i = 0; i < spec.motors.length; i++) {
     motor = spec.motors[i];
+    image.strokeStyle = motor.color;
     yv = motor[spec.stat];
     if (motor.totalImpulse > 0 && yv > 0) {
       label = motorLabel(motor);
@@ -599,6 +605,7 @@ function thrustCurveComparison(spec) {
   if (spec == null || spec.motors == null)
     return;
   maxThrust = maxTime = 0;
+  const colors = lineColors(spec.motors.length);
   for (i = 0; i < spec.motors.length; i++) {
     if (spec.motors[i].data)
       stats = analyze.stats(spec.motors[i].data);
@@ -610,6 +617,7 @@ function thrustCurveComparison(spec) {
       if (stats.maxThrust > maxThrust)
         maxThrust = stats.maxThrust;
     }
+    spec.motors[i].color = colors[i];
   }
   if (maxThrust <= 0 || maxTime <= 0)
     return;
@@ -735,7 +743,7 @@ function thrustCurveComparison(spec) {
     }
 
     // draw the thrust curve line
-    image.strokeStyle = CurveStroke;
+    image.strokeStyle = motor.color;
     image.lineWidth = CurveWidth;
     image.beginPath();
     image.moveTo(layout.plotX(0), layout.plotY(0));

@@ -28,6 +28,7 @@ node_modules
 
 tmp
 out
+database/backup
 
 # Mac OS thumbnails
 .DS_Store

@@ -1,6 +1,6 @@
 # ThrustCurve.org, v3
 
-This repository contains the code that will soon power the [ThrustCurve.org](http://thrustcurve.org/) site.
+This repository contains the code that powers the [ThrustCurve.org](https://www.thrustcurve.org/) site.
 
 [![Build Status](https://travis-ci.org/JohnCoker/thrustcurve3.svg?branch=master)](https://travis-ci.org/JohnCoker/thrustcurve3)
 
@@ -46,6 +46,11 @@ The v2 implementation was in Java/JSP, which by 2015 had become dated, was getti
 to maintain, and my hosting options were limited.
 So, I decided to re-implement it using current web technologies.
 
+After most of the site was built in 2016, I ran out of steam and made only fitfull progress.
+There were a lot of little things to do as well as the big thing of rebuilding the API.
+In 2020, the ISP hosting the previous site died and I was forced to roll out this implementation.
+There are still many things left to complete, see [the to-do page](TODO.md).
+
 ## V3 Stack
 
 The v2 implementation was all server-side rendered using Java back-end code and pages which
@@ -63,7 +68,7 @@ I have been able to make it work by bridging some of its deficiencies with
 I didn't want to go entirely client-side rendering because I wanted the site to be SEO-friendly,
 but I did want to have the option of higher interactivity in the browser.
 Initially, I was looking at [AngularJS](https://angularjs.org/), but their approach is a bit too
-radically client-side, plus 2.0 is still immature.
+radically client-side, plus 2.0 was immature.
 In the end, all of the full-featured frameworks just felt too complex and cumbersome and I
 went back to a simpler structure of [Express](http://expressjs.com/) with
 Handlebars as the template engine.
@@ -90,6 +95,7 @@ thrustcurve3
 │   ├── ranking
 │   └── schema
 ├── lib
+│   ├── color
 │   ├── crawlers
 │   ├── errors
 │   ├── helpers

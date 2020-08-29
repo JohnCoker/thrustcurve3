@@ -24,7 +24,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * use visual styles in spreadsheets
  * varying launch conditions (ground altitude, temperature, wind)
- * provide a way to see public rockets entered
 
 ## Account
 

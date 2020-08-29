@@ -210,3 +210,37 @@ $('#finish').change(function(e) {
     $('input[name=cd]').val(cd);
 });
 </script>
+
+<h2>Other's Rockets</h2>
+<p>
+There are also {{publicCount}} public rockets entered by other people you can try out.
+</p>
+<table id="public-rockets" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th class="number">Body Diam</th>
+      <th class="number">Weight</th>
+      <th class="number">MMT Diam</th>
+      <th class="number">MMT Len</th>
+      <th>Owner</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each publicRockets}}
+    <tr>
+      <td><a href="/motors/guide.html?rocket={{_id}}">{{name}}</a></td>
+      <td class="number" data-sort="{{formatSort bodyDiameter 'length' bodyDiameterUnit}}">{{formatLength bodyDiameter bodyDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort weight 'mass' weightUnit}}">{{formatMass weight weightUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtDiameter 'length' mmtDiameterUnit}}">{{formatLength mmtDiameter mmtDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtLength 'length' mmtLengthUnit}}">{{formatLength mmtLength mmtLengthUnit}}</td>
+      <td>{{_contributor.name}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#public-rockets', {
+  order: [[0,'asc']]
+});
+</script>

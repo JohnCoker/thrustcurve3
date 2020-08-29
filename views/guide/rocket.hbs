@@ -35,9 +35,11 @@ Please check that the MMT diameter is a standard size and the length is correct 
 by
 {{#if singleManufacturer}}{{singleManufacturer.abbrev}}{{/if}}
 {{#unless singleManufacturer}}{{manufacturerCount}} manufacturers{{/unless}}
-fit your rocket's motor mount tube{{#if rocket.adapters}} or adapters{{/if}}.
+fit this rocket's motor mount tube{{#if rocket.adapters}} or adapters{{/if}}.
+{{#if editLink}}
 </br>
 <a href="{{editLink}}">Edit this rocket</a>.
+{{/if}}
 </p>
 
 <p>

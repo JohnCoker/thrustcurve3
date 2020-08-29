@@ -38,29 +38,37 @@ const guidePage = '/motors/guide.html';
  */
 function doEntryPage(req, res, rockets) {
   metadata.getAvailableMotors(req, function(available) {
-    var lengthUnit = units.getUnitPref('length').label,
-        massUnit = units.getUnitPref('mass').label,
-        guideDefault = units.defaultGuideLength();
+    let q = { public: true };
+    if (req.user != null)
+      q._contributor = { $ne: req.user._id };
+    req.db.Rocket.find(q, undefined, { sort: { updatedAt: -1 } })
+                 .populate('_contributor').exec(req.success(function(pubRockets) {
+      var lengthUnit = units.getUnitPref('length').label,
+          massUnit = units.getUnitPref('mass').label,
+          guideDefault = units.defaultGuideLength();
 
-    res.render('guide/entry', locals(req, defaults, {
-      title: "Motor Guide",
-      rockets: rockets,
-      rocket: {
-        bodyDiameterUnit: lengthUnit,
-        weightUnit: massUnit,
-        mmtDiameterUnit: 'mm',
-        mmtLengthUnit: lengthUnit,
-        cd: 0.6,
-        guideLength: guideDefault.value,
-        guideLengthUnit: guideDefault.unit,
-      },
-      schema: schema,
-      metadata: available,
-      lengthUnits: units.length,
-      massUnits: units.mass,
-      finishes: metadata.CdFinishes,
-      submitLink: guidePage,
-      rocketsLink: '/mystuff/rockets.html',
+      res.render('guide/entry', locals(req, defaults, {
+        title: "Motor Guide",
+        rockets: rockets,
+        rocket: {
+          bodyDiameterUnit: lengthUnit,
+          weightUnit: massUnit,
+          mmtDiameterUnit: 'mm',
+          mmtLengthUnit: lengthUnit,
+          cd: 0.6,
+          guideLength: guideDefault.value,
+          guideLengthUnit: guideDefault.unit,
+        },
+        schema: schema,
+        metadata: available,
+        lengthUnits: units.length,
+        massUnits: units.mass,
+        finishes: metadata.CdFinishes,
+        submitLink: guidePage,
+        rocketsLink: '/mystuff/rockets.html',
+        publicCount: pubRockets.length,
+        publicRockets: pubRockets,
+      }));
     }));
   });
 }
@@ -72,6 +80,9 @@ function doRocketPage(req, res, rockets, rocket) {
   mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
 
   metadata.getRocketMotors(req, rocket, function(fit) {
+    let editLink;
+    if (req.user && req.user._id.toString() == rocket._contributor.toString())
+      editLink = '/mystuff/rocket/' + rocket._id + '/edit.html';
     res.render('guide/rocket', locals(req, defaults, {
       title: rocket.name || "motor Guide",
       rockets: rockets,
@@ -95,7 +106,7 @@ function doRocketPage(req, res, rockets, rocket) {
       singleManufacturer: fit.manufacturers.length == 1 ? fit.manufacturers[0] : undefined,
 
       submitLink: guidePage,
-      editLink: '/mystuff/rocket/' + rocket._id + '/edit.html',
+      editLink: editLink,
       entryLink: guidePage,
     }));
   });

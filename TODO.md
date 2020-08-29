@@ -7,8 +7,7 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * flag motors favorited by other users
  * outbox feature
- * add "max liftoff weight" to motors
- * provide a way to see public rockets entered
+ * add [max liftoff weight](https://apogeerockets.com/education/downloads/Newsletter214.pdf) to motors
 
 ## Contribution
 
@@ -24,8 +23,8 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Motor Guide
 
  * use visual styles in spreadsheets
- * varying launch conditions (ground altitude, temperature)
- * add info to rockets on performance of actual flights
+ * varying launch conditions (ground altitude, temperature, wind)
+ * provide a way to see public rockets entered
 
 ## Account
 
@@ -49,6 +48,11 @@ This page lists the things supported in the old site which haven't yet been reim
  * documentation page
  * demonstration page
  * add support for bi-directional sync in phone app
+
+## Phone App
+
+ * re-implement TCTG on latest Cordova using updated API
+
 
 # Old Site Pages
 

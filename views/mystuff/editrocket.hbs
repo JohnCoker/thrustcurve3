@@ -243,7 +243,8 @@ If you have an adapter for another motor diameter, you can add it as well.
   <div class="form-group">
     <label for="weight" class="col-sm-3 control-label">Adapter Weight</label>
     <div class="col-sm-6">
-      <input type="number" class="form-control" name="weight" required>
+      <input type="number" class="form-control" name="weight"
+             step="0.001" min="0.001" required>
       <span class="help-block with-errors"></span>
     </div>
     <div class="col-sm-3">

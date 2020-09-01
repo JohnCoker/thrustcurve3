@@ -87,7 +87,14 @@ function dateOnly(mongoose) {
   return DateOnly;
 }
 
-function schemaOptions(schema) {
+function stdOptions(base) {
+  let opts = base || {};
+  if (!opts.hasOwnProperty('usePushEach'))
+    opts.usePushEach = true;
+  return opts;
+}
+
+function stdHooks(schema) {
   // touch updatedAt timestamp
   schema.pre('save', function(next) {
     if (!this.isNew && this.isModified())
@@ -119,8 +126,8 @@ function makeManufacturerModel(mongoose) {
     aliases: [{ type: String, required: true }],
     website: { type: String, match: UrlRegex },
     active: { type: Boolean, required: true, default: true }
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('Manufacturer', schema);
 }
 
@@ -134,8 +141,8 @@ function makeCertOrgModel(mongoose) {
     aliases: [{ type: String, required: true }],
     website: { type: String, match: UrlRegex },
     active: { type: Boolean, required: true, default: true }
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('CertOrg', schema);
 }
 
@@ -171,14 +178,14 @@ function makeMotorModel(mongoose) {
     sparky: { type: Boolean, default: false },
     dataSheet: { type: String, match: UrlRegex },
     availability: { type: String, required: true, enum: MotorAvailabilityEnum }
-  }, {
+  }, stdOptions({
     toObject: {
       virtuals: true
     },
     toJSON: {
       virtuals: true
     }
-  });
+  }));
   schema.index({ _manufacturer: 1, designation: 1 }, { unique: true });
   schema.index({
     designation: 'text',
@@ -215,7 +222,7 @@ function makeMotorModel(mongoose) {
     next();
   });
 
-  schemaOptions(schema);
+  stdHooks(schema);
   return mongoose.model('Motor', schema);
 }
 
@@ -283,8 +290,8 @@ function makeContributorModel(mongoose) {
     },
     resetToken: String,
     resetExpires: Date
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
 
   // http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
   schema.pre('save', function(next) {
@@ -344,8 +351,8 @@ function makeMotorNoteModel(mongoose) {
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
     subject: { type: String, required: true },
     content: { type: String, required: true }
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('MotorNote', schema);
 }
 
@@ -360,8 +367,8 @@ function makeSimFileModel(mongoose) {
     dataSource: { type: String, required: true, enum: SimFileDataSourceEnum },
     license: { type: String, enum: SimFileLicenseEnum },
     data: { type: String, required: true }
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('SimFile', schema);
 }
 
@@ -374,8 +381,8 @@ function makeSimFileNoteModel(mongoose) {
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
     subject: { type: String, required: true },
     content: { type: String, required: true }
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('SimFileNote', schema);
 }
 
@@ -409,8 +416,8 @@ function makeRocketModel(mongoose) {
     guideLengthUnit: { type: String, enum: units.length.labels },
     website: { type: String, match: UrlRegex },
     comments: String
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('Rocket', schema);
 }
 
@@ -421,8 +428,8 @@ function makeMotorViewModel(mongoose) {
     _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true, index: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', index: true },
     source: { type: String, enum: MotorViewSourceEnum }
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('MotorView', schema);
 }
 
@@ -453,8 +460,8 @@ function makeMotorRankingModel(mongoose) {
         trendSigma: { type: Number, required: true }
       } ],
     } ]
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('MotorRanking', schema);
 }
 
@@ -464,10 +471,10 @@ function makeFavoriteMotorModel(mongoose) {
     updatedAt: { type: Date, default: Date.now, required: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', required: true, index: true },
     _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true, index: true },
-  });
+  }, stdOptions());
   schema.index({ _contributor: 1, _motor: 1 }, { unique: true });
 
-  schemaOptions(schema);
+  stdHooks(schema);
   return mongoose.model('FavoriteMotor', schema);
 }
 
@@ -512,8 +519,8 @@ function makeGuideResultModel(mongoose) {
       pass: { type: Boolean, required: true },
       reason: { type: String },
     } ]
-  });
-  schemaOptions(schema);
+  }, stdOptions());
+  stdHooks(schema);
   return mongoose.model('GuideResult', schema);
 }
 
@@ -529,9 +536,10 @@ function makeIntIdMapModel(mongoose) {
     collName: { type: String, required: true },
     oid: { type: mongoose.Schema.Types.ObjectId, required: true },
     int: { type: Number, required: true, min: 1 }
-  });
+  }, stdOptions());
   schema.index({ collName: 1, oid: 1 }, { unique: true });
   schema.index({ collName: 1, int: 1 }, { unique: true });
+  stdHooks(schema);
 
   var model = mongoose.model('IntIdMap', schema);
 

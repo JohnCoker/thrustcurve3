@@ -99,7 +99,7 @@ No changes to save.
     <label for="delays" class="col-sm-3 control-label">Delays</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="delays"
-             pattern="^P|[0-9,-]*$" data-error="seconds, separated by dash or comma (optional)"
+             pattern="^[0-9P,-]*$" data-error="seconds, separated by dash or comma (optional)"
              placeholder="4,7,10" value="{{{motor.delays}}}">
       <span class="help-block with-errors"></span>
     </div>
@@ -210,7 +210,7 @@ No changes to save.
     <div class="col-sm-9">
       <div class="input-group">
         <input type="number" class="form-control" name="totalWeight"
-               min="1"
+               step="0.1" min="1"
                value="{{{motor.totalWeight}}}">
         <span class="input-group-addon">g</span>
       </div>
@@ -222,7 +222,7 @@ No changes to save.
     <div class="col-sm-9">
       <div class="input-group">
         <input type="number" class="form-control" name="propellantWeight"
-               min="1"
+               step="0.1" min="1"
                value="{{{motor.propellantWeight}}}">
         <span class="input-group-addon">g</span>
       </div>

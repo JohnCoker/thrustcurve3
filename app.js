@@ -47,12 +47,15 @@ const index = require('./routes/index'),
       admin = require('./routes/admin'),
       api_v1 = require('./routes/api_v1');
 
+const domain = 'www.thrustcurve.org';
 const app = express();
 if (process.env.NODE_ENV === 'production') {
-  // force SSL in production (except for API)
+  // force SSL and canonical domain in production (except for API)
   app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https' && !/^\/(servlets|api)\//.test(req.url))
-      res.redirect(`https://${req.header('host')}${req.url}`);
+    let host = req.header('host');
+    if (!/^\/(servlets|api)\//.test(req.url) &&
+        (host != null && host != domain || req.header('x-forwarded-proto') !== 'https'))
+      res.redirect(`https://${domain}${req.url}`);
     else
       next();
   });

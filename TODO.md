@@ -25,6 +25,7 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * add manufacturer to report
  * add "Gs" to report
+ * add diameter to report if more than one (due to adapters)
  * use visual styles in spreadsheets
  * varying launch conditions (ground altitude, temperature, wind)
 

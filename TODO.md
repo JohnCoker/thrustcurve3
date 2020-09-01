@@ -23,9 +23,10 @@ This page lists the things supported in the old site which haven't yet been reim
 
 ## Motor Guide
 
+ * add manufacturer to report
+ * add "Gs" to report
  * use visual styles in spreadsheets
  * varying launch conditions (ground altitude, temperature, wind)
- * add "Gs" to report
 
 ## Account
 

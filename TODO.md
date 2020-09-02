@@ -7,7 +7,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * flag motors favorited by other users
  * outbox feature
- * export simfile points as CSV
 
 ## Contribution
 

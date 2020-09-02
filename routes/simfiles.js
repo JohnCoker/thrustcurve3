@@ -36,7 +36,7 @@ function getSimFile(req, res, cb) {
   }
 }
 
-function simFileName(simfile) {
+function simFileName(simfile, ext) {
   var file, info;
 
   // make the most descriptive name we can
@@ -55,9 +55,13 @@ function simFileName(simfile) {
              .replace(/_+$/, '');
 
   // add appropriate file extension
-  info = parsers.formatInfo(simfile.format);
-  if (info != null)
-    file += info.extension;
+  if (ext)
+    file += ext;
+  else {
+    info = parsers.formatInfo(simfile.format);
+    if (info != null)
+      file += info.extension;
+  }
 
   return file;
 }
@@ -125,6 +129,7 @@ router.get('/simfiles/:id/', function(req, res, next) {
 	deleteLink: req.helpers.simfileLink(simfile) + 'delete.html',
 	graphLink: req.helpers.simfileLink(simfile) + 'graph.svg',
 	downloadLink: req.helpers.simfileLink(simfile) + 'download/' + simFileName(simfile),
+	pointsLink: req.helpers.simfileLink(simfile) + 'points/' + simFileName(simfile, '.csv'),
       }));
     }));
   });
@@ -229,6 +234,31 @@ router.get('/simfiles/:id/download/:file', function(req, res, next) {
     res.type(contentType)
        .header('Content-Disposition', 'attachment; filename=' + simFileName(simfile))
        .send(simfile.data);
+  });
+});
+
+
+/*
+ * /simfiles/:id/points/:file
+ * Download a CSV file containing the data points from the simulator file content.
+ */
+router.get('/simfiles/:id/points/:file', function(req, res, next) {
+  getSimFile(req, res, function(simfile) {
+    let motor = simfile._motor;
+    let csv = `"motor:","${motor._manufacturer.abbrev} ${motor.designation}"\n` +
+              `"contributor:","${simfile._contributor.name}"\n` +
+              `"details:","https://www.thrustcurve.org/simfiles/${simfile._id}}/"\n`;
+
+    let errs = new errors.Collector();
+    let parsed = parsers.parseData(simfile.format, simfile.data, errs);
+    if (parsed != null && parsed.points != null) {
+      csv += '\n"Time (s)","Thrust (N)"\n';
+      parsed.points.forEach(point => csv += `${point.time},${point.thrust}\n`);
+    }
+
+    res.type('text/csv')
+       .header('Content-Disposition', 'attachment; filename=' + simFileName(simfile, '.csv'))
+       .send(csv);
   });
 });
 

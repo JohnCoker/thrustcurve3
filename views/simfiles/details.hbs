@@ -215,3 +215,9 @@ $('#data-link').click(function(e) {
 });
 </script>
 </div>
+
+{{#if pointsLink}}
+<p>
+You can also <a href="{{pointsLink}}">download the raw data points</a> as a CSV file.
+</p>
+{{/if}}

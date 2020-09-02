@@ -43,14 +43,17 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
 <table id="result-list" class="table table-bordered">
   <thead>
     <tr>
-     <th>Designation</th>
-     <th class="visible-md visible-lg">Manufacturer</th>
-     <th class="number" title="thrust-to-weight ratio">T:W</th>
-     <th class="number" title="velocity off launch guide">Guide</th>
-     <th class="number visible-lg" title="maximum speed">Velocity</th>
-     <th class="number visible-lg" title="maximum acceleration">Accel</th>
-     <th class="number" title="maximum altitude">Apogee</th>
-     <th class="number" title="optimal delay time">Delay</th>
+      <th>Designation</th>
+      <th class="visible-md visible-lg">Manufacturer</th>
+      {{#if multiDiam}}
+      <th class="visible-lg">Diam.</th>
+      {{/if}}
+      <th class="number" title="thrust-to-weight ratio">T:W</th>
+      <th class="number" title="velocity off launch guide">Guide</th>
+      <th class="number visible-lg" title="maximum speed">Velocity</th>
+      <th class="number visible-lg" title="maximum acceleration">Accel</th>
+      <th class="number" title="maximum altitude">Apogee</th>
+      <th class="number" title="optimal delay time">Delay</th>
     </tr>
   </thead>
   <tbody>
@@ -58,6 +61,9 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
     <tr data-id="{{motor._id}}">
       <td><a href="{{motorLink manufacturer motor}}">{{motor.designation}}</a></td>
       <td class="visible-md visible-lg">{{manufacturer.abbrev}}</td>
+      {{#if ../multiDiam}}
+      <td class="visible-lg">{{formatMMT motor.diameter}}</td>
+      {{/if}}
       <td class="number" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
       <td class="number" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
       <td class="number visible-lg" data-sort="{{formatSort simulation.maxVelocity}}">{{formatVelocity simulation.maxVelocity}}</td>

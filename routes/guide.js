@@ -554,6 +554,7 @@ function doSummaryPage(req, res, rockets) {
       result: result,
       anyResults: result.results.length > 0,
       passResults: passResults,
+      multiDiam: _.uniq(_.map(passResults, r => r.motor.diameter)).length > 1,
       detailsLink: '/motors/guide/' + result._id + '/details.html',
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
       csvLink: '/motors/guide/' + result._id + '/spreadsheet.csv',
@@ -705,7 +706,7 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     row = 0;
     motorsSheet.setLabel(row,  0, 'Designation');
     motorsSheet.setLabel(row,  1, 'Manufacturer');
-    motorsSheet.setLabel(row,  2, 'MMT');
+    motorsSheet.setLabel(row,  2, 'Diameter');
     motorsSheet.setLabel(row,  3, 'Weight', 'mass');
     motorsSheet.setLabel(row,  4, 'T:W');
     motorsSheet.setLabel(row,  5, 'Liftoff', 'duration');
@@ -724,7 +725,7 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
       r = result.results[i];
       motorsSheet.setString(row,  0, r.motor.designation);
       motorsSheet.setString(row,  1, r.manufacturer.abbrev);
-      motorsSheet.setString(row,  2, r.mmt);
+      motorsSheet.setUnit  (row,  2, r.motor.diameter, 'mmt');
 
       motorsSheet.setNumber(row,  4, r.thrustWeight, 1);
       if (r.simulation) {

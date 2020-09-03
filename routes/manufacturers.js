@@ -122,7 +122,8 @@ router.get('/manufacturers/:name/details.html', function(req, res, next) {
         unavailable: unavailable,
         unavailableLink: req.helpers.manufacturerLink(manufacturer) + '?unavailable',
         motorsLink: motorsLink(manufacturer) + (unavailable ? '&unavailable' : ''),
-        editLink: '/manufacturers/' + manufacturer._id + '/edit.html'
+        editLink: '/manufacturers/' + manufacturer._id + '/edit.html',
+        addMotorLink: '/motors/' + manufacturer.abbrev + '/new/edit.html',
       }));
     }));
   }));

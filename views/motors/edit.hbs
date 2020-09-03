@@ -70,7 +70,7 @@ No changes to save.
     <label for="commonName" class="col-sm-3 control-label">Common Name</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="commonName"
-             pattern="^1/[248][Aa](0\.)?[1-9]|[A-Za-z][1-9][0-9]*$" required data-error="impulse class plus avg. thrust"
+             pattern="^1/[248]A(0\.)?[1-9]|[A-O][1-9][0-9]*$" required data-error="impulse class plus avg. thrust"
              placeholder="G10" value="{{{motor.commonName}}}">
       <span class="help-block with-errors"></span>
     </div>
@@ -79,7 +79,7 @@ No changes to save.
     <label for="altName" class="col-sm-3 control-label">Alt. Name</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="altName"
-             pattern="^1\/[248][Aa](0\.)?[1-9]|[A-Za-z][1-9][0-9]*$" data-error="impulse class plus avg. thrust (optional)"
+             pattern="^1\/[248]A(0\.)?[1-9]|[A-O][1-9][0-9]*$" data-error="impulse class plus avg. thrust (optional)"
              value="{{{motor.altName}}}">
       <span class="help-block with-errors"></span>
     </div>
@@ -150,7 +150,7 @@ No changes to save.
     <div class="col-sm-9">
       <div class="input-group">
         <input type="number" class="form-control" name="length"
-               min="10" required
+               step="0.1" min="10" required
                value="{{{motor.length}}}">
         <span class="input-group-addon">mm</span>
       </div>

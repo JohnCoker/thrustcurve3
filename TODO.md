@@ -33,8 +33,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
 ## Administration
 
- * new motor entry
- * manufacturer editing
  * user administration
  * delete data files
 

@@ -40,11 +40,11 @@ tr.inactive {
   </tbody>
 </table>
 
-{{#if newLink}}
+{{#hasPerm 'metadata'}}
 <p>
 <a href="{{newLink}}">Add a new manufacturer</a>.
 </p>
-{{/if}}
+{{/hasPerm}}
 
 <script type="text/javascript">
 $(document).ready(function() {

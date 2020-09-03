@@ -1008,7 +1008,10 @@ router.get('/motors/:mfr/:desig/edit.html', authorized('motors'), function(req, 
             res.render('motors/edit', locals(defaults, {
               title: 'New Motor',
               manufacturer: manufacturer,
-              motor: { availability: 'regular' },
+              motor: {
+                _manufacturer: manufacturer._id,
+                availability: 'regular',
+              },
               isNew: true,
               submitLink: '/motors/' + encodeURIComponent(manufacturer.abbrev) + '/new/edit.html',
               manufacturers: caches.manufacturers,
@@ -1096,6 +1099,13 @@ function doSubmit(req, res, motor) {
       }
     }
   });
+  if (!req.hasBodyProperty('impulseClass') && motor.commonName != null) {
+    let cls = motor.commonName.replace(/^(1\/[248])?([A-O]).*$/, '$2');
+    if (cls.length == 1 && motor.impulseClass != cls) {
+      motor.impulseClass = cls;
+      isChanged = true;
+    }
+  }
 
   // date values
   [ 'certDate',

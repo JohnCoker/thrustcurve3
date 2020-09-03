@@ -31,7 +31,7 @@ ul.trail li.current .name {
 <ul class="trail">
 {{#each trail}}
   {{#if current}}
-    <li class="current"><span class="name">{{label}}</span> ({{formatInt ../../motorCount}})</li>
+    <li class="current"><span class="name">{{label}}</span> ({{formatPosInt ../motorCount}})</li>
   {{else}}
     <li {{#if head}}class="head"{{/if}}><a href="{{link}}">{{label}}</a></li>
   {{/if}}

@@ -2,12 +2,12 @@
 
 {{#if isSaved}}
 <div class="alert alert-success" role="alert">
-Changes to motor saved.
+Changes to organization saved.
 </div>
 {{/if}}
 {{#if isCreated}}
 <div class="alert alert-success" role="alert">
-New motor created.
+New organization created.
 </div>
 {{/if}}
 {{#if isUnchanged}}
@@ -39,7 +39,7 @@ No changes to save.
     <label for="abbrev" class="col-sm-3 control-label">Abbreviation</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="abbrev"
-             pattern="^[A-Z][A-Za-z0-9/-]+$" required data-error="single word, no special characters"
+             pattern="^[A-Za-z0-9/-]+$" required data-error="single word, no special characters"
              value="{{{certorg.abbrev}}}">
       <span class="help-block with-errors"></span>
     </div>
@@ -69,14 +69,12 @@ No changes to save.
       <input type="checkbox" name="active" {{#if certorg.active}}checked{{/if}}> Active
     </div>
   </div>
-  {{#if motors}}
   <div class="form-group">
     <label for="motors" class="col-sm-3 control-label">Motors</label>
     <div class="col-sm-9">
       <p class="form-control-static">{{formatInt motors}}</p>
     </div>
   </div>
-  {{/if}}
 
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 form-submit">

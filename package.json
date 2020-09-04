@@ -27,7 +27,7 @@
     "fs": "0.0.2",
     "handlebars-helper": "0.0.12",
     "less-middleware": "1.0.x",
-    "mongodb": "^2.1.2",
+    "mongodb": "^3.1.13",
     "mongoose": "4.10.8",
     "mongoose-dateonly": "^1.0.3",
     "morgan": "^1.6.1",

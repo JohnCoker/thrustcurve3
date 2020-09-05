@@ -222,7 +222,7 @@ describe('schemas', function() {
       	expect(found.name).toBe('Joe Anyone');
       	expect(found.organization).toBe('XYZ Rocket Club');
         expect(found.showEmail).toBe(true);
-	      expect(found.website).toBe('http://example.com/joes-rockets.html');
+	expect(found.website).toBe('http://example.com/joes-rockets.html');
 
         done();
       });
@@ -280,6 +280,7 @@ describe('schemas', function() {
       done();
     });
 
+    let mapped;
     beforeEach(function(done) {
       orgs = [];
       async.series([
@@ -325,8 +326,12 @@ describe('schemas', function() {
             expect(err).toBeNull();
             expect(ints.length).toBe(3);
             expect(ints[0]).toBe(1);
-            for (var i = 1; i < ints.length; i++)
+            for (var i = 1; i < ints.length; i++) {
               expect(ints[i]).toBeGreaterThan(1000000);
+              for (var j = 0; j < i; j++)
+                expect(ints[i]).not.toBe(ints[j]);
+            }
+            mapped = ints;
 
             IntIdMapModel.count().exec().then(function(count) {
               expect(count).toBe(3);
@@ -373,7 +378,7 @@ describe('schemas', function() {
       });
     });
     it("lookup", function(done) {
-      IntIdMapModel.lookup(CertOrgModel, [1, 2002, 1000001], function(err, docs) {
+      IntIdMapModel.lookup(CertOrgModel, [1, 2002, mapped[1]], function(err, docs) {
         expect(err).toBeNull();
         expect(docs).toBeDefined();
         expect(docs.length).toBe(2);
@@ -393,11 +398,18 @@ describe('schemas', function() {
     });
 
     it("re-map new", function(done) {
-      IntIdMapModel.mapOne(orgs[1], function(err, int) {
-        expect(err).toBeNull();
-        expect(int).toBe(1000001);
-        done();
-      });
+      const N = 10;
+      let finished = 0;
+      for (let i = 0; i < N; i++) {
+        const which = 1 + i % 2;
+        IntIdMapModel.mapOne(orgs[which], function(err, int) {
+          expect(err).toBeNull();
+          expect(int).toBe(mapped[which]);
+          finished++;
+          if (finished === N)
+            done();
+        });
+      }
     });
   });
 

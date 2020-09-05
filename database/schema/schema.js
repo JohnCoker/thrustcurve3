@@ -543,6 +543,7 @@ function makeIntIdMapModel(mongoose) {
 
   var model = mongoose.model('IntIdMap', schema);
 
+  // look up a single document through a pre-mapped int ID
   model.lookupOne = function(m, int, next) {
     model.findOne({ collName: m.collection.collectionName, int: int }, function(err, map) {
       if (err)
@@ -553,6 +554,8 @@ function makeIntIdMapModel(mongoose) {
         next(null, undefined);
     });
   };
+
+  // look up a set of documents through a pre-mapped int IDs
   model.lookup = function(m, ints, next) {
     model.find({ collName: m.collection.collectionName, int: { $in: ints } }, function(err, maps) {
       if (err)
@@ -568,6 +571,8 @@ function makeIntIdMapModel(mongoose) {
       }
     });
   };
+
+  // get the int ID for a single document
   model.mapOne = function(doc, next) {
     const collName = doc.constructor.collection.collectionName;
     model.findOne({ collName: collName, oid: doc._id }, function(err, map) {
@@ -583,9 +588,8 @@ function makeIntIdMapModel(mongoose) {
         });
       } else {
         counterModel.findByIdAndUpdate(collName, { $inc: { seq: 1 } }, { new: true, upsert: true }, function(err, seq) {
-          if (err) {
+          if (err)
             return next(err);
-          }
           model.create({ collName: collName, oid: doc._id, int: 1000000 + seq.seq }, function(err, map) {
             if (err)
               return next(err);
@@ -595,6 +599,8 @@ function makeIntIdMapModel(mongoose) {
       }
     });
   };
+
+  // get the int IDs for a set of documents
   model.map = function(docs, next) {
     const ints = [];
     async.eachOf(docs,

@@ -29,12 +29,10 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * search other contributors
  * search for entered rockets
- * confirmation on rocket deletion
 
 ## Administration
 
  * user administration
- * delete data files
 
 ## API
 
@@ -75,7 +73,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | contribute.shtml    | info/contribute.html         | ✓ | general info |
 | deletenote.jsp      |                              |   | contribution |
 | deleterocket.jsp    | mystuff/rocket/*/delete.html | ✓ | account |
-| deletesimfile.jsp   |                              |   | contribution |
+| deletesimfile.jsp   | simfiles/*/delete.html       | ✓ | contribution |
 | download.jsp        | simfiles/*/download.html     |   | outbox |
 | errors.shtml        |                              | — | general info |
 | forgotpasswd.jsp    | mystuff/forgotpasswd.html    | ✓ | account |

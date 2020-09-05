@@ -161,7 +161,7 @@ File couldn't be parsed and may be unusable:
 <p>
 <a href="{{editLink}}">Edit this data file</a>
 or
-<a href="{{deleteLink}}">delete it entirely</a>.
+<a onclick="return confirm('Delete data file (cannot be undone)?')" href="{{deleteLink}}">delete it entirely</a>.
 </p>
 {{/if}}
 
@@ -199,10 +199,12 @@ $(document).ready(function() {
 </table>
 {{/if}}
 
+{{#if addNoteLink}}
 <p>
 Do you have a comment on this file?
-Please <a href="{{simfileLink simfile}}/note.html">add a note</a>.
+Please <a href="{{addNoteLink}}">add a note</a>.
 </p>
+{{/if}}
 
 <a name="data"></a>
 <div id="data" class="hidden-xs hidden-sm">

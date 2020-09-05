@@ -106,7 +106,7 @@ This rocket was entered by
 {{#if editLink}}
 <p>
 <a href="{{editLink}}">Edit this rocket</a> or
-<a href="{{deleteLink}}">Delete it</a>.
+<a onclick="return confirm('Delete rocket (cannot be undone)?')" href="{{deleteLink}}">delete it entirely</a>.
 </p>
 {{/if}}
 

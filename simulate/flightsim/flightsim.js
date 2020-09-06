@@ -8,22 +8,26 @@ const errors = require('../../lib/errors'),
       units = require('../../lib/units'),
       analyze = require('../analyze');
 
+// https://en.wikipedia.org/wiki/Standard_gravity
 const GravityMSL = 9.80665;
 
-const DefaultParams = {
-  // https://en.wikipedia.org/wiki/Standard_gravity
-  G: GravityMSL,
-  // https://en.wikipedia.org/wiki/Density_of_air
-  rho: 1.2041
-};
-Object.freeze(DefaultParams);
+// https://en.wikipedia.org/wiki/Density_of_air
+const RhoMSL = 1.2041;
 
-function simulateRocket(rocket, motor, data, params, error) {
+const DefaultConditions = {
+  // ground temperature (°C)
+  temp: 20,
+  // launch altitude aboce MSL (m)
+  baseAlt: 0,
+};
+Object.freeze(DefaultConditions);
+
+function simulateRocket(rocket, motor, data, conditions, error) {
   var inputs;
 
-  if (arguments.length == 4 && typeof params == 'function') {
-    error = params;
-    params = undefined;
+  if (arguments.length == 4 && typeof conditions == 'function') {
+    error = conditions;
+    conditions = undefined;
   }
 
   inputs = {
@@ -35,20 +39,20 @@ function simulateRocket(rocket, motor, data, params, error) {
     motorBurnoutMass: motorBurnoutMass(motor),
   };
 
-  return simulate(inputs, data, params, error);
+  return simulate(inputs, data, conditions, error);
 }
 
-function simulate(inputs, data, params, error) {
+function simulate(inputs, data, conditions, error) {
   var stats, curve,
       tLiftoff, tBurnout, tApogee, velGuide, accMax, velMax, altBurnout, altMax, impulse,
       t, dt, mass, dm, acc, vel, alt, liftoff, fDrag, fThrust;
 
-  if (arguments.length == 3 && typeof params == 'function') {
-    error = params;
-    params = undefined;
+  if (arguments.length == 3 && typeof conditions == 'function') {
+    error = conditions;
+    conditions = undefined;
   }
-  if (params == null)
-    params = DefaultParams;
+  if (conditions == null)
+    conditions = DefaultConditions;
   if (error == null)
     error = function() {};
 
@@ -103,6 +107,7 @@ function simulate(inputs, data, params, error) {
   inputs.loadedInitialMass = mass;
 
   // calculate drag at launch
+  let params = calculateParams(conditions.baseAlt, conditions.temp);
   inputs.standardDrag = standardDrag(inputs.bodyDiameter, inputs.cd, params);
 
   // simulate through motor burn
@@ -112,7 +117,9 @@ function simulate(inputs, data, params, error) {
   impulse = 0;
   for (t = dt; t <= tBurnout; t += dt) {
     // drag force is proportional to velocity squared
-    fDrag = (vel * vel) * inputs.standardDrag;
+    if (alt > 0)
+      params = calculateParams(conditions.baseAlt + alt, conditions.temp);
+    fDrag = (vel * vel) * standardDrag(inputs.bodyDiameter, inputs.cd, params);
 
     // get instantaneous thrust
     fThrust = curve(t);
@@ -161,6 +168,7 @@ function simulate(inputs, data, params, error) {
     t += dt;
 
     // drag force is proportional to velocity squared
+    params = calculateParams(conditions.baseAlt + alt, conditions.temp);
     fDrag = (vel * vel) * inputs.standardDrag;
 
     // calculate acceleration, velocity and altitude
@@ -189,11 +197,10 @@ function simulate(inputs, data, params, error) {
   };
 }
 
+// constrain to Troposphere
 const EarthRadius = 6400000,
-      DefaultAltitude = 0,
-      MinAltitude = -500,
-      MaxAltitude = 9000,
-      DefaultTemperature = 20,
+      MinAltitude = -60,
+      MaxAltitude = 11000,
       MinTemperature = -50,
       MaxTemperature = 60;
 
@@ -206,7 +213,7 @@ function calculateParams(altitude, temperature) {
 
   // bound altitude
   if (typeof altitude != 'number' || isNaN(altitude))
-    altitude = DefaultAltitude;
+    altitude = DefaultConditions.baseAlt;
   else if (altitude < MinAltitude)
     altitude = MinAltitude;
   else if (altitude > MaxAltitude)
@@ -214,7 +221,7 @@ function calculateParams(altitude, temperature) {
 
   // bound temperature
   if (typeof temperature != 'number' || isNaN(temperature))
-    temperature = DefaultTemperature;
+    temperature = DefaultConditions.temp;
   if (temperature < MinTemperature)
     temperature = MinTemperature;
   if (temperature > MaxTemperature)
@@ -273,10 +280,10 @@ function standardDrag(diameter, cd, params) {
  * <li>error reporter (optional)</li>
  * </ul>
  *
- * <p>The simulation parameters reflect varying launch conditions:<p>
+ * <p>The simulation conditions reflect the launch site:<p>
  * <ul>
- * <li>G: acceleration due to gravity (m/s²)</li>
- * <li>rho: air density (kg/m³)</li>
+ * <li>temp: ground temperature (°C)</li>
+ * <li>baseAlt: launch altitude above MSL (m)</li>
  * </ul>
  *
  * <p>All input and output measurements are in MKS units.</p>
@@ -336,16 +343,22 @@ function standardDrag(diameter, cd, params) {
  */
 module.exports = {
   /**
-   * <p>The acceleration due to gravity at sea level (~9.8m/s²).</p>
+   * <p>The acceleration due to gravity (G) at sea level (~9.8m/s²).</p>
    * @member {number} GravityMSL
    */
   GravityMSL: GravityMSL,
 
   /**
-   * <p>The default simulation parameters (20℃ at sea level).</p>
-   * @member {object} DefaultParams
+   * <p>The basic atmospheric density (ρ) at sea level (~1.2kg/m³).</p>
+   * @member {number} RhoMSL
    */
-  DefaultParams: DefaultParams,
+  RhoMSL: RhoMSL,
+
+  /**
+   * <p>The default launch conditions (20℃ at sea level).</p>
+   * @member {object} DefaultConditions
+   */
+  DefaultConditions: DefaultConditions,
 
   /**
    * <p>Calculate simulation parameters from altitude and temperature,
@@ -366,7 +379,7 @@ module.exports = {
    * @param {object} rocket entered rocket info with units
    * @param {object} motor information on the motor
    * @param {object} data parsed thrust curve
-   * @param {object} [params] simulation parameters
+   * @param {object} [conditions] launch conditions
    * @param {function} [error] error reporter
    * @return {object} simulation results
    */
@@ -383,7 +396,7 @@ module.exports = {
    * @param {number} input.motorInitialMass launch weight of motor (Kg)
    * @param {number} input.motorBurnoutMass post-burn weight of motor (Kg)
    * @param {object} data parsed thrust curve
-   * @param {object} [params] simulation parameters
+   * @param {object} [conditions] launch conditions
    * @param {function} [error] error reporter
    * @return {object} simulation results
    */

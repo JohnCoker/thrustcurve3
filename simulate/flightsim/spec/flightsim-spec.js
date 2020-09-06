@@ -7,11 +7,11 @@ var errors = require("../../../lib/errors"),
 
 describe("flightsim", function() {
   describe("params", function() {
-    it("DefaultParams", function() {
-      var params = flightsim.DefaultParams;
-      expect(params).toBeDefined();
-      expect(params.G).toBeCloseTo(9.807, 3);
-      expect(params.rho).toBeCloseTo(1.204, 3);
+    it("DefaultConditions", function() {
+      var conds = flightsim.DefaultConditions;
+      expect(conds).toBeDefined();
+      expect(conds.temp).toBeCloseTo(20, 3);
+      expect(conds.baseAlt).toBeCloseTo(0, 3);
     });
     describe("calculateParams", function() {
       it("MSL, 20℃", function() {
@@ -20,8 +20,8 @@ describe("flightsim", function() {
           params = flightsim.calculateParams(0, 20);
         }).not.toThrow();
         expect(params).toBeDefined();
-        expect(params.G).toBeCloseTo(flightsim.DefaultParams.G, 3);
-        expect(params.rho).toBeCloseTo(flightsim.DefaultParams.rho, 3);
+        expect(params.G).toBeCloseTo(flightsim.GravityMSL, 3);
+        expect(params.rho).toBeCloseTo(flightsim.RhoMSL, 3);
       });
       it("Black Rock", function() {
         var params;
@@ -166,28 +166,25 @@ describe("flightsim", function() {
       it("result", function() {
         expect(result.liftoffTime).toBeCloseTo(0.0, 1);
         expect(result.burnoutTime).toBeCloseTo(7.0, 1);
-        expect(result.apogeeTime).toBeCloseTo(27.1, 1);
+        expect(result.apogeeTime).toBeCloseTo(27.4, 1);
         expect(result.guideVelocity).toBeCloseTo(23.3, 1);
-        expect(result.maxAcceleration).toBeCloseTo(76.8, 1);
-        expect(result.maxVelocity).toBeCloseTo(311.1, 1);
-        expect(result.burnoutAltitude).toBeCloseTo(1475.9, 1);
-        expect(result.maxAltitude).toBeCloseTo(3828.4, 1);
+        expect(result.maxAcceleration).toBeCloseTo(76.9, 1);
+        expect(result.maxVelocity).toBeCloseTo(315.0, 1);
+        expect(result.burnoutAltitude).toBeCloseTo(1487.4, 1);
+        expect(result.maxAltitude).toBeCloseTo(3911.3, 1);
         expect(result.integratedImpulse).toBeCloseTo(result.inputs.motorTotalImpulse, 1);
       });
     });
     describe("simulation, Black Rock", function() {
-      // temperature: 35℃, altitude: 1207m, humidity: 5%
-      var params,
-          result;
-      it("calculateParams", function() {
-        expect(function() {
-          params = flightsim.calculateParams(1207, 25);
-        }).not.toThrow();
-        expect(params).toBeDefined();
-      });
+      // temperature: 35℃, altitude: 1207m
+      const conditions = {
+        temp: 35,
+        baseAlt: 1207,
+      };
+      var result;
       it("simulateRocket", function() {
         expect(function() {
-          result = flightsim.simulateRocket(rocket, motor, data, params, errors.print);
+          result = flightsim.simulateRocket(rocket, motor, data, conditions, errors.print);
         }).not.toThrow();
         expect(result).toBeDefined();
       });
@@ -204,12 +201,12 @@ describe("flightsim", function() {
       it("result", function() {
         expect(result.liftoffTime).toBeCloseTo(0.0, 1);
         expect(result.burnoutTime).toBeCloseTo(7.0, 1);
-        expect(result.apogeeTime).toBeCloseTo(28.3, 1);
+        expect(result.apogeeTime).toBeCloseTo(28.8, 1);
         expect(result.guideVelocity).toBeCloseTo(23.3, 1);
         expect(result.maxAcceleration).toBeCloseTo(77.2, 1);
-        expect(result.maxVelocity).toBeCloseTo(319.0, 1);
-        expect(result.burnoutAltitude).toBeCloseTo(1501.7, 1);
-        expect(result.maxAltitude).toBeCloseTo(4115.8, 1);
+        expect(result.maxVelocity).toBeCloseTo(324.2, 1);
+        expect(result.burnoutAltitude).toBeCloseTo(1517.1, 1);
+        expect(result.maxAltitude).toBeCloseTo(4260.2, 1);
         expect(result.integratedImpulse).toBeCloseTo(result.inputs.motorTotalImpulse, 1);
       });
     });

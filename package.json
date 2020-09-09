@@ -19,7 +19,7 @@
     "date-format-lite": "^0.7.4",
     "debug": "~2.6.9",
     "expect": "^1.20.2",
-    "handlebars": "4.5.0",
+    "handlebars": "4.5.3",
     "exphbs": "^1.1.0",
     "express": "^4.17.1",
     "express-session": "^1.13.0",

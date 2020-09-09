@@ -43,10 +43,10 @@ fit this rocket's motor mount tube{{#if rocket.adapters}} or adapters{{/if}}.
 </p>
 
 <p>
-Narrow down the possible motors using the options below and then run the guide.
+Narrow down the possible motors if desired:
 </p>
 
-<form name="guide" action="{{submitLink}}" method="post">
+<form role="form" class="form-horizontal" name="guide" action="{{submitLink}}" method="post" data-toggle="validator">
   <input type="hidden" name="rocket" value="{{rocket._id}}">
   <div class="row">
     {{#unless singleClass}}
@@ -95,7 +95,43 @@ Narrow down the possible motors using the options below and then run the guide.
     {{/unless}}
   </div> <!-- row -->
 
+  <div class="row">
+    <p class="col-sm-12 form-control-static">Enter the launch site conditions if desired:</p>
+  </div>
   <div class="form-group">
+    <label for="temperature" class="col-sm-3 control-label" title="air temperature at launch site">Temperature</label>
+    <div class="col-sm-3">
+      <input type="number" class="form-control" name="temperature"
+             step="0.1"
+             value="{{conditions/temperature}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="temperatureUnit" required>
+        {{#each temperatureUnits}}
+	<option value="{{label}}" {{#equal label ../conditions/temperatureUnit}}selected{{/equal}}>{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="altitude" class="col-sm-3 control-label" title="ground altitude at launch site">Base Altitude</label>
+    <div class="col-sm-3">
+      <input type="number" class="form-control" name="altitude"
+             step="0.1"
+             value="{{conditions/altitude}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" name="altitudeUnit" required>
+        {{#each altitudeUnits}}
+	<option value="{{label}}" {{#equal label ../conditions/altitudeUnit}}selected{{/equal}}>{{description}}</option>
+	{{/each}}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group col-sm-12">
     <div class="form-submit">
       <button type="submit" class="btn btn-primary">Submit</button>
       <button type="reset" class="btn btn-default">Reset</button>

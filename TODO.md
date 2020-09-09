@@ -23,7 +23,6 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Motor Guide
 
  * use visual styles in spreadsheets
- * varying launch conditions (ground altitude, temperature, wind)
 
 ## Account
 

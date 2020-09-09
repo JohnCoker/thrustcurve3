@@ -45,6 +45,8 @@ function doEntryPage(req, res, rockets) {
                  .populate('_contributor').exec(req.success(function(pubRockets) {
       var lengthUnit = units.getUnitPref('length').label,
           massUnit = units.getUnitPref('mass').label,
+          tempUnit = units.getUnitPref('temperature').label,
+          altUnit = units.getUnitPref('altitude').label,
           guideDefault = units.defaultGuideLength();
 
       res.render('guide/entry', locals(req, defaults, {
@@ -59,10 +61,18 @@ function doEntryPage(req, res, rockets) {
           guideLength: guideDefault.value,
           guideLengthUnit: guideDefault.unit,
         },
+        conditions: {
+          temperature: tempUnit === '℉' ? 75 : 20,
+          temperatureUnit: tempUnit,
+          altitude: 0,
+          altitudeUnit: altUnit,
+        },
         schema: schema,
         metadata: available,
         lengthUnits: units.length,
         massUnits: units.mass,
+        temperatureUnits: units.temperature,
+        altitudeUnits: units.altitude,
         finishes: metadata.CdFinishes,
         submitLink: guidePage,
         rocketsLink: '/mystuff/rockets.html',
@@ -74,10 +84,12 @@ function doEntryPage(req, res, rockets) {
 }
 
 function doRocketPage(req, res, rockets, rocket) {
-  var mmtDiameter, mmtLength;
+  var mmtDiameter, mmtLength, tempUnit, altUnit;
 
   mmtDiameter = units.convertUnitToMKS(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit);
   mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
+  tempUnit = units.getUnitPref('temperature').label;
+  altUnit = units.getUnitPref('altitude').label;
 
   metadata.getRocketMotors(req, rocket, function(fit) {
     let editLink;
@@ -90,6 +102,14 @@ function doRocketPage(req, res, rockets, rocket) {
       mmtDiameter: mmtDiameter,
       mmtLength: mmtLength,
       fit: fit,
+      conditions: {
+        temperature: tempUnit === '℉' ? 75 : 20,
+        temperatureUnit: tempUnit,
+        altitude: 0,
+        altitudeUnit: altUnit,
+      },
+      temperatureUnits: units.temperature,
+      altitudeUnits: units.altitude,
 
       motorCount: fit.count,
 
@@ -227,9 +247,10 @@ function doRunGuide(req, res, rocket) {
   // get metadata on available motors
   metadata.getAvailableMotors(req, function(available) {
     var errors = [], warnings = [], filter = {}, filterCount = 0,
-        inputs, cluster, mmts, steps, results, totalFit, totalSim, totalFail, totalPass, g, i;
+        inputs, cluster, conditions,
+        mmts, steps, results, totalFit, totalSim, totalFail, totalPass, g, i;
 
-    // collect inputs common to all simulations
+    // collect rocket inputs
     inputs = {};
     inputs.rocketMass = units.convertUnitToMKS(rocket.weight, 'mass', rocket.weightUnit);
     if (inputs.rocketMass == null || isNaN(inputs.rocketMass) || inputs.rocketMass <= 0)
@@ -256,6 +277,13 @@ function doRunGuide(req, res, rocket) {
       cluster = 1;
 
     Object.freeze(inputs);
+
+    // collect launch conditions
+    conditions = {
+      temp: units.convertUnitToMKS(req.body.temperature, 'temperature', req.body.temperatureUnit),
+      baseAlt: units.convertUnitToMKS(req.body.altitude, 'altitude', req.body.altitudeUnit),
+    };
+    Object.freeze(conditions);
 
     // add selected impulse class(es) to filter
     if (req.body.classes && req.body.classes.length > 0) {
@@ -309,12 +337,15 @@ function doRunGuide(req, res, rocket) {
         res.render('guide/failed', locals(req, defaults, {
           title: "Motor Guide",
           rocket: rocket,
+          copnditions: conditions,
           errors: errors,
           warnings: warnings,
           schema: schema,
           metadata: available,
           lengthUnits: units.length,
           massUnits: units.mass,
+          temperatureUnits: units.temperature,
+          altitudeUnits: units.altitude,
           finishes: metadata.CdFinishes,
           submitLink: guidePage,
           rocketsLink: '/mystuff/rockets.html',
@@ -380,7 +411,7 @@ function doRunGuide(req, res, rocket) {
                           if (cluster > 1)
                             data = analyze.scale(data, cluster);
                           simErrors = new ErrorCollector();
-                          simOutput = flightsim.simulate(simInputs, data, simErrors);
+                          simOutput = flightsim.simulate(simInputs, data, conditions, simErrors);
                           if (simOutput != null) {
                             result.simulation = simOutput;
                             if (result.simulation.apogeeTime > result.simulation.burnoutTime)
@@ -440,6 +471,7 @@ function doRunGuide(req, res, rocket) {
           _contributor: req.user ? req.user._id : undefined,
           public: req.user == null || !!rocket.public,
           inputs: inputs,
+          conditions: conditions,
           mmts: mmts,
           warnings: warnings,
           filters: filterCount,
@@ -657,6 +689,18 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     if (result.inputs.cluster > 1) {
       rocketSheet.setLabel(row, 0, 'Cluster');
       rocketSheet.setNumber(row, 1, result.inputs.cluster, 0);
+      row++;
+    }
+
+    if (result.conditions.temp != null) {
+      rocketSheet.setLabel(row, 0, 'Temperature', 'temperature');
+      rocketSheet.setUnit(row, 1, result.conditions.temp, 'temperature');
+      row++;
+    }
+
+    if (result.conditions.baseAlt != null) {
+      rocketSheet.setLabel(row, 0, 'Launch Elevation', 'altitude');
+      rocketSheet.setUnit(row, 1, result.conditions.baseAlt, 'altitude');
       row++;
     }
 

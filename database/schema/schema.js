@@ -503,6 +503,10 @@ function makeGuideResultModel(mongoose) {
       pass: { type: Number, required: true },
       fail: { type: Number, required: true }
     } ],
+    conditions: {
+      temp: { type: Number },
+      baseAlt: { type: Number },
+    },
     warnings: [ { type: String, required: true } ],
     filters: { type: Number, required: true },
     filtered: { type: Number, required: true },

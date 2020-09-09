@@ -16,8 +16,8 @@
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "continuation-local-storage": "^3.1.7",
-    "mongodb": "^2.1.2",
-    "mongoose": "^4.5",
+    "mongodb": "^3.6.1",
+    "mongoose": "4.10.8",
     "mongoose-dateonly": "^1.0.3"
   }
 }

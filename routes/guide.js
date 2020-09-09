@@ -283,6 +283,10 @@ function doRunGuide(req, res, rocket) {
       temp: units.convertUnitToMKS(req.body.temperature, 'temperature', req.body.temperatureUnit),
       baseAlt: units.convertUnitToMKS(req.body.altitude, 'altitude', req.body.altitudeUnit),
     };
+    if (conditions.temp == null || isNaN(conditions.temp))
+      conditions.temp = flightsim.DefaultConditions.temp;
+    if (conditions.baseAlt == null || isNaN(conditions.baseAlt))
+      conditions.baseAlt = flightsim.DefaultConditions.baseAlt;
     Object.freeze(conditions);
 
     // add selected impulse class(es) to filter

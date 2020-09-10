@@ -447,13 +447,14 @@ function doSearch(req, res, params) {
           failed = true;
 
       } else if (k == 'text') {
-        if (v)
-          query.$text = { $search: v };
+        let cn = v.toUpperCase();
+        if (metadata.isCommonName(cn))
+          query.$or = [ { commonName: cn }, { altName: cn } ];
         else
-          failed = true;
+          query.$text = { $search: v };
 
       } else if (k == 'availability') {
-        if (v == null || v == 'available')
+        if (v == 'available')
           query.availability = { $in: req.db.schema.MotorAvailableEnum };
         else if (v == 'all')
           ; // no restriction

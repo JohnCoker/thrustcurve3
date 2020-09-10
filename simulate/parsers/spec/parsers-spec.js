@@ -1,7 +1,8 @@
 "use strict";
 
 var errors = require("../../../lib/errors"),
-    parsers = require("../parsers.js");
+    parsers = require("../parsers.js"),
+    number = require("../number.js");
 
 describe("parsers", function() {
   describe("AllFormats", function() {
@@ -223,5 +224,54 @@ describe("parsers", function() {
       expect(parsed.points[1].thrust).toBe(0);
       expect(parsed.points[1].propellantWeight).toBe(0);
     });
+  });
+});
+
+describe("number", function() {
+  it("isInt", function() {
+    expect(number.isInt("")).toBe(false);
+    expect(number.isInt("0")).toBe(true);
+    expect(number.isInt("1000")).toBe(true);
+    expect(number.isInt("-1")).toBe(false);
+    expect(number.isInt("01")).toBe(false);
+    expect(number.isInt("01.")).toBe(false);
+    expect(number.isInt("1.")).toBe(false);
+    expect(number.isInt("1.01")).toBe(false);
+  });
+  it("isFloat", function() {
+    expect(number.isFloat("")).toBe(false);
+    expect(number.isFloat("0")).toBe(true);
+    expect(number.isFloat("1000")).toBe(true);
+    expect(number.isFloat("-1")).toBe(false);
+    expect(number.isFloat("01")).toBe(false);
+    expect(number.isFloat("01.")).toBe(false);
+    expect(number.isFloat("1.")).toBe(true);
+    expect(number.isFloat("1.01")).toBe(true);
+    expect(number.isFloat(".0")).toBe(true);
+    expect(number.isFloat(".01")).toBe(true);
+    expect(number.isFloat(".")).toBe(false);
+  });
+  it("parseInt", function() {
+    expect(number.parseInt("")).toBeNaN();
+    expect(number.parseInt("0")).toBe(0);
+    expect(number.parseInt("1000")).toBe(1000);
+    expect(number.parseInt("-1")).toBeNaN();
+    expect(number.parseInt("01")).toBeNaN();
+    expect(number.parseInt("01.")).toBeNaN();
+    expect(number.parseInt("1.")).toBeNaN();
+    expect(number.parseInt("1.01")).toBeNaN();
+  });
+  it("parseFloat", function() {
+    expect(number.parseFloat("")).toBeNaN();
+    expect(number.parseFloat("0")).toBe(0);
+    expect(number.parseFloat("1000")).toBe(1000);
+    expect(number.parseFloat("-1")).toBeNaN();
+    expect(number.parseFloat("01")).toBeNaN();
+    expect(number.parseFloat("01.")).toBeNaN();
+    expect(number.parseFloat("1.")).toBe(1.0);
+    expect(number.parseFloat("1.01")).toBe(1.01);
+    expect(number.parseFloat(".0")).toBe(0);
+    expect(number.parseFloat(".01")).toBe(0.01);
+    expect(number.parseFloat(".")).toBeNaN();
   });
 });

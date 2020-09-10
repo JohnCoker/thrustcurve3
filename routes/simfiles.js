@@ -24,11 +24,11 @@ function getSimFile(req, res, cb) {
   if (req.db.isId(id)) {
     req.db.SimFile.findOne({ _id: id }).populate('_motor').exec(req.success(function(simfile) {
       if (simfile == null) {
-	res.notfound();
-	return;
+        res.notfound();
+        return;
       }
       simfile.populate('_contributor', req.success(function() {
-	simfile._motor.populate('_manufacturer', 'abbrev', req.success(function() { cb(simfile); }));
+        simfile._motor.populate('_manufacturer', 'abbrev', req.success(function() { cb(simfile); }));
       }));
     }));
   } else {
@@ -112,24 +112,24 @@ router.get('/simfiles/:id/', function(req, res, next) {
       errs = new errors.Collector();
       parsed = parsers.parseData(simfile.format, simfile.data, errs);
       if (parsed != null)
-	stats = analyze.stats(parsed, errs);
+        stats = analyze.stats(parsed, errs);
 
       // render the file details
       res.render('simfiles/details', locals(defaults, {
-	title: req.helpers.motorDesignation(simfile._motor) + ' Data (' + simfile.format + ')',
-	simfile: simfile,
-	motor: simfile._motor,
-	notes: notes,
-	parsed: parsed,
-	info: parsed == null ? {} : parsed.info,
-	stats: stats,
-	hasErrors: errs.hasErrors(),
-	errors: errs.errors,
-	editLink: req.helpers.simfileLink(simfile) + 'edit.html',
-	deleteLink: req.helpers.simfileLink(simfile) + 'delete.html',
-	graphLink: req.helpers.simfileLink(simfile) + 'graph.svg',
-	downloadLink: req.helpers.simfileLink(simfile) + 'download/' + simFileName(simfile),
-	pointsLink: req.helpers.simfileLink(simfile) + 'points/' + simFileName(simfile, '.csv'),
+        title: req.helpers.motorDesignation(simfile._motor) + ' Data (' + simfile.format + ')',
+        simfile: simfile,
+        motor: simfile._motor,
+        notes: notes,
+        parsed: parsed,
+        info: parsed == null ? {} : parsed.info,
+        stats: stats,
+        hasErrors: errs.hasErrors(),
+        errors: errs.errors,
+        editLink: req.helpers.simfileLink(simfile) + 'edit.html',
+        deleteLink: req.helpers.simfileLink(simfile) + 'delete.html',
+        graphLink: req.helpers.simfileLink(simfile) + 'graph.svg',
+        downloadLink: req.helpers.simfileLink(simfile) + 'download/' + simFileName(simfile),
+        pointsLink: req.helpers.simfileLink(simfile) + 'points/' + simFileName(simfile, '.csv'),
       }));
     }));
   });
@@ -305,10 +305,19 @@ router.get('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
       return;
     }
     simfile._motor.populate('_manufacturer', req.success(function() {
+      // parse the file to find errors and warnings
+      let errs = new errors.Collector();
+      parsers.parseData(simfile.format, simfile.data, errs);
+
       res.render('simfiles/edit', locals(defaults, {
         title: 'Edit Data File',
         motor: simfile._motor,
         simfile: simfile,
+        hasErrors: errs.hasErrors(),
+        errors: errs.errors,
+        isCreated: req.query.result == 'created',
+        isSaved: req.query.result == 'saved',
+        isUnchanged: req.query.result == 'unchanged',
         submitLink: '/simfiles/' + simfile._id + '/edit.html'
       }));
     }));
@@ -336,6 +345,63 @@ function noUpdatePerm(req, res) {
 }
 
 function updateFile(req, res, simfile) {
+  let isNew = simfile._id == null, isChanged = false;
+
+  // attributes
+  [ 'format',
+    'dataSource',
+    'license',
+  ].forEach(function(p) {
+    let s;
+    if (req.hasBodyProperty(p)) {
+      s = req.body[p].trim();
+      if (s !== '') {
+        if (simfile[p] == null || req.body[p] != simfile[p].toString()) {
+          simfile[p] = req.body[p];
+          isChanged = true;
+        }
+      }
+    }
+  });
+
+  // data
+  if (req.hasBodyProperty('data')) {
+    let data = req.body.data.trim();
+    if (data !== simfile.data) {
+      simfile.data = data;
+      isChanged = true;
+    }
+
+    let errs = new errors.Collector();
+    let parsed = parsers.parseData(simfile.format, data, errs);
+    if (parsed == null || errs.hasErrors()) {
+      res.render('simfiles/edit', locals(defaults, {
+        title: 'Edit Data File',
+        motor: simfile._motor,
+        simfile: simfile,
+        hasErrors: errs.hasErrors(),
+        errors: errs.errors,
+        submitLink: '/simfiles/' + (isNew ? "new" : simfile._id) + '/edit.html'
+      }));
+      return;
+    }
+  }
+
+  if (isNew) {
+    req.db.SimFile.create(new req.db.SimFile(simfile), req.success(function(updated) {
+      let url = req.helpers.simfileLink(updated._id) + "edit.html";
+      res.redirect(303, url + '?result=created');
+    }));
+  } else {
+    let url = req.helpers.simfileLink(simfile._id) + "edit.html";
+    if (isChanged) {
+      simfile.save(req.success(function(updated) {
+        res.redirect(303, url + '?result=saved');
+      }));
+    } else {
+      res.redirect(303, url + '?result=unchanged');
+    }
+  }
 }
 
 router.post('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
@@ -354,15 +420,13 @@ router.post('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
     }));
   } else {
     // edit this file
-    req.db.SimFile.findOne(q, req.success(function(simfile) {
+    req.db.SimFile.findOne(q).populate('_motor _contributor').exec(req.success(function(simfile) {
       if (simfile == null) {
         noSimFile(req, res);
       } else if (!canUpdateFile(req, simfile)) {
         noUpdatePerm(req, res);
       } else {
-        simfile._motor.populate('_manufacturer', req.success(function(motor) {
-          updateFile(req, res, simfile);
-        }));
+        updateFile(req, res, simfile);
       }
     }));
   }

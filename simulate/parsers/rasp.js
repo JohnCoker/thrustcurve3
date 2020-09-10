@@ -4,13 +4,16 @@
  */
 'use strict';
 
-var errors = require('../../lib/errors');
+const errors = require('../../lib/errors'),
+      parseInt = require('./number').parseInt,
+      parseFloat = require('./number').parseFloat;
 
 var tEpsilon = 0.0005;
 
 function parse(data, error) {
-  var lines, fields, info, points, line, point, lastTime, i;
+  var lines, fields, info, points, pointErrors, line, point, lastTime, i;
 
+  // fatal of header can't be read
   if (data == null || typeof data != 'string' || data === '') {
     error(errors.DATA_FILE_EMPTY, 'missing data');
     return;
@@ -66,6 +69,7 @@ function parse(data, error) {
   // parse data points
   points = [];
   lastTime = 0;
+  pointErrors = 0;
   for (++i; i < lines.length; i++) {
     line = lines[i].trim();
     if (line === '' || line.charAt(0) == ';')
@@ -73,7 +77,8 @@ function parse(data, error) {
     fields = line.split(/\s+/);
     if (fields.length != 2) {
       error(errors.INVALID_POINTS, 'invalid thrust data at line {1}; expected two fields', i + 1);
-      return;
+      pointErrors++;
+      continue;
     }
     point = {
       time: parseFloat(fields[0]),
@@ -83,7 +88,8 @@ function parse(data, error) {
     // time must be positive and should be increasing
     if (isNaN(point.time) || point.time < 0) {
       error(errors.INVALID_POINTS, 'invalid time "{1}" at line {2}; expected seconds', fields[0], i + 1);
-      return;
+      pointErrors++;
+      continue;
     }
     if (points.length === 0 && point.time < tEpsilon)
       error(errors.INVALID_POINTS, 'first time "{1}" at line {2} not positive', fields[0], i + 1);
@@ -92,21 +98,30 @@ function parse(data, error) {
 
     // thrust must be non-negative
     if (isNaN(point.thrust) || point.thrust < 0) {
-      error(errors.INVALID_POINTS, 'invalid thrust "{1}" at line {2}; expected seconds', fields[1], i + 1);
-      return;
+      error(errors.INVALID_POINTS, 'invalid thrust "{1}" at line {2}; expected Newtons', fields[1], i + 1);
+      pointErrors++;
+      continue;
     }
 
     points.push(point);
     lastTime = point.time;
   }
-  if (points.length < 2) {
+  if (pointErrors < 1 && points.length < 2) {
     if (points.length < 1)
       error(errors.MISSING_POINTS, 'no data points; expected at least two');
     else
       error(errors.MISSING_POINTS, 'too few data points ({1}); expected at least two', points.length);
-    return;
   }
   parse.points = points;
+
+  // extra stuff at EOF
+  for ( ; i < lines.length; i++) {
+    line = lines[i].trim();
+    if (line !== '' && line.charAt(0) !== ';') {
+      error(errors.MULTIPLE_MOTORS, 'extra content at line {1}; expected end of file', i + 1);
+      break;
+    }
+  }
 
   // additional data warnings
   for (i = 0; i < points.length - 1; i++) {
@@ -115,6 +130,11 @@ function parse(data, error) {
   }
   if (points[points.length - 1] > 0.0001)
     error(errors.MISSING_POINTS, 'missing final data point with zero thrust');
+
+  // fatal if points can't be read
+  if (pointErrors > 0 || points.length < 2) {
+    return;
+  }
 
   return {
     format: 'RASP',

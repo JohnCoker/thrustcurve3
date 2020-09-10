@@ -10,7 +10,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
 ## Contribution
 
- * add/edit/delete simfiles
  * add/edit/delete motor and simfile notes
 
 ## Search

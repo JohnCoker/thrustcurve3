@@ -1,6 +1,28 @@
 <h1>{{title}}</h1>
 
+{{#if isSaved}}
+<div class="alert alert-success" role="alert">
+Changes to data file saved.
+</div>
+{{/if}}
+{{#if isCreated}}
+<div class="alert alert-success" role="alert">
+New data file created.
+</div>
+{{/if}}
+{{#if isUnchanged}}
+<div class="alert alert-success" role="alert">
+No changes to save.
+</div>
+{{/if}}
+{{#if hasErrors}}
+<div class="alert alert-danger" role="alert">
+Invalid simulator data.
+</div>
+{{/if}}
+
 <form role="form" class="form-horizontal" name="edit-simfile" action="{{submitLink}}" method="post" data-toggle="validator">
+  <input type="hidden" name="motorId" value="{{motor._id}}" />
   {{#unless isNew}}
   <div class="form-group" style="margin-bottom: 0">
     <label for="id" class="col-sm-3 control-label">ID</label>
@@ -33,9 +55,9 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="source" class="col-sm-3 control-label">Data Source</label>
+    <label for="dataSource" class="col-sm-3 control-label">Data Source</label>
     <div class="col-sm-9">
-      <select class="form-control" name="source" required>
+      <select class="form-control" name="dataSource" required>
         <option value="">(select source)</option>
         <option value="cert" {{#equal simfile.dataSource 'cert'}}selected{{/equal}}>Certification Org.</option>
         <option value="mfr" {{#equal simfile.dataSource 'mfr'}}selected{{/equal}}>Manufacturer</option>
@@ -45,7 +67,7 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="source" class="col-sm-3 control-label">License</label>
+    <label for="license" class="col-sm-3 control-label">License</label>
     <div class="col-sm-9">
       <select class="form-control" name="license">
         <option value="">(unknown)</option>
@@ -61,15 +83,13 @@
     <div class="col-sm-9">
       <textarea class="form-control" name="data" rows="8" required>{{simfile.data}}</textarea>
       <span class="help-block with-errors"></span>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="upload" class="col-sm-3 control-label">Upload File</label>
-    <div class="col-sm-9">
-      <label class="btn btn-default btn-file">
-        Browse <input type="file" hidden style="display: none">
-      </label>
-      <span class="help-block with-errors"></span>
+      {{#if hasErrors}}
+      <ol class="alert alert-danger">
+      {{#each errors}}
+      <li>{{message}}</li>
+      {{/each}}
+      </ol>
+      {{/if}}
     </div>
   </div>
   <div class="form-group">

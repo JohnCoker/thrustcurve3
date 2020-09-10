@@ -164,3 +164,10 @@ p.compare-legend {
 span.inaccurate {
   font-weight: bold;
 }
+
+ul.alert {
+  list-style-type: none;
+}
+ol.alert {
+  list-style-position: inside;
+}

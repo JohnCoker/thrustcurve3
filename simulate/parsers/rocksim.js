@@ -4,8 +4,9 @@
  */
 'use strict';
 
-var xmlparser = require("xml-parser"),
-    errors = require('../../lib/errors');
+const xmlparser = require("xml-parser"),
+      errors = require('../../lib/errors'),
+      parseFloat = require('./number').parseFloat;
 
 var tEpsilon = 0.00005;
 

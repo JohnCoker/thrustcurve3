@@ -157,13 +157,13 @@ File couldn't be parsed and may be unusable:
 </ul>
 {{/if}}
 
-{{#if editLink}}
+{{#hasPerm 'simfiles'}}
 <p>
 <a href="{{editLink}}">Edit this data file</a>
 or
 <a onclick="return confirm('Delete data file (cannot be undone)?')" href="{{deleteLink}}">delete it entirely</a>.
 </p>
-{{/if}}
+{{/hasPerm}}
 
 {{#if parsed}}
 <h2>Data Graph</h2>

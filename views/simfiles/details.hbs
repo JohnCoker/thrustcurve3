@@ -144,7 +144,7 @@
 <h2>File Errors</h2>
 <p>
 {{#if parsed}}
-File is usabled, but has some problems:
+File is usable, but has some problems:
 {{/if}}
 {{#unless parsed}}
 File couldn't be parsed and may be unusable:
@@ -157,8 +157,12 @@ File couldn't be parsed and may be unusable:
 </ul>
 {{/if}}
 
-{{#hasPerm 'simfiles'}}
+{{#if parsed}}
+<a href="{{outboxLink}}">Add this file to my outbox</a>.
+{{/if}}
+
 <p>
+{{#hasPerm 'simfiles'}}
 <a href="{{editLink}}">Edit this data file</a>
 or
 <a onclick="return confirm('Delete data file (cannot be undone)?')" href="{{deleteLink}}">delete it entirely</a>.

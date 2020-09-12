@@ -143,10 +143,31 @@ function parse(data, error) {
   };
 }
 
+function combine(data, error) {
+  if (data == null || data.length < 1) {
+    error(errors.DATA_FILE_EMPTY, 'missing data');
+    return;
+  }
+
+  let text = '';
+  data.forEach((one, i) => {
+    one = one.trim();
+    if (one === '') {
+      error(errors.DATA_FILE_EMPTY, 'missing data[' + i + ']');
+      return;
+    }
+    if (text !== '' && one.charAt(0) !== ';')
+      text += ';\n';
+    text += one + '\n';
+  });
+  return text;
+}
+
 module.exports = {
   format: 'RASP',
   extension: '.eng',
   mimeType: 'text/x-rasp+plain',
   parse: parse,
+  combine: combine,
 };
 Object.freeze(module.exports);

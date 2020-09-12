@@ -193,4 +193,22 @@ module.exports = {
    * @return {object} parsed structure
    */
   parseRockSim: rocksim.parse,
+
+  /**
+   * <p>Combine multiple data in RASP file format into one.</p>
+   * @function
+   * @param {string[]} data data files content
+   * @param {function} error error reporter
+   * @return {string} combined file
+   */
+  combineRASP: rasp.combine,
+
+  /**
+   * <p>Combine multiple data in RockSim file format into one.</p>
+   * @function
+   * @param {string[]} data data files content
+   * @param {function} error error reporter
+   * @return {string} combined file
+   */
+  combineRockSim: rocksim.combine,
 };

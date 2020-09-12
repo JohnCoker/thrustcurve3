@@ -40,6 +40,7 @@ const index = require('./routes/index'),
       motors = require('./routes/motors'),
       manufacturers = require('./routes/manufacturers'),
       simfiles = require('./routes/simfiles'),
+      outbox = require('./routes/outbox'),
       contributors = require('./routes/contributors'),
       guide = require('./routes/guide'),
       browser = require('./routes/browser'),
@@ -249,6 +250,7 @@ app.use('/', index);
 app.use('/', info);
 app.use('/', motors);
 app.use('/', simfiles);
+app.use('/', outbox);
 app.use('/', manufacturers);
 app.use('/', contributors);
 app.use('/', guide);

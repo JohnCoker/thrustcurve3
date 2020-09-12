@@ -39,13 +39,13 @@ function parse(data, error) {
       } else {
 	error(errors.ROCKSIM_WRONG_DOC, 'unexpected element {1} in engine-list', value.children[i].name);
       }
-      if (engine == null) {
-	error(errors.ROCKSIM_WRONG_DOC, 'missing engine element in engine-list');
-	return;
-      }
-      if (n > 1)
-	error(errors.MULTIPLE_MOTORS, '{1} engine elements in engine-list', n);
     }
+    if (engine == null) {
+      error(errors.ROCKSIM_WRONG_DOC, 'missing engine element in engine-list');
+      return;
+    }
+    if (n > 1)
+      error(errors.MULTIPLE_MOTORS, '{1} engine elements in engine-list', n);
   } else if (xml.root.name == 'engine') {
     engine = xml.root;
   } else {
@@ -214,10 +214,45 @@ function parse(data, error) {
   };
 }
 
+function combine(data, error) {
+  if (data == null || data.length < 1) {
+    error(errors.DATA_FILE_EMPTY, 'missing data');
+    return;
+  }
+
+  let text = '<engine-database>\n' +
+             ' <engine-list>\n';
+
+  data.forEach((one, i) => {
+    one = one.trim();
+    if (one === '') {
+      error(errors.DATA_FILE_EMPTY, 'missing data[' + i + ']');
+      return;
+    }
+
+    let xml = xmlparser(one);
+    if (xml == null || xml.root == null) {
+      error(errors.ROCKSIM_BAD_XML, 'invalid XML for RockSim data file[' + i + ']');
+      return;
+    }
+    if (xml.root.name == 'engine-database') {
+      one = one.replace(/^.*<engine-database[^>]*>\s*<engine-list[^>]*>\s*/s, '')
+               .replace(/\s*<\/engine-list[^>]*>\s*<\/engine-database[^>]*>.*$/s, '');
+      text += one + '\n';
+    }
+  });
+
+  text += ' </engine-list>\n' +
+          '</engine-database>\n';
+
+  return text;
+}
+
 module.exports = {
   format: 'RockSim',
   extension: '.rse',
   mimeType: 'text/x-rse+xml',
   parse: parse,
+  combine: combine,
 };
 Object.freeze(module.exports);

@@ -2,7 +2,8 @@
 
 var errors = require("../../../lib/errors"),
     parsers = require("../parsers.js"),
-    number = require("../number.js");
+    number = require("../number.js"),
+    xmlparser = require("xml-parser");
 
 describe("parsers", function() {
   describe("AllFormats", function() {
@@ -223,6 +224,104 @@ describe("parsers", function() {
       expect(parsed.points[1].time).toBe(3.5);
       expect(parsed.points[1].thrust).toBe(0);
       expect(parsed.points[1].propellantWeight).toBe(0);
+    });
+  });
+
+  describe("combineRASP", function() {
+    it("function", function() {
+      expect(typeof parsers.combineRASP).toBe('function');
+    });
+
+    var combined;
+    it("call", function() {
+      var data = [
+        ('; AeroTech K550W\n' +
+         '; converted from TMT test stand data 1998 (www.tripoli.org)\n' +
+         '; provided by ThrustCurve.org (www.thrustcurve.org)\n' +
+         'K550W 54 410 0 0.919744 1.48736 AT\n' +
+         '   0.065 604.264\n' +
+         '   3.356 0.000\n'),
+        ('G54 29 124 6-10-14 0.046 0.1365 AT\n' +
+         '0.018 10.953\n' +
+         '1.51 0        \n')
+      ];
+      expect(function() {
+        combined = parsers.combineRASP(data, errors.print);
+      }).not.toThrow();
+      expect(combined).toBe('; AeroTech K550W\n' +
+                            '; converted from TMT test stand data 1998 (www.tripoli.org)\n' +
+                            '; provided by ThrustCurve.org (www.thrustcurve.org)\n' +
+                            'K550W 54 410 0 0.919744 1.48736 AT\n' +
+                            '   0.065 604.264\n' +
+                            '   3.356 0.000\n' +
+                            ';\n' +
+                            'G54 29 124 6-10-14 0.046 0.1365 AT\n' +
+                            '0.018 10.953\n' +
+                            '1.51 0\n');
+    });
+  });
+
+  describe("combineRockSim", function() {
+    it("function", function() {
+      expect(typeof parsers.combineRockSim).toBe('function');
+    });
+
+    var combined;
+    it("call", function() {
+      var data = [
+        ('<engine-database>\n' +
+         ' <engine-list>\n' +
+         '  <engine code="K550W" mfg="Aerotech" delays="6,10,14,18" dia="54." len="410." Type="reloadable" ' +
+         'massFrac="58.11" Isp="184.68" peakThrust="853.13" initWt="1515.1" propWt="880.4" Itot="1594.46" ' +
+         'avgThrust="455.561" burn-time="3.5">\n' +
+         '   <data>\n' +
+         '    <eng-data f="628.15" t="0." m="880.4"/>\n' +
+         '    <eng-data f="0." t="3.5" m="0."/>\n' +
+         '   </data>\n' +
+         '  </engine>\n' +
+         ' </engine-list>\n' +
+         '</engine-database>\n'),
+        ('<engine-database>\n' +
+         ' <engine-list>\n' +
+         '<engine FDiv="10" FFix="1" FStep="-1." Isp="179.67" Itot="81.05" Type="reloadable" auto-calc-cg="1" auto-calc-mass="1" avgThrust="53.676" burn-time="1.51" cgDiv="10" cgFix="1" cgStep="-1." code="G54" delays="6,10,14" dia="29." exitDia="0." initWt="136.5" len="124." mDiv="10" mFix="1" mStep="-1." massFrac="33.7" mfg="Aerotech" peakThrust="81.64" propWt="46." tDiv="10" tFix="1" tStep="-1." throatDia="0.">\n' +
+         '<data>\n' +
+         '<eng-data cg="62." f="10.953" m="45.9441" t="0.018"/>\n' +
+         '<eng-data cg="62." f="0." m="0." t="1.51"/>\n' +
+         '</data>\n' +
+         '</engine>\n' +
+         ' </engine-list>\n' +
+         '</engine-database>\n')
+      ];
+      expect(function() {
+        combined = parsers.combineRockSim(data, errors.print);
+      }).not.toThrow();
+      expect(combined).toBeDefined();
+      expect(combined).not.toBe('');
+    });
+    it("header/footer", function() {
+      expect(combined.match(/<engine-database[^>]*>/g).length).toBe(1);
+      expect(combined.match(/<engine-list[^>]*>/g).length).toBe(1);
+      expect(combined.match(/<\/engine-database[^>]*>/g).length).toBe(1);
+      expect(combined.match(/<\/engine-list[^>]*>/g).length).toBe(1);
+    });
+    it("engines", function() {
+      let engines = combined.match(/<engine [^>]*>/g) || [];
+      expect(engines.length).toBe(2);
+      expect(engines[0].replace(/^.* code="([^"]*)".*$/, "$1")).toBe('K550W');
+      expect(engines[1].replace(/^.* code="([^"]*)".*$/, "$1")).toBe('G54');
+    });
+    it("structure", function() {
+      let xml = xmlparser(combined);
+      expect(xml).toBeDefined();
+      expect(xml.root).toBeDefined();
+      expect(xml.root.name).toBe('engine-database');
+      expect(xml.root.children.length).toBe(1);
+      expect(xml.root.children[0].name).toBe('engine-list');
+      let list = xml.root.children[0];
+      expect(list.children.length).toBe(2);
+      for (let i = 0; i < list.children.length; i++) {
+        expect(list.children[i].name).toBe('engine');
+      }
     });
   });
 });

@@ -130,6 +130,7 @@ router.get('/simfiles/:id/', function(req, res, next) {
         graphLink: req.helpers.simfileLink(simfile) + 'graph.svg',
         downloadLink: req.helpers.simfileLink(simfile) + 'download/' + simFileName(simfile),
         pointsLink: req.helpers.simfileLink(simfile) + 'points/' + simFileName(simfile, '.csv'),
+        outboxLink: '/outbox/add/' + simfile._id + '/',
       }));
     }));
   });

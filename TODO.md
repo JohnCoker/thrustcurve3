@@ -6,7 +6,6 @@ This page lists the things supported in the old site which haven't yet been reim
 ## General
 
  * flag motors favorited by other users
- * outbox feature
 
 ## Contribution
 
@@ -72,7 +71,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | deletenote.jsp      |                              |   | contribution |
 | deleterocket.jsp    | mystuff/rocket/*/delete.html | ✓ | account |
 | deletesimfile.jsp   | simfiles/*/delete.html       | ✓ | contribution |
-| download.jsp        | simfiles/*/download.html     |   | outbox |
+| download.jsp        | simfiles/*/download.html     | ✓ | outbox |
 | errors.shtml        |                              | — | general info |
 | forgotpasswd.jsp    | mystuff/forgotpasswd.html    | ✓ | account |
 | glossary.shtml      | info/glossary.html           | ✓ | general info |
@@ -89,7 +88,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | motorstats.shtml    | info/motorstats.html         | ✓ | general info |
 | notfound.jsp        | notfound.html                | ✓ | internal page |
 | notfound.shtml      | notfound.html                | ✓ | internal page |
-| outbox.jsp          |                              |   | outbox |
+| outbox.jsp          | outbox/*                     | ✓ | outbox |
 | raspformat.shtml    | info/raspformat.html         | ✓ | general info |
 | search.shtml        | motors/search.html           | ✓ | attribute search |
 | searchapi.shtml     | info/api.html                |   | general info |
@@ -104,7 +103,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | updatenote.jsp      |                              |   | contribution |
 | updaterocket.jsp    | mystuff/rocket/*/edit.html   | ✓ | account |
 | updates.jsp         | motors/updates.html          | ✓ | general info |
-| updatesimfile.jsp   |                              |   | contribution |
+| updatesimfile.jsp   | simfiles/*/edit.html         | ✓ | contribution |
 | servlets/metadata   | api/1/metadata.*             | ✓ | API |
 | servlets/search     | api/1/search.*               |   | API |
 | servlets/download   | api/1/download.*             |   | API |

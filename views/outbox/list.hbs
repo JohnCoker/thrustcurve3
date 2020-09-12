@@ -1,0 +1,62 @@
+<h1>{{title}}</h1>
+
+<p>
+This is your outbox, containing {{totalCount}} simulator files.
+</p>
+
+<table id="simfile-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Motor</th>
+     <th>Format</th>
+     <th class="visible-lg">Source</th>
+     <th class="visible-lg">Updated</th>
+     <th class="visible-lg">Contributor</th>
+     <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each simfiles}}
+    <tr data-id="{{_id}}">
+      <td>{{_motor.commonName}}</td>
+      <td>{{format}}</td>
+      <td class="visible-lg">{{dataSource}}</td>
+      <td class="visible-lg">{{formatDate updatedAt}}</td>
+      <td class="visible-lg"><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>
+      <td>
+        <a href="/outbox/remove/{{_id}}">remove</a>
+        &bull;
+        <a href="{{simfileLink this}}">view</a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+
+<p>
+{{#if multiFormat}}
+You have chosen files in multiple formats. These can't all be combined into a single simulator-specific file,
+but you can download a separate merged file for each format.
+{{else}}
+You can download the chosen files merged into in a single simulator-specific file.
+{{/if}}
+Alternately, you can download a ZIP containing the individual data files separately.
+</p>
+
+<ul>
+{{#if raspLink}}
+<li><a href="{{raspLink}}">Download {{raspCount}} files as an ENG file (RASP)</a></li>
+{{/if}}
+{{#if rocksimLink}}
+<li><a href="{{rocksimLink}}">Download {{rocksimCount}} files as a RSE file (RockSim)</a></li>
+{{/if}}
+{{#if zipLink}}
+<li><a href="{{zipLink}}">Download {{totalCount}} files as a ZIP file (mixed)</a></li>
+{{/if}}
+</ul>
+
+<p>
+To find more files, search for motors you want to use, then pick one of the available Simulator Files
+and click "Add this file to my outbox."
+To start over, <a href="{{clearLink}}">clear all files</a>.
+</p>

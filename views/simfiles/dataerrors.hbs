@@ -1,0 +1,34 @@
+<h1>{{title}}</h1>
+
+<p>
+{{formatCount totalCount}} data files parsed:
+{{#if errorCount}}
+{{formatInt errorCount}} had errors and {{formatInt failCount}} failed entirely.
+{{else}}
+all without error.
+{{/if}}
+</p>
+
+{{#if simfiles}}
+<table id="simfile-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Format</th>
+     <th>Motor</th>
+     <th>Updated</th>
+     <th class="number">Errors</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each simfiles}}
+    <tr data-id="{{_id}}">
+      <td><a href="{{simfileLink this}}">{{format}}</a></td>
+      <td>{{mfr_abbrev}} {{_motor.designation}}</td>
+      <td>{{formatDate updatedAt}}</td>
+      <td class="number alert alert-{{#if failed}}danger{{else}}warning{{/if}}">{{errorCount}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+{{/if}}
+

@@ -9,6 +9,7 @@ const express = require('express'),
       errors = require('../lib/errors'),
       units = require('../lib/units'),
       schema = require('../database/schema'),
+      metadata = require('../lib/metadata'),
       parsers = require('../simulate/parsers'),
       analyze = require('../simulate/analyze'),
       graphs = require('../render/graphs'),
@@ -457,6 +458,64 @@ router.get('/simfiles/:id/delete.html', authenticated, function(req, res, next) 
       }));
     }
   }));
+});
+
+/*
+ * /simfiles/dataerrors.html
+ * Parse all data files checking for errors.
+ */
+router.get('/simfiles/:id/dataerrors.html', function(req, res, next) {
+  metadata.getManufacturers(req, function(manufacturers) {
+    let errfiles = [];
+    let failCount = 0, totalCount = 0;
+    let q;
+    if (req.body.id !== '*' && req.body.id !== '-')
+      q = simFileQuery(req);
+    let cursor = req.db.SimFile.find(q).populate('_motor').cursor();
+    cursor.on('data', simfile => {
+      let errs = new errors.Collector();
+      let parsed = parsers.parseData(simfile.format, simfile.data, errs);
+      if (parsed == null) {
+        simfile.failed = true;
+        failCount++;
+      }
+      if (parsed == null || errs.errorCount() > 0) {
+        let mfr = manufacturers.byId(simfile._motor._manufacturer);
+        simfile.mfr_abbrev = mfr == null ? '?' : mfr.abbrev;
+        simfile.errorCount = errs.errorCount();
+        simfile.errors = errs;
+        errfiles.push(simfile);
+      }
+      totalCount++;
+    });
+    cursor.on('close', () => {
+      errfiles.sort((a, b) => {
+        if (a.failed && !b.failed)
+          return -1;
+        if (!a.failed && b.failed)
+          return 1;
+
+        if (a.errorCount > b.errorCount)
+          return -1;
+        if (a.errorCount < b.errorCount)
+          return 1;
+
+        let comp = a.mfr_abbrev.localeCompare(b.mfr_abbrev);
+        if (comp != 0)
+          return comp;
+        a._motor.designation.localeCompare(b._motor.designation);
+      });
+      res.render('simfiles/dataerrors', locals(defaults, {
+        title: 'Data File Errors',
+        simfiles: errfiles,
+        errorCount: errfiles.length,
+        failCount,
+        totalCount,
+      }));
+      return;
+    });
+    cursor.on('error', e => next(e));
+  });
 });
 
 module.exports = router;

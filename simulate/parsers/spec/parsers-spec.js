@@ -225,6 +225,67 @@ describe("parsers", function() {
       expect(parsed.points[1].thrust).toBe(0);
       expect(parsed.points[1].propellantWeight).toBe(0);
     });
+
+    it("CDATA", function() {
+      var data =
+          '<engine-database>\n' +
+          ' <engine-list>\n' +
+          '<engine FDiv="10" FFix="1" FStep="-1." Isp="204.62" Itot="1069.71" Type="reloadable" auto-calc-cg="1" auto-calc-mass="1" avgThrust="459.105" burn-time="2.33" cgDiv="10" cgFix="1" cgStep="-1." code="J450ST" delays="1000" dia="54." exitDia="0." initWt="1196.4" len="326." mDiv="10" mFix="1" mStep="-1." massFrac="44.56" mfg="Animal Motor Works" peakThrust="563.18" propWt="533.1" tDiv="10" tFix="1" tStep="-1." throatDia="0.">\n' +
+          '<comments><![CDATA[Animal Motor Works 54-1050\n' +
+          'AMW J450ST RASP.ENG file made from NAR published data\n' +
+          'File produced SEPT 4, 2002\n' +
+          'This file my be used or given away. All I ask is that this header\n' +
+          'is maintained to give credit to NAR S&T. Thank you, Jack Kane\n' +
+          'The total impulse, peak thrust, average thrust and burn time are\n' +
+          'the same as the averaged static test data on the NAR web site in\n' +
+          'the certification file. The curve drawn with these data points is as\n' +
+          'close to the certification curve as can be with such a limited\n' +
+          'number of points (32) allowed with wRASP up to v1.6.\n' +
+          ']]></comments>\n' +
+          '<data>\n' +
+          '<eng-data cg="163." f="0." m="533.1" t="0."/>\n' +
+          '<eng-data cg="163." f="251.586" m="532.536" t="0.009"/>\n' +
+          '<eng-data cg="163." f="376.074" m="531.441" t="0.016"/>\n' +
+          '<eng-data cg="163." f="413.45" m="528.687" t="0.03"/>\n' +
+          '<eng-data cg="163." f="430.832" m="524.269" t="0.051"/>\n' +
+          '<eng-data cg="163." f="423.296" m="515.117" t="0.094"/>\n' +
+          '<eng-data cg="163." f="413.149" m="500.944" t="0.162"/>\n' +
+          '<eng-data cg="163." f="395.566" m="480.793" t="0.262"/>\n' +
+          '<eng-data cg="163." f="420.182" m="452.335" t="0.402"/>\n' +
+          '<eng-data cg="163." f="444.898" m="432.288" t="0.495"/>\n' +
+          '<eng-data cg="163." f="504.078" m="358.984" t="0.805"/>\n' +
+          '<eng-data cg="163." f="536.028" m="296.005" t="1.048"/>\n' +
+          '<eng-data cg="163." f="550.597" m="248.622" t="1.223"/>\n' +
+          '<eng-data cg="163." f="563.18" m="227.529" t="1.299"/>\n' +
+          '<eng-data cg="163." f="555.319" m="217.775" t="1.334"/>\n' +
+          '<eng-data cg="163." f="560.042" m="179.977" t="1.47"/>\n' +
+          '<eng-data cg="163." f="559.841" m="147.049" t="1.588"/>\n' +
+          '<eng-data cg="163." f="546.98" m="98.5088" t="1.764"/>\n' +
+          '<eng-data cg="163." f="516.838" m="56.8911" t="1.921"/>\n' +
+          '<eng-data cg="163." f="496.743" m="38.7066" t="1.993"/>\n' +
+          '<eng-data cg="163." f="499.154" m="30.7656" t="2.025"/>\n' +
+          '<eng-data cg="163." f="479.16" m="25.4025" t="2.047"/>\n' +
+          '<eng-data cg="163." f="414.354" m="16.7194" t="2.086"/>\n' +
+          '<eng-data cg="163." f="344.525" m="11.2356" t="2.115"/>\n' +
+          '<eng-data cg="163." f="252.29" m="7.36905" t="2.141"/>\n' +
+          '<eng-data cg="163." f="140.161" m="3.84859" t="2.177"/>\n' +
+          '<eng-data cg="163." f="82.78" m="1.84871" t="2.213"/>\n' +
+          '<eng-data cg="163." f="50.347" m="0.98623" t="2.239"/>\n' +
+          '<eng-data cg="163." f="27.861" m="0.362621" t="2.271"/>\n' +
+          '<eng-data cg="163." f="12.86" m="0.108951" t="2.296"/>\n' +
+          '<eng-data cg="163." f="0." m="0." t="2.33"/>\n' +
+          '</data>\n' +
+          '</engine>\n' +
+          ' </engine-list>\n' +
+          '</engine-database>\n';
+      let parsed;
+      expect(function() {
+        parsed = parsers.parseData('RockSim', data, errors.print);
+      }).not.toThrow();
+      expect(parsed).toBeDefined();
+      expect(parsed.info.name).toBe('J450ST');
+      expect(parsed.points.length).toBe(31);
+    });
   });
 
   describe("combineRASP", function() {
@@ -331,46 +392,61 @@ describe("number", function() {
     expect(number.isInt("")).toBe(false);
     expect(number.isInt("0")).toBe(true);
     expect(number.isInt("1000")).toBe(true);
-    expect(number.isInt("-1")).toBe(false);
-    expect(number.isInt("01")).toBe(false);
+    expect(number.isInt("-1")).toBe(true);
+    expect(number.isInt("01")).toBe(true);
     expect(number.isInt("01.")).toBe(false);
     expect(number.isInt("1.")).toBe(false);
     expect(number.isInt("1.01")).toBe(false);
+    expect(number.isInt("010")).toBe(true);
   });
-  it("isFloat", function() {
-    expect(number.isFloat("")).toBe(false);
-    expect(number.isFloat("0")).toBe(true);
-    expect(number.isFloat("1000")).toBe(true);
-    expect(number.isFloat("-1")).toBe(false);
-    expect(number.isFloat("01")).toBe(false);
-    expect(number.isFloat("01.")).toBe(false);
-    expect(number.isFloat("1.")).toBe(true);
-    expect(number.isFloat("1.01")).toBe(true);
-    expect(number.isFloat(".0")).toBe(true);
-    expect(number.isFloat(".01")).toBe(true);
-    expect(number.isFloat(".")).toBe(false);
+  it("isNonNegInt", function() {
+    expect(number.isNonNegInt("")).toBe(false);
+    expect(number.isNonNegInt("0")).toBe(true);
+    expect(number.isNonNegInt("1000")).toBe(true);
+    expect(number.isNonNegInt("-1")).toBe(false);
+    expect(number.isNonNegInt("01")).toBe(true);
+    expect(number.isNonNegInt("01.")).toBe(false);
+    expect(number.isNonNegInt("1.")).toBe(false);
+    expect(number.isNonNegInt("1.01")).toBe(false);
+    expect(number.isNonNegInt("010")).toBe(true);
   });
-  it("parseInt", function() {
-    expect(number.parseInt("")).toBeNaN();
-    expect(number.parseInt("0")).toBe(0);
-    expect(number.parseInt("1000")).toBe(1000);
-    expect(number.parseInt("-1")).toBeNaN();
-    expect(number.parseInt("01")).toBeNaN();
-    expect(number.parseInt("01.")).toBeNaN();
-    expect(number.parseInt("1.")).toBeNaN();
-    expect(number.parseInt("1.01")).toBeNaN();
+  it("isPosInt", function() {
+    expect(number.isPosInt("")).toBe(false);
+    expect(number.isPosInt("0")).toBe(false);
+    expect(number.isPosInt("1000")).toBe(true);
+    expect(number.isPosInt("-1")).toBe(false);
+    expect(number.isPosInt("01")).toBe(true);
+    expect(number.isPosInt("01.")).toBe(false);
+    expect(number.isPosInt("1.")).toBe(false);
+    expect(number.isPosInt("1.01")).toBe(false);
+    expect(number.isPosInt("010")).toBe(true);
   });
-  it("parseFloat", function() {
-    expect(number.parseFloat("")).toBeNaN();
-    expect(number.parseFloat("0")).toBe(0);
-    expect(number.parseFloat("1000")).toBe(1000);
-    expect(number.parseFloat("-1")).toBeNaN();
-    expect(number.parseFloat("01")).toBeNaN();
-    expect(number.parseFloat("01.")).toBeNaN();
-    expect(number.parseFloat("1.")).toBe(1.0);
-    expect(number.parseFloat("1.01")).toBe(1.01);
-    expect(number.parseFloat(".0")).toBe(0);
-    expect(number.parseFloat(".01")).toBe(0.01);
-    expect(number.parseFloat(".")).toBeNaN();
+  it("isNumber", function() {
+    expect(number.isNumber("")).toBe(false);
+    expect(number.isNumber("0")).toBe(true);
+    expect(number.isNumber("1000")).toBe(true);
+    expect(number.isNumber("-1")).toBe(true);
+    expect(number.isNumber("01")).toBe(true);
+    expect(number.isNumber("01.")).toBe(true);
+    expect(number.isNumber("1.")).toBe(true);
+    expect(number.isNumber("1.01")).toBe(true);
+    expect(number.isNumber(".0")).toBe(true);
+    expect(number.isNumber(".01")).toBe(true);
+    expect(number.isNumber(".")).toBe(false);
+    expect(number.isNumber("064.9091")).toBe(true);
+  });
+  it("parseNumber", function() {
+    expect(number.parseNumber("")).toBeNaN();
+    expect(number.parseNumber("0")).toBe(0);
+    expect(number.parseNumber("1000")).toBe(1000);
+    expect(number.parseNumber("-1")).toBe(-1);
+    expect(number.parseNumber("01")).toBe(1);
+    expect(number.parseNumber("01.")).toBe(1.0);
+    expect(number.parseNumber("1.")).toBe(1.0);
+    expect(number.parseNumber("1.01")).toBe(1.01);
+    expect(number.parseNumber(".0")).toBe(0);
+    expect(number.parseNumber(".01")).toBe(0.01);
+    expect(number.parseNumber(".")).toBeNaN();
+    expect(number.parseNumber("064.9091")).toBe(64.9091);
   });
 });

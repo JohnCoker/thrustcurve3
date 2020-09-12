@@ -4,13 +4,14 @@
     {{{body}}}
   </div>
   <div class="col-md-3 col-md-offset-1 sidebar sidebar-right hidden-xs hidden-sm">
-    <h2>Information</h2>
+    <h2>Administration</h2>
     <ul class="links">
       {{#hasPerm 'metadata'}}
       <li><a href="/admin/certorgs/">Certification Orgs.</a></li>
       {{/hasPerm}}
       <li><a href="/motors/missingdata.html">Motors Without Data</a></li>
       <li><a href="/motors/missingstats.html">Motors Missing Stats</a></li>
+      <li><a href="/simfiles/*/dataerrors.html">Data with Errors</a></li>
     </ul>
     {{#block "sidebar-extra"}}
     {{/block}}

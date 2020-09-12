@@ -5,8 +5,7 @@
 'use strict';
 
 const errors = require('../../lib/errors'),
-      parseInt = require('./number').parseInt,
-      parseFloat = require('./number').parseFloat;
+      parseNumber = require('./number').parseNumber;
 
 var tEpsilon = 0.0005;
 
@@ -42,11 +41,11 @@ function parse(data, error) {
 
   info = {
     name: fields[0],
-    diameter: parseInt(fields[1]),
-    length: parseInt(fields[2]),
+    diameter: parseNumber(fields[1]),
+    length: parseNumber(fields[2]),
     delays: fields[3],
-    propellantWeight: parseFloat(fields[4]),
-    totalWeight: parseFloat(fields[5]),
+    propellantWeight: parseNumber(fields[4]),
+    totalWeight: parseNumber(fields[5]),
     manufacturer: fields[6]
   };
 
@@ -81,8 +80,8 @@ function parse(data, error) {
       continue;
     }
     point = {
-      time: parseFloat(fields[0]),
-      thrust: parseFloat(fields[1])
+      time: parseNumber(fields[0]),
+      thrust: parseNumber(fields[1])
     };
 
     // time must be positive and should be increasing

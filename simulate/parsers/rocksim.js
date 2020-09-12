@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 John Coker for ThrustCurve.org
+ * Copyright 2015-2020 John Coker for ThrustCurve.org
  * Licensed under the ISC License, https://opensource.org/licenses/ISC
  */
 'use strict';
@@ -263,6 +263,11 @@ function combine(data, error) {
   return text;
 }
 
+/**
+ * <p>The rocksim module knows how to parse RockSim RSE (XML) files.
+ *
+ * @module rocksim
+ */
 module.exports = {
   format: 'RockSim',
   extension: '.rse',

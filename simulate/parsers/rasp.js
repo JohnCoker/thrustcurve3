@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 John Coker for ThrustCurve.org
+ * Copyright 2015-2020 John Coker for ThrustCurve.org
  * Licensed under the ISC License, https://opensource.org/licenses/ISC
  */
 'use strict';
@@ -162,6 +162,11 @@ function combine(data, error) {
   return text;
 }
 
+/**
+ * <p>The rasp module knows how to parse RASP ENG (text) files.
+ *
+ * @module rasp
+ */
 module.exports = {
   format: 'RASP',
   extension: '.eng',

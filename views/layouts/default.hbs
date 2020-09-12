@@ -53,6 +53,7 @@
                 <li><a href="/motors/guide.html">Match a Rocket</a></li>
                 <li><a href="/motors/browser.html">Browse by Type</a></li>
                 <li><a href="/motors/popular.html">Most Popular</a></li>
+                <li><a href="/motors/recent.html">Recently Viewed</a></li>
               </ul>
             </li>
             <li class="dropdown" title="my rockets and favorites">
@@ -87,7 +88,7 @@
               </ul>
             </li>
             {{#hasPerm 'any'}}
-            <li class="dropdown" title="site administration">
+            <li class="dropdown visible-md" title="site administration">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 {{#hasPerm 'metadata'}}
@@ -106,7 +107,7 @@
       </div>
     </nav>
 
-    <div class="container">
+    <div class="container" style="padding: 0;">
     {{{body}}}
     </div>
 

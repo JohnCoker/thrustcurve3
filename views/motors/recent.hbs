@@ -28,11 +28,11 @@ Compare button at the bottom.
      <th title="Select" class="no-sort"><input type="checkbox" name="all"/></th>
      <th>Designation</th>
      <th>Manufacturer</th>
-     <th>Type</th>
-     <th class="number">Diam</th>
-     <th class="number">Impulse</th>
-     <th class="number hidden-xs">Avg Thr</th>
-     <th class="number hidden-xs">Burn</th>
+     <th class="visible-sm">Type</th>
+     <th class="number visible-sm">Diam</th>
+     <th class="number visible-md">Impulse</th>
+     <th class="number visible-md">Avg Thr</th>
+     <th class="number visible-sm">Burn</th>
     </tr>
   </thead>
   <tbody>
@@ -41,11 +41,11 @@ Compare button at the bottom.
       <td data-sort="{{recentOrder}}"><input type="checkbox" name="motors" value="{{_id}}"/></td>
       <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
       <td>{{_manufacturer.abbrev}}</td>
-      <td>{{formatType type}}</td>
-      <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
-      <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
-      <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
-      <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
+      <td class="visible-sm">{{formatType type}}</td>
+      <td class="number visible-sm" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+      <td class="number visible-md" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+      <td class="number visible-md" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+      <td class="number visible-sm" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
     </tr>
   {{/each}}
   </tbody>

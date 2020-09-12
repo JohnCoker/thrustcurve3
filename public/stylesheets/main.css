@@ -14,6 +14,14 @@ h1:first-child {
   margin-top: 0;
 }
 
+@media (max-width: 991px) {
+  .container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
 .navbar-brand {
   font-size: 16pt;
   padding: 9px 15px 11px 15px;

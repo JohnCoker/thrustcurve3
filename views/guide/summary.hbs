@@ -49,9 +49,9 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
       <th class="visible-lg">Diam.</th>
       {{/if}}
       <th class="number" title="thrust-to-weight ratio">T:W</th>
-      <th class="number" title="velocity off launch guide">Guide</th>
-      <th class="number visible-lg" title="maximum speed">Velocity</th>
-      <th class="number visible-lg" title="maximum acceleration">Accel</th>
+      <th class="number visible-sm" title="velocity off launch guide">Guide</th>
+      <th class="number visible-sm" title="maximum speed">Velocity</th>
+      <th class="number visible-sm" title="maximum acceleration">Accel</th>
       <th class="number" title="maximum altitude">Apogee</th>
       <th class="number" title="optimal delay time">Delay</th>
     </tr>
@@ -65,9 +65,9 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
       <td class="visible-lg">{{formatMMT motor.diameter}}</td>
       {{/if}}
       <td class="number" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
-      <td class="number" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
-      <td class="number visible-lg" data-sort="{{formatSort simulation.maxVelocity}}">{{formatVelocity simulation.maxVelocity}}</td>
-      <td class="number visible-lg" data-sort="{{formatSort simulation.maxAccleration}}">{{formatAcceleration simulation.maxAcceleration}}</td>
+      <td class="number visible-sm" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
+      <td class="number visible-sm" data-sort="{{formatSort simulation.maxVelocity}}">{{formatVelocity simulation.maxVelocity}}</td>
+      <td class="number visible-sm" data-sort="{{formatSort simulation.maxAccleration}}">{{formatAcceleration simulation.maxAcceleration}}</td>
       <td class="number" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
       <td class="number" data-sort="{{formatSort optimalDelay}}">{{formatDuration optimalDelay}}</td>
     </tr>

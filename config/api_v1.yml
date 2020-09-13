@@ -5,15 +5,18 @@ info:
   description: Programmatic access to ThrustCurve.org motor and simulator file database.
   contact:
     name: John Coker
-    url: 'http://www.thrustcurve.org/api.html'
+    url: 'https://www.thrustcurve.org/api.html'
     email: john@jcsw.com
   license:
     name: ISC license
     url: 'https://opensource.org/licenses/ISC'
   version: 1.0.0
 
-host: 'thrustcurve.org'
+host: www.thrustcurve.org
 basePath: /api/v1
+schemes:
+  - https
+  - http
 
 tags:
   - name: metadata
@@ -369,7 +372,7 @@ definitions:
             infoUrl:
               type: string
               format: url
-              example: 'http://nar.org/SandT/pdf/Estes/C6.pdf'
+              example: 'https://nar.org/SandT/pdf/Estes/C6.pdf'
             totalWeightG:
               type: number
               example: 24

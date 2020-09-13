@@ -126,13 +126,23 @@ function searchQuery(request, cache, error) {
 }
 
 /*
- * Basic CORS support.
+ * Basic CORS support. We allow access from anywhere for the API,
+ * including with credentials which requires echoing back the requested origin
+ * in the response headers.
  */
 router.all('/api/v1/*', function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
+  let origin = '*';
+  if (req.header('origin') != null)
+    origin = req.header('origin');
+  else if (req.header('x-forwarded-proto') != null)
+    origin = req.header('x-forwarded-proto') + '://' + req.header('host');
+  else if (req.protocol && req.get('host'))
+    origin = req.protocol + '://' + req.get('host');
+  res.header('Access-Control-Allow-Origin', origin);
   res.header('Access-Control-Allow-Headers', 'X-Requested-With');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Methods', 'GET,POST');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE');
+  res.header('Access-Control-Allow-Credentials', 'true');
   next();
 });
 

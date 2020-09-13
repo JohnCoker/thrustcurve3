@@ -6,6 +6,7 @@ This page lists the things supported in the old site which haven't yet been reim
 ## General
 
  * flag motors favorited by other users
+ * create master lists by manufacturer (as Mark used to maintain)
 
 ## Contribution
 
@@ -21,6 +22,7 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Motor Guide
 
  * use visual styles in spreadsheets
+ * compare motors from results
 
 ## Account
 

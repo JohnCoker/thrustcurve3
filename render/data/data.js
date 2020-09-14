@@ -47,6 +47,21 @@ class Format {
     return this.elementList(listName, values);
   }
 
+  error(errs) {
+    if (errs == null || errs.errorCount() < 1)
+      return false;
+
+    let s = '';
+    errs.errors.forEach(e => {
+      if (s !== '')
+        s += '\n';
+      s += e.message;
+    });
+    this.element('error', s);
+
+    return true;
+  }
+
   close() {
   }
 
@@ -247,10 +262,10 @@ class JSONFormat extends Format {
       return value.toISOString();
 
     // NaN and Inf not valid in JSON
-    if (typeof value == 'number' && (isNaN(value) || value.isInfinite()))
+    if (typeof value == 'number' && !isFinite(value))
       return null;
 
-    // recures into arrays and objects
+    // recurse into arrays and objects
     if (Array.isArray(value))
       return _.map(value, JSONFormat.value);
     else if (typeof value == 'object')

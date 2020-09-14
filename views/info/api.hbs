@@ -1,5 +1,28 @@
 <h1>{{title}}</h1>
 
+<style type="text/css">
+table.endpoint {
+  margin-bottom: 1em;
+  border: 1px solid #69718c;
+  border-left: 1em solid #69718c;
+}
+table.endpoint th {
+  font-weight: normal;
+  font-style: italic;
+  padding: 2pt 1em;
+}
+table.endpoint th:after {
+  content: " endpoint:";
+}
+table.endpoint td {
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+  padding: 2pt 0.5em;
+}
+a.copy {
+  margin: 0 0.5em;
+}
+</style>
+
 <p>
 This site provides a UI for searching for motors and downloading data right within any web browser.
 However, for those intrepid souls who would like to integerate the data provided by this site into programs
@@ -11,7 +34,8 @@ However, for those intrepid souls who would like to integerate the data provided
 <p>
 The API described on this page provides basic database access through REST endpoints.
 Inputs can be specified as XML, JSON or form data and results can be returned as XML or JSON.
-(The v1 API, described on this page, is a superset of the XML-only API supported by the v2 site.)
+The v1 API, described on this page, is a superset of the XML-only API supported by the v2 site.
+The "compatible endpoints" listed are those that were supported by the v2 site.
 </p>
 
 <p>
@@ -26,7 +50,10 @@ There are five actions supported, all of which use HTTP POST methods:
 </ul>
 
 <p>
-There is a <a href="/api/v1/swagger.json">Swagger spec</a> for API.
+There is a <a href="/api/v1/swagger.json">OpenAPI (Swagger) spec</a> for API and you can use
+<a class="url" href="https://swagger.io/tools/swagger-inspector/" target="_blank">Swagger Inspector</a>
+to explore the API with it.
+Point Swagger Insector (or similar OpenAPI tool) at <code>https://www.thrustcurve.org/api/v1/swagger.json</code>.
 </p>
 
 <p>
@@ -38,9 +65,11 @@ Each API is described in its own section below, plus there are a few
 <a name="metadata"></a>
 <h2>Metadata</h2>
 
-JSON endpoint: /api/v1/metadata.json (Swagger spec)
-XML endpoint: /api/v1/metadata.xml (request and response schema)
-compatible endpoint: /servlets/metadata
+<table class="endpoint">
+<tr><th>JSON</th><td class="url">/api/v1/metadata.json</td></tr>
+<tr><th>XML</th><td class="url">/api/v1/metadata.xml</td></tr>
+<tr><th>compatible</th><td class="url">/servlets/metadata</td></tr>
+</table>
 
 <p>
 The metadata API doesn't return stats or data on individual motors, but instead is used to find out what actual criteria exist for doing a search.
@@ -50,7 +79,8 @@ The metadata API doesn't return stats or data on individual motors, but instead 
 This is useful for building interactive programs that want to populate a set of combo boxes with valid search criteria,
 without hard-coding the actual values into the program.
 The simplest case is to return metadata encompasing all motors in the database using no input at all:
-<a href="/api/v1/metadata.json">/api/v1/metadata.json</a>.
+<a href="/api/v1/metadata.json">/api/v1/metadata.<b>json</b></a>
+(or <a href="/api/v1/metadata.xml">metadata.<b>xml</b></a>).
 </p>
 
 <p>
@@ -58,10 +88,24 @@ However, its usually desirable to get metadata only for the motors that the user
 For example, if you don't care about motors that are out of production, restricting the metadata to available motors
 makes more sense:
 <a href="/api/v1/metadata.json?availability=available">/api/v1/metadata.json?availability=available</a>.
+This endpoint accepts the same query as the <b>search</b> endpoint below.
 </p>
+
 
 <a name="search"></a>
 <h2>Search</h2>
+
+<table class="endpoint">
+<tr><th>JSON</th><td class="url">/api/v1/search.json</td></tr>
+<tr><th>XML</th><td class="url">/api/v1/search.xml</td></tr>
+<tr><th>compatible</th><td class="url">/servlets/search</td></tr>
+</table>
+
+<p>
+The search API is where it starts to get more interesting. This is the first API that requires inputs and
+returns data on specific motors in the the database. This API could be used to drive you own search front-end.
+</p>
+
 
 <a name="download"></a>
 <h2>Download</h2>
@@ -74,3 +118,29 @@ makes more sense:
 
 <a name="examples"></a>
 <h2>Example Programs</h2>
+
+<textarea id="copy" style="width: 0; height: 0; border: none; outline: none; margin: 0; resize: none;"></textarea>
+<script type="text/javascript">
+$(document).ready(function() {
+  try {
+    if (!document.queryCommandSupported('copy'))
+      return;
+  } catch (e) {
+    return;
+  }
+
+  $('table.endpoint td.url').each(function(i, td) {
+    let path = td.innerText;
+    let link = $('<a class="copy" href="#" title="copy URL"><i class="fa fa-copy"/></a>');
+    link.on('click', function(e) {
+      e.preventDefault();
+      let textarea = document.querySelector('#copy');
+      $(textarea).val('https://www.thrustcurve.org' + path);
+      textarea.focus();
+      textarea.select();
+      document.execCommand('copy');
+    });
+    link.appendTo(td);
+  });
+});
+</script>

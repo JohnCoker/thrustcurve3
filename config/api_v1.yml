@@ -5,7 +5,7 @@ info:
   description: Programmatic access to ThrustCurve.org motor and simulator file database.
   contact:
     name: John Coker
-    url: 'https://www.thrustcurve.org/api.html'
+    url: 'https://www.thrustcurve.org/info/api.html'
     email: john@jcsw.com
   license:
     name: ISC license
@@ -229,6 +229,10 @@ definitions:
           - A
           - B
           - C
+      error:
+        description: errors in criteria specification
+        type: string
+        example: Invalid manufacturer value "Estus".
   NameAndAbbrev:
     type: object
     description: full name and abbreviation
@@ -254,7 +258,7 @@ definitions:
       commonName:
         description: standard name of motor
         type: string
-        pattern: '(1/4A|1/2A|[A-Z])[0-9]+'
+        pattern: '(1/8A|1/4A|1/2A|[A-O])[0-9]+'
         example: C6
       impulseClass:
         description: letter class of motor
@@ -276,10 +280,24 @@ definitions:
         description: certification organization name or abbreviation
         type: string
         example: NAR
+      sparky:
+        description: whether or not the motor produces sparks in the exhaust
+        type: boolean
+        example: false
+      infoUpdatedSince:
+        description: only motors updated since the specified date
+        type: string
+        format: date
+        example: 2020-01-01
       hasDataFiles:
         description: only motors with data files
         type: boolean
         example: true
+      dataUpdatedSince:
+        description: only motors with data files updated since the specified date
+        type: string
+        format: date
+        example: 2020-01-01
       availability:
         description: motor current availability
         type: string
@@ -317,9 +335,9 @@ definitions:
               type: integer
               example: 3
             error:
-              description: errors in criteria specification
+              description: error in criterion specification
               type: string
-              example:
+              example: Invalid commonName value "C6".
       results:
         description: information on the motors matched
         type: array
@@ -392,6 +410,8 @@ definitions:
               type: string
               format: date
               example: '2014-12-02'
+            sparky:
+              type: boolean
   DownloadRequest:
     type: object
     description: motor identifier list

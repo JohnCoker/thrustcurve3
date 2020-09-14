@@ -5,7 +5,7 @@
 'use strict';
 
 const errors = require('../../lib/errors'),
-      parseNumber = require('./number').parseNumber;
+      parseNumber = require('../../lib/number').parseNumber;
 
 var tEpsilon = 0.0005;
 

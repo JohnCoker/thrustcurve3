@@ -6,7 +6,7 @@
 
 const xmlparser = require("xml-parser"),
       errors = require('../../lib/errors'),
-      parseNumber = require('./number').parseNumber;
+      parseNumber = require('../../lib/number').parseNumber;
 
 var tEpsilon = 0.00005;
 

@@ -1,0 +1,17 @@
+{
+  "name": "api1",
+  "version": "1.0.0",
+  "description": "/api/v1 support",
+  "main": "api1.js",
+  "scripts": {
+    "test": "jasmine",
+    "lint": "jshint *.js spec/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/lib/api1"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC",
+  "dependencies": {}
+}

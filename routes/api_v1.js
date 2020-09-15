@@ -5,18 +5,18 @@
 'use strict';
 
 const express = require('express'),
+      bodyParser = require('body-parser'),
       router = express.Router(),
       _ = require('underscore'),
       path = require('path'),
       async = require('async'),
-      xmlparser = require('express-xml-bodyparser'),
       yamljs = require('yamljs'),
       errors = require('../lib/errors'),
       metadata = require('../lib/metadata'),
       data = require('../render/data'),
       api1 = require('../lib/api');
 
-xmlparser.regexp = /.*/;
+require('body-parser-xml')(bodyParser);
 
 const APIPrefix = '/api/v1/';
 const LegacyPrefix = '/servlets/';
@@ -46,6 +46,53 @@ router.all(LegacyPrefix + '*', function(req, res, next) {
   next();
 });
 
+/*
+ * API body support. We don't require a Content-Type to be specified, so if we assume
+ * the body type implied by the path.
+ */
+const jsonBodyParser = bodyParser.json({ type: () => true });
+
+function jsonParser(req, res, next) {
+  jsonBodyParser(req, res, err => {
+    if (err) {
+      let msg;
+      if (err.message)
+        msg = err.message.replace(/^\w*Error: */, '').trim();
+      if (msg == null || msg === '')
+        msg = 'JSON parsing failed';
+      res.status(400);
+      res.send(JSON.stringify({ error: msg }, undefined, 2));
+      return;
+    }
+    next();
+  });
+}
+
+const xmlBodyParser = bodyParser.xml({ type: () => true });
+
+function xmlParser(req, res, next) {
+  xmlBodyParser(req, res, err => {
+    if (err) {
+      let msg;
+      if (err.message)
+        msg = err.message.replace(/^\w*Error: */, '').trim();
+      if (msg == null || msg === '')
+        msg = 'XML parsing failed';
+      let root;
+      if (/^\/(?:api\/v1|servlets)\/([a-z]+).*$/.test(req.path))
+        root = req.path.replace(/^([a-z1]*\/)*([a-z]*).*$/, "$2-response");
+      else
+        root = "response";
+      res.status(400);
+      let format = new data.XMLFormat();
+      format.root(root);
+      format.element('error', msg);
+      format.send(res);
+      return;
+    }
+    next();
+  });
+}
 
 /*
  * /api/v1/swagger
@@ -123,13 +170,13 @@ function doMetadata(req, res, format) {
 router.get(APIPrefix + 'metadata.json', function(req, res, next) {
   doMetadata(req, res, new data.JSONFormat());
 });
-router.post(APIPrefix + 'metadata.json', function(req, res, next) {
+router.post(APIPrefix + 'metadata.json', jsonParser, function(req, res, next) {
   doMetadata(req, res, new data.JSONFormat());
 });
-router.get([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlparser(), function(req, res, next) {
+router.get([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], function(req, res, next) {
   doMetadata(req, res, new data.XMLFormat());
 });
-router.post([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlparser(), function(req, res, next) {
+router.post([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlParser, function(req, res, next) {
   doMetadata(req, res, new data.XMLFormat());
 });
 

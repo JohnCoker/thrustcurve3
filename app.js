@@ -71,10 +71,8 @@ app.set('view engine', 'hbs');
 
 // other Express configuration
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(morgan('combined'));
+app.use(cookieParser());
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
@@ -245,7 +243,11 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-// the defined routes
+// API route is special
+app.use('/', api_v1);
+
+// UI routes
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/', index);
 app.use('/', info);
 app.use('/', motors);
@@ -257,7 +259,6 @@ app.use('/', guide);
 app.use('/', browser);
 app.use('/', mystuff);
 app.use('/', admin);
-app.use('/', api_v1);
 
 // handle other routes as 404
 app.use(function(req, res, next) {

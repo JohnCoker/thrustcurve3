@@ -5,18 +5,11 @@
 'use strict';
 
 const _ = require('underscore'),
-      XMLWriter = require('xml-writer'),
-      IDmap2int = {},
-      IDmap2str = {};
-var IDmapNext = 1000001;
+      XMLWriter = require('xml-writer');
 
 class Format {
 
   type() {
-  }
-
-  compat() {
-    return false;
   }
 
   root(name) {
@@ -25,7 +18,7 @@ class Format {
   element(name, value) {
   }
 
-  elementList(listName, values) {
+  elementListFull(listName, values, extra) {
   }
 
   lengthList(listName, values) {
@@ -34,17 +27,9 @@ class Format {
 
     return this.elementList(listName, _.map(values, function(v) {
       // convert to millimeters and round
-      var s = (v * 1000).toFixed(1);
-      return s.replace(/\.0$/, '');
+      if (typeof v === 'number' && isFinite(v))
+        return Math.round(v * 10000) / 10;
     }));
-  }
-
-  id(name, value) {
-    return this.element(name, value);
-  }
-
-  idList(listName, values) {
-    return this.elementList(listName, values);
   }
 
   error(errs) {
@@ -72,13 +57,11 @@ class Format {
     res.type(this.type()).send(this.toString());
   }
 
-  toId(value) {
-    return value;
-  }
-
   static singular(listName) {
     if (/ses$/.test(listName))
       return listName.substring(0, listName.length - 2);
+    else if (/ria$/.test(listName))
+      return listName.substring(0, listName.length - 3) + 'rion';
     else if (/ies$/.test(listName))
       return listName.substring(0, listName.length - 3) + 'y';
     else
@@ -93,7 +76,6 @@ class XMLFormat extends Format {
     this._w.startDocument('1.0', 'UTF-8');
     if (options && options.root)
       this.root(options.root);
-    this._compat = options && options.compat;
   }
 
   root(name) {
@@ -109,79 +91,71 @@ class XMLFormat extends Format {
     return 'text/xml';
   }
 
-  compat() {
-    return this._compat;
-  }
-
   element(name, value) {
-    var keys, k, i;
-
     if (value == null)
       return false;
 
     this._w.startElement(name);
 
     if (typeof value == 'object') {
-      keys = Object.keys(value);
-      for (i = 1; i < keys.length; i++) {
-	k = keys[i];
-	this._w.writeAttribute(k, value[k]);
+      let keys = Object.keys(value);
+      for (let i = 1; i < keys.length; i++) {
+	let k = keys[i];
+        let v = XMLFormat.value(value[k]);
+        if (v == null || v === '')
+          continue;
+	this._w.writeAttribute(k, v);
       }
-      k = keys[0];
-      this._w.text(value[k]);
+      let k0 = keys[0];
+      this._w.text(XMLFormat.value(value[k0]));
     } else {
-      this._w.text(value);
+      let v = XMLFormat.value(value);
+      if (v != null)
+        this._w.text(v);
     }
 
     this._w.endElement(name);
     return true;
   }
 
-  elementList(listName, values) {
-    var eltName, i;
+  elementFull(name, value) {
+    if (value == null)
+      return false;
 
+    this._w.startElement(name);
+
+    this._children(value);
+
+    this._w.endElement(name);
+    return true;
+  }
+
+  elementList(listName, values) {
     if (values == null || values.length < 1)
       return false;
 
     this._w.startElement(listName);
 
-    eltName = Format.singular(listName);
-    for (i = 0; i < values.length; i++)
+    let eltName = Format.singular(listName);
+    for (let i = 0; i < values.length; i++)
       this.element(eltName, values[i]);
 
     this._w.endElement(listName);
     return true;
   }
 
-  id(name, value) {
-    var str;
-
-    if (value == null)
-      return false;
-
-    if (typeof value == 'string' && this._compat) {
-      str = value;
-      value = IDmap2str[str];
-      if (value == null) {
-        value = IDmapNext++;
-        IDmap2int[str] = value;
-        IDmap2str[value.toFixed()] = str;
-      }
-    }
-    return this.element(name, value);
-  }
-
-  idList(listName, values) {
-    var eltName, i;
-
+  elementListFull(listName, values, extra) {
     if (values == null || values.length < 1)
       return false;
 
     this._w.startElement(listName);
 
-    eltName = Format.singular(listName);
-    for (i = 0; i < values.length; i++)
-      this.id(eltName, values[i]);
+    let eltName = Format.singular(listName);
+    for (let i = 0; i < values.length; i++)
+      this.elementFull(eltName, values[i]);
+
+    if (extra != null)
+      this._children(extra);
 
     this._w.endElement(listName);
     return true;
@@ -199,10 +173,45 @@ class XMLFormat extends Format {
     return this._w.toString();
   }
 
-  toId(value) {
-    if (typeof value == 'number' && this._compat)
-      return IDmap2str[value.toFixed()];
-    return value;
+  _children(value) {
+    if (typeof value == 'object') {
+      let keys = Object.keys(value);
+      for (let i = 0; i < keys.length; i++) {
+	let k = keys[i];
+        let v = XMLFormat.value(value[k]);
+        if (v == null || v === '')
+          continue;
+        this._w.startElement(k);
+	this._w.text(v);
+        this._w.endElement(k);
+      }
+    } else {
+      let v = XMLFormat.value(value);
+      if (v != null)
+        this._w.text(v);
+    }
+  }
+
+  static value(value) {
+    // undefined not valid in XML
+    if (value == null)
+      return null;
+
+    // format date only
+    if (value instanceof Date)
+      return value.toISOString().replace(/T.*$/, '');
+
+    // NaN and Inf not valid in XML
+    if (typeof value === 'number' && !isFinite(value))
+      return null;
+
+    // recurse into arrays and objects
+    if (Array.isArray(value))
+      return _.map(value, XMLFormat.value);
+    else if (typeof value === 'object')
+      return _.mapObject(value, XMLFormat.value);
+
+    return String(value);
   }
 }
 
@@ -224,12 +233,20 @@ class JSONFormat extends Format {
     return true;
   }
 
+  elementFull(name, value) {
+    return this.element(name, value);
+  }
+
   elementList(listName, values) {
     if (values == null || values.length < 1)
       return false;
 
     this._obj[JSONFormat.camelCase(listName)] = _.map(values, JSONFormat.value);
     return true;
+  }
+
+  elementListFull(listName, values, extra) {
+    return this.elementList(listName, values);
   }
 
   toString() {
@@ -247,29 +264,28 @@ class JSONFormat extends Format {
     if (value == null)
       return null;
 
-    // use available value types
-    if (typeof value == 'string') {
-      if (/^[0-9]+(\.[0-9]+)?$/.test(value))
-	return parseFloat(value);
-      if (value == 'true')
-	return true;
-      if (value == 'false')
-	return false;
-    }
-
-    // format dates as ISO 8869
+    // format date only
     if (value instanceof Date)
-      return value.toISOString();
+      return value.toISOString().replace(/T.*$/, '');
 
     // NaN and Inf not valid in JSON
-    if (typeof value == 'number' && !isFinite(value))
+    if (typeof value === 'number' && !isFinite(value))
       return null;
 
     // recurse into arrays and objects
     if (Array.isArray(value))
       return _.map(value, JSONFormat.value);
-    else if (typeof value == 'object')
-      return _.mapObject(value, JSONFormat.value);
+    else if (typeof value === 'object') {
+      let mapped = {};
+      Object.keys(value).forEach(k => {
+        let v = JSONFormat.value(value[k]);
+        if (v == null || v === '')
+          return;
+        mapped[JSONFormat.camelCase(k)] = v;
+      });
+
+      return mapped;
+    }
 
     return value;
   }
@@ -315,11 +331,6 @@ class JSONFormat extends Format {
  * <pre>
  * var format = new XMLFormat({ root: 'metadata-response' });
  * </pre>
- *
- * <p>In order to handle compatibility with the previous site API, where object IDs were integer values,
- * the "compat" option may be specified, which maps the MongoDB ObjectId values to integers.
- * Note that this is a partial solution because the mapping is only in-memory, but it's enough to make
- * basic API sequences work (search then download).
  *
  * @module data
  */

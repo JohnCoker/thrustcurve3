@@ -50,23 +50,69 @@ describe("data", function() {
 	expect(s).toBe('<element><place abbrev="Where">Somewhere</place></element>');
       });
     });
-    describe("element-list", function() {
+    describe("elementFull", function() {
       var fmt;
       it("construct", function() {
-	fmt = new XMLFormat({ root: "element-list" });
+	fmt = new XMLFormat({ root: "element" });
       });
-      it("elementList", function() {
-	expect(fmt.elementList('things', [ 'one', 'two', 'three' ])).toBe(true);
+      it("elementFull", function() {
+	expect(fmt.elementFull('place', { name: 'Somewhere', abbrev: 'Where' })).toBe(true);
       });
       it("close", function() {
 	fmt.close();
       });
       it("toString", function() {
 	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
-	expect(s).toBe('<element-list><things><thing>one</thing><thing>two</thing><thing>three</thing></things></element-list>');
+	expect(s).toBe('<element><place><name>Somewhere</name><abbrev>Where</abbrev></place></element>');
       });
     });
-    describe("length-list", function() {
+    describe("elementList", function() {
+      var fmt;
+      it("construct", function() {
+	fmt = new XMLFormat({ root: "element-list" });
+      });
+      it("elementList", function() {
+	expect(fmt.elementList('the-things', [ 'one', 'two', 'three' ])).toBe(true);
+      });
+      it("close", function() {
+	fmt.close();
+      });
+      it("toString", function() {
+	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
+	expect(s).toBe('<element-list>' +
+                        '<the-things>' +
+                         '<the-thing>one</the-thing>' +
+                         '<the-thing>two</the-thing>' +
+                         '<the-thing>three</the-thing>' +
+                        '</the-things>' +
+                       '</element-list>');
+      });
+    });
+    describe("elementListFull", function() {
+      var fmt;
+      it("construct", function() {
+	fmt = new XMLFormat({ root: "element-list" });
+      });
+      it("elementListFull", function() {
+	expect(fmt.elementListFull('the-things', [
+          { 'the-name': 'one', x: 1 }, { 'the-name': 'two', x: 2 }, { 'the-name': 'three', x: 3 }
+        ])).toBe(true);
+      });
+      it("close", function() {
+	fmt.close();
+      });
+      it("toString", function() {
+	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
+	expect(s).toBe('<element-list>' +
+                        '<the-things>' +
+                         '<the-thing><the-name>one</the-name><x>1</x></the-thing>' +
+                         '<the-thing><the-name>two</the-name><x>2</x></the-thing>' +
+                         '<the-thing><the-name>three</the-name><x>3</x></the-thing>' +
+                        '</the-things>' +
+                       '</element-list>');
+      });
+    });
+    describe("lengthList", function() {
       var fmt;
       it("construct", function() {
 	fmt = new XMLFormat({ root: "length-list" });
@@ -80,38 +126,6 @@ describe("data", function() {
       it("toString", function() {
 	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
 	expect(s).toBe('<length-list><lengths><length>6</length><length>10.5</length><length>18</length><length>24</length></lengths></length-list>');
-      });
-    });
-    describe("id", function() {
-      var fmt;
-      it("construct", function() {
-	fmt = new XMLFormat({ root: "id" });
-      });
-      it("id", function() {
-	expect(fmt.id('thing', '012345678abcdef012345678')).toBe(true);
-      });
-      it("close", function() {
-	fmt.close();
-      });
-      it("toString", function() {
-	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
-	expect(s).toBe('<id><thing>012345678abcdef012345678</thing></id>');
-      });
-    });
-    describe("id-list", function() {
-      var fmt;
-      it("construct", function() {
-	fmt = new XMLFormat({ root: "id-list" });
-      });
-      it("idList", function() {
-	expect(fmt.idList('things', [ '012345678abcdef012345678', 'abcdef012345678901abcdef', '876543210fedcba876543210' ])).toBe(true);
-      });
-      it("close", function() {
-	fmt.close();
-      });
-      it("toString", function() {
-	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
-	expect(s).toBe('<id-list><things><thing>012345678abcdef012345678</thing><thing>abcdef012345678901abcdef</thing><thing>876543210fedcba876543210</thing></things></id-list>');
       });
     });
   });
@@ -140,19 +154,19 @@ describe("data", function() {
 	expect(JSONFormat.value('foo')).toBe('foo');
       });
       it("real", function() {
-	expect(JSONFormat.value('11.1')).toBe(11.1);
+	expect(JSONFormat.value(11.1)).toBe(11.1);
       });
       it("fraction", function() {
-	expect(JSONFormat.value('0.11')).toBe(0.11);
+	expect(JSONFormat.value(0.11)).toBe(0.11);
       });
       it("int", function() {
-	expect(JSONFormat.value('11')).toBe(11);
+	expect(JSONFormat.value(11)).toBe(11);
       });
       it("NaN", function() {
 	expect(JSONFormat.value(0/0)).toBe(null);
       });
       it("date", function() {
-	expect(JSONFormat.value(new Date('2016-03-26T18:51:30Z'))).toBe('2016-03-26T18:51:30.000Z');
+	expect(JSONFormat.value(new Date('2016-03-26T18:51:30Z'))).toBe('2016-03-26');
       });
     });
 
@@ -188,23 +202,61 @@ describe("data", function() {
 	expect(s).toBe('{"place":{"name":"Somewhere","abbrev":"Where"}}');
       });
     });
-    describe("element-list", function() {
+    describe("elementFull", function() {
       var fmt;
       it("construct", function() {
 	fmt = new JSONFormat();
       });
-      it("elementList", function() {
-	expect(fmt.elementList('things', [ 'one', 'two', 'three' ])).toBe(true);
+      it("elementFull", function() {
+	expect(fmt.elementFull('place', { name: 'Somewhere', abbrev: 'Where' })).toBe(true);
       });
       it("close", function() {
 	fmt.close();
       });
       it("toString", function() {
 	var s = fmt.toString().replace(/\n\s*/g, '').replace(/ *: +/g, ':');
-	expect(s).toBe('{"things":["one","two","three"]}');
+	expect(s).toBe('{"place":{"name":"Somewhere","abbrev":"Where"}}');
       });
     });
-    describe("length-list", function() {
+    describe("elementList", function() {
+      var fmt;
+      it("construct", function() {
+	fmt = new JSONFormat();
+      });
+      it("elementList", function() {
+	expect(fmt.elementList('the-things', [ 'one', 'two', 'three' ])).toBe(true);
+      });
+      it("close", function() {
+	fmt.close();
+      });
+      it("toString", function() {
+	var s = fmt.toString().replace(/\n\s*/g, '').replace(/ *: +/g, ':');
+	expect(s).toBe('{"theThings":["one","two","three"]}');
+      });
+    });
+    describe("elementListFull", function() {
+      var fmt;
+      it("construct", function() {
+	fmt = new JSONFormat({ root: "element-list" });
+      });
+      it("elementListFull", function() {
+	expect(fmt.elementListFull('the-things', [
+          { 'the-name': 'one', x: 1 }, { 'the-name': 'two', x: 2 }, { 'the-name': 'three', x: 3 }
+        ])).toBe(true);
+      });
+      it("close", function() {
+	fmt.close();
+      });
+      it("toString", function() {
+	var s = fmt.toString().replace(/\n\s*/g, '');
+	expect(s).toBe('{"theThings": [' +
+                       '{"theName": "one","x": 1},' +
+                       '{"theName": "two","x": 2},' +
+                       '{"theName": "three","x": 3}' +
+                      ']}');
+      });
+    });
+    describe("lengthList", function() {
       var fmt;
       it("construct", function() {
 	fmt = new JSONFormat();
@@ -218,38 +270,6 @@ describe("data", function() {
       it("toString", function() {
 	var s = fmt.toString().replace(/\n\s*/g, '').replace(/ *: +/g, ':');
 	expect(s).toBe('{"lengths":[6,10.5,18,24]}');
-      });
-    });
-    describe("id", function() {
-      var fmt;
-      it("construct", function() {
-	fmt = new JSONFormat();
-      });
-      it("id", function() {
-	expect(fmt.id('thing', '012345678abcdef012345678')).toBe(true);
-      });
-      it("close", function() {
-	fmt.close();
-      });
-      it("toString", function() {
-	var s = fmt.toString().replace(/\n\s*/g, '').replace(/ *: +/g, ':');
-	expect(s).toBe('{"thing":"012345678abcdef012345678"}');
-      });
-    });
-    describe("id-list", function() {
-      var fmt;
-      it("construct", function() {
-	fmt = new JSONFormat();
-      });
-      it("idList", function() {
-	expect(fmt.idList('things', [ '012345678abcdef012345678', 'abcdef012345678901abcdef', '876543210fedcba876543210' ])).toBe(true);
-      });
-      it("close", function() {
-	fmt.close();
-      });
-      it("toString", function() {
-	var s = fmt.toString().replace(/\n\s*/g, '').replace(/ *: +/g, ':');
-	expect(s).toBe('{"things":["012345678abcdef012345678","abcdef012345678901abcdef","876543210fedcba876543210"]}');
       });
     });
   });

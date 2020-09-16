@@ -43,6 +43,7 @@ router.all(APIPrefix + '*', function(req, res, next) {
 router.all(LegacyPrefix + '*', function(req, res, next) {
   // simpler CORS support for legacy endpoints
   res.header('Access-Control-Allow-Origin', '*');
+  req.isLegacy = true;
   next();
 });
 
@@ -185,5 +186,161 @@ router.post([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlParser, 
  * /api/v1/search
  * Search for motors, either as XML or JSON.
  */
+function doSearch(req, res, format) {
+  var request;
+  if (req.method == 'GET')
+    request = req.query;
+  else
+    request = api1.getElement(req.body, 'search-request') || req.body;
+
+  let maxResults = api1.getElement(request, "max-results");
+  if (isNaN(maxResults))
+    maxResults = 20;
+  else if (maxResults <= 0)
+    maxResults = -1;
+  let resultMatches = 0;
+
+  metadata.get(req, function(cache) {
+    let errs = new errors.Collector();
+    let query = api1.searchQuery(request, cache, errs);
+    let criteria = api1.searchCriteria(request);
+
+    format.root('search-response');
+    let criteriaInfo = [];
+    let queries = [];
+    Object.keys(criteria).map(crit => {
+      let info = {
+        name: crit,
+        value: criteria[crit],
+      };
+
+      let critErrs = new errors.Collector();
+      let one = {};
+      one[crit] = criteria[crit];
+      let query = api1.searchQuery(one, cache, critErrs);
+      if (critErrs.errorCount() > 0) {
+        info.error = critErrs.lastError().message;
+        info.matches = 0;
+      } else {
+        queries.push(function(cb) {
+          req.db.Motor.count(query, function(err, count) {
+            if (err)
+              return cb(err);
+            info.matches = count;
+            cb(null, count);
+          });
+        });
+      }
+      criteriaInfo.push(info);
+    });
+
+    let results = [];
+    if (errs.errorCount() == 0) {
+      queries.push(function(cb) {
+        req.db.Motor.find(query)
+          .sort({ totalImpulse: 1 })
+          .exec(function(err, motors) {
+            if (err)
+              return cb(err);
+
+            // have raw motor results
+            results = motors;
+            resultMatches = results.length;
+            if (maxResults > 0 && results.length > maxResults)
+              results.splice(maxResults, results.length - maxResults);
+
+            // count the number of simfiles
+            let sfq = { _motor : { $in: motors.map(m => m._id) } };
+            req.db.SimFile.find(sfq, '_id _motor').exec(function(err, simfiles) {
+              if (err)
+                return cb(err);
+
+              motors.forEach(m => {
+                m.simFileCount = 0;
+                simfiles.forEach(sf => {
+                  if (sf._motor.toString() == m._id.toString())
+                    m.simFileCount++;
+                });
+              });
+
+              // default external IDs
+              if (req.isLegacy) {
+                req.db.IntIdMap.map(motors, function(err, ints) {
+                  if (err)
+                    return cb(err);
+                  if (ints.length != motors.length)
+                    return cb(new Error('unable to map motor results to int IDs'));
+
+                  for (let i = 0; i < motors.length; i++)
+                    motors[i].externalId = ints[i];
+
+                  return cb(null, motors);
+                });
+              } else {
+                motors.forEach(m => {
+                  m.externalId = m._id.toString();
+                });
+                return cb(null, motors);
+              }
+            });
+          });
+      });
+    }
+
+    function send() {
+      format.elementListFull('criteria', criteriaInfo, { matches: resultMatches });
+      format.elementListFull('results', results.map(motor => {
+        let mfr = cache.manufacturers.byId(motor._manufacturer, true);
+        let org = cache.certOrgs.byId(motor._certOrg, true);
+        return {
+          "motor-id": motor.externalId,
+          'manufacturer': mfr.name,
+          'manufacturer-abbrev': mfr.abbrev,
+          designation: motor.designation,
+          'common-name': motor.commonName,
+          'impulse-class': motor.impulseClass,
+          diameter: motor.diameter * 1000,
+          length: motor.length * 1000,
+          type: motor.type,
+          'cert-org': org.name,
+          'avg-thrust-n': motor.avgThrust,
+          'max-thrust-n': motor.maxThrust,
+          'tot-impulse-ns': motor.totalImpulse,
+          'burn-time-s': motor.burnTime,
+          'data-files': motor.simFileCount,
+          'info-url': motor.dataSheet,
+          'total-weight-g': motor.totalWeight * 1000,
+          'prop-weight-g': motor.propellantWeight * 1000,
+          delays: motor.delays,
+          'case-info': motor.caseInfo,
+          'prop-info': motor.propellantInfo,
+          sparky: motor.sparky,
+          'updated-on': motor.updatedAt,
+        };
+      }));
+      format.send(res);
+    }
+
+    if (queries.length > 0) {
+      async.parallel(queries, req.success(results => {
+        send();
+      }));
+    } else
+      send();
+  });
+}
+
+router.get(APIPrefix + 'search.json', function(req, res, next) {
+  doSearch(req, res, new data.JSONFormat());
+});
+router.post(APIPrefix + 'search.json', jsonParser, function(req, res, next) {
+  doSearch(req, res, new data.JSONFormat());
+});
+router.get([APIPrefix + 'search.xml', LegacyPrefix + 'search'], function(req, res, next) {
+  doSearch(req, res, new data.XMLFormat());
+});
+router.post([APIPrefix + 'search.xml', LegacyPrefix + 'search'], xmlParser, function(req, res, next) {
+  doSearch(req, res, new data.XMLFormat());
+});
 
 module.exports = router;

@@ -317,7 +317,7 @@ definitions:
     description: motor search results
     properties:
       criteria:
-        description: the search criteria plus number of matches
+        description: the search criteria with errors and matches
         type: array
         items:
           type: object
@@ -338,6 +338,10 @@ definitions:
               description: error in criterion specification
               type: string
               example: Invalid commonName value "C6".
+      matches:
+        description: number of matches of all criteria (and)
+        type: integer
+        example: 25
       results:
         description: information on the motors matched
         type: array
@@ -412,6 +416,7 @@ definitions:
               example: '2014-12-02'
             sparky:
               type: boolean
+              example: false
   DownloadRequest:
     type: object
     description: motor identifier list

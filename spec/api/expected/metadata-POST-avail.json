@@ -1,0 +1,53 @@
+{
+  "manufacturers": [
+    {
+      "name": "AeroTech",
+      "abbrev": "AeroTech"
+    },
+    {
+      "name": "Estes Industries",
+      "abbrev": "Estes"
+    }
+  ],
+  "certOrgs": [
+    {
+      "name": "National Association of Rocketry",
+      "abbrev": "NAR"
+    },
+    {
+      "name": "Tripoli Rocketry Association, Inc.",
+      "abbrev": "TRA"
+    }
+  ],
+  "types": [
+    "SU",
+    "reload"
+  ],
+  "diameters": [
+    13,
+    18,
+    24,
+    29,
+    32,
+    38,
+    54,
+    75,
+    98
+  ],
+  "impulseClasses": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N"
+  ]
+}

@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search-response xmlns="http://www.thrustcurve.org/2016/SearchResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2016/SearchResponse http://www.thrustcurve.org/2016/search-response.xsd">
+    <criteria>
+        <criterion>
+            <name>manufacturer</name>
+            <value>Estes</value>
+            <matches>22</matches>
+        </criterion>
+        <matches>22</matches>
+    </criteria>
+    <results>
+        <result>
+            <motor-id>4</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>1/4A3</designation>
+            <common-name>1/4A3</common-name>
+            <impulse-class>A</impulse-class>
+            <diameter>13</diameter>
+            <length>45</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>2.36</avg-thrust-n>
+            <max-thrust-n>4.95</max-thrust-n>
+            <tot-impulse-ns>0.59</tot-impulse-ns>
+            <burn-time-s>0.25</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/qtrA3.pdf</info-url>
+            <prop-weight-g>0.83</prop-weight-g>
+            <delays>3</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>6</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>1/2A3</designation>
+            <common-name>1/2A3</common-name>
+            <impulse-class>A</impulse-class>
+            <diameter>13</diameter>
+            <length>45</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>3.03</avg-thrust-n>
+            <max-thrust-n>7.62</max-thrust-n>
+            <tot-impulse-ns>1.09</tot-impulse-ns>
+            <burn-time-s>0.36</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/halfA3T.pdf</info-url>
+            <prop-weight-g>2</prop-weight-g>
+            <delays>2,4</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>7</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>1/2A6</designation>
+            <common-name>1/2A6</common-name>
+            <impulse-class>A</impulse-class>
+            <diameter>18</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>3.42</avg-thrust-n>
+            <max-thrust-n>7.86</max-thrust-n>
+            <tot-impulse-ns>1.13</tot-impulse-ns>
+            <burn-time-s>0.33</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/halfA6.pdf</info-url>
+            <prop-weight-g>2.6</prop-weight-g>
+            <delays>2</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>12</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>A10</designation>
+            <common-name>A10</common-name>
+            <impulse-class>A</impulse-class>
+            <diameter>13</diameter>
+            <length>45</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>2.35</avg-thrust-n>
+            <max-thrust-n>12.64</max-thrust-n>
+            <tot-impulse-ns>2</tot-impulse-ns>
+            <burn-time-s>0.85</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/A10T.pdf</info-url>
+            <prop-weight-g>3.8</prop-weight-g>
+            <delays>0,3,P</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>9</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>A3</designation>
+            <common-name>A3</common-name>
+            <impulse-class>A</impulse-class>
+            <diameter>13</diameter>
+            <length>45</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>2.2</avg-thrust-n>
+            <max-thrust-n>5.83</max-thrust-n>
+            <tot-impulse-ns>2.22</tot-impulse-ns>
+            <burn-time-s>1.01</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/A3T.pdf</info-url>
+            <prop-weight-g>3.3</prop-weight-g>
+            <delays>4</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>11</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>A8</designation>
+            <common-name>A8</common-name>
+            <impulse-class>A</impulse-class>
+            <diameter>18</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>3.18</avg-thrust-n>
+            <max-thrust-n>9.73</max-thrust-n>
+            <tot-impulse-ns>2.32</tot-impulse-ns>
+            <burn-time-s>0.73</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/A8.pdf</info-url>
+            <prop-weight-g>3.3</prop-weight-g>
+            <delays>0,3,5</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>14</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>B4</designation>
+            <common-name>B4</common-name>
+            <impulse-class>B</impulse-class>
+            <diameter>18</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>4.17</avg-thrust-n>
+            <max-thrust-n>12.75</max-thrust-n>
+            <tot-impulse-ns>4.29</tot-impulse-ns>
+            <burn-time-s>1.03</burn-time-s>
+            <data-files>3</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/B4.pdf</info-url>
+            <prop-weight-g>6</prop-weight-g>
+            <delays>2,4</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>16</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>B6</designation>
+            <common-name>B6</common-name>
+            <impulse-class>B</impulse-class>
+            <diameter>18</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>5.03</avg-thrust-n>
+            <max-thrust-n>12.14</max-thrust-n>
+            <tot-impulse-ns>4.33</tot-impulse-ns>
+            <burn-time-s>0.86</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/B6.pdf</info-url>
+            <total-weight-g>15</total-weight-g>
+            <prop-weight-g>5.6</prop-weight-g>
+            <delays>0,2,4,6</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>26</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>C11</designation>
+            <common-name>C11</common-name>
+            <impulse-class>C</impulse-class>
+            <diameter>24</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>10.86</avg-thrust-n>
+            <max-thrust-n>21.73</max-thrust-n>
+            <tot-impulse-ns>8.8</tot-impulse-ns>
+            <burn-time-s>0.81</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/C11.pdf</info-url>
+            <prop-weight-g>12</prop-weight-g>
+            <delays>0,3,5,7</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>21</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>C6</designation>
+            <common-name>C6</common-name>
+            <impulse-class>C</impulse-class>
+            <diameter>18</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>4.74</avg-thrust-n>
+            <max-thrust-n>14.09</max-thrust-n>
+            <tot-impulse-ns>8.82</tot-impulse-ns>
+            <burn-time-s>1.86</burn-time-s>
+            <data-files>3</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/C6.pdf</info-url>
+            <prop-weight-g>10.8</prop-weight-g>
+            <delays>0,3,5,7</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>20</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>C5</designation>
+            <common-name>C5</common-name>
+            <impulse-class>C</impulse-class>
+            <diameter>18</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>5.26</avg-thrust-n>
+            <max-thrust-n>21.85</max-thrust-n>
+            <tot-impulse-ns>9.1</tot-impulse-ns>
+            <burn-time-s>1.73</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/C5.pdf</info-url>
+            <prop-weight-g>11.3</prop-weight-g>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>32</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>D12</designation>
+            <common-name>D12</common-name>
+            <impulse-class>D</impulse-class>
+            <diameter>24</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>10.21</avg-thrust-n>
+            <max-thrust-n>29.73</max-thrust-n>
+            <tot-impulse-ns>16.84</tot-impulse-ns>
+            <burn-time-s>1.65</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/D12.pdf</info-url>
+            <prop-weight-g>21.1</prop-weight-g>
+            <delays>0,3,5,7</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>31</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>D11</designation>
+            <common-name>D11</common-name>
+            <impulse-class>D</impulse-class>
+            <diameter>24</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>9.4</avg-thrust-n>
+            <max-thrust-n>26.01</max-thrust-n>
+            <tot-impulse-ns>17.49</tot-impulse-ns>
+            <burn-time-s>1.86</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://nar.org/SandT/pdf/Estes/D11.pdf</info-url>
+            <total-weight-g>44.8</total-weight-g>
+            <prop-weight-g>24.5</prop-weight-g>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-18</updated-on>
+        </result>
+        <result>
+            <motor-id>995</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>E12</designation>
+            <common-name>E12</common-name>
+            <impulse-class>E</impulse-class>
+            <diameter>24</diameter>
+            <length>95</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>11.17</avg-thrust-n>
+            <max-thrust-n>33.29</max-thrust-n>
+            <tot-impulse-ns>27.24</tot-impulse-ns>
+            <burn-time-s>2.44</burn-time-s>
+            <data-files>1</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/E12.pdf</info-url>
+            <prop-weight-g>35.9</prop-weight-g>
+            <delays>0,4,6,8</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>40</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>E9</designation>
+            <common-name>E9</common-name>
+            <impulse-class>E</impulse-class>
+            <diameter>24</diameter>
+            <length>95</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>9.02</avg-thrust-n>
+            <max-thrust-n>19.47</max-thrust-n>
+            <tot-impulse-ns>27.87</tot-impulse-ns>
+            <burn-time-s>3.09</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/E9.pdf</info-url>
+            <total-weight-g>58</total-weight-g>
+            <prop-weight-g>35.8</prop-weight-g>
+            <delays>4,6,8</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>1016</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>E16</designation>
+            <common-name>E16</common-name>
+            <impulse-class>E</impulse-class>
+            <diameter>29</diameter>
+            <length>114</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>15.97</avg-thrust-n>
+            <max-thrust-n>26.44</max-thrust-n>
+            <tot-impulse-ns>33.38</tot-impulse-ns>
+            <burn-time-s>2.09</burn-time-s>
+            <data-files>1</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/E16.pdf</info-url>
+            <total-weight-g>84</total-weight-g>
+            <prop-weight-g>40</prop-weight-g>
+            <delays>0,4,6,8</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2015-06-03</updated-on>
+        </result>
+        <result>
+            <motor-id>996</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>E30</designation>
+            <common-name>E30</common-name>
+            <impulse-class>E</impulse-class>
+            <diameter>24</diameter>
+            <length>70</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>32.95</avg-thrust-n>
+            <max-thrust-n>49.3</max-thrust-n>
+            <tot-impulse-ns>33.56</tot-impulse-ns>
+            <burn-time-s>1.02</burn-time-s>
+            <data-files>1</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/E30.pdf</info-url>
+            <prop-weight-g>17.8</prop-weight-g>
+            <delays>4,7</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>1010</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>F15</designation>
+            <common-name>F15</common-name>
+            <impulse-class>F</impulse-class>
+            <diameter>29</diameter>
+            <length>114</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>14.38</avg-thrust-n>
+            <max-thrust-n>25.26</max-thrust-n>
+            <tot-impulse-ns>49.61</tot-impulse-ns>
+            <burn-time-s>3.45</burn-time-s>
+            <data-files>2</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/F15.pdf</info-url>
+            <total-weight-g>102</total-weight-g>
+            <prop-weight-g>60</prop-weight-g>
+            <delays>0, 4, 6, 8</delays>
+            <prop-info>black powder</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2015-06-03</updated-on>
+        </result>
+        <result>
+            <motor-id>997</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>F26</designation>
+            <common-name>F26</common-name>
+            <impulse-class>F</impulse-class>
+            <diameter>29</diameter>
+            <length>98</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>26.96</avg-thrust-n>
+            <max-thrust-n>39.16</max-thrust-n>
+            <tot-impulse-ns>62.19</tot-impulse-ns>
+            <burn-time-s>2.31</burn-time-s>
+            <data-files>0</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/F26FJ.pdf</info-url>
+            <prop-weight-g>43.1</prop-weight-g>
+            <delays>6</delays>
+            <prop-info>composite</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+        <result>
+            <motor-id>998</motor-id>
+            <manufacturer>Estes Industries</manufacturer>
+            <manufacturer-abbrev>Estes</manufacturer-abbrev>
+            <designation>F50</designation>
+            <common-name>F50</common-name>
+            <impulse-class>F</impulse-class>
+            <diameter>29</diameter>
+            <length>98</length>
+            <type>SU</type>
+            <cert-org>National Association of Rocketry</cert-org>
+            <avg-thrust-n>53.73</avg-thrust-n>
+            <max-thrust-n>79.59</max-thrust-n>
+            <tot-impulse-ns>76.83</tot-impulse-ns>
+            <burn-time-s>1.43</burn-time-s>
+            <data-files>1</data-files>
+            <info-url>http://www.nar.org/SandT/pdf/Estes/F50T.pdf</info-url>
+            <prop-weight-g>37.9</prop-weight-g>
+            <delays>4,6</delays>
+            <prop-info>composite</prop-info>
+            <sparky>false</sparky>
+            <updated-on>2014-07-05</updated-on>
+        </result>
+    </results>
+</search-response>

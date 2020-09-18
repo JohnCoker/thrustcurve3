@@ -112,6 +112,31 @@ describe("data", function() {
                        '</element-list>');
       });
     });
+    describe("elementListFull extra", function() {
+      var fmt;
+      it("construct", function() {
+	fmt = new XMLFormat({ root: "element-list" });
+      });
+      it("elementListFull", function() {
+	expect(fmt.elementListFull('the-things', [
+          { 'the-name': 'one', x: 1 }, { 'the-name': 'two', x: 2 }, { 'the-name': 'three', x: 3 }
+        ], { 'thing-count': 3 })).toBe(true);
+      });
+      it("close", function() {
+	fmt.close();
+      });
+      it("toString", function() {
+	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
+	expect(s).toBe('<element-list>' +
+                        '<the-things>' +
+                         '<the-thing><the-name>one</the-name><x>1</x></the-thing>' +
+                         '<the-thing><the-name>two</the-name><x>2</x></the-thing>' +
+                         '<the-thing><the-name>three</the-name><x>3</x></the-thing>' +
+                         '<thing-count>3</thing-count>' +
+                        '</the-things>' +
+                       '</element-list>');
+      });
+    });
     describe("lengthList", function() {
       var fmt;
       it("construct", function() {
@@ -254,6 +279,31 @@ describe("data", function() {
                        '{"theName": "two","x": 2},' +
                        '{"theName": "three","x": 3}' +
                       ']}');
+      });
+    });
+    describe("elementListFull extra", function() {
+      var fmt;
+      it("construct", function() {
+	fmt = new JSONFormat({ root: "element-list" });
+      });
+      it("elementListFull", function() {
+	expect(fmt.elementListFull('the-things', [
+          { 'the-name': 'one', x: 1 }, { 'the-name': 'two', x: 2 }, { 'the-name': 'three', x: 3 }
+        ], { 'thing-count': 3 })).toBe(true);
+      });
+      it("close", function() {
+	fmt.close();
+      });
+      it("toString", function() {
+	var s = fmt.toString().replace(/\n\s*/g, '');
+	expect(s).toBe('{' +
+                       '"theThings": [' +
+                       '{"theName": "one","x": 1},' +
+                       '{"theName": "two","x": 2},' +
+                       '{"theName": "three","x": 3}' +
+                       '],' +
+                       '"thingCount": 3' +
+                       '}');
       });
     });
     describe("lengthList", function() {

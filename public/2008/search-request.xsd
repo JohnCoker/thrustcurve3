@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<xs:schema version="2008.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2008/SearchRequest"
+ xmlns="http://www.thrustcurve.org/2008/SearchRequest"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the request sent to the ThrustCurve.org search XML API.
+      For more information, see the documentation at http://www.thrustcurve.org/searchapi.shtml
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="search-request">
+    <xs:complexType>
+      <xs:all>
+	<xs:element name="manufacturer" type="xs:string" minOccurs="0"/>
+	<xs:element name="designation" type="xs:string" minOccurs="0"/>
+	<xs:element name="brand-name" type="xs:string" minOccurs="0"/>
+
+	<xs:element name="common-name" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:pattern value="(1/4A|1/2A|[A-Z])[0-9]+"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+
+	<xs:element name="impulse-class" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:pattern value="[A-Z]"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+
+        <xs:element name="diameter" type="xs:decimal" minOccurs="0"/>
+
+	<xs:element name="type" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="SU"/>
+              <xs:enumeration value="reload"/>
+              <xs:enumeration value="hybrid"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+
+	<xs:element name="cert-org" type="xs:string" minOccurs="0"/>
+	<xs:element name="has-data-files" type="xs:boolean" minOccurs="0"/>
+	<xs:element name="info-updated-since" type="xs:date" minOccurs="0"/>
+	<xs:element name="data-updated-since" type="xs:date" minOccurs="0"/>
+        <xs:element name="max-results" type="xs:positiveInteger" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

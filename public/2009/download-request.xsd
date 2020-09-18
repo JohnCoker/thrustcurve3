@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<xs:schema version="2009.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2009/DownloadRequest"
+ xmlns="http://www.thrustcurve.org/2009/DownloadRequest"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the request sent to the ThrustCurve.org download XML API.
+      For more information, see the documentation at http://www.thrustcurve.org/searchapi.shtml
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="download-request">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+	  <xs:element name="motor-id" type="xs:integer"/>
+	  <xs:element name="motor-ids">
+            <xs:complexType>
+              <xs:sequence>
+	        <xs:element name="id" type="xs:integer" maxOccurs="20"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+
+        <xs:element name="format" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="CompuRoc"/>
+              <xs:enumeration value="ALT4"/>
+              <xs:enumeration value="RASP"/>
+              <xs:enumeration value="RockSim"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+
+        <xs:element name="license" minOccurs="0">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="PD"/>
+              <xs:enumeration value="free"/>
+              <xs:enumeration value="other"/>
+              <xs:enumeration value=""/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+
+        <xs:element name="max-results" type="xs:positiveInteger" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

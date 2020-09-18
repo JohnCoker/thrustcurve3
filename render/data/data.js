@@ -78,13 +78,23 @@ class XMLFormat extends Format {
       this.root(options.root);
   }
 
-  root(name) {
+  root(name, schema) {
     if (this._root)
       throw new Error('XML document already has a root (' + this._root + ').');
 
     this._root = name;
     this._w.startElement(name);
     this._open = true;
+    if (schema) {
+      this._w.writeAttribute("xmlns", "http://www.thrustcurve.org/" + schema);
+      this._w.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+      let m = /^(\d+)\/([a-z]+)Response$/i.exec(schema);
+      if (m != null) {
+        let file = m[1] + "/" + m[2].toLowerCase() + "-response.xsd";
+        this._w.writeAttribute("xsi:schemaLocation", "http://www.thrustcurve.org/" + schema +
+                               " http://www.thrustcurve.org/" + file);
+      }
+    }
   }
 
   type() {
@@ -246,7 +256,16 @@ class JSONFormat extends Format {
   }
 
   elementListFull(listName, values, extra) {
-    return this.elementList(listName, values);
+    let r = this.elementList(listName, values);
+    if (extra != null) {
+      let top = this._obj;
+      Object.keys(extra).forEach(k => {
+        let v = JSONFormat.value(extra[k]);
+        if (v != null)
+          top[JSONFormat.camelCase(k)] = v;
+      });
+    }
+    return r;
   }
 
   toString() {

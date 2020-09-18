@@ -44,3 +44,6 @@ If you need to clear an existing database, use the script in the migrate directo
 ```
 ./migrate/dropall.sh
 ```
+
+For local testing, use the `testdb.sh` script, which resets and loads the sample data into
+the "test" database.

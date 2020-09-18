@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<xs:schema version="2009.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2009/DownloadResponse"
+ xmlns="http://www.thrustcurve.org/2009/DownloadResponse"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the reply from by the ThrustCurve.org download XML API.
+      For more information, see the documentation at http://www.thrustcurve.org/searchapi.shtml
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="download-response">
+    <xs:complexType>
+      <xs:sequence>
+
+        <!-- the list of results is always present, but may be empty -->
+	<xs:element name="results">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="result" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="motor-id" type="xs:integer"/>
+                    <xs:element name="simfile-id" type="xs:integer"/>
+                    <xs:element name="format">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="CompuRoc"/>
+                          <xs:enumeration value="ALT4"/>
+                          <xs:enumeration value="RASP"/>
+                          <xs:enumeration value="RockSim"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="source">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="cert"/>
+                          <xs:enumeration value="mfr"/>
+                          <xs:enumeration value="user"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="license">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="PD"/>
+                          <xs:enumeration value="free"/>
+                          <xs:enumeration value="other"/>
+                          <xs:enumeration value=""/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="data" type="xs:base64Binary"/>
+                    <xs:element name="info-url" type="xs:anyURI"/>
+                    <xs:element name="data-url" type="xs:anyURI"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+        <!-- if a general error occurred more detail is returned -->
+	<xs:element name="error" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

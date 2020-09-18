@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xs:schema version="2015.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2015/GetRocketsRequest"
+ xmlns="http://www.thrustcurve.org/2015/GetRocketsRequest"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the request sent to the ThrustCurve.org get rockets XML API.
+      For more information, see the documentation at http://www.thrustcurve.org/searchapi.shtml
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="getrockets-request">
+    <xs:complexType>
+      <xs:all>
+	<xs:element name="username" type="xs:string" />
+	<xs:element name="password" type="xs:string" minOccurs="0" />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

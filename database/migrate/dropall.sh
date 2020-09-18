@@ -1,7 +1,13 @@
 #!/bin/sh
 
+db=thrustcurve
+if [ $# -eq 1 ]; then
+  db="$1"
+fi
+echo "Dropping all collections in $db..."
+
 exec mongo localhost << _EOF_
-use thrustcurve
+use $db
 db.manufacturers.drop()
 db.certorgs.drop()
 db.motors.drop()

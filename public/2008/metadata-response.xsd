@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<xs:schema version="2008.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2008/MetadataResponse"
+ xmlns="http://www.thrustcurve.org/2008/MetadataResponse"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the response returned by the ThrustCurve.org metadata XML API.
+      For more information, see the documentation at http://www.thrustcurve.org/searchapi.shtml
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:complexType name="NameAndAbbrev">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="abbrev" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="metadata-response">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- each set of results is always present, but may be empty -->
+	<xs:element name="manufacturers" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+	      <xs:element name="manufacturer"
+                          minOccurs="0" maxOccurs="unbounded"
+                          type="NameAndAbbrev"/>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+	<xs:element name="cert-orgs" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+	      <xs:element name="cert-org"
+                          minOccurs="0" maxOccurs="unbounded"
+                          type="NameAndAbbrev"/>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+	<xs:element name="types" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+	      <xs:element name="type"
+                          minOccurs="0" maxOccurs="unbounded"
+                          type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+	<xs:element name="diameters" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+	      <xs:element name="diameter"
+                          minOccurs="0" maxOccurs="unbounded"
+                          type="xs:decimal"/>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+	<xs:element name="impulse-classes" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+	      <xs:element name="impulse-class"
+                          minOccurs="0" maxOccurs="unbounded"
+                          type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+        <!-- if a general error occurred, more detail is returned -->
+	<xs:element name="error" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

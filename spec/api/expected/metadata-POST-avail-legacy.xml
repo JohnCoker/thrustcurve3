@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata-response xmlns="http://www.thrustcurve.org/2008/MetadataResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2008/MetadataResponse http://www.thrustcurve.org/2008/metadata-response.xsd">
+    <manufacturers>
+        <manufacturer abbrev="AeroTech">AeroTech</manufacturer>
+        <manufacturer abbrev="Estes">Estes Industries</manufacturer>
+    </manufacturers>
+    <cert-orgs>
+        <cert-org abbrev="NAR">National Association of Rocketry</cert-org>
+        <cert-org abbrev="TRA">Tripoli Rocketry Association, Inc.</cert-org>
+    </cert-orgs>
+    <types>
+        <type>SU</type>
+        <type>reload</type>
+    </types>
+    <diameters>
+        <diameter>13</diameter>
+        <diameter>18</diameter>
+        <diameter>24</diameter>
+        <diameter>29</diameter>
+        <diameter>32</diameter>
+        <diameter>38</diameter>
+        <diameter>54</diameter>
+        <diameter>75</diameter>
+        <diameter>98</diameter>
+    </diameters>
+    <impulse-classes>
+        <impulse-class>A</impulse-class>
+        <impulse-class>B</impulse-class>
+        <impulse-class>C</impulse-class>
+        <impulse-class>D</impulse-class>
+        <impulse-class>E</impulse-class>
+        <impulse-class>F</impulse-class>
+        <impulse-class>G</impulse-class>
+        <impulse-class>H</impulse-class>
+        <impulse-class>I</impulse-class>
+        <impulse-class>J</impulse-class>
+        <impulse-class>K</impulse-class>
+        <impulse-class>L</impulse-class>
+        <impulse-class>M</impulse-class>
+        <impulse-class>N</impulse-class>
+    </impulse-classes>
+</metadata-response>

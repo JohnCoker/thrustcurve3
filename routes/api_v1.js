@@ -122,7 +122,7 @@ router.get(APIPrefix + 'swagger.json', function(req, res, next) {
  * Possible motor search criteria, either as XML or JSON.
  */
 function sendMetadata(res, format, metadata, errs) {
-  format.root('metadata-response');
+  format.root('metadata-response', '2008/MetadataResponse');
   format.elementList('manufacturers', _.map(metadata.manufacturers, function(m) {
     return {
       name: m.name,
@@ -205,7 +205,7 @@ function doSearch(req, res, format) {
     let query = api1.searchQuery(request, cache, errs);
     let criteria = api1.searchCriteria(request);
 
-    format.root('search-response');
+    format.root('search-response', (req.isLegacy ? '2016' : '2020') + '/SearchResponse');
     let criteriaInfo = [];
     let queries = [];
     Object.keys(criteria).map(crit => {

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xs:schema version="2015.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2015/GetRocketsResponse"
+ xmlns="http://www.thrustcurve.org/2015/GetRocketsResponse"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the response sent to the ThrustCurve.org get rockets XML API.
+      For more information, see the documentation at http://www.thrustcurve.org/searchapi.shtml
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="getrockets-response">
+    <xs:complexType>
+      <xs:sequence>
+
+        <!-- the list of rockets is always present, but may be empty -->
+	<xs:element name="results">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="rocket" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="id" type="xs:integer" />
+                    <xs:element name="name" type="xs:string" />
+                    <xs:element name="body-diameter-m" type="xs:decimal" />
+                    <xs:element name="mmt-diameter-mm" type="xs:decimal" />
+                    <xs:element name="mmt-length-mm" type="xs:decimal" />
+                    <xs:element name="weight-kg" type="xs:decimal" />
+                    <xs:element name="cd" type="xs:decimal" />
+                    <xs:element name="guide-length-m" type="xs:decimal" />
+                    <xs:element name="website" type="xs:string" />
+                    <xs:element name="comments" type="xs:string" />
+                    <xs:element name="created-on" type="xs:date" />
+                    <xs:element name="updated-on" type="xs:date" />
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+        <!-- if a general error occurred more detail is returned -->
+	<xs:element name="error" type="xs:string" minOccurs="0" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

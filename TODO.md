@@ -36,7 +36,7 @@ This page lists the things supported in the old site which haven't yet been reim
 ## API
 
  * re-implement XML API with JSON option (/api/1)
-   * download
+   * search: data-fields
    * getrockets
    * motorguide
  * documentation page

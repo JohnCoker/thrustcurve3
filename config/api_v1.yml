@@ -126,9 +126,12 @@ paths:
   /download.json:
     post:
       tags:
-        - search
         - download
-      description: The POST method specifies JSON object with motor identifiers.
+      description: The POST method specifies JSON object with motor identifiers, at least one required.
+      consumes:
+        - application/json
+      produces:
+        - application/json
       parameters:
         - in: body
           name: body
@@ -138,7 +141,7 @@ paths:
             $ref: '#/definitions/DownloadRequest'
       responses:
         '200':
-          description: Motor data downloads. One entry returned for each valid motor identifier.
+          description: Motor data downloads. One or more result returned for each valid motor identifier.
           schema:
             $ref: '#/definitions/DownloadResponse'
 
@@ -181,6 +184,7 @@ definitions:
           - available
           - all
         example: available
+
   MetadataResponse:
     type: object
     description: motor metadata
@@ -233,6 +237,7 @@ definitions:
         description: errors in criteria specification
         type: string
         example: Invalid manufacturer value "Estus".
+
   NameAndAbbrev:
     type: object
     description: full name and abbreviation
@@ -243,6 +248,7 @@ definitions:
       abbrev:
         type: string
         description: most common abbreviation
+
   SearchRequest:
     type: object
     description: motor search query criteria
@@ -312,6 +318,7 @@ definitions:
         description: maximum number of motors to return
         type: integer
         example: 20
+
   SearchResponse:
     type: object
     description: motor search results
@@ -410,18 +417,122 @@ definitions:
             propInfo:
               type: string
               example: ''
+            sparky:
+              type: boolean
+              example: false
             updatedOn:
               type: string
               format: date
               example: '2014-12-02'
-            sparky:
-              type: boolean
-              example: false
+
   DownloadRequest:
     type: object
     description: motor identifier list
     properties:
+      motorIds:
+        type: array
+        description: unique identifiers of motors to download data for
+        items:
+          type: string
+          example: 5f4294d20002310000000015
+      format:
+        description: data file format
+        type: string
+        example: RASP
+        enum:
+          - RASP
+          - RockSim
+      license:
+        description: license for data file
+        type: string
+        example: PD
+        enum:
+          - PD
+          - free
+          - other
+      data:
+        description: what data is desired
+        type: string
+        example: both
+        enum:
+          - file
+          - samples
+          - both
+      maxResults:
+        description: maximum number of data files to return
+        type: integer
+        example: 20
+
   DownloadResponse:
     type: object
     description: motor data downloads
     properties:
+      results:
+        description: motor data files
+        type: array
+        items:
+          type: object
+          properties:
+            motorId:
+              description: unique identifier of motor
+              type: string
+              example: 5f4294d20002310000000015
+            simfileId:
+              description: unique identifier of data file
+              type: string
+              example: 5f4294d20002e90000000833
+            format:
+              description: data file format
+              type: string
+              example: RASP
+              enum:
+                - RASP
+                - RockSim
+            source:
+              description: source of data
+              type: string
+              example: cert
+              enum:
+                - cert
+                - mfr
+                - user
+            license:
+              description: license for data file
+              type: string
+              example: PD
+              enum:
+                - PD
+                - free
+                - other
+            data:
+              description: simulator file content, Base64 encoded
+              type: string
+              example: 'OyBDNi0wDQpDNi0wIDE4I...'
+            samples:
+              description: extracted data points
+              type: array
+              items:
+                type: object
+                properties:
+                  time:
+                    description: time since ignition in seconds
+                    type: number
+                    example: 0.01
+                  thrust:
+                    description: thrust at this time in Newtons
+                    type: number
+                    example: 3.5
+            infoUrl:
+              description: ThrustCurve.org data info page
+              type: string
+              format: url
+              example: 'https://www.thrustcurve.org/simfiles/5f4294d20002e900000004e7/'
+            dataUrl:
+              description: ThrustCurve.org data download URL
+              type: string
+              format: url
+              example: 'https://www.thrustcurve.org/simfiles/5f4294d20002e900000004e7/download/Estes_C6.eng'
+      error:
+        description: any errors that occurred
+        type: string
+        example: Invalid format value "ANG".

@@ -7,7 +7,7 @@
   <xs:annotation>
     <xs:documentation xml:lang="en">
       This schema defines the response returned by the ThrustCurve.org search XML API.
-      For more information, see the documentation at http://www.thrustcurve.org/searchapi.shtml
+      For more information, see the documentation at https://www.thrustcurve.org/info/api.html
     </xs:documentation>
   </xs:annotation>
 

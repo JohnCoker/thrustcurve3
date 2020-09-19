@@ -50,7 +50,29 @@ There are five actions supported, all of which use HTTP POST methods:
 </ul>
 
 <p>
-There is a <a href="/api/v1/swagger.json">OpenAPI (Swagger) spec</a> for API and you can use
+Each action supports has three endpoints:
+</p>
+<ul>
+<li>JSON: request is query string or JSON object, response is a JSON object
+<li>XML: request is query string or XML element, response is an XML element
+<li>compatible: request and response are XML elements
+</ul>
+
+<p>
+The compatible endpoints are a legacy of the previous version of this site and have not changed (nor will they
+change in future).
+The XML endpoint is close to the compatible endpoint, but has some changes and will continue to evolve.
+The JSON and XML endpoints are versioned and new versions may be introduced over time.
+</p>
+
+<p>
+For those updating their code from the compatible (<code>/servlets</code>) to the newer (<code>/api/v1</code>)
+endpoints, the main difference is that IDs are not integers. In the newer APIs they are longer hexadecimal numbers
+instead of short integers, but if your code treats the IDs as strings, there is no real difference.
+</p>
+
+<p>
+There is a <a href="/api/v1/swagger.json">OpenAPI (Swagger) spec</a> for the JSON API and you can use
 <a class="url" href="https://swagger.io/tools/swagger-inspector/" target="_blank">Swagger Inspector</a>
 to explore the API with it.
 Point Swagger Insector (or similar OpenAPI tool) at <code>https://www.thrustcurve.org/api/v1/swagger.json</code>.
@@ -109,6 +131,18 @@ returns data on specific motors in the the database. This API could be used to d
 
 <a name="download"></a>
 <h2>Download</h2>
+
+<table class="endpoint">
+<tr><th>JSON</th><td class="url">/api/v1/download.json</td></tr>
+<tr><th>XML</th><td class="url">/api/v1/download.xml</td></tr>
+<tr><th>compatible</th><td class="url">/servlets/download</td></tr>
+</table>
+
+<p>
+The download API is used to pull data files for motors you've previously found via search.
+The request specifies one or more motors and may also specify criteria for the simulator files.
+</p>
+
 
 <a name="getrockets"></a>
 <h2>Get Rockets</h2>

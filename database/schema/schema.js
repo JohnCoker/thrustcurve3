@@ -568,7 +568,7 @@ function makeIntIdMapModel(mongoose) {
         var ids = [], i;
         for (i = 0; i < maps.length; i++)
           ids.push(maps[i].oid);
-        if (ids.length > 1)
+        if (ids.length > 0)
           m.find({ _id: { $in: ids } }, next);
         else
           next(null, []);

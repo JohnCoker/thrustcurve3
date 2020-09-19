@@ -358,8 +358,8 @@ describe("API v1", function() {
   });
 
   describe("search", function() {
-    const LEGACY_SCHEMA = "2016/search-response.xsd";
     const API_SCHEMA = "2020/search-response.xsd";
+    const LEGACY_SCHEMA = "2016/search-response.xsd";
     describe("GET", function() {
       it("manufacturer JSON", function(done) {
         get('/api/v1/search.json?manufacturer=Estes').then(response => {
@@ -431,6 +431,168 @@ describe("API v1", function() {
           expect(response).not.toMatch(/AeroTech/);
           expect(response).toMatch(/<matches>22<\/matches>/);
           expect(response).toMatchN(/<result>/, 20);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+  });
+
+  describe("download", function() {
+    const API_SCHEMA = "2020/download-response.xsd";
+    const LEGACY_SCHEMA = "2014/download-response.xsd";
+    describe("GET", function() {
+      it("motorId JSON", function(done) {
+        get('/api/v1/download.json?motorId=56a409280002310000000146').then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"motorId": *"56a409280002310000000146"/);
+          expect(response).toMatch(/"simfileId": *"56a409280002e900000003c5"/);
+          expect(response).toMatch(/"data": *"PGVuZ2luZS1kYXRhYmF/);
+          expect(response).not.toMatch(/"samples":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("motor-id XML", function(done) {
+        get('/api/v1/download.xml?motor-id=56a409280002310000000146').then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatch(/<motor-id>56a409280002310000000146<\/motor-id>/);
+          expect(response).toMatch(/<simfile-id>56a409280002e900000003c5<\/simfile-id>/);
+          expect(response).toMatch(/<data>PGVuZ2luZS1kYXRhYmF/);
+          expect(response).not.toMatch(/<samples>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("POST", function() {
+      let legacyIds;
+      beforeAll(function(done) {
+        // make sure ID is mapped for legacy API
+        let body = `<search-request>
+                     <manufacturer>AeroTech</manufacturer>
+                     <impulseClass>K</impulseClass>
+                     <diameter>54</diameter>
+                    </search-request>`;
+        post('/servlets/search', body).then(response => {
+          legacyIds = response.match(/<motor-id>\d+<\/motor-id>/g)
+                              .map(e => e.replace(/<motor-id>(\d+)<\/motor-id>/, "$1"));
+          legacyIds.sort((a, b) => parseInt(a) - parseInt(b));
+          expect(legacyIds).toEqual(['301','306','326','344','346','358','359','486','494',
+                                     '495','529','590','898','899','905','967','969','1034']);
+          done();
+        });
+      });
+      it("motorId JSON", function(done) {
+        let body = '{ "motorId": "56a409280002310000000146" }';
+        post('/api/v1/download.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"motorId": *"56a409280002310000000146"/, 2);
+          expect(response).toMatch(/"simfileId": *"56a409280002e900000003c5"/);
+          expect(response).toMatch(/"data": *"PGVuZ2luZS1kYXRhYmF/);
+          expect(response).not.toMatch(/"samples":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("motor-id XML", function(done) {
+        let body = `<download-request>
+                     <motor-id>56a409280002310000000146</motor-id>
+                    </download-request>`;
+        post('/api/v1/download.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<motor-id>56a409280002310000000146<\/motor-id>/, 2);
+          expect(response).toMatch(/<simfile-id>56a409280002e900000003c5<\/simfile-id>/);
+          expect(response).toMatch(/<data>PGVuZ2luZS1kYXRhYmF/);
+          expect(response).not.toMatch(/<samples>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("motor-id legacy", function(done) {
+        let body = `<download-request>
+                     <motor-id>326</motor-id>
+                    </download-request>`;
+        post('/servlets/download', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<motor-id>326<\/motor-id>/, 2);
+          expect(response).toMatch(/<simfile-id>113<\/simfile-id>/);
+          expect(response).toMatch(/<data>PGVuZ2luZS1kYXRhYmF/);
+          expect(response).not.toMatch(/<samples>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+
+      it("motorIds JSON", function(done) {
+        let body = '{ "motorIds": [ "56a409280002310000000146", "56a40928000231000000012d" ] }';
+        post('/api/v1/download.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"motorId": *"56a40928000231000000012d"/, 2);
+          expect(response).toMatchN(/"motorId": *"56a409280002310000000146"/, 2);
+          expect(response).toMatchN(/"simfileId":/, 4);
+          expect(response).toMatchN(/"data":/, 4);
+          expect(response).not.toMatch(/"samples":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("motor-ids XML", function(done) {
+        let body = `<download-request>
+                     <motor-ids>
+                      <id>56a40928000231000000012d</id>
+                      <id>56a409280002310000000146</id>
+                     </motor-ids>
+                    </download-request>`;
+        post('/api/v1/download.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<motor-id>56a40928000231000000012d<\/motor-id>/, 2);
+          expect(response).toMatchN(/<motor-id>56a409280002310000000146<\/motor-id>/, 2);
+          expect(response).toMatchN(/<simfile-id>/, 4);
+          expect(response).toMatchN(/<data>/, 4);
+          expect(response).not.toMatch(/<samples>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("motor-ids legacy", function(done) {
+        let body = `<download-request>
+                     <motor-ids>
+                      <id>301</id>
+                      <id>326</id>
+                     </motor-ids>
+                    </download-request>`;
+        post('/servlets/download', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<motor-id>301<\/motor-id>/, 2);
+          expect(response).toMatchN(/<motor-id>326<\/motor-id>/, 2);
+          expect(response).toMatchN(/<simfile-id>/, 4);
+          expect(response).toMatchN(/<data>/, 4);
+          expect(response).not.toMatch(/<samples>/);
           expect(response).toBeExpected();
           done();
         }).catch(e => {

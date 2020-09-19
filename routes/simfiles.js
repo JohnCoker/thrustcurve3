@@ -501,7 +501,7 @@ router.get('/simfiles/:id/dataerrors.html', function(req, res, next) {
           return 1;
 
         let comp = a.mfr_abbrev.localeCompare(b.mfr_abbrev);
-        if (comp != 0)
+        if (comp !== 0)
           return comp;
         a._motor.designation.localeCompare(b._motor.designation);
       });

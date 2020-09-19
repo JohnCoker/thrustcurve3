@@ -53,7 +53,9 @@ class Format {
   toString() {
   }
 
-  send(res) {
+  send(res, failed) {
+    if (failed)
+      res.status(400);
     res.type(this.type()).send(this.toString());
   }
 
@@ -134,14 +136,17 @@ class XMLFormat extends Format {
 
     this._w.startElement(name);
 
-    this._children(value);
+    this._children(value, true);
 
     this._w.endElement(name);
     return true;
   }
 
-  elementList(listName, values) {
-    if (values == null || values.length < 1)
+  elementList(listName, values, force) {
+    if (force) {
+      if (values == null)
+        values = [];
+    } else if (values == null || values.length < 1)
       return false;
 
     this._w.startElement(listName);
@@ -156,7 +161,7 @@ class XMLFormat extends Format {
 
   elementListFull(listName, values, extra) {
     if (values == null || values.length < 1)
-      return false;
+      values = [];
 
     this._w.startElement(listName);
 
@@ -183,16 +188,36 @@ class XMLFormat extends Format {
     return this._w.toString();
   }
 
-  _children(value) {
+  _children(value, full) {
     if (typeof value == 'object') {
       let keys = Object.keys(value);
       for (let i = 0; i < keys.length; i++) {
 	let k = keys[i];
-        let v = XMLFormat.value(value[k]);
-        if (v == null || v === '')
-          continue;
+        let v;
+        if (Array.isArray(value[k])) {
+          v = value[k];
+          if (v.length < 1 && !full)
+            continue;
+        } else {
+          if (full && typeof value[k] === 'string') {
+            v = value[k];
+          } else {
+            v = XMLFormat.value(value[k]);
+            if (v == null || v === '')
+              continue;
+          }
+        }
         this._w.startElement(k);
-	this._w.text(v);
+        if (Array.isArray(v)) {
+          let innerName = XMLFormat.singular(k);
+          v.forEach(e => {
+            this._w.startElement(innerName);
+            this._children(e, full);
+            this._w.endElement(innerName);
+          });
+        } else {
+	  this._w.text(v);
+        }
         this._w.endElement(k);
       }
     } else {
@@ -247,8 +272,11 @@ class JSONFormat extends Format {
     return this.element(name, value);
   }
 
-  elementList(listName, values) {
-    if (values == null || values.length < 1)
+  elementList(listName, values, force) {
+    if (force) {
+      if (values == null)
+        values = [];
+    } else if (values == null || values.length < 1)
       return false;
 
     this._obj[JSONFormat.camelCase(listName)] = _.map(values, JSONFormat.value);
@@ -256,7 +284,10 @@ class JSONFormat extends Format {
   }
 
   elementListFull(listName, values, extra) {
-    let r = this.elementList(listName, values);
+    if (values == null || values.length < 1)
+      values = [];
+
+    let r = this.elementList(listName, values, true);
     if (extra != null) {
       let top = this._obj;
       Object.keys(extra).forEach(k => {

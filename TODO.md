@@ -39,7 +39,6 @@ This page lists the things supported in the old site which haven't yet been reim
    * search: data-fields
    * getrockets
    * motorguide
- * documentation page
  * demonstration page
  * add support for bi-directional sync in phone app
 

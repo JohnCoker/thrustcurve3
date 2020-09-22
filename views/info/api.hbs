@@ -50,12 +50,12 @@ There are five actions supported, all of which use HTTP POST methods:
 </ul>
 
 <p>
-Each action supports has three endpoints:
+Each action supports three endpoints:
 </p>
 <ul>
 <li>JSON: request is query string or JSON object, response is a JSON object
 <li>XML: request is query string or XML element, response is an XML element
-<li>compatible: request and response are XML elements
+<li>compatible: request and response are XML elements (deprecated)
 </ul>
 
 <p>
@@ -75,12 +75,15 @@ instead of short integers, but if your code treats the IDs as strings, there is 
 There is a <a href="/api/v1/swagger.json">OpenAPI (Swagger) spec</a> for the JSON API and you can use
 <a class="url" href="https://swagger.io/tools/swagger-inspector/" target="_blank">Swagger Inspector</a>
 to explore the API with it.
-Point Swagger Insector (or similar OpenAPI tool) at <code>https://www.thrustcurve.org/api/v1/swagger.json</code>.
+You can
+<a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0" target="_blank">Browse the hosted documentation</a>
+or point Swagger Insector (or similar OpenAPI tool) at <code>https://www.thrustcurve.org/api/v1/swagger.json</code>
+or browse
 </p>
 
 <p>
-Each API is described in its own section below, plus there are a few
-<a href="#examples">example programs</a> at the bottom.
+Each API is described in its own section below. The JSON and XML endpoints support both GET and POST and the
+compatible endpoints support only POST (and only XML).
 </p>
 
 
@@ -96,6 +99,12 @@ Each API is described in its own section below, plus there are a few
 <p>
 The metadata API doesn't return stats or data on individual motors, but instead is used to find out what actual criteria exist for doing a search.
 </p>
+
+<ul>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0#/metadata" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="/2014/metadata-request.xsd" target="_blank">XSD for the XML API request</a>
+<li><a href="/2008/metadata-response.xsd" target="_blank">XSD for the XML API response</a>
+</ul>
 
 </p>
 This is useful for building interactive programs that want to populate a set of combo boxes with valid search criteria,
@@ -128,6 +137,18 @@ The search API is where it starts to get more interesting. This is the first API
 returns data on specific motors in the the database. This API could be used to drive you own search front-end.
 </p>
 
+<ul>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0#/search" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="/2014/search-request.xsd" target="_blank">XSD for the XML API request</a>
+<li><a href="/2020/search-response.xsd" target="_blank">XSD for the XML API response</a>
+</ul>
+
+<p>
+Search is useful for finding motors that match one or more criteria.
+You can specify a wide range of filters and retrieve all the data on the motors that match.
+Among other data is the unique ID of the motor which can be used to download data files.
+</p>
+
 
 <a name="download"></a>
 <h2>Download</h2>
@@ -143,15 +164,32 @@ The download API is used to pull data files for motors you've previously found v
 The request specifies one or more motors and may also specify criteria for the simulator files.
 </p>
 
+<ul>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0#/download" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="/2020/download-request.xsd" target="_blank">XSD for the XML API request</a>
+<li><a href="/2020/download-response.xsd" target="_blank">XSD for the XML API response</a>
+</ul>
+
+<p>
+Download is useful for retrieving the simulator data files uploaded to ThrustCurve.org.
+Once you have one or more motors found via search (above), you can use download to get their data files.
+You can specify a few criteria for the data files as well, such as the format.
+</p>
+
+<p>
+There is also a feature to access the parsed data points in a standard format if you want to consume the data
+directly. In the request, specify <code>data=samples</code> to get the parsed data points instead of the file.
+</p>
+
 
 <a name="getrockets"></a>
 <h2>Get Rockets</h2>
 
+
 <a name="motorguide"></a>
 <h2>Motor Guide</h2>
 
-<a name="examples"></a>
-<h2>Example Programs</h2>
+
 
 <textarea id="copy" style="width: 0; height: 0; border: none; outline: none; margin: 0; resize: none;"></textarea>
 <script type="text/javascript">

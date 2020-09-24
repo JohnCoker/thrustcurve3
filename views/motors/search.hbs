@@ -97,14 +97,15 @@ advanced search below to search by various attributes.
   <div class="form-group">
     <label for="availability" class="col-sm-3 control-label">Availability</label>
     <div class="col-sm-9">
-      <label class="checkbox-inline">
-        <input type="checkbox" name="availability" value="regular" {{#equal params.availability 'regular'}}checked{{/equal}}> regular
+    <p>
+      <label class="radio-inline">
+        <input type="radio" name="availability" value="regular" {{#equal params.availability 'regular'}}checked{{/equal}}> regular
       </label>
-      <label class="checkbox-inline">
-        <input type="checkbox" name="availability" value="available" {{#equal params.availability 'available'}}checked{{/equal}}> available
+      <label class="radio-inline">
+        <input type="radio" name="availability" value="available" {{#equal params.availability 'available'}}checked{{/equal}}> available
       </label>
-      <label class="checkbox-inline">
-        <input type="checkbox" name="availability" value="all" {{#equal params.availability 'all'}}checked{{/equal}}> all
+      <label class="radio-inline">
+        <input type="radio" name="availability" value="all" {{#equal params.availability 'all'}}checked{{/equal}}> all
       </label>
     </div>
   </div>
@@ -178,7 +179,7 @@ plus a logo that links to this page.
 
 <div id="linksearch-live" style="padding-left: 4em; padding-bottom: 1em;">
 <form method="get" action="https://www.thrustcurve.org/motors/search.html">
-  <label for="name">
+  <label for="text">
     <a href="https://www.thrustcurve.org/motors/search.html" style="font-family: Helvetica, Arial, sans-serif; font-size: larger; font-weight: normal; color: #9e1a20; text-decoration: none;"><b>thrust</b>curve.org</a>
   </label>
   <input type="text" name="text" placeholder="motor">

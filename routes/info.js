@@ -19,6 +19,13 @@ router.get(['/searchapi.html', '/searchapi.shtml'], function(req, res, next) {
   res.redirect(301, '/info/api.html');
 });
 
+router.get('/info/apidemo.html', function(req, res, next) {
+  res.render('info/apidemo', locals(defaults, 'ThrustCurve API'));
+});
+router.get(['/apidemo.html', '/apidemo.shtml'], function(req, res, next) {
+  res.redirect(301, '/info/apidemo.html');
+});
+
 router.get('/info/background.html', function(req, res, next) {
   res.render('info/background', locals(defaults, 'About this Site'));
 });

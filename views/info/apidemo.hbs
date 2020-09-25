@@ -1,0 +1,364 @@
+<h1>{{title}}</h1>
+
+
+<style type="text/css">
+.request button {
+  font-size: larger;
+}
+.request pre {
+  font-size: smaller;
+  padding: 0 0.5em;
+}
+form.search, table.motors {
+  margin-bottom: 1em;
+}
+form.search td {
+  padding: 1pt 1em;
+}
+form.search td>* {
+  width: 200px;
+}
+table.motors {
+  border: 1px solid #999;
+  border-collapse: collapse;
+}
+table.motors th {
+  border: 1px solid #999;
+  padding: 2px 0.5em;
+  text-align: left;
+}
+table.motors td {
+  border: 1px solid #999;
+  padding: 2px 0.5em;
+}
+table.motors td:nth-child(1), table.motors td:nth-child(4), table.motors td:nth-child(7) {
+  text-align: center;
+}
+table.motors td:nth-child(5), table.motors td:nth-child(6) {
+  text-align: right;
+}
+table.motors tfoot td {
+  font-style: italic;
+  text-align: left !important;
+}
+div#chart {
+  margin: 1em 0;
+  background-color: rgb(245, 245, 245);
+  border: 1px solid rgb(204, 204, 204);
+}
+</style>
+
+<p>
+This page presents an example of using the ThrustCurve API to find motors and download data for them.
+See <a href="api.html">the API documentation page</a> for high-level info; this page contains a specific example app.
+</p>
+
+<p>
+This demo uses the <b>metadata</b>, <b>search</b> and <b>download</b> API endpoints through JSON directly in the
+browser. The API also supports XML, but JSON will be more commonly used for web mashups.
+</p>
+
+<p>
+You may also like to explore the API through
+<a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0" target="_blank">SwaggerHub</a>.
+</p>
+
+
+<a name="metadata"></a>
+<h2>1. Get Metadata</h2>
+
+<p>
+We want to create a search form, but need to know how to populate the select inputs. The natural way to get that
+info is through the <b>metadata</b> API. We'll access this through a GET method since we don't need to provide inputs.
+Try it out by pressing the "Metadata" button below.
+</p>
+
+<div class="request">
+ <pre><code>
+ // use GET to download metadata for all motors
+ $.get('https://www.thrustcurve.org/api/v1/metadata.json', function(data) {
+   console.log('metadata response:', data);
+
+   // populate the combo boxes in the search form
+   let form = $('form[name=search]');
+
+   let select = form.find('select[name=manufacturer]');
+   select.empty().append($('&lt;option selected&gt;(all)&lt;/option&gt;'));
+   data.manufacturers.forEach(mfr => {
+     select.append($(`&lt;option value="${mfr.abbrev}"&gt;${mfr.name}&lt;/option&gt;`));
+   });
+
+   select = form.find('select[name=diameter]');
+   select.empty().append($('&lt;option selected&gt;(all)&lt;/option&gt;'));
+   data.diameters.forEach(diam => {
+     select.append($(`&lt;option&gt;${diam}&lt;/option&gt;`));
+   });
+
+   select = form.find('select[name=impulseClass]');
+   select.empty().append($('&lt;option selected&gt;(all)&lt;/option&gt;'));
+   data.impulseClasses.forEach(cls => {
+     select.append($(`&lt;option>${cls}&lt;/option>`));
+   });
+ });
+ </code></pre>
+ <button>Metadata</button>
+</div>
+
+
+<a name="search"></a>
+<h2>2. Search for Motors</h2>
+
+<p>
+The combo boxes of this form get populated by the code above.
+Make sure to run it at least once by pressing the "Metadata" button above.
+Then choose some combination of search criteria and press the "Search" button below.
+</p>
+
+<form class="search" name="search">
+  <table>
+    <tr>
+     <th><label for="commonName">Common Name:</label></th>
+     <td><input class="form-control" type="text" name="commonName" placeholder="A8"></td>
+    </tr>
+    <tr>
+     <th><label for="manufacturer">Manufacturer:</label></th>
+     <td><select class="form-control" name="manufacturer"/>
+    </tr>
+    <tr>
+     <th><label for="diameter">Diameter:</label></th>
+     <td><select class="form-control" name="diameter"/>
+    </tr>
+    <tr>
+     <th><label for="impulseClass">Impulse Class:</label></th>
+     <td><select class="form-control" name="impulseClass"/>
+    </tr>
+  </table>
+</form>
+
+<p>
+The execute the <b>search</b> API, we use the POST method supplying the search criteria as a JSON object.
+</p>
+
+<div class="request">
+ <pre><code>
+ // pick up criteria from the form above
+ let form = $('form[name=search]');
+ let req = {};
+ ['commonName', 'manufacturer', 'diameter', 'impulseClass'].forEach(prop => {
+   let v = form.find(':input[name=' + prop + ']').val();
+   if (v != null && v.trim() !== '' && v !== '(all)')
+     req[prop] = v;
+ });
+ console.log('search request:', req);
+
+ // use POST with the criteria as the JSON body
+ $.ajax({
+   url: 'https://www.thrustcurve.org/api/v1/search.json',
+   method: 'POST',
+   data: JSON.stringify(req),
+   success: function(data) {
+     console.log('search response:', data);
+
+     // put key data for each motor into the table
+     let motors = $('table.motors tbody');
+     motors.empty();
+     function num(v, d) {
+       return v > 0 ? v.toFixed(d) : "";
+     }
+     let summary = data.criteria.length < 1 ? 'no' : data.criteria.length;
+     summary += ' search criteria: ';
+     if (data.results != null && data.results.length > 0) {
+       data.results.forEach(r => {
+         let tr = $(`&lt;tr&gt;
+                      &lt;td&gt;&lt;input type="radio" name="motorId" value="${r.motorId}"&gt;&lt;/td&gt;
+                      &lt;td&gt;${r.manufacturerAbbrev}&lt;/td&gt;
+                      &lt;td&gt;${r.designation}&lt;/td&gt;
+                      &lt;td&gt;${r.diameter}&lt;/td&gt;
+                      &lt;td&gt;${num(r.totImpulseNs, 1)}&lt;/td&gt;
+                      &lt;td&gt;${num(r.burnTimeS, 2)}&lt;/td&gt;
+                      &lt;td&gt;${r.dataFiles}&lt;/td&gt;
+                     &lt;/tr&gt;`);
+         motors.append(tr);
+       });
+       if (data.results.length == data.matches)
+         summary += `all ${data.results.length} matches`;
+       else
+         summary += `${data.results.length} of ${data.matches} matches`;
+     } else {
+       summary += 'no matches';
+     }
+     $('table.motors tfoot td').text(summary);
+   },
+ });
+ </code></pre>
+ <button>Search</button>
+</div>
+
+
+<a name="download"></a>
+<h2>3. Download Data</h2>
+
+<p>
+This table gets populated by the search form above. Once you've executed a search that matches existing motors,
+click on one of the radio buttons in the first column to choose that motor and press the "Download" button below.
+</p>
+
+<form class="motors" name="motors">
+<table class="motors">
+ <thead>
+  <tr>
+   <th>Pick</th>
+   <th>Manufacturer</th>
+   <th>Designation</th>
+   <th>Diameter</th>
+   <th>Impulse</th>
+   <th>Burn Time</th>
+   <th>Files</th>
+  </tr>
+ </thead>
+ <tbody/>
+ <tfoot>
+  <tr><td colspan="7">(no search yet)</td></tr>
+ </tfoot>
+</table>
+
+<p>
+To execute the <b>download</b> API, we use the POST method supplying the motor ID as a JSON object.
+</p>
+
+<div class="request">
+ <pre><code>
+ let motorId = $('table.motors input:checked').val();
+ if (motorId == null) {
+   alert('Pick a motor in the above table (Search first if needed).');
+ } else {
+   // use POST with the motor ID as the JSON body
+   let req = {
+     motorId: motorId, // motor to find files for
+     data: 'samples',  // we want just the parsed data points
+   };
+   console.log('download request:', req);
+   $.ajax({
+     url: 'https://www.thrustcurve.org/api/v1/download.json',
+     method: 'POST',
+     data: JSON.stringify(req),
+     success: function(data) {
+       console.log('download response:', data);
+
+       // overall all data files into an line chart
+       let title = 'no data files';
+       let series = [];
+       if (data.results != null && data.results.length > 0) {
+         title = data.results.length > 1 ? data.results.length + ' data files' : 'one data file';
+
+         // make a unique name for each file
+         let names = [];
+         function name(result) {
+           let name = result.format + ' ' + result.source;
+           if (names.indexOf(name) >= 0) {
+             let n = 1, alt;
+             do
+               alt = name + ' ' + ++n;
+             while (names.indexOf(alt) >= 0);
+             name = alt;
+           }
+           names.push(name);
+           return name;
+         }
+
+         // build the series data points from the thrust/time values
+         data.results.forEach(result => {
+           let data = result.samples.map(s => [s.time, s.thrust]);
+           if (data[0][0] > 0.001)
+             data.splice(0, 0, [0, 0]);
+           series.push({
+             type: 'line',
+             smooth: true,
+             name: name(result),
+             showSymbol: true,
+             data: data,
+           });
+         });
+       }
+       chart.clear();
+       chart.setOption({
+         title: {
+           text: title,
+         },
+         tooltip: {
+           formatter: params => `time: ${params.data[0]}s, thrust: ${params.data[1]}Ns`,
+         },
+         legend: {
+           right: 10,
+           orient: 'vertical',
+           align: 'left'
+         },
+         xAxis: {
+           name: 'Time (s)',
+         },
+         yAxis: {
+           name: 'Thrust (Ns)',
+         },
+         series,
+       });
+     }
+   });
+ }
+ </code></pre>
+ <button>Download</button>
+</div>
+
+<p style="margin-top: 1em">
+The data points from the download files are displayed in this chart.
+</p>
+
+<div id="chart" style="width: 100%; height: 400px;"></div>
+
+<p>
+The interesting parts of the code are displayed in the sections above,
+but you can always View Source to see the setup code if you like.
+It's also helpful to open your browser developer tools to see the request and response JSON objects and any
+errors that occur.
+</p>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.8.0/echarts.min.js"
+        integrity="sha512-OvWfXEXFlgwaMYESoKZRrPGq9Ndjcf7pMgp+NjbUNeqEA1OOOUbLgquJGOzvh7H78qinNObGwRiFIj22es61Eg=="
+        crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+var chart;
+$(document).ready(function() {
+  $('div.request').each(function(i, div) {
+    let code = $(div).find('code');
+    let btn = $(div).find('button');
+    btn.addClass('btn btn-primary');
+    btn.on('click', function(e) {
+      e.preventDefault();
+      try {
+        eval(code.text());
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  });
+  $('form.search').on('submit', function(e) {
+    e.preventDefault();
+    alert('Use the button below the code to try it out.');
+    return false;
+  });
+  chart = echarts.init(document.getElementById('chart'));
+  chart.setOption({
+    title: {
+      text: 'no download yet',
+    },
+    xAxis: {
+      name: 'Time (s)',
+    },
+    yAxis: {
+      name: 'Thrust (Ns)',
+    },
+    series: []
+ });
+});
+</script>

@@ -63,7 +63,8 @@ function jsonParser(req, res, next) {
         msg = err.message.replace(/^\w*Error: */, '').trim();
       if (msg == null || msg === '')
         msg = 'JSON parsing failed';
-      res.send(JSON.stringify({ error: msg }, undefined, 2), true);
+      res.status(400)
+         .send(JSON.stringify({ error: msg }, undefined, 2));
       return;
     }
     next();
@@ -396,9 +397,15 @@ function doDownload(req, res, format) {
         if (wantData)
           result.data = Buffer.from(simfile.data).toString('base64');
         if (wantSamples) {
-          let parsed = parsers.parseData(simfile.format, simfile.data, errs);
-          if (parsed != null)
-            result.samples = parsed.points;
+          let parsed = parsers.parseData(simfile.format, simfile.data, errors.ignore);
+          if (parsed != null) {
+            result.samples = parsed.points.map(pt => {
+              return {
+                time: pt.time,
+                thrust: pt.thrust,
+              };
+            });
+          }
         }
         result["info-url"] = req.helpers.simfileLink(simfile);
         result["data-url"] = req.helpers.simfileDownloadLink(simfile);

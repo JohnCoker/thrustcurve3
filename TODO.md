@@ -39,7 +39,6 @@ This page lists the things supported in the old site which haven't yet been reim
    * search: data-fields
    * getrockets
    * motorguide
- * demonstration page
  * add support for bi-directional sync in phone app
 
 ## Phone App
@@ -60,7 +59,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | old page            | new page                     | ✓ | area |
 |:--------------------|:-----------------------------|---|:------|
 | advsearch.jsp       |                              | — | internal page |
-| apidemo.shtml       |                              |   | API |
+| apidemo.shtml       | info/apidemo.html            | ✓ | API |
 | background.shtml    | info/background.html         | ✓ | general info |
 | bbcode.shtml        |                              | — | notes |
 | browser.jsp         | motors/browser.html          | ✓ | motor browser |
@@ -91,7 +90,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | outbox.jsp          | outbox/*                     | ✓ | outbox |
 | raspformat.shtml    | info/raspformat.html         | ✓ | general info |
 | search.shtml        | motors/search.html           | ✓ | attribute search |
-| searchapi.shtml     | info/api.html                |   | general info |
+| searchapi.shtml     | info/api.html                | ✓ | general info |
 | searchpage.jsp      | motors/search.html           | ✓ | attribute search |
 | servererror.jsp     | error.html                   | ✓ | internal page |
 | simfilesearch.jsp   | simfiles/*/                  | ✓ | data files |
@@ -105,8 +104,8 @@ This table lists all pages of the old site and will be filled in as work proceed
 | updates.jsp         | motors/updates.html          | ✓ | general info |
 | updatesimfile.jsp   | simfiles/*/edit.html         | ✓ | contribution |
 | servlets/metadata   | api/1/metadata.*             | ✓ | API |
-| servlets/search     | api/1/search.*               |   | API |
-| servlets/download   | api/1/download.*             |   | API |
+| servlets/search     | api/1/search.*               | ✓ | API |
+| servlets/download   | api/1/download.*             | ✓ | API |
 | servlets/getrockets | api/1/getrockets.*           |   | API |
 | servlets/motorguide | api/1/motorguide.*           |   | API |
 

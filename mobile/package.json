@@ -1,0 +1,27 @@
+{
+  "name": "org.thrustcurve.tctg",
+  "displayName": "ThrustCurve",
+  "version": "1.1.3",
+  "description": "Mobile device interface to ThrustCurve.org to take motor info and rocket performance estimates out to the launch site.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "John Coker",
+  "license": "ISC",
+  "devDependencies": {
+    "cordova-android": "^9.0.0",
+    "cordova-ios": "^6.1.1",
+    "cordova-plugin-network-information": "^2.0.2",
+    "cordova-plugin-whitelist": "^1.3.4"
+  },
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-network-information": {}
+    }
+  }
+}

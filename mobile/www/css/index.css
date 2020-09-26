@@ -1,0 +1,100 @@
+* {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+body {
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: none;
+  -webkit-user-select: none;
+}
+
+.km-cloud:after, .km-cloud:before {
+  content: "\e08e";
+}
+.km-download:after, .km-download:before {
+  content: "\e209";
+}
+.km-gears:after, .km-gears:before {
+  content: "\e0a6";
+}
+.km-keys:after, .km-keys:before {
+  content: "\e0b1";
+}
+.km-checkmark:after, .km-checkmark:before {
+  content: "\e037";
+}
+
+footer, .form-submit {
+  text-align: center;
+}
+.form-submit {
+  margin-top: 15px;
+}
+.k-grid table {
+  width: 100%;
+}
+.good-motors {
+  margin: 0;
+  float: right;
+  font-size: -3 !important;
+  padding: 0pt 4pt 0pt 4pt !important;
+  font-style: italic;
+}
+.km-android .good-motors {
+  padding: 2pt 5pt 1pt 5pt !important;
+}
+
+ul[data-role=listview] a {
+  text-decoration: none;
+}
+.km-ios7 .km-list input, .km-ios7 form .km-list select {
+  color: #8e8e93;
+}
+
+.km-android table {
+  font-size: 1.1em;
+  background-color: black;
+}
+.km-android table th {
+  background: linear-gradient(rgba(128, 128, 128, 0.6) 0px, rgba(0, 0, 0, 0) 100%);
+  background-color: #3d3d3d;
+  border-color: rgba(153,153,153,0.6);
+  color: white;
+}
+.km-android table td {
+  font-weight: normal;
+  border-color: rgba(153,153,153,0.7);
+}
+.km-android table .k-alt td {
+  background-color: #3d3d3d;
+  border-color: rgba(153,153,153,0.6);
+}
+
+.rotate-me {
+  position: absolute;
+  left: 5px;
+  top: 3px;
+  width: 75px;
+  line-height: 105%;
+  padding: 3px;
+  z-index: 5;
+  border-radius: 12px;
+  text-align: center;
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.rotate-me span {
+  display: inline-block;
+  margin: 10px 3px 10px 3px;
+}
+.km-ios7 .rotate-me {
+  background-color: rgba(178, 215, 255, 0.8);
+  background-image: url(../img/rotate-ios.png);
+  color: #5e5e61;
+}
+.km-android .rotate-me {
+  background-color: rgba(116, 201, 232, 0.8);
+  background-image: url(../img/rotate-android.png);
+  color: #e1e5e1;
+}

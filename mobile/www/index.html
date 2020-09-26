@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, target-densitydpi=device-dpi" />
+        <title>ThrustCurve to-go</title>
+        <link href="css/kendo.common.min.css" rel="stylesheet" />
+        <link href="css/kendo.black.min.css" rel="stylesheet" />
+        <link href="css/kendo.default.min.css" rel="stylesheet" />
+        <link href="css/kendo.dataviz.min.css" rel="stylesheet" />
+        <link href="css/kendo.dataviz.default.min.css" rel="stylesheet" />  
+        <link href="css/kendo.dataviz.black.min.css" rel="stylesheet" />
+        <link href="css/kendo.mobile.all.min.css" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <link rel="stylesheet" type="text/css" href="css/device.css" />
+    </head>
+    <body>
+      <!-- Motors Home section -->
+      <div data-role="layout" data-id="motors-home-layout">
+        <header data-role="header">
+          <div data-role="navbar">
+            <a data-align="left" data-role="button" class="nav-button" href="#settings-units">Settings</a>
+            <span data-role="view-title"></span>
+            <a data-align="right" data-role="button" class="nav-button" href="#rockets-home">Rockets</a>
+          </div>
+        </header>
+        <footer data-role="footer">
+          <div data-role="tabstrip">
+            <a data-role="button" data-icon="favorites" href="#motors-favorites">Favorites</a>
+            <a data-role="button" data-icon="search" href="#motors-search">Search</a>
+            <a data-role="button" data-icon="recents" href="#motors-recents">Recent</a>
+          </div>
+        </footer>
+      </div>
+      <div data-role="view" data-layout="motors-home-layout" data-title="Favorite Motors" id="motors-favorites" data-init="initMotorsFavorites" data-after-show="showMotorsFavorites" data-before-hide="hideMotorsFavorites">
+        <div class="placeholder">
+          <p>
+            This page lists motors you have marked to take with you.
+            Use <b>Search</b> to find motors, mark them as favorites in the <b>Recent</b> list,
+            and they will be stored locally for reference at the launch site.
+          </p>
+          <div class="form-submit">
+            <a data-role="button" data-icon="search" href="#motors-search"> Search for Motors</a>
+          </div>
+        </div>
+        <div class="rotate-me"><span>rotate for details</span></div>
+        <div id="motors-favorites-grid"></div>
+      </div>
+      <div data-role="view" data-layout="motors-home-layout" data-title="Recent Motors" id="motors-recents" data-init="initMotorsRecent" data-after-show="showMotorsRecent" data-before-hide="hideMotorsRecent">
+        <div class="placeholder">
+          <p>
+            This page lists motors found by the last search.
+            Use <b>Search</b> to find motors, mark them as favorites here,
+            and they will be stored locally for reference at the launch site.
+          </p>
+          <div class="form-submit">
+            <a data-role="button" data-icon="search" href="#motors-search"> Search for Motors</a>
+          </div>
+        </div>
+        <div class="rotate-me"><span>rotate for details</span></div>
+        <div id="motors-recents-grid"></div>
+      </div>
+      <div data-role="view" data-layout="motors-home-layout" data-title="Motor Search" id="motors-search" data-init="initMotorsSearch" data-after-show="showMotorsSearch" data-before-hide="hideMotorsSearch" data-use-native-scrolling="true">
+        <form id="motors-search-form">
+          <ul data-role="listview" data-style="inset">
+            <li>
+              <label>
+                Manufacturer
+                <select name="mfr"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Common Name
+                <input type="text" name="name" />
+              </label>
+            </li>
+            <li>
+              <label>
+                Impulse Class
+                <select name="class"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Diameter (mm)
+                <select name="diameter"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Motor Type
+                <select name="type"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Cert. Org
+                <select name="cert"></select>
+              </label>
+            </li>
+          </ul>
+          <div class="form-submit">
+            <a data-role="button" data-icon="search"  data-click="submitMotorsSearch"> Search Motors</a>
+          </div>
+        </form>
+      </div>
+      <div data-role="view" data-title="Motor Details" id="motors-details" data-init="initMotorsDetails" data-after-show="showMotorsDetails" data-before-hide="hideMotorsDetails" data-use-native-scrolling="true">
+        <header data-role="header">
+          <div data-role="navbar">
+            <a data-align="left" data-role="backbutton" class="nav-button">Back</a>
+            <span data-role="view-title"></span>
+          </div>
+        </header>
+        <div class="rotate-me"><span>rotate for graph</span></div>
+        <ul data-role="listview" id="motors-details-list" data-style="inset">
+          <li>
+            <label>
+              Manufacturer
+              <input type="text" name="mfr" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Designation
+              <input type="text" name="desig" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Common Name
+              <input type="text" name="name" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Dimensions
+              <input type="text" name="size" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Tot Impulse
+              <input type="text" name="impulse" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Avg Thrust
+              <input type="text" name="avgthr" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Max Thrust
+              <input type="text" name="maxthr" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Burn Time
+              <input type="text" name="burntime" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Motor Type
+              <input type="text" name="type" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Propellant
+              <input type="text" name="propinfo" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Hardware
+              <input type="text" name="caseinfo" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Favorite
+              <input type="checkbox" name="favorite" data-role="switch" data-change="motorDetailsFavorite" />
+            </label>
+          </li>
+        </ul>
+        <div id="motors-details-chart"></div>
+      </div>
+
+      <!-- Rockets Home section -->
+      <div data-role="layout" data-id="rockets-home-layout">
+        <header data-role="header">
+          <div data-role="navbar">
+            <a data-align="left" data-role="button" class="nav-button" href="#motors-favorites">Motors</a>
+            <span data-role="view-title"></span>
+            <a data-align="right" data-role="button" class="nav-button" href="#settings-units">Settings</a>
+          </div>
+        </header>
+      </div>
+      <div data-role="view" data-layout="rockets-home-layout" data-title="Rockets" id="rockets-home" data-init="initRocketsHome" data-after-show="showRocketsHome">
+        <div class="placeholder">
+          <p>
+            This page lists the rockets you have defined.
+            Use <b>New Rocket</b> to enter one, then run the <b>Motor Guide</b> to find options
+            which will be stored locally for reference at the launch site.
+          </p>
+          <div class="form-submit">
+            <a data-role="button" data-icon="add" href="#rocket-info-stats?add=1"> New Rocket</a>
+            <a data-role="button" data-icon="play" data-click="rocketsHomeSamples"> Sample Rockets</a>
+          </div>
+        </div>
+        <ul data-role="listview" data-style="inset" id="rockets-list" data-click="rocketsHomeSelect">
+        </ul>
+        <footer data-role="footer">
+          <div class="km-tabstrip">
+            <a data-role="button" data-icon="add" href="#rocket-info-stats?add=1"> New Rocket</a>
+            <a class="download" data-role="button" data-icon="download" data-click="rocketsHomeDownload"> Download</a>
+          </div>
+        </footer>
+      </div>
+
+      <!-- Rocket Info section -->
+      <div data-role="layout" data-id="rocket-info-layout">
+        <header data-role="header">
+          <div data-role="navbar">
+            <a data-align="left" data-role="button" class="nav-button" href="#rockets-home">Rockets</a>
+            <span data-role="view-title"></span>
+          </div>
+        </header>
+        <footer data-role="footer">
+          <div data-role="tabstrip">
+            <a data-role="button" data-icon="info" href="#rocket-info-stats">Rocket Info</a>
+            <a data-role="button" data-icon="featured" href="#rocket-info-recent">Good Motors</a>
+            <a data-role="button" data-icon="search" href="#rocket-info-guide">Motor Guide</a>
+          </div>
+        </footer>
+      </div>
+      <div data-role="view" data-layout="rocket-info-layout" data-title="Rocket Info" id="rocket-info-stats" data-init="initRocketInfoStats" data-after-show="showRocketInfoStats" data-before-hide="hideRocketInfoStats" data-use-native-scrolling="true">
+        <form id="rocket-info-stats-form">
+          <ul data-role="listview" data-style="inset">
+            <li>
+              <label>
+                Name
+                <input type="text" name="name" />
+              </label>
+            </li>
+            <li>
+              <label>
+                Body Diam
+                <input type="number" name="body" />
+              </label>
+            </li>
+            <li>
+              <label>
+                Dry Weight
+                <input type="number" name="weight" />
+              </label>
+            </li>
+            <li>
+              <label>
+                MMT Diam (mm)
+                <select name="mmtdiam"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                MMT Len
+                <input type="number" name="mmtlen" />
+              </label>
+            </li>
+            <li>
+              <label>
+                C<sub>D</sub>
+                <input type="number" name="cd" value="0.7" />
+              </label>
+              <a data-role="detailbutton" data-icon="more" href="#rocket-info-stats-cdcalc" data-rel="popover"></a>
+            </li>
+            <li>
+              <label>
+                Guide Len
+                <input type="number" name="guide" value="" />
+              </label>
+            </li>
+          </ul>
+        </form>
+        <div class="form-submit">
+          <a data-role="button" data-icon="trash" data-click="rocketInfoDelete"> Delete Rocket</a>
+        </div>
+        <div data-role="popover" id="rocket-info-stats-cdcalc" data-popup='{"width": "100%"}'>
+          <div data-role="view" data-title="Calculator" data-init="initRocketInfoCDCalc" data-after-show="showRocketInfoCDCalc" data-before-hide="hideRocketInfoCDCalc">
+            <header data-role="header">
+              <div data-role="navbar">
+                <span data-role="view-title"></span>
+                <a data-align="right" data-role="button" data-click="rocketInfoCDCalcOK">Accept</a>
+              </div>
+            </header>
+            <form id="rocket-info-stats-cdcalc-form">
+              <ul data-role="listview" data-style="inset">
+                <li>
+                  <label>
+                    Complexity
+                    <select name="complexity">
+                      <option value="1">simple</option>
+                      <option value="2">complex</option>
+                    </select>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Surface/Finish
+                    <select name="surface">
+                      <option value="1">perfect</option>
+                      <option value="2" selected="selected">average</option>
+                      <option value="3">rough</option>
+                    </select>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    C<sub>D</sub>
+                    <input type="number" name="cd" />
+                  </label>
+                </li>
+              </ul>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div data-role="view" data-layout="rocket-info-layout" data-title="Good Motors" id="rocket-info-recent" data-init="initRocketInfoRecent" data-after-show="showRocketInfoRecent" data-before-hide="hideRocketInfoRecent">
+        <div class="placeholder">
+          <p>
+            This page lists the motors previously found for this rocket.
+            Use the <b>Motor Guide</b> to find options
+            that will be stored locally for reference at the launch site.
+          </p>
+          <div class="form-submit">
+            <a data-role="button" data-icon="search" href="#rocket-info-guide"> Motor Guide</a>
+          </div>
+        </div>
+        <div class="rotate-me"><span>rotate for details</span></div>
+        <div id="rocket-info-recent-grid"></div>
+      </div>
+      <div data-role="view" data-title="Guide Details" id="rocket-info-motor-details" data-init="initRocketInfoMotorDetails" data-after-show="showRocketInfoMotorDetails" data-before-hide="hideRocketInfoMotorDetails" data-use-native-scrolling="true">
+        <header data-role="header">
+          <div data-role="navbar">
+            <a data-align="left" data-role="backbutton" class="nav-button">Back</a>
+            <span data-role="view-title"></span>
+          </div>
+        </header>
+        <ul data-role="listview" id="rocket-info-motor-details-list" data-style="inset">
+          <li>
+            <label>
+              Manufacturer
+              <input type="text" name="mfr" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Designation
+              <input type="text" name="desig" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Common Name
+              <input type="text" name="name" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Thrust:Weight
+              <input type="text" name="thrustToWeight" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Simulations
+              <input type="text" name="simulationsRun" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Liftoff Mass
+              <input type="text" name="liftoffMass" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Burnout Mass
+              <input type="text" name="burnoutMass" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Liftoff Time
+              <input type="text" name="liftoffTime" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Burnout Time
+              <input type="text" name="burnoutTime" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Apogee Time
+              <input type="text" name="apogeeTime" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Max Accel
+              <input type="text" name="maxAcceleration" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Guide Velocity
+              <input type="text" name="guideVelocity" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Max Velocity
+              <input type="text" name="maxVelocity" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Burnout Altitude
+              <input type="text" name="burnoutAltitude" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Max Altitude
+              <input type="text" name="maxAltitude" />
+            </label>
+          </li>
+          <li>
+            <label>
+              Optimal Delay
+              <input type="text" name="optimalDelay" />
+            </label>
+          </li>
+        </ul>
+      </div>
+      <div data-role="view" data-layout="rocket-info-layout" data-title="Motor Guide" id="rocket-info-guide" data-init="initRocketInfoGuide" data-after-show="showRocketInfoGuide" data-before-hide="hideRocketInfoGuide" data-use-native-scrolling="true">
+        <form id="rocket-info-guide-form">
+          <ul data-role="listview" data-style="inset">
+            <li>
+              <label>
+                Rocket
+                <input type="text" name="name" readonly="readonly" />
+              </label>
+            </li>
+            <li>
+              <label>
+                MMT
+                <input type="text" name="mmt" readonly="readonly" />
+              </label>
+            </li>
+            <li>
+              <label>
+                Dry Weight
+                <input type="text" name="weight" readonly="readonly" />
+              </label>
+            </li>
+            <li>
+              <label>
+                Motor Mfr
+                <select name="mfr"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Motor Type
+                <select name="type"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Impulse Class
+                <select name="class"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Guide Len
+                <input type="number" name="guide" value="" />
+              </label>
+            </li>
+          </ul>
+          <div class="form-submit">
+            <a data-role="button" data-icon="gears" data-click="submitRocketInfoGuide"> Run Motor Guide</a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Settings section -->
+      <div data-role="layout" data-id="settings-home-layout">
+        <header data-role="header">
+          <div data-role="navbar">
+            <a data-align="left" data-role="button" class="nav-button" href="#rockets-home">Rockets</a>
+            <span data-role="view-title"></span>
+            <a data-align="right" data-role="button" class="nav-button" href="#motors-favorites">Motors</a>
+          </div>
+        </header>
+        <footer data-role="footer">
+          <div data-role="tabstrip">
+            <a data-role="button" data-icon="compose" href="#settings-units">Units</a>
+            <a data-role="button" data-icon="organize" href="#settings-view">View</a>
+            <a data-role="button" data-icon="keys" href="#settings-account">Account</a>
+            <a data-role="button" data-icon="info" href="#settings-about">About</a>
+          </div>
+        </footer>
+      </div>
+      <div data-role="view" data-layout="settings-home-layout" data-title="Units" id="settings-units" data-init="initSettingsUnits" data-after-show="showSettingsUnits" data-before-hide="hideSettingsUnits">
+        <form id="settings-units-form">
+          <ul data-role="listview" data-style="inset">
+            <li>
+              <label>
+                Preset
+                <select name="preset"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Length
+                <select name="length"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Mass
+                <select name="mass"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Force
+                <select name="force"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Velocity
+                <select name="velocity"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Acceleration
+                <select name="acceleration"></select>
+              </label>
+            </li>
+            <li>
+              <label>
+                Altitude
+                <select name="altitude"></select>
+              </label>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div data-role="view" data-layout="settings-home-layout" data-title="View" id="settings-view" data-init="initSettingsView" data-after-show="showSettingsView" data-before-hide="hideSettingsView">
+        <form id="settings-view-form">
+          <ul data-role="listview" data-style="inset" data-type="group">
+            <li>
+              Motor Details
+              <ul class="motorDetails">
+                <li>
+                  <label>
+                    Length
+                    <input type="checkbox" name="length" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Type
+                    <input type="checkbox" name="type" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Tot Impulse
+                    <input type="checkbox" name="totImpulse" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Max Thrust
+                    <input type="checkbox" name="maxThrust" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Burn Time
+                    <input type="checkbox" name="burnTime" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Propellant
+                    <input type="checkbox" name="propInfo" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Case
+                    <input type="checkbox" name="caseInfo" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              Simulation Details
+              <ul class="simDetails">
+                <li>
+                  <label>
+                    Max Velocity
+                    <input type="checkbox" name="maxVelocity" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Guide Vel
+                    <input type="checkbox" name="guideVelocity" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Accleration
+                    <input type="checkbox" name="maxAcceleration" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Apogee Time
+                    <input type="checkbox" name="apogeeTime" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    Optimal Delay
+                    <input type="checkbox" name="optimalDelay" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              General
+              <ul class="general">
+                <li>
+                  <label>
+                    Rotate Prompts
+                    <input type="checkbox" name="rotate" data-role="switch" data-change="settingsViewChange" />
+                  </label>
+                </li>
+                <li class="reset">
+                  <label>
+                    <a>Reset Defaults</a>
+                    <a class="checkmark" data-role="detailbutton" data-icon="checkmark" data-enable="false"></a>
+                  </label>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div data-role="view" data-layout="settings-home-layout" data-title="Account" id="settings-account" data-init="initSettingsAccount" data-after-show="showSettingsAccount" data-before-hide="showSettingsAccount">
+        <p class="help">
+          It is not necessary to have a ThrustCurve.org login to use this app.
+          However if you have one, rockets you enter online can be downloaded.
+        </p>
+        <form id="settings-account-form" data-use-native-scrolling="true">
+          <ul data-role="listview" data-style="inset">
+            <li>
+              <label>
+                Email
+                <input type="text" name="email" value="" />
+              </label>
+            </li>
+            <li>
+              <label>
+                Password
+                <input type="password" name="password" value="" />
+              </label>
+            </li>
+          </ul>
+        </form>
+        <div class="form-submit">
+          <a data-role="button" data-icon="globe" data-click="settingsAccountSave"> Save Login</a>
+        </div>
+      </div>
+      <div data-role="view" data-layout="settings-home-layout" data-title="About" id="settings-about" data-init="initSettingsAbout" data-after-show="showSettingsAbout" data-before-hide="showSettingsAbout">
+        <p>
+          The <b>ThrustCurve to-go</b> app is a companion to
+          the ThrustCurve.org web site,
+          a shared collection of rocket motor data files.
+        </p>
+        <p>
+          The goal of this app is to provide a way to take enough information with you to
+          choose which motor to fly in your rocket, even without cell phone coverage at
+          the launch site.
+        </p>
+        <p>
+          Version <span class="version">1.1.3</span>.
+          <br/>
+          Copyright &copy; John Coker, 2020.
+          <br/>
+          All rights under copyright reserved.
+          <br/>
+          wwww.thrustcurve.org/info/mobile.html
+        </p>
+        <div class="form-submit">
+          <a data-role="button" data-icon="globe" data-click="settingsAboutWebsite"> ThrustCurve.org</a>
+        </div>
+      </div>
+
+      <script type="text/javascript" src="cordova.js"></script>
+      <script src="js/index.js"></script>
+      <script type="text/javascript" src="js/lib/jquery.min.js"></script>
+      <script type="text/javascript" src="js/lib/kendo.custom.min.js"></script>
+      <script type="text/javascript" src="js/lib/lz-string-1.4.1-min.js"></script>
+      <script type="text/javascript" src="js/util.js"></script>
+      <script type="text/javascript" src="js/motors.js"></script>
+      <script type="text/javascript" src="js/rockets.js"></script>
+      <script type="text/javascript" src="js/guide.js"></script>
+      <script type="text/javascript" src="js/units.js"></script>
+      <script type="text/javascript" src="js/account.js"></script>
+      <script type="text/javascript" src="js/metadata.js"></script>
+      <script type="text/javascript" src="js/format.js"></script>
+      <script type="text/javascript" src="js/options.js"></script>
+      <script type="text/javascript" src="js/motors-lists.js"></script>
+      <script type="text/javascript" src="js/motors-search.js"></script>
+      <script type="text/javascript" src="js/motors-details.js"></script>
+      <script type="text/javascript" src="js/rockets-home.js"></script>
+      <script type="text/javascript" src="js/rocket-info-stats.js"></script>
+      <script type="text/javascript" src="js/rocket-info-recent.js"></script>
+      <script type="text/javascript" src="js/rocket-info-guide.js"></script>
+      <script type="text/javascript" src="js/rocket-info-motor-details.js"></script>
+      <script type="text/javascript" src="js/settings-units.js"></script>
+      <script type="text/javascript" src="js/settings-view.js"></script>
+      <script type="text/javascript" src="js/settings-account.js"></script>
+      <script type="text/javascript" src="js/settings-about.js"></script>
+
+      <!-- application setup -->
+      <script type="text/javascript">
+      // Cordova
+      app.initialize();
+
+      // Kendo mobile
+      var KendoApp;
+      $(document).ready(function() {
+        var options = {
+          useNativeScrolling: false,
+          layout: "tabstrip-layout"
+        },
+            os = kendo.support.mobileOS;
+
+        KendoApp = new kendo.mobile.Application($(document).body, options);
+        Metadata.load();
+      });
+      </script>
+    </body>
+</html>

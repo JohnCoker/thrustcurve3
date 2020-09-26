@@ -2,6 +2,8 @@
   "name": "site",
   "version": "1.0.0",
   "private": true,
+  "author": "John Coker",
+  "license": "ISC",
   "scripts": {
     "start": "node ./bin/www",
     "test": "node_modules/jasmine/bin/jasmine.js",

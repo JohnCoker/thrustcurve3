@@ -189,6 +189,31 @@ directly. In the request, specify <code>data=samples</code> to get the parsed da
 <a name="getrockets"></a>
 <h2>Get Rockets</h2>
 
+<table class="endpoint">
+<tr><th>JSON</th><td class="url">/api/v1/getrockets.json</td></tr>
+<tr><th>XML</th><td class="url">/api/v1/getrockets.xml</td></tr>
+<tr><th>compatible</th><td class="url">/servlets/getrockets</td></tr>
+</table>
+
+<p>
+The getrockets API is used to pull saved rockets from your account in ThrustCurve.org.
+The request specifies the email address and password in the POST body, or using browser
+authentication for the GET method.
+Note that if a password is not specified, you can download the <i>public</i> rockets for
+any user whose email address you know.
+</p>
+
+<ul>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.1#/account/post_getrockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="/2015/getrockets-request.xsd" target="_blank">XSD for the XML API request</a>
+<li><a href="/2020/getrockets-response.xsd" target="_blank">XSD for the XML API response</a>
+</ul>
+
+<p>
+This API is used by the <a href="mobile.html">mobile app</a> to load your saved rockets into your
+device, but could potentially be useful to save this data for other uses.
+</p>
+
 
 <a name="motorguide"></a>
 <h2>Motor Guide</h2>

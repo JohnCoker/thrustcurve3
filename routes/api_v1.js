@@ -13,6 +13,7 @@ const express = require('express'),
       async = require('async'),
       yamljs = require('yamljs'),
       errors = require('../lib/errors'),
+      units = require('../lib/units'),
       metadata = require('../lib/metadata'),
       parsers = require('../simulate/parsers'),
       data = require('../render/data'),
@@ -102,10 +103,10 @@ function xmlParser(req, res, next) {
  */
 const specFile = path.resolve(__dirname + '/../config/api_v1.yml');
 
-router.get(APIPrefix + 'swagger.yml', function(req, res, next) {
+router.get(APIPrefix + 'swagger.yml', function(req, res, _next) {
   res.type('application/yaml').sendFile(specFile);
 });
-router.get(APIPrefix + 'swagger.json', function(req, res, next) {
+router.get(APIPrefix + 'swagger.json', function(req, res, _next) {
   let spec = yamljs.load(specFile),
       text;
   if (process.env.NODE_ENV == 'production' || req.hasQueryProperty('canonical'))
@@ -169,16 +170,16 @@ function doMetadata(req, res, format) {
   });
 }
 
-router.get(APIPrefix + 'metadata.json', function(req, res, next) {
+router.get(APIPrefix + 'metadata.json', function(req, res, _next) {
   doMetadata(req, res, new data.JSONFormat());
 });
-router.post(APIPrefix + 'metadata.json', jsonParser, function(req, res, next) {
+router.post(APIPrefix + 'metadata.json', jsonParser, function(req, res, _next) {
   doMetadata(req, res, new data.JSONFormat());
 });
-router.get(APIPrefix + 'metadata.xml', function(req, res, next) {
+router.get(APIPrefix + 'metadata.xml', function(req, res, _next) {
   doMetadata(req, res, new data.XMLFormat());
 });
-router.post([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlParser, function(req, res, next) {
+router.post([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlParser, function(req, res, _next) {
   doMetadata(req, res, new data.XMLFormat());
 });
 
@@ -326,7 +327,7 @@ function doSearch(req, res, format) {
     }
 
     if (queries.length > 0) {
-      async.parallel(queries, req.success(results => {
+      async.parallel(queries, req.success(_results => {
         send();
       }));
     } else
@@ -334,16 +335,16 @@ function doSearch(req, res, format) {
   });
 }
 
-router.get(APIPrefix + 'search.json', function(req, res, next) {
+router.get(APIPrefix + 'search.json', function(req, res, _next) {
   doSearch(req, res, new data.JSONFormat());
 });
-router.post(APIPrefix + 'search.json', jsonParser, function(req, res, next) {
+router.post(APIPrefix + 'search.json', jsonParser, function(req, res, _next) {
   doSearch(req, res, new data.JSONFormat());
 });
-router.get(APIPrefix + 'search.xml', function(req, res, next) {
+router.get(APIPrefix + 'search.xml', function(req, res, _next) {
   doSearch(req, res, new data.XMLFormat());
 });
-router.post([APIPrefix + 'search.xml', LegacyPrefix + 'search'], xmlParser, function(req, res, next) {
+router.post([APIPrefix + 'search.xml', LegacyPrefix + 'search'], xmlParser, function(req, res, _next) {
   doSearch(req, res, new data.XMLFormat());
 });
 
@@ -484,7 +485,9 @@ function doDownload(req, res, format) {
         query._motor.$in.forEach(id => {
           try {
             ids.push(mongoose.Types.ObjectId(id));
-          } catch (e) {}
+          } catch (e) {
+            // invalid ID; drop from query
+          }
         });
       }
       if (ids.length > 0) {
@@ -497,17 +500,153 @@ function doDownload(req, res, format) {
   });
 }
 
-router.get(APIPrefix + 'download.json', function(req, res, next) {
+router.get(APIPrefix + 'download.json', function(req, res, _next) {
   doDownload(req, res, new data.JSONFormat());
 });
-router.post(APIPrefix + 'download.json', jsonParser, function(req, res, next) {
+router.post(APIPrefix + 'download.json', jsonParser, function(req, res, _next) {
   doDownload(req, res, new data.JSONFormat());
 });
-router.get(APIPrefix + 'download.xml', function(req, res, next) {
+router.get(APIPrefix + 'download.xml', function(req, res, _next) {
   doDownload(req, res, new data.XMLFormat());
 });
-router.post([APIPrefix + 'download.xml', LegacyPrefix + 'download'], xmlParser, function(req, res, next) {
+router.post([APIPrefix + 'download.xml', LegacyPrefix + 'download'], xmlParser, function(req, res, _next) {
   doDownload(req, res, new data.XMLFormat());
+});
+
+
+/*
+ * /api/v1/getrockets
+ * Download saved rockets for a contributor (account).
+ */
+function sendUnauthorized(req, res, format) {
+  res.status(401);
+  let errs = new errors.Collector();
+  errs(errors.INVALID_LOGIN, 'Invalid username/password specified.');
+  format.error(errs);
+  format.send(res);
+}
+
+function doGetRockets(req, res, format) {
+  let request;
+  if (req.method == 'GET')
+    request = req.query;
+  else
+    request = api1.getElement(req.body, 'getrockets-request') || req.body;
+
+  format.root('getrockets-response', (req.isLegacy ? '2015' : '2020') + '/GetRocketsResponse');
+
+  let errs = new errors.Collector();
+
+  function query(user, publicOnly) {
+    let q = { _contributor: user._id };
+    if (publicOnly)
+      q.public = true;
+    req.db.Rocket.find(q).exec(req.success(function(rockets) {
+      function send(rockets) {
+        format.elementListFull('results', 'rocket', rockets.map(rocket => {
+          let info = {
+            id: rocket.externalId,
+            name: rocket.name,
+          };
+          if (!req.isLegacy)
+            info.public = rocket.public;
+
+          function m(n, unit) {
+            return units.convertUnitToMKS(n, 'length', unit);
+          }
+          function mm(n, unit) {
+            let m = units.convertUnitToMKS(n, 'length', unit);
+            if (m == null)
+              return;
+            return Math.round(m * 1000000) / 1000;
+          }
+          function kg(n, unit) {
+            return units.convertUnitToMKS(n, 'mass', unit);
+          }
+
+          info['body-diameter-m'] = m(rocket.bodyDiameter, rocket.bodyDiameterUnit);
+          info['mmt-diameter-mm'] = mm(rocket.mmtDiameter, rocket.mmtDiameterUnit);
+          info['mmt-length-mm'] = mm(rocket.mmtLength, rocket.mmtLengthUnit);
+          if (!req.isLegacy)
+            info['mmt-count'] = rocket.mmtCount;
+          info['weight-kg'] = kg(rocket.weight, rocket.weightUnit);
+          if (!req.isLegacy && rocket.adapters != null && rocket.adapters.length > 0) {
+            info.adapters = rocket.adapters.map(adapter => {
+              return {
+                'mmt-diameter-mm': mm(adapter.mmtDiameter, adapter.mmtDiameterUnit),
+                'mmt-length-mm': mm(adapter.mmtLength, adapter.mmtLengthUnit),
+                'weight-kg': kg(adapter.weight, adapter.weightUnit),
+              };
+            });
+          }
+          info.cd = rocket.cd;
+          info['guide-length-m'] = m(rocket.guideLength, rocket.guideLengthUnit);
+          info.website = rocket.website;
+          info.comments = rocket.comments;
+          info['created-on'] = rocket.createdAt;
+          info['updated-on'] = rocket.updatedAt;
+          return info;
+        }));
+        format.error(errs);
+        format.send(res);
+      }
+
+      if (req.isLegacy) {
+        req.db.IntIdMap.map(rockets, req.success(function(ints) {
+          if (ints.length != rockets.length)
+            return cb(new Error('unable to map rocket results to int IDs'));
+          for (let i = 0; i < rockets.length; i++)
+            rockets[i].externalId = ints[i];
+          send(rockets);
+        }));
+      } else {
+        rockets.forEach(r => r.externalId = r._id.toString());
+        send(rockets);
+      }
+    }));
+  }
+
+  let username = api1.getElement(request, "username");
+  let password = api1.getElement(request, "password");
+  if (req.method == 'GET' && username == null) {
+    // expect user to be logged in
+    if (req.user != null)
+      query(req.user, false);
+    else
+      sendUnauthorized(req, res, format);
+  } else {
+    req.db.Contributor.findOne({ email: username }, req.success(function(user) {
+      if (user == null) {
+        // email not registered
+        sendUnauthorized(req, res, format);
+      } else if (password == null) {
+        // public rockets for this useer
+        query(user, true);
+      } else {
+        // validate password
+        user.comparePassword(password, req.success(function(isMatch) {
+          if (!isMatch)
+            sendUnauthorized(req, res, format);
+          else
+            query(user, false);
+        }));
+      }
+    }));
+  }
+
+}
+
+router.get(APIPrefix + 'getrockets.json', function(req, res, _next) {
+  doGetRockets(req, res, new data.JSONFormat());
+});
+router.post(APIPrefix + 'getrockets.json', jsonParser, function(req, res, _next) {
+  doGetRockets(req, res, new data.JSONFormat());
+});
+router.get(APIPrefix + 'getrockets.xml', function(req, res, _next) {
+  doGetRockets(req, res, new data.XMLFormat());
+});
+router.post([APIPrefix + 'getrockets.xml', LegacyPrefix + 'getrockets'], xmlParser, function(req, res, _next) {
+  doGetRockets(req, res, new data.XMLFormat());
 });
 
 

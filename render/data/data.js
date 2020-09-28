@@ -160,12 +160,18 @@ class XMLFormat extends Format {
   }
 
   elementListFull(listName, values, extra) {
+    let eltName;
+    if (arguments.length > 2 && typeof arguments[1] == 'string') {
+      eltName = arguments[1];
+      values = arguments[2];
+      extra = arguments[3];
+    } else
+      eltName = Format.singular(listName);
     if (values == null || values.length < 1)
       values = [];
 
     this._w.startElement(listName);
 
-    let eltName = Format.singular(listName);
     for (let i = 0; i < values.length; i++)
       this.elementFull(eltName, values[i]);
 
@@ -284,6 +290,12 @@ class JSONFormat extends Format {
   }
 
   elementListFull(listName, values, extra) {
+    if (arguments.length > 2 && typeof arguments[1] == 'string') {
+      // child element name not needed
+      values = arguments[2];
+      extra = arguments[3];
+    }
+
     if (values == null || values.length < 1)
       values = [];
 

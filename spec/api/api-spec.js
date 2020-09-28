@@ -11,12 +11,13 @@ const fs = require('fs'),
  */
 const updateExpected = false;
 
-function get(path) {
+function get(path, headers) {
   return new Promise((resolve, reject) => {
     let req = http.request({
       host: 'localhost',
       port: 3000,
       path,
+      headers,
     }, rsp => {
       let body = '';
       rsp.on('data', chunk => body += chunk);
@@ -593,6 +594,181 @@ describe("API v1", function() {
           expect(response).toMatchN(/<simfile-id>/, 4);
           expect(response).toMatchN(/<data>/, 4);
           expect(response).not.toMatch(/<samples>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+  });
+
+  describe("getrockets", function() {
+    const API_SCHEMA = "2020/getrockets-response.xsd";
+    const LEGACY_SCHEMA = "2015/getrockets-response.xsd";
+    describe("GET", function() {
+      let headers = {
+        'Authorization': 'Basic ZmxpZXIuZnJlZEBnbWFpbC5jb206c2VjcmV0',
+      };
+      xit("mine JSON", function(done) {
+        get('/api/v1/getrockets.json', headers).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).not.toMatchN(/"rocket":/, 3);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      xit("mine XML", function(done) {
+        get('/api/v1/getrockets.xml', headers).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<rocket>/, 3);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("others JSON", function(done) {
+        get('/api/v1/getrockets.json?username=flier.fred@gmail.com').then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"id":/, 2);
+          expect(response).toMatch(/"name": *"Alpha III"/);
+          expect(response).toMatch(/"name": *"Versatile"/);
+          expect(response).not.toMatch(/Secret Project/);
+          expect(response).toMatchN(/"adapters": *\[/, 1);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("others XML", function(done) {
+        get('/api/v1/getrockets.xml?username=flier.fred@gmail.com').then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<rocket>/, 2);
+          expect(response).toMatch(/<name>Alpha III<\/name>/);
+          expect(response).toMatch(/<name>Versatile<\/name>/);
+          expect(response).toMatchN(/<adapter>/, 1);
+          expect(response).not.toMatch(/Secret Project/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("POST", function() {
+      it("mine JSON", function(done) {
+        let body = `{
+                      "username": "flier.fred@gmail.com",
+                      "password": "secret"
+                    }`;
+        post('/api/v1/getrockets.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"id":/, 3);
+          expect(response).toMatch(/"name": *"Alpha III"/);
+          expect(response).toMatch(/"name": *"Secret Project"/);
+          expect(response).toMatch(/"name": *"Versatile"/);
+          expect(response).toMatchN(/"adapters": *\[/, 1);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("mine XML", function(done) {
+        let body = `<getrockets-request>
+                     <username>flier.fred@gmail.com</username>
+                     <password>secret</password>
+                    </getrockets-request>`;
+        post('/api/v1/getrockets.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<rocket>/, 3);
+          expect(response).toMatch(/<name>Alpha III<\/name>/);
+          expect(response).toMatch(/<name>Secret Project<\/name>/);
+          expect(response).toMatch(/<name>Versatile<\/name>/);
+          expect(response).toMatchN(/<adapter>/, 1);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("mine legacy", function(done) {
+        let body = `<getrockets-request>
+                     <username>flier.fred@gmail.com</username>
+                     <password>secret</password>
+                    </getrockets-request>`;
+        post('/servlets/getrockets', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<rocket>/, 3);
+          expect(response).toMatch(/<name>Alpha III<\/name>/);
+          expect(response).toMatch(/<name>Secret Project<\/name>/);
+          expect(response).toMatch(/<name>Versatile<\/name>/);
+          expect(response).not.toMatch(/<adapter>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("others JSON", function(done) {
+        let body = `{
+                      "username": "flier.fred@gmail.com"
+                    }`;
+        post('/api/v1/getrockets.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"id":/, 2);
+          expect(response).toMatch(/"name": *"Alpha III"/);
+          expect(response).toMatch(/"name": *"Versatile"/);
+          expect(response).not.toMatch(/"name": *"Secret Project"/);
+          expect(response).toMatchN(/"adapters": *\[/, 1);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("others XML", function(done) {
+        let body = `<getrockets-request>
+                     <username>flier.fred@gmail.com</username>
+                    </getrockets-request>`;
+        post('/api/v1/getrockets.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<rocket>/, 2);
+          expect(response).toMatch(/<name>Alpha III<\/name>/);
+          expect(response).toMatch(/<name>Versatile<\/name>/);
+          expect(response).not.toMatch(/<name>Secret Project<\/name>/);
+          expect(response).toMatchN(/<adapter>/, 1);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("others legacy", function(done) {
+        let body = `<getrockets-request>
+                     <username>flier.fred@gmail.com</username>
+                    </getrockets-request>`;
+        post('/servlets/getrockets', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<rocket>/, 2);
+          expect(response).toMatch(/<name>Alpha III<\/name>/);
+          expect(response).toMatch(/<name>Versatile<\/name>/);
+          expect(response).not.toMatch(/<name>Secret Project<\/name>/);
+          expect(response).not.toMatch(/<adapter>/);
           expect(response).toBeExpected();
           done();
         }).catch(e => {

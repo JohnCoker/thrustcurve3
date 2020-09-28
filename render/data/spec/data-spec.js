@@ -137,6 +137,31 @@ describe("data", function() {
                        '</element-list>');
       });
     });
+    describe("elementListFull child name", function() {
+      var fmt;
+      it("construct", function() {
+	fmt = new XMLFormat({ root: "element-list" });
+      });
+      it("elementListFull", function() {
+	expect(fmt.elementListFull('the-things', 'thang', [
+          { 'the-name': 'one', x: 1 }, { 'the-name': 'two', x: 2 }, { 'the-name': 'three', x: 3 }
+        ], { 'thing-count': 3 })).toBe(true);
+      });
+      it("close", function() {
+	fmt.close();
+      });
+      it("toString", function() {
+	var s = fmt.toString().replace(/^<\?[^>]+>/, '').replace(/\n\s*/g, '');
+	expect(s).toBe('<element-list>' +
+                        '<the-things>' +
+                         '<thang><the-name>one</the-name><x>1</x></thang>' +
+                         '<thang><the-name>two</the-name><x>2</x></thang>' +
+                         '<thang><the-name>three</the-name><x>3</x></thang>' +
+                         '<thing-count>3</thing-count>' +
+                        '</the-things>' +
+                       '</element-list>');
+      });
+    });
     describe("lengthList", function() {
       var fmt;
       it("construct", function() {

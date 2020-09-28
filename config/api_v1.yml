@@ -10,7 +10,7 @@ info:
   license:
     name: ISC license
     url: 'https://opensource.org/licenses/ISC'
-  version: 1.0.0
+  version: 1.0.1
 
 host: www.thrustcurve.org
 basePath: /api/v1
@@ -25,6 +25,8 @@ tags:
     description: Find motors by various criteria.
   - name: download
     description: Retrieve simulator file data for specific motors.
+  - name: account
+    description: Synchronize account info.
 
 paths:
   /metadata.json:
@@ -144,6 +146,27 @@ paths:
           description: Motor data downloads. One or more result returned for each valid motor identifier.
           schema:
             $ref: '#/definitions/DownloadResponse'
+  /getrockets.json:
+    post:
+      tags:
+        - account
+      description: The POST method specifies JSON object with account credentials.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Account credential. At least username must be specified.
+          required: true
+          schema:
+            $ref: '#/definitions/GetRocketsRequest'
+      responses:
+        '200':
+          description: Saved rocket downloads.
+          schema:
+            $ref: '#/definitions/GetRocketsResponse'
 
 definitions:
   MetadataRequest:
@@ -536,3 +559,102 @@ definitions:
         description: any errors that occurred
         type: string
         example: Invalid format value "ANG".
+
+  GetRocketsRequest:
+    type: object
+    description: account credentials
+    properties:
+      username:
+        type: string
+        description: account email address
+        example: flier.fred@gmail.com
+      password:
+        description: account password
+        type: string
+        example: secret
+  GetRocketsResponse:
+    type: object
+    description: list of saved rockets
+    properties:
+      results:
+        description: save rockets
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              description: unique identifier of rocket
+              type: string
+              example: 5f70ff46e645437e11edd06b
+            name:
+              description: name of rocket
+              type: string
+              example: Alpha III
+            public:
+              description: is rocket publicly visible
+              type: boolean
+              example: true
+            body-diameter-m:
+              description: main diameter in meters
+              type: number
+              example: 0.025
+            mmt-diameter-mm:
+              description: motor mount tube diameter in millimeters
+              type: number
+              example: 18
+            mmt-length-mm:
+              description: motor mount tube length in millimeters
+              type: number
+              example: 70
+            mmt-count:
+              description: number of motor mount tubes (cluster)
+              type: integer
+              example: 1
+            weight-kg:
+              description: dry weight of rocket in kilograms
+              example: 0.035
+            adapters:
+              type: array
+              description: motor adapters available for rocket
+              items:
+                type: object
+                properties:
+                  mmt-diameter-mm:
+                    description: adapter MMT diameter in millimeters
+                    type: number
+                    example: 13
+                  mmt-length-mm:
+                    description: adapter MMT length in millimeters
+                    type: number
+                    example: 70
+                  weight-kg:
+                    description: weight of the adapter itself in kilograms
+                    type: number
+                    example: 0.0085
+            cd:
+              description: coeffient of drag
+              type: number
+              example: 0.4
+            guide-length-m:
+              description: length of launch guide (rod or rail) in meters
+              type: number
+              example: 1.0
+            website:
+              description: web page for this rocket
+              type: string
+              format: url
+              example: 'http://highflier.com/fred'
+            comments:
+              description: description of this rocket
+              type: string
+              example: My first rocket
+            created-on:
+              description: date rocket was first entered
+              type: string
+              format: date
+              example: '2020-07-01'
+            updated-on:
+              description: date rocket was first entered
+              type: string
+              format: date
+              example: '2020-08-15'

@@ -1,0 +1,57 @@
+{
+  "results": [
+    {
+      "id": "5f70ff46e645437e11edd06b",
+      "name": "Alpha III",
+      "public": true,
+      "bodyDiameterM": 0.024891999999999997,
+      "mmtDiameterMm": 18,
+      "mmtLengthMm": 76.2,
+      "mmtCount": 1,
+      "weightKg": 0.0340194,
+      "cd": 0.4,
+      "guideLengthM": 0.9144000000000001,
+      "website": "https://estesrockets.com/product/001256-alpha-iii/",
+      "comments": "This is my first rocket; I'm very proud!",
+      "createdOn": "2020-09-27",
+      "updatedOn": "2020-09-27"
+    },
+    {
+      "id": "5f70fff1e645437e11edd06c",
+      "name": "Secret Project",
+      "public": false,
+      "bodyDiameterM": 0.06604,
+      "mmtDiameterMm": 24,
+      "mmtLengthMm": 101.6,
+      "mmtCount": 3,
+      "weightKg": 0.1417475,
+      "cd": 0.5,
+      "guideLengthM": 1.2192,
+      "comments": "Don't tell anyone (yet).",
+      "createdOn": "2020-09-27",
+      "updatedOn": "2020-09-27"
+    },
+    {
+      "id": "5f711cc28a854d83fee8efd9",
+      "name": "Versatile",
+      "public": true,
+      "bodyDiameterM": 0.033782,
+      "mmtDiameterMm": 24,
+      "mmtLengthMm": 152.4,
+      "mmtCount": 1,
+      "weightKg": 0.0850485,
+      "adapters": [
+        {
+          "mmtDiameterMm": 18,
+          "mmtLengthMm": 76.2,
+          "weightKg": 0.01417475
+        }
+      ],
+      "cd": 0.45,
+      "guideLengthM": 0.9144000000000001,
+      "comments": "Can adapt down to 18mm",
+      "createdOn": "2020-09-27",
+      "updatedOn": "2020-09-27"
+    }
+  ]
+}

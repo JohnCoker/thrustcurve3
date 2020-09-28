@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<getrockets-response xmlns="http://www.thrustcurve.org/2020/GetRocketsResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2020/GetRocketsResponse http://www.thrustcurve.org/2020/getrockets-response.xsd">
+    <results>
+        <rocket>
+            <id>5f70ff46e645437e11edd06b</id>
+            <name>Alpha III</name>
+            <public>true</public>
+            <body-diameter-m>0.024891999999999997</body-diameter-m>
+            <mmt-diameter-mm>18</mmt-diameter-mm>
+            <mmt-length-mm>76.2</mmt-length-mm>
+            <mmt-count>1</mmt-count>
+            <weight-kg>0.0340194</weight-kg>
+            <cd>0.4</cd>
+            <guide-length-m>0.9144000000000001</guide-length-m>
+            <website>https://estesrockets.com/product/001256-alpha-iii/</website>
+            <comments>This is my first rocket; I'm very proud!</comments>
+            <created-on>2020-09-27</created-on>
+            <updated-on>2020-09-27</updated-on>
+        </rocket>
+        <rocket>
+            <id>5f711cc28a854d83fee8efd9</id>
+            <name>Versatile</name>
+            <public>true</public>
+            <body-diameter-m>0.033782</body-diameter-m>
+            <mmt-diameter-mm>24</mmt-diameter-mm>
+            <mmt-length-mm>152.4</mmt-length-mm>
+            <mmt-count>1</mmt-count>
+            <weight-kg>0.0850485</weight-kg>
+            <adapters>
+                <adapter>
+                    <mmt-diameter-mm>18</mmt-diameter-mm>
+                    <mmt-length-mm>76.2</mmt-length-mm>
+                    <weight-kg>0.01417475</weight-kg>
+                </adapter>
+            </adapters>
+            <cd>0.45</cd>
+            <guide-length-m>0.9144000000000001</guide-length-m>
+            <comments>Can adapt down to 18mm</comments>
+            <created-on>2020-09-27</created-on>
+            <updated-on>2020-09-27</updated-on>
+        </rocket>
+    </results>
+</getrockets-response>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ASCII"?>
 <?xml-stylesheet type="text/xsl" href="/xs3p.xsl"?>
-<xs:schema version="2015.1"
+<xs:schema version="2020.1"
  xmlns:xs="http://www.w3.org/2001/XMLSchema"
- targetNamespace="http://www.thrustcurve.org/2015/GetRocketsResponse"
- xmlns="http://www.thrustcurve.org/2015/GetRocketsResponse"
+ targetNamespace="http://www.thrustcurve.org/2020/GetRocketsResponse"
+ xmlns="http://www.thrustcurve.org/2020/GetRocketsResponse"
  elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation xml:lang="en">
@@ -23,12 +23,35 @@
               <xs:element name="rocket" minOccurs="0" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:all>
-                    <xs:element name="id" type="xs:integer" />
+                    <xs:element name="id">
+                       <xs:simpleType>
+                         <xs:restriction base="xs:string">
+                           <xs:pattern value="[0-9A-Fa-f]+"/>
+                         </xs:restriction>
+                       </xs:simpleType>
+                    </xs:element>
                     <xs:element name="name" type="xs:string" />
+                    <xs:element name="public" type="xs:boolean" />
                     <xs:element name="body-diameter-m" type="xs:decimal" />
                     <xs:element name="mmt-diameter-mm" type="xs:decimal" />
                     <xs:element name="mmt-length-mm" type="xs:decimal" />
+                    <xs:element name="mmt-count" type="xs:integer" />
                     <xs:element name="weight-kg" type="xs:decimal" />
+                    <xs:element name="adapters" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="adapter" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:all>
+                                <xs:element name="mmt-diameter-mm" type="xs:decimal" />
+                                <xs:element name="mmt-length-mm" type="xs:decimal" />
+                                <xs:element name="weight-kg" type="xs:decimal" />
+                              </xs:all>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
                     <xs:element name="cd" type="xs:decimal" />
                     <xs:element name="guide-length-m" type="xs:decimal" />
                     <xs:element name="website" type="xs:string" minOccurs="0" />

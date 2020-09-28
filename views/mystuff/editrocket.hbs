@@ -220,7 +220,7 @@ If you have an adapter for another motor diameter, you can add it as well.
     <div class="col-sm-3">
       <select class="form-control" name="mmtDiameterUnit" required>
         {{#each lengthUnits}}
-	<option value="{{label}}">{{description}}</option>
+	<option value="{{label}}" {{#equal label ../rocket.mmtDiameterUnit}}selected{{/equal}}>{{description}}</option>
 	{{/each}}
       </select>
     </div>
@@ -235,7 +235,7 @@ If you have an adapter for another motor diameter, you can add it as well.
     <div class="col-sm-3">
       <select class="form-control" name="mmtLengthUnit" required>
         {{#each lengthUnits}}
-	<option value="{{label}}">{{description}}</option>
+	<option value="{{label}}" {{#equal label ../rocket.mmtLengthUnit}}selected{{/equal}}>{{description}}</option>
 	{{/each}}
       </select>
     </div>
@@ -250,7 +250,7 @@ If you have an adapter for another motor diameter, you can add it as well.
     <div class="col-sm-3">
       <select class="form-control" name="weightUnit" required>
         {{#each massUnits}}
-	<option value="{{label}}">{{description}}</option>
+	<option value="{{label}}" {{#equal label ../rocket.weightUnit}}selected{{/equal}}>{{description}}</option>
 	{{/each}}
       </select>
     </div>

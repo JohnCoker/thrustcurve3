@@ -7,6 +7,7 @@
 const express = require('express'),
       router = express.Router(),
       JSZip = require('jszip'),
+      schema = require('../database/schema'),
       metadata = require('../lib/metadata'),
       errors = require('../lib/errors'),
       parsers = require('../simulate/parsers'),
@@ -19,12 +20,35 @@ var defaults = {
 
 const outboxLink = '/outbox/';
 const downloadBasename = 'thrustcurve';
+const downloadLink = '/outbox/download/';
+const setLink = '/outbox/set/';
 
 /*
  * /outbox/
  * List all files in the outbox.
  */
 function doList(req, res) {
+  function empty() {
+    metadata.getManufacturers(req, function(manufacturers) {
+      let sets = [];
+      manufacturers.forEach(mfr => {
+        if (mfr.active) {
+          sets.push({
+            manufacturer: mfr,
+            name: mfr.name,
+            abbrev: mfr.abbrev,
+            raspLink: setLink + mfr.abbrev + '.eng',
+            raspFile: mfr.abbrev + '.eng',
+            rockSimLink: setLink + mfr.abbrev + '.rse',
+            rockSimFile: mfr.abbrev + '.rse',
+          });
+        }
+      });
+      res.render('outbox/empty', locals(defaults, {
+        sets,
+      }));
+    });
+  }
   if (req.session.outbox && req.session.outbox.length > 0) {
     req.db.SimFile.find({ _id: { $in: req.session.outbox } })
                   .populate('_motor _contributor')
@@ -34,8 +58,7 @@ function doList(req, res) {
         req.session.touch();
       }
       if (simfiles.length < 1) {
-        res.render('outbox/empty', locals(defaults, {
-        }));
+        empty();
       } else {
         let raspCount = 0, rocksimCount = 0, otherCount = 0;
         simfiles.forEach(simfile => {
@@ -49,9 +72,9 @@ function doList(req, res) {
 
         let raspLink, rocksimLink;
         if (raspCount > 0)
-          raspLink = '/outbox/download/' + downloadBasename + '.eng';
+          raspLink = downloadLink + downloadBasename + '.eng';
         if (rocksimCount > 0)
-          rocksimLink = '/outbox/download/' + downloadBasename + '.rse';
+          rocksimLink = downloadLink + downloadBasename + '.rse';
           
         res.render('outbox/list', locals(defaults, {
           simfiles,
@@ -59,7 +82,7 @@ function doList(req, res) {
           multiFormat: raspCount > 0 && rocksimCount > 0,
           raspCount,
           rocksimCount,
-          zipLink: '/outbox/download/' + downloadBasename + '.zip',
+          zipLink: downloadLink + downloadBasename + '.zip',
           raspLink,
           rocksimLink,
           clearLink: '/outbox/clear/',
@@ -67,8 +90,7 @@ function doList(req, res) {
       }
     }));
   } else {
-    res.render('outbox/empty', locals(defaults, {
-    }));
+    empty();
   }
 }
 
@@ -155,6 +177,7 @@ function parserCombiner(contentType, format, combine) {
 
   return {
     contentType: contentType,
+    format: format,
     send,
   };
 }
@@ -187,17 +210,20 @@ function zipCombiner() {
   };
 }
 
-router.get('/outbox/download/:file', function(req, res, next) {
-  let file = req.params.file;
-  let combiner;
+function getCombiner(file) {
   if (file != null && file !== '') {
     if (/\.eng$/i.test(file))
-      combiner = parserCombiner('text/plain', 'RASP', parsers.combineRASP);
-    else if (/\.rse$/i.test(file))
-      combiner = parserCombiner('text/xml', 'RockSim', parsers.combineRockSim);
-    else if (/\.zip$/i.test(file))
-      combiner = zipCombiner();
+      return parserCombiner('text/plain', 'RASP', parsers.combineRASP);
+    if (/\.rse$/i.test(file))
+      return parserCombiner('text/xml', 'RockSim', parsers.combineRockSim);
+    if (/\.zip$/i.test(file))
+      return zipCombiner();
   }
+}
+
+router.get(downloadLink + ':file', function(req, res, next) {
+  const file = req.params.file;
+  let combiner = getCombiner(file);
   if (combiner == null) {
     res.status(404);
     res.render('notfound', locals(defaults, {
@@ -225,6 +251,53 @@ router.get('/outbox/download/:file', function(req, res, next) {
   } else {
     noFiles(req, res);
   }
+});
+
+router.get(setLink + ':file', function(req, res, next) {
+  const file = req.params.file;
+  let combiner = getCombiner(file);
+  if (combiner == null || combiner.format == null) {
+    res.status(404);
+    res.render('notfound', locals(defaults, {
+      title: 'Unsupported Download File Format',
+      url: req.url,
+      status: 404,
+      message: 'The requested manufacturer set file type is not supported.'
+    }));
+    return;
+  }
+  metadata.get(req, function(metadata) {
+    let mfr = metadata.manufacturers.byName(req.params.file.replace(/\.\w+$/, ''));
+    if (mfr == null) {
+      noFiles(req, res);
+      return;
+    }
+
+    req.db.Motor.find({ _manufacturer: mfr._id, availability: { $in: schema.MotorAvailableEnum } })
+                .exec(req.success(function(motors) {
+      let ids = motors.map(m => m._id);
+      req.db.SimFile.find({ _motor: { $in: ids }, format: combiner.format })
+                    .populate('_motor')
+                    .sort([['updatedAt', -1]])
+                    .exec(req.success(function(simfiles) {
+        let seenMotors = [];
+        let uniqueFiles = [];
+        simfiles.forEach(simfile => {
+          if (seenMotors.indexOf(simfile._motor._id.toString()) >= 0)
+            return;
+          seenMotors.push(simfile._motor._id.toString());
+          uniqueFiles.push(simfile);
+        });
+        if (uniqueFiles.length < 1) {
+          noFiles(req, res);
+        } else {
+          res.type(combiner.contentType)
+             .header('Content-Disposition', 'attachment; filename=' + file);
+          combiner.send(req, res, next, uniqueFiles);
+        }
+      }));
+    }));
+  });
 });
 
 module.exports = router;

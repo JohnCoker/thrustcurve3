@@ -8,3 +8,33 @@ This is your outbox, but right now it's empty.
 To find files, search for motors you want to use, then pick one of the available Simulator Files
 and click "Add this file to my outbox."
 </p>
+
+<h2>Manufacturer Sets</h2>
+
+<p>
+For convenience, this site can also provide complete sets of motor files for in-production motors by manufacturer.
+Note that when there is more than one entry for a motor, the most recent one is used.
+</p>
+
+<table id="set-list" class="table table-bordered">
+  <thead>
+     <th>Manufacturer</th>
+     <th>RASP</th>
+     <th>RockSim</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each sets}}
+    <tr>
+     <td>{{name}}</td>
+     <td><a href="{{raspLink}}">{{raspFile}}</a></td>
+     <td><a href="{{rockSimLink}}">{{rockSimFile}}</a></td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+
+<p>
+Note that there will not be exactly the same set of files available in the different formats,
+depending on what files have been contributed.
+</p>

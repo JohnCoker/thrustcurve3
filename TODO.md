@@ -1,12 +1,11 @@
 # To-Do
 
-All of the functionality of the old site should be avaiable in the new (plus more, of course).
-This page lists the things supported in the old site which haven't yet been reimplemented.
+All of the functionality of the old site should be available in the new (plus more, of course).
+This page lists the things supported in the old site which haven't yet been reimplemented plus ideas for new features.
 
 ## General
 
  * flag motors favorited by other users
- * create master lists by manufacturer (as Mark used to maintain)
 
 ## Contribution
 

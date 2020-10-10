@@ -2,22 +2,26 @@
 
 {{#if isSaved}}
 <div class="alert alert-success" role="alert">
-Changes to data file saved.
+Changes to data file saved;
+<a href="{{simfileLink simfile}}">view entry</a>.
 </div>
 {{/if}}
 {{#if isCreated}}
 <div class="alert alert-success" role="alert">
-New data file created.
+New data file created;
+<a href="{{simfileLink simfile}}">view entry</a>.
 </div>
 {{/if}}
 {{#if isUnchanged}}
 <div class="alert alert-success" role="alert">
-No changes to save.
+No changes to save;
+<a href="{{simfileLink simfile}}">view entry</a>.
 </div>
 {{/if}}
 {{#if hasErrors}}
 <div class="alert alert-danger" role="alert">
-Invalid simulator data.
+Invalid simulator data;
+<a href="{{simfileLink simfile}}">view entry</a>.
 </div>
 {{/if}}
 

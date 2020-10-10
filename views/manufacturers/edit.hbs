@@ -2,17 +2,20 @@
 
 {{#if isSaved}}
 <div class="alert alert-success" role="alert">
-Changes to manufacturer saved.
+Changes to manufacturer saved;
+<a href="{{manufacturerLink manufacturer}}">view entry</a>.
 </div>
 {{/if}}
 {{#if isCreated}}
 <div class="alert alert-success" role="alert">
-New manufacturer created.
+New manufacturer created;
+<a href="{{manufacturerLink manufacturer}}">view entry</a>.
 </div>
 {{/if}}
 {{#if isUnchanged}}
 <div class="alert alert-success" role="alert">
-No changes to save.
+No changes to save;
+<a href="{{manufacturerLink manufacturer}}">view entry</a>.
 </div>
 {{/if}}
 

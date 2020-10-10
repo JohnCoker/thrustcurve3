@@ -2,17 +2,20 @@
 
 {{#if isSaved}}
 <div class="alert alert-success" role="alert">
-Changes to motor saved.
+Changes to motor saved;
+<a href="{{motorLink manufacturer motor}}">view entry</a>.
 </div>
 {{/if}}
 {{#if isCreated}}
 <div class="alert alert-success" role="alert">
-New motor created.
+New motor created;
+<a href="{{motorLink manufacturer motor}}">view entry</a>.
 </div>
 {{/if}}
 {{#if isUnchanged}}
 <div class="alert alert-success" role="alert">
-No changes to save.
+No changes to save;
+<a href="{{motorLink manufacturer motor}}">view entry</a>.
 </div>
 {{/if}}
 

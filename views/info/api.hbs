@@ -46,6 +46,7 @@ There are five actions supported, all of which use HTTP POST methods:
 <li><a href="#search">search</a>: find matching motors</li>
 <li><a href="#download">download</a>: retrieve simulator data files</li>
 <li><a href="#getrockets">getrockets</a>: retrieve user's saved rockets</li>
+<li><a href="#saverockets">saverockets</a>: store user's saved rockets</li>
 <li><a href="#motorguide">motorguide</a>: find motors that work for a rocket</li>
 </ul>
 
@@ -204,14 +205,40 @@ any user whose email address you know.
 </p>
 
 <ul>
-<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.1#/account/post_getrockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.2#/account/post_getrockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
 <li><a href="/2015/getrockets-request.xsd" target="_blank">XSD for the XML API request</a>
 <li><a href="/2020/getrockets-response.xsd" target="_blank">XSD for the XML API response</a>
 </ul>
 
 <p>
 This API is used by the <a href="mobile.html">mobile app</a> to load your saved rockets into your
-device, but could potentially be useful to save this data for other uses.
+device, but could potentially be useful to download this data for other uses.
+</p>
+
+
+<a name="saverockets"></a>
+<h2>Save Rockets</h2>
+
+<table class="endpoint">
+<tr><th>JSON</th><td class="url">/api/v1/saverockets.json</td></tr>
+<tr><th>XML</th><td class="url">/api/v1/saverockets.xml</td></tr>
+</table>
+
+<p>
+The saverockets API is used to save rocket definitions into your account in ThrustCurve.org.
+The request specifies the email address and password in the POST body, along with a list
+of rockets to save.
+</p>
+
+<ul>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.2#/account/post_saverockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="/2020/saverockets-request.xsd" target="_blank">XSD for the XML API request</a>
+<li><a href="/2020/saverockets-response.xsd" target="_blank">XSD for the XML API response</a>
+</ul>
+
+<p>
+This API is used by the <a href="mobile.html">mobile app</a> to save rockets entered into your
+device, but could potentially be useful to save rocket definitions created in other programs.
 </p>
 
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saverockets-response xmlns="http://www.thrustcurve.org/2020/SaveRocketsResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2020/SaveRocketsResponse http://www.thrustcurve.org/2020/saverockets-response.xsd">
+    <results>
+        <result>
+            <client-id>1</client-id>
+            <id>...</id>
+            <name>Mobile One</name>
+            <status>created</status>
+        </result>
+        <result>
+            <client-id>2</client-id>
+            <id>...</id>
+            <name>Mobile Two</name>
+            <status>created</status>
+        </result>
+    </results>
+</saverockets-response>

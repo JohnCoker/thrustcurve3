@@ -1,0 +1,16 @@
+{
+  "results": [
+    {
+      "clientId": "1",
+      "id": "...",
+      "name": "Mobile One",
+      "status": "created"
+    },
+    {
+      "clientId": "2",
+      "id": "...",
+      "name": "Mobile Two",
+      "status": "created"
+    }
+  ]
+}

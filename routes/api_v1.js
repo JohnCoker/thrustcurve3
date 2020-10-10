@@ -51,6 +51,51 @@ router.all(LegacyPrefix + '*', function(req, res, next) {
 });
 
 /*
+ * On errors, instead of a web site page, we send an appropriate error response.
+ */
+function sendError(req, res, error, status) {
+  let msg;
+  if (typeof error === 'string')
+    msg = error;
+  else if (error instanceof Error)
+    msg = error.stack;
+  if (msg == null || msg === '')
+    msg = "Unknown error occurred.";
+
+  if (status == null)
+    status = 500;
+
+  let body;
+  if (/.json$/.test(req.path)) {
+    body = JSON.stringify({ error: msg }, undefined, 2);
+  } else if (req.isLegacy || /.xml$/.test(req.path)) {
+    let root;
+    if (/^\/(?:api\/v1|servlets)\/([a-z]+).*$/.test(req.path))
+      root = req.path.replace(/^([a-z1]*\/)*([a-z]*).*$/, "$2-response");
+    else
+      root = "response";
+    let format = new data.XMLFormat();
+    format.root(root);
+    format.element('error', msg);
+    format.send(res, true);
+  } else {
+    body = msg;
+  }
+
+  res.status(status)
+     .send(body);
+}
+
+function success(req, res, cb) {
+  return function(err, result) {
+    if (err)
+      sendError(req, res, err);
+    else
+      cb(result);
+  };
+}
+
+/*
  * API body support. We don't require a Content-Type to be specified, so if we assume
  * the body type implied by the path.
  */
@@ -64,11 +109,11 @@ function jsonParser(req, res, next) {
         msg = err.message.replace(/^\w*Error: */, '').trim();
       if (msg == null || msg === '')
         msg = 'JSON parsing failed';
-      res.status(400)
-         .send(JSON.stringify({ error: msg }, undefined, 2));
-      return;
+      sendError(req, res, msg, 400);
+    } else {
+      req.isJSON = true;
+      next();
     }
-    next();
   });
 }
 
@@ -82,20 +127,14 @@ function xmlParser(req, res, next) {
         msg = err.message.replace(/^\w*Error: */, '').trim();
       if (msg == null || msg === '')
         msg = 'XML parsing failed';
-      let root;
-      if (/^\/(?:api\/v1|servlets)\/([a-z]+).*$/.test(req.path))
-        root = req.path.replace(/^([a-z1]*\/)*([a-z]*).*$/, "$2-response");
-      else
-        root = "response";
-      let format = new data.XMLFormat();
-      format.root(root);
-      format.element('error', msg);
-      format.send(res, true);
-      return;
+      sendError(req, res, msg, 400);
+    } else {
+      req.isXML = true;
+      next();
     }
-    next();
   });
 }
+
 
 /*
  * /api/v1/swagger
@@ -145,11 +184,7 @@ function sendMetadata(res, format, metadata, errs) {
 }
 
 function doMetadata(req, res, format) {
-  let request;
-  if (req.method == 'GET')
-    request = req.query;
-  else
-    request = api1.getElement(req.body, 'metadata-request') || req.body;
+  const request = api1.getRequest(req, 'metadata-request');
 
   metadata.get(req, function(cache) {
     let errs = new errors.Collector();
@@ -189,12 +224,7 @@ router.post([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlParser, 
  * Search for motors, either as XML or JSON.
  */
 function doSearch(req, res, format) {
-  let request;
-  if (req.method == 'GET')
-    request = req.query;
-  else
-    request = api1.getElement(req.body, 'search-request') || req.body;
-
+  const request = api1.getRequest(req, 'search-request');
   const errs = new errors.Collector();
 
   let maxResults = api1.getElement(request, "max-results", api1.intValue, errs);
@@ -327,7 +357,7 @@ function doSearch(req, res, format) {
     }
 
     if (queries.length > 0) {
-      async.parallel(queries, req.success(_results => {
+      async.parallel(queries, success(req, res, _results => {
         send();
       }));
     } else
@@ -354,12 +384,7 @@ router.post([APIPrefix + 'search.xml', LegacyPrefix + 'search'], xmlParser, func
  * Download sim files, either as XML or JSON.
  */
 function doDownload(req, res, format) {
-  let request;
-  if (req.method == 'GET')
-    request = req.query;
-  else
-    request = api1.getElement(req.body, 'download-request') || req.body;
-
+  const request = api1.getRequest(req, 'download-request');
   const errs = new errors.Collector();
 
   let wantData = true;
@@ -425,7 +450,7 @@ function doDownload(req, res, format) {
       req.db.SimFile.find(query)
         .sort({ updatedAt: -1 })
         .populate('_motor')
-        .exec(req.success(function(simfiles) {
+        .exec(success(req, res, function(simfiles) {
           // have raw simfile results
           if (simfiles.length < 1)
             return send(simfiles);
@@ -442,7 +467,7 @@ function doDownload(req, res, format) {
               function(cb) {
                 req.db.IntIdMap.map(simfiles, cb);
               },
-            ], req.success(maps => {
+            ], success(req, res, maps => {
               simfiles.forEach((s, i) => {
                 s.externalId = maps[1][i];
                 s.externalMotorId = maps[0][i];
@@ -470,7 +495,7 @@ function doDownload(req, res, format) {
         });
       }
       if (ints.length > 0) {
-        req.db.IntIdMap.lookup(req.db.Motor, ints, req.success(function(motors) {
+        req.db.IntIdMap.lookup(req.db.Motor, ints, success(req, res, function(motors) {
           if (motors.length > 0) {
             query._motor = { $in: motors.map(m => m._id) };
             run();
@@ -527,21 +552,16 @@ function sendUnauthorized(req, res, format) {
 }
 
 function doGetRockets(req, res, format) {
-  let request;
-  if (req.method == 'GET')
-    request = req.query;
-  else
-    request = api1.getElement(req.body, 'getrockets-request') || req.body;
+  const request = api1.getRequest(req, 'getrockets-request');
+  const errs = new errors.Collector();
 
   format.root('getrockets-response', (req.isLegacy ? '2015' : '2020') + '/GetRocketsResponse');
-
-  let errs = new errors.Collector();
 
   function query(user, publicOnly) {
     let q = { _contributor: user._id };
     if (publicOnly)
       q.public = true;
-    req.db.Rocket.find(q).exec(req.success(function(rockets) {
+    req.db.Rocket.find(q).exec(success(req, res, function(rockets) {
       function send(rockets) {
         format.elementListFull('results', 'rocket', rockets.map(rocket => {
           let info = {
@@ -592,9 +612,9 @@ function doGetRockets(req, res, format) {
       }
 
       if (req.isLegacy) {
-        req.db.IntIdMap.map(rockets, req.success(function(ints) {
+        req.db.IntIdMap.map(rockets, success(req, res, function(ints) {
           if (ints.length != rockets.length)
-            return cb(new Error('unable to map rocket results to int IDs'));
+            return sendError(req, res, new Error('unable to map rocket results to int IDs'));
           for (let i = 0; i < rockets.length; i++)
             rockets[i].externalId = ints[i];
           send(rockets);
@@ -615,7 +635,7 @@ function doGetRockets(req, res, format) {
     else
       sendUnauthorized(req, res, format);
   } else {
-    req.db.Contributor.findOne({ email: username }, req.success(function(user) {
+    req.db.Contributor.findOne({ email: username }, success(req, res, function(user) {
       if (user == null) {
         // email not registered
         sendUnauthorized(req, res, format);
@@ -624,7 +644,7 @@ function doGetRockets(req, res, format) {
         query(user, true);
       } else {
         // validate password
-        user.comparePassword(password, req.success(function(isMatch) {
+        user.comparePassword(password, success(req, res, function(isMatch) {
           if (!isMatch)
             sendUnauthorized(req, res, format);
           else
@@ -633,7 +653,6 @@ function doGetRockets(req, res, format) {
       }
     }));
   }
-
 }
 
 router.get(APIPrefix + 'getrockets.json', function(req, res, _next) {
@@ -647,6 +666,94 @@ router.get(APIPrefix + 'getrockets.xml', function(req, res, _next) {
 });
 router.post([APIPrefix + 'getrockets.xml', LegacyPrefix + 'getrockets'], xmlParser, function(req, res, _next) {
   doGetRockets(req, res, new data.XMLFormat());
+});
+
+
+/*
+ * /api/v1/saverockets
+ * Save defined rockets for a contributor (account).
+ */
+function doSaveRockets(req, res, format) {
+  const request = api1.getRequest(req, 'saverockets-request');
+  const errs = new errors.Collector();
+
+  format.root('saverockets-response', '2020/SaveRocketsResponse');
+
+  let results = [];
+  function send() {
+    format.elementListFull('results', results);
+    format.error(errs);
+    format.send(res, errs.hasErrors());
+  }
+
+  function query(user) {
+    req.db.Rocket.find({ _contributor: user._id }).exec(success(req, res, function(existing) {
+      req.user = user;
+      let upserts = api1.rocketModels(req, request, errs, existing, results);
+      if (upserts != null && upserts.length > 0) {
+        let saves = [];
+        upserts.forEach(upsert => {
+          saves.push(function(cb) {
+            const wasNew = upsert.isNew;
+            upsert.save(function(err, updated) {
+              let result = {
+                'client-id': upsert.clientId,
+                id: upsert.id,
+                name: upsert.name,
+              };
+              if (err) {
+                errs(errors.INVALID_ROCKET, 'Error saving rocket definition: {1}', err.message);
+                result.status = 'invalid';
+              } else {
+                result.id = updated._id.toString();
+                result.status = wasNew ? 'created' : 'updated';
+              }
+              results.push(result);
+              cb(null, result);
+            });
+          });
+        });
+        async.parallel(saves, success(req, res, _results => {
+          send();
+        }));
+      } else {
+        // nothing to save
+        send();
+      }
+    }));
+  }
+
+  // check credentials
+  let username = api1.getElement(request, "username");
+  let password = api1.getElement(request, "password");
+  if (req.method == 'GET' && username == null) {
+    // expect user to be logged in
+    if (req.user != null)
+      query(req.user);
+    else
+      sendUnauthorized(req, res, format);
+  } else {
+    req.db.Contributor.findOne({ email: username }, success(req, res, function(user) {
+      if (user == null || password == null) {
+        sendUnauthorized(req, res, format);
+      } else {
+        // validate password
+        user.comparePassword(password, success(req, res, function(isMatch) {
+          if (!isMatch)
+            sendUnauthorized(req, res, format);
+          else
+            query(user);
+        }));
+      }
+    }));
+  }
+}
+
+router.post(APIPrefix + 'saverockets.json', jsonParser, function(req, res, _next) {
+  doSaveRockets(req, res, new data.JSONFormat());
+});
+router.post(APIPrefix + 'saverockets.xml', xmlParser, function(req, res, _next) {
+  doSaveRockets(req, res, new data.XMLFormat());
 });
 
 

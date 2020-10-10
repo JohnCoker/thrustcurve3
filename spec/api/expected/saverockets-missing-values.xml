@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saverockets-response xmlns="http://www.thrustcurve.org/2020/SaveRocketsResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2020/SaveRocketsResponse http://www.thrustcurve.org/2020/saverockets-response.xsd">
+    <results>
+        <result>
+            <client-id>29384756-abcdef</client-id>
+            <status>invalid</status>
+        </result>
+    </results>
+    <error>Missing rocket name value.
+Invalid rocket body-diameter-m value; expected length.
+Invalid rocket mmt-diameter-mm value; expected length.
+Invalid rocket mmt-length-mm value; expected length.
+Invalid rocket guide-length-m value; expected length.
+Invalid rocket weight-kg value; expected mass.
+Invalid rocket cd value.</error>
+</saverockets-response>

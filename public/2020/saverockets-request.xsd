@@ -2,28 +2,35 @@
 <?xml-stylesheet type="text/xsl" href="/xs3p.xsl"?>
 <xs:schema version="2020.1"
  xmlns:xs="http://www.w3.org/2001/XMLSchema"
- targetNamespace="http://www.thrustcurve.org/2020/GetRocketsResponse"
- xmlns="http://www.thrustcurve.org/2020/GetRocketsResponse"
+ targetNamespace="http://www.thrustcurve.org/2020/SaveRocketsRequest"
+ xmlns="http://www.thrustcurve.org/2020/SaveRocketsRequest"
  elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation xml:lang="en">
-      This schema defines the response sent to the ThrustCurve.org getrockets XML API.
+      This schema defines the request sent to the ThrustCurve.org saverockets XML API.
       For more information, see the documentation at https://www.thrustcurve.org/info/api.html
     </xs:documentation>
   </xs:annotation>
 
-  <xs:element name="getrockets-response">
+  <xs:element name="saverockets-request">
     <xs:complexType>
-      <xs:sequence>
-
-        <!-- the list of rockets is always present, but may be empty -->
-	<xs:element name="results">
+      <xs:all>
+	<xs:element name="username" type="xs:string" />
+	<xs:element name="password" type="xs:string" />
+	<xs:element name="rockets">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="rocket" minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="rocket" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:all>
-                    <xs:element name="id">
+                    <xs:element name="client-id">
+                       <xs:simpleType>
+                         <xs:restriction base="xs:string">
+                           <xs:pattern value="[0-9A-Fa-f-]+"/>
+                         </xs:restriction>
+                       </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="id" minOccurs="0">
                        <xs:simpleType>
                          <xs:restriction base="xs:string">
                            <xs:pattern value="[0-9A-Fa-f]+"/>
@@ -56,8 +63,6 @@
                     <xs:element name="guide-length-m" type="xs:decimal" />
                     <xs:element name="website" type="xs:string" minOccurs="0" />
                     <xs:element name="comments" type="xs:string" minOccurs="0" />
-                    <xs:element name="created-on" type="xs:date" />
-                    <xs:element name="updated-on" type="xs:date" />
                   </xs:all>
                 </xs:complexType>
               </xs:element>
@@ -67,7 +72,7 @@
 
         <!-- if a general error occurred more detail is returned -->
 	<xs:element name="error" type="xs:string" minOccurs="0" />
-      </xs:sequence>
+      </xs:all>
     </xs:complexType>
   </xs:element>
 

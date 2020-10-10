@@ -1,0 +1,71 @@
+{
+  "results": [
+    {
+      "id": "...",
+      "name": "Alpha III",
+      "public": true,
+      "bodyDiameterM": 0.024891999999999997,
+      "mmtDiameterMm": 18,
+      "mmtLengthMm": 76.2,
+      "mmtCount": 1,
+      "weightKg": 0.0340194,
+      "cd": 0.4,
+      "guideLengthM": 0.9144000000000001,
+      "website": "https://estesrockets.com/product/001256-alpha-iii/",
+      "comments": "This is my first rocket; I'm very proud!",
+      "createdOn": "...",
+      "updatedOn": "..."
+    },
+    {
+      "id": "...",
+      "name": "Secret Project",
+      "public": false,
+      "bodyDiameterM": 0.06604,
+      "mmtDiameterMm": 24,
+      "mmtLengthMm": 101.6,
+      "mmtCount": 3,
+      "weightKg": 0.1417475,
+      "cd": 0.5,
+      "guideLengthM": 1.2192,
+      "comments": "Don't tell anyone (yet).",
+      "createdOn": "...",
+      "updatedOn": "..."
+    },
+    {
+      "id": "...",
+      "name": "Versatile",
+      "public": true,
+      "bodyDiameterM": 0.033782,
+      "mmtDiameterMm": 24,
+      "mmtLengthMm": 152.4,
+      "mmtCount": 1,
+      "weightKg": 0.0850485,
+      "adapters": [
+        {
+          "mmtDiameterMm": 18,
+          "mmtLengthMm": 76.2,
+          "weightKg": 0.01417475
+        }
+      ],
+      "cd": 0.45,
+      "guideLengthM": 0.9144000000000001,
+      "comments": "Can adapt down to 18mm",
+      "createdOn": "...",
+      "updatedOn": "..."
+    },
+    {
+      "id": "...",
+      "name": "Mobile Three (2)",
+      "public": true,
+      "bodyDiameterM": 0.075,
+      "mmtDiameterMm": 29,
+      "mmtLengthMm": 208,
+      "mmtCount": 3,
+      "weightKg": 0.065,
+      "cd": 0.5,
+      "guideLengthM": 2,
+      "createdOn": "...",
+      "updatedOn": "..."
+    }
+  ]
+}

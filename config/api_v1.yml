@@ -10,7 +10,7 @@ info:
   license:
     name: ISC license
     url: 'https://opensource.org/licenses/ISC'
-  version: 1.0.1
+  version: 1.0.2
 
 host: www.thrustcurve.org
 basePath: /api/v1
@@ -27,6 +27,8 @@ tags:
     description: Retrieve simulator file data for specific motors.
   - name: account
     description: Synchronize account info.
+  - name: guide
+    description: Find motors that work for a rocket.
 
 paths:
   /metadata.json:
@@ -164,9 +166,30 @@ paths:
             $ref: '#/definitions/GetRocketsRequest'
       responses:
         '200':
-          description: Saved rocket downloads.
+          description: Saved rocket definitions.
           schema:
             $ref: '#/definitions/GetRocketsResponse'
+  /saverockets.json:
+    post:
+      tags:
+        - account
+      description: The POST method specifies JSON object with account credentials and rockets.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Account credentials and list of rockets to save.
+          required: true
+          schema:
+            $ref: '#/definitions/SaveRocketsRequest'
+      responses:
+        '200':
+          description: Saved rocket status.
+          schema:
+            $ref: '#/definitions/SaveRocketsResponse'
 
 definitions:
   MetadataRequest:
@@ -560,6 +583,92 @@ definitions:
         type: string
         example: Invalid format value "ANG".
 
+  Rocket:
+    type: object
+    description: saved rocket definition
+    properties:
+      id:
+        description: unique identifier of rocket
+        type: string
+        example: 5f70ff46e645437e11edd06b
+      name:
+        description: name of rocket
+        type: string
+        example: Alpha III
+      public:
+        description: is rocket publicly visible
+        type: boolean
+        example: true
+      bodyDiameterM:
+        description: main diameter in meters
+        type: number
+        example: 0.025
+      mmtDiameterMm:
+        description: motor mount tube diameter in millimeters
+        type: number
+        example: 18
+      mmtLengthMm:
+        description: motor mount tube length in millimeters
+        type: number
+        example: 70
+      mmtCount:
+        description: number of motor mount tubes (cluster)
+        type: integer
+        example: 1
+      weightKg:
+        description: dry weight of rocket in kilograms
+        type: number
+        example: 0.035
+      adapters:
+        type: array
+        description: motor adapters available for rocket
+        items:
+          type: object
+          properties:
+            mmtDiameterMm:
+              description: adapter MMT diameter in millimeters
+              type: number
+              example: 13
+            mmtLengthMm:
+              description: adapter MMT length in millimeters
+              type: number
+              example: 70
+            weightKg:
+              description: weight of the adapter itself in kilograms
+              type: number
+              example: 0.0085
+      cd:
+        description: coeffient of drag
+        type: number
+        example: 0.4
+      guideLengthM:
+        description: length of launch guide (rod or rail) in meters
+        type: number
+        example: 1.0
+      website:
+        description: web page for this rocket
+        type: string
+        format: url
+        example: 'http://highflier.com/fred'
+      comments:
+        description: description of this rocket
+        type: string
+        example: My first rocket
+      createdOn:
+        description: date rocket was first entered
+        type: string
+        format: date
+        example: '2020-07-01'
+      updatedOn:
+        description: date rocket was first entered
+        type: string
+        format: date
+        example: '2020-08-15'
+      clientId:
+        description: unique identifier sent in saverockets request
+        type: string
+        example: 829fb49e-b599-4907-8607-e5bf07be9e7a
+
   GetRocketsRequest:
     type: object
     description: account credentials
@@ -577,11 +686,47 @@ definitions:
     description: list of saved rockets
     properties:
       results:
-        description: save rockets
+        description: saved rockets
+        type: array
+        items:
+          $ref: '#/definitions/Rocket'
+      error:
+        description: any errors that occurred
+        type: string
+        example: Invalid username/password specified.
+
+  SaveRocketsRequest:
+    type: object
+    description: account credentials and list of rockets
+    properties:
+      username:
+        type: string
+        description: account email address
+        example: flier.fred@gmail.com
+      password:
+        description: account password
+        type: string
+        example: secret
+      rockets:
+        description: rocket(s) to save
+        type: array
+        items:
+          $ref: '#/definitions/Rocket'
+  SaveRocketsResponse:
+    type: object
+    description: status of saved rockets
+    properties:
+      results:
+        description: saved rocket info
         type: array
         items:
           type: object
+          description: saved rocket confirmation
           properties:
+            clientId:
+              description: unique identifier sent by client
+              type: string
+              example: 829fb49e-b599-4907-8607-e5bf07be9e7a
             id:
               description: unique identifier of rocket
               type: string
@@ -590,71 +735,16 @@ definitions:
               description: name of rocket
               type: string
               example: Alpha III
-            public:
-              description: is rocket publicly visible
-              type: boolean
-              example: true
-            body-diameter-m:
-              description: main diameter in meters
-              type: number
-              example: 0.025
-            mmt-diameter-mm:
-              description: motor mount tube diameter in millimeters
-              type: number
-              example: 18
-            mmt-length-mm:
-              description: motor mount tube length in millimeters
-              type: number
-              example: 70
-            mmt-count:
-              description: number of motor mount tubes (cluster)
-              type: integer
-              example: 1
-            weight-kg:
-              description: dry weight of rocket in kilograms
-              example: 0.035
-            adapters:
-              type: array
-              description: motor adapters available for rocket
-              items:
-                type: object
-                properties:
-                  mmt-diameter-mm:
-                    description: adapter MMT diameter in millimeters
-                    type: number
-                    example: 13
-                  mmt-length-mm:
-                    description: adapter MMT length in millimeters
-                    type: number
-                    example: 70
-                  weight-kg:
-                    description: weight of the adapter itself in kilograms
-                    type: number
-                    example: 0.0085
-            cd:
-              description: coeffient of drag
-              type: number
-              example: 0.4
-            guide-length-m:
-              description: length of launch guide (rod or rail) in meters
-              type: number
-              example: 1.0
-            website:
-              description: web page for this rocket
+            status:
+              description: status of save
               type: string
-              format: url
-              example: 'http://highflier.com/fred'
-            comments:
-              description: description of this rocket
-              type: string
-              example: My first rocket
-            created-on:
-              description: date rocket was first entered
-              type: string
-              format: date
-              example: '2020-07-01'
-            updated-on:
-              description: date rocket was first entered
-              type: string
-              format: date
-              example: '2020-08-15'
+              enum:
+                - created
+                - updated
+                - unchanged
+                - invalid
+              example: updated
+      error:
+        description: any errors that occurred
+        type: string
+        example: Missing name for rocket #1.

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "node_modules/jasmine/bin/jasmine.js",
-    "lint": "jshint `find . -name node_modules -prune -o -name out -prune -o -name tmp -prune -o -name public -prune -o -name '*.js' -print` public/javascripts/main.js"
+    "lint": "jshint `find . -name mobile -prune -o -name node_modules -prune -o -name out -prune -o -name tmp -prune -o -name public -prune -o -name '*.js' -print` public/javascripts/main.js"
   },
   "dependencies": {
     "async": "^1.5.2",

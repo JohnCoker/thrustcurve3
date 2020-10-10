@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ASCII"?>
+<?xml-stylesheet type="text/xsl" href="/xs3p.xsl"?>
+<xs:schema version="2020.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2020/SaveRocketsResponse"
+ xmlns="http://www.thrustcurve.org/2020/SaveRocketsResponse"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the response returned by the ThrustCurve.org saverockets XML API.
+      For more information, see the documentation at https://www.thrustcurve.org/info/api.html
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="saverockets-response">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- the list of results is always present, but may be empty -->
+	<xs:element name="results">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="result" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="client-id" minOccurs="0">
+                       <xs:simpleType>
+                         <xs:restriction base="xs:string">
+                           <xs:pattern value="[0-9A-Fa-f-]+"/>
+                         </xs:restriction>
+                       </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="id" minOccurs="0">
+                       <xs:simpleType>
+                         <xs:restriction base="xs:string">
+                           <xs:pattern value="[0-9A-Fa-f]+"/>
+                         </xs:restriction>
+                       </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="name" type="xs:string" minOccurs="0" />
+                    <xs:element name="status">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="created"/>
+                          <xs:enumeration value="updated"/>
+                          <xs:enumeration value="unchanged"/>
+                          <xs:enumeration value="invalid"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+        <!-- if a general error occurred more detail is returned -->
+	<xs:element name="error" type="xs:string" minOccurs="0" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

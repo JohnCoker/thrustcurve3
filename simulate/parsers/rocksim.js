@@ -251,9 +251,11 @@ function combine(data, error) {
       return;
     }
     if (xml.root.name == 'engine-database') {
+      /* jshint ignore:start */
       one = one.replace(/^.*<engine-database[^>]*>\s*<engine-list[^>]*>\s*/s, '')
                .replace(/\s*<\/engine-list[^>]*>\s*<\/engine-database[^>]*>.*$/s, '');
       text += one + '\n';
+      /* jshint ignore:end */
     }
   });
 

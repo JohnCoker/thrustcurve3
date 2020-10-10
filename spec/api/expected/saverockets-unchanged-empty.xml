@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saverockets-response xmlns="http://www.thrustcurve.org/2020/SaveRocketsResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2020/SaveRocketsResponse http://www.thrustcurve.org/2020/saverockets-response.xsd">
+    <results>
+        <result>
+            <client-id>abcde-12345</client-id>
+            <id>5f70ff46e645437e11edd06b</id>
+            <name>Alpha III</name>
+            <status>unchanged</status>
+        </result>
+    </results>
+</saverockets-response>

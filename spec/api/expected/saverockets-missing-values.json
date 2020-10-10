@@ -1,0 +1,9 @@
+{
+  "results": [
+    {
+      "clientId": "29384756-abcdef",
+      "status": "invalid"
+    }
+  ],
+  "error": "Missing rocket name value.\nInvalid rocket bodyDiameterM value; expected length.\nInvalid rocket mmtDiameterMm value; expected length.\nInvalid rocket mmtLengthMm value; expected length.\nInvalid rocket guideLengthM value; expected length.\nInvalid rocket weightKg value; expected mass.\nInvalid rocket cd value."
+}

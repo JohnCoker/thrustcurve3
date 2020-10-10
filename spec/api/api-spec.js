@@ -68,25 +68,22 @@ describe("API v1", function() {
     jasmine.addMatchers({
       toBeExpected: function(util, customEqualityTesters) {
         return {
-          compare: function(actual, expectFile) {
-            if (expectFile == null) {
-              expectFile = currentSpec.fullName.replace(/^API v1 */i, '');
-              expectFile = expectFile.replace(/ +JSON$/i, '.json')
-                                     .replace(/ +XML$/i, '.xml')
-                                     .replace(/ +legacy$/i, '-legacy.xml')
-                                     .replace(/ +/g, '-');
-            }
+          compare: function(actual, regex, replace) {
+            let expectFile = currentSpec.fullName.replace(/^API v1 */i, '')
+                                        .replace(/ +JSON$/i, '.json')
+                                        .replace(/ +XML$/i, '.xml')
+                                        .replace(/ +legacy$/i, '-legacy.xml')
+                                        .replace(/ +/g, '-');
             if (actual == null || actual.trim() === '') {
               return {
                 pass: false,
                 message: 'Expected ' + actual + ' to have content',
               };
             }
-            if (expectFile == null || expectFile === '') {
-              return {
-                pass: false,
-                message: 'Missing expected file name',
-              };
+            if (regex != null) {
+              if (replace == null)
+                replace = '';
+              actual = actual.replace(regex, replace);
             }
             if (updateExpected) {
               fs.writeFileSync(expectedDir + "/" + expectFile, actual);
@@ -771,6 +768,449 @@ describe("API v1", function() {
           expect(response).not.toMatch(/<adapter>/);
           expect(response).toBeExpected();
           done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+  });
+
+  describe("saverockets", function() {
+    function cleanup(done) {
+      let proc = process.exec('mongo', (err, stdout) => {
+        done(err);
+      });
+      proc.stdin.write(`use test
+                        db.rockets.remove({ name: { $regex: /^mobile/i } })`);
+      proc.stdin.end();
+    }
+    beforeEach(cleanup);
+    afterAll(cleanup);
+
+    const API_SCHEMA = "2020/saverockets-response.xsd";
+    describe("missing values", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "username": "flier.fred@gmail.com",
+                        "password": "secret",
+                        "rockets": [{
+                          "clientId": "29384756-abcdef"
+                         }]
+                      }`;
+        post('/api/v1/saverockets.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"clientId": *"29384756-abcdef"/, 1);
+          expect(response).toMatchN(/"status": "invalid"/, 1);
+          expect(response).toMatch(/"error": *"Missing rocket name value./);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<saverockets-request>
+                        <username>flier.fred@gmail.com</username>
+                        <password>secret</password>
+                        <rockets>
+                          <rocket>
+                            <client-id>29384756-abcdef</client-id>
+                          </rocket>
+                        </rockets>
+                      </saverockets-request>`;
+        post('/api/v1/saverockets.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<client-id>29384756-abcdef<\/client-id>/, 1);
+          expect(response).toMatchN(/<status>invalid<\/status>/, 1);
+          expect(response).toMatch(/<error>Missing rocket name value./);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("unchanged-complete", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "username": "flier.fred@gmail.com",
+                        "password": "secret",
+                        "rockets": [{
+                          "clientId": "abcde-12345",
+                          "id": "5f70ff46e645437e11edd06b",
+                          "name": "Alpha III",
+                          "public": true,
+                          "bodyDiameterM": 0.024892,
+                          "mmtDiameterMm": 18,
+                          "mmtLengthMm": 76.2,
+                          "mmtCount": 1,
+                          "weightKg": 0.0340194,
+                          "cd": 0.4,
+                          "guideLengthM": 0.9144,
+                          "website": "https://estesrockets.com/product/001256-alpha-iii/",
+                          "comments": "This is my first rocket; I'm very proud!"
+                        }]
+                      }`;
+        post('/api/v1/saverockets.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"clientId": *"abcde-12345"/, 1);
+          expect(response).toMatchN(/"status": *"unchanged"/, 1);
+          expect(response).not.toMatch(/"error":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<saverockets-request>
+                        <username>flier.fred@gmail.com</username>
+                        <password>secret</password>
+                        <rockets>
+                          <rocket>
+                            <client-id>abcde-12345</client-id>
+                            <id>5f70ff46e645437e11edd06b</id>
+                            <name>Alpha III</name>
+                            <public>true</public>
+                            <body-diameter-m>0.024892</body-diameter-m>
+                            <mmt-diameter-mm>18</mmt-diameter-mm>
+                            <mmt-length-mm>76.2</mmt-length-mm>
+                            <mmt-count>1</mmt-count>
+                            <weight-kg>0.0340194</weight-kg>
+                            <cd>0.4</cd>
+                            <guide-length-m>0.9144</guide-length-m>
+                            <website>https://estesrockets.com/product/001256-alpha-iii/</website>
+                            <comments>This is my first rocket; I'm very proud!</comments>
+                          </rocket>
+                        </rockets>
+                      </saverockets-request>`;
+        post('/api/v1/saverockets.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<client-id>abcde-12345<\/client-id>/, 1);
+          expect(response).toMatchN(/<status>unchanged<\/status>/, 1);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("unchanged-empty", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "username": "flier.fred@gmail.com",
+                        "password": "secret",
+                        "rockets": [{
+                          "clientId": "abcde-12345",
+                          "id": "5f70ff46e645437e11edd06b"
+                        }]
+                      }`;
+        post('/api/v1/saverockets.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"clientId": *"abcde-12345"/, 1);
+          expect(response).toMatchN(/"status": *"unchanged"/, 1);
+          expect(response).not.toMatch(/"error":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<saverockets-request>
+                        <username>flier.fred@gmail.com</username>
+                        <password>secret</password>
+                        <rockets>
+                          <client-id>abcde-12345</client-id>
+                          <id>5f70ff46e645437e11edd06b</id>
+                        </rockets>
+                      </saverockets-request>`;
+        post('/api/v1/saverockets.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<client-id>abcde-12345<\/client-id>/, 1);
+          expect(response).toMatchN(/<status>unchanged<\/status>/, 1);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("create-two", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "username": "flier.fred@gmail.com",
+                        "password": "secret",
+                        "rockets": [{
+                          "clientId": "1",
+                          "name": "Mobile One",
+                          "public": true,
+                          "bodyDiameterM": 0.024892,
+                          "mmtDiameterMm": 18,
+                          "mmtLengthMm": 76.2,
+                          "mmtCount": 1,
+                          "weightKg": 0.0340194,
+                          "cd": 0.4,
+                          "guideLengthM": 0.9144,
+                          "website": "https://flierfred.com/",
+                          "comments": "built at the launch!"
+                        }, {
+                          "clientId": "2",
+                          "name": "Mobile Two",
+                          "bodyDiameterM": 0.033782,
+                          "mmtDiameterMm": 24,
+                          "mmtLengthMm": 152.4,
+                          "weightKg": 0.0850485,
+                          "adapters": [{
+                            "mmtDiameterMm": 18,
+                            "mmtLengthMm": 76.2,
+                            "weightKg": 0.01417475
+                          }],
+                          "cd": 0.45,
+                          "guideLengthM": 0.9144
+                        }]
+                      }`;
+        post('/api/v1/saverockets.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"clientId":/, 2);
+          expect(response).toMatchN(/"clientId": *"1"/, 1);
+          expect(response).toMatchN(/"clientId": *"2"/, 1);
+          expect(response).toMatchN(/"id":/, 2);
+          expect(response).toMatchN(/"name":/, 2);
+          expect(response).toMatchN(/"status": *"created"/, 2);
+          expect(response).not.toMatch(/"error":/);
+          expect(response).toBeExpected(/"id": *"[^"]*"/g, '"id": "..."');
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<saverockets-request>
+                        <username>flier.fred@gmail.com</username>
+                        <password>secret</password>
+                        <rockets>
+                          <rocket>
+                            <client-id>1</client-id>
+                            <name>Mobile One</name>
+                            <public>true</public>
+                            <body-diameter-m>0.024892</body-diameter-m>
+                            <mmt-diameter-mm>18</mmt-diameter-mm>
+                            <mmt-length-mm>76.2</mmt-length-mm>
+                            <mmt-count>1</mmt-count>
+                            <weight-kg>0.0340194</weight-kg>
+                            <cd>0.4</cd>
+                            <guide-length-m>0.9144</guide-length-m>
+                            <website>https://flierfred.com/</website>
+                            <comments>built at the launch!</comments>
+                          </rocket>
+                          <rocket>
+                            <client-id>2</client-id>
+                            <name>Mobile Two</name>
+                            <body-diameter-m>0.033782</body-diameter-m>
+                            <mmt-diameter-mm>24</mmt-diameter-mm>
+                            <mmt-length-mm>152.4</mmt-length-mm>
+                            <weight-kg>0.0850485</weight-kg>
+                            <adapters>
+                              <adapter>
+                                <mmt-diameter-mm>18</mmt-diameter-mm>
+                                <mmt-length-mm>76.2</mmt-length-mm>
+                                <weight-kg>0.01417475</weight-kg>
+                              </adapter>
+                            </adapters>
+                            <cd>0.45</cd>
+                            <guide-length-m>0.9144</guide-length-m>
+                          </rocket>
+                        </rockets>
+                      </saverockets-request>`;
+        post('/api/v1/saverockets.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<client-id>/, 2);
+          expect(response).toMatchN(/<client-id>1<\/client-id>/, 1);
+          expect(response).toMatchN(/<client-id>2<\/client-id>/, 1);
+          expect(response).toMatchN(/<id>/, 2);
+          expect(response).toMatchN(/<name>/, 2);
+          expect(response).toMatchN(/<status>created<\/status>/, 2);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected(/<id>[^<]*/g, '<id>...');
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("update-one", function() {
+      it("JSON", function(done) {
+        const create = `{
+                          "username": "flier.fred@gmail.com",
+                          "password": "secret",
+                          "rockets": [{
+                            "clientId": "3",
+                            "name": "Mobile Three",
+                            "bodyDiameterM": 0.024892,
+                            "mmtDiameterMm": 18,
+                            "mmtLengthMm": 76.2,
+                            "mmtCount": 1,
+                            "weightKg": 0.0340194,
+                            "cd": 0.4,
+                            "guideLengthM": 0.9144
+                          }]
+                        }`;
+        post('/api/v1/saverockets.json', create).then(created => {
+          expect(created).toBeValidJSON();
+          expect(created).toMatchN(/"clientId":/, 1);
+          expect(created).toMatchN(/"id":/, 1);
+          expect(created).toMatch(/"name": *"Mobile Three"/);
+          expect(created).toMatchN(/"status": *"created"/, 1);
+          expect(created).not.toMatch(/"error":/);
+          const id = JSON.parse(created).results[0].id;
+          expect(id).toMatch(/^[0-9a-f]{24}$/i);
+
+          const update = `{
+                            "username": "flier.fred@gmail.com",
+                            "password": "secret",
+                            "rockets": [{
+                              "clientId": "3",
+                              "id": "${id}",
+                              "name": "Mobile Three (2)",
+                              "bodyDiameterM": 0.075,
+                              "mmtDiameterMm": 29,
+                              "mmtLengthMm": 208,
+                              "mmtCount": 3,
+                              "weightKg": 0.065,
+                              "cd": 0.5,
+                              "guideLengthM": 2
+                            }]
+                          }`;
+          post('/api/v1/saverockets.json', update).then(updated => {
+            expect(updated).toBeValidJSON();
+            expect(updated).toMatchN(/"clientId":/, 1);
+            expect(updated).toMatch(/"clientId": *"3"/);
+            expect(updated).toMatchN(/"id":/, 1);
+            expect(updated).toMatch(/"name": *"Mobile Three \(2\)"/);
+            expect(updated).toMatchN(/"status": *"updated"/, 1);
+            expect(updated).not.toMatch(/"error":/);
+
+            let list = `{
+                          "username": "flier.fred@gmail.com",
+                          "password": "secret"
+                        }`;
+            post('/api/v1/getrockets.json', list).then(listed => {
+              expect(listed).toBeValidJSON();
+              expect(listed).toMatchN(/"id":/, 4);
+              expect(listed).toMatch(/"name": *"Mobile Three \(2\)"/);
+              expect(listed).toMatch(/"bodyDiameterM": *0.075/);
+              expect(listed).toMatch(/"mmtDiameterMm": *29/);
+              expect(listed).toMatch(/"mmtLengthMm": *208/);
+              expect(listed).toMatch(/"mmtCount": *3/);
+              expect(listed).toMatch(/"weightKg": *0.065/);
+              expect(listed).toMatch(/"cd": *0.5/);
+              expect(listed).toMatch(/"guideLengthM": *2/);
+              expect(listed).toBeExpected(/"(id|createdOn|updatedOn)": *"[^"]*"/g, '"$1": "..."');
+              done();
+            }).catch(e => {
+              fail(e);
+              done();
+            });
+          }).catch(e => {
+            fail(e);
+            done();
+          });
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const create = `<saverockets-request>
+                          <username>flier.fred@gmail.com</username>
+                          <password>secret</password>
+                          <rockets>
+                            <rocket>
+                              <client-id>3</client-id>
+                              <name>Mobile Three</name>
+                              <body-diameter-m>0.024892</body-diameter-m>
+                              <mmt-diameter-mm>18</mmt-diameter-mm>
+                              <mmt-length-mm>76.2</mmt-length-mm>
+                              <mmt-count>1</mmt-count>
+                              <weight-kg>0.0340194</weight-kg>
+                              <cd>0.4</cd>
+                              <guide-length-m>0.914</guide-length-m>
+                            </rocket>
+                          </rockets>
+                        </saverockets-request>`;
+        post('/api/v1/saverockets.xml', create).then(created => {
+          expect(created).toBeValidXML(API_SCHEMA);
+          expect(created).toMatchN(/<client-id>/, 1);
+          expect(created).toMatchN(/<id>/, 1);
+          expect(created).toMatch(/<name>Mobile Three<\/name>/);
+          expect(created).toMatchN(/<status>created<\/status>/, 1);
+          expect(created).not.toMatch(/<error>/);
+          const id = created.replace(/\s+/g, ' ').replace(/^.*<id>([^<]+)<\/id>.*$/, '$1');
+          expect(id).toMatch(/^[0-9a-f]{24}$/i);
+
+          const update = `<saverockets-request>
+                            <username>flier.fred@gmail.com</username>
+                            <password>secret</password>
+                            <rockets>
+                              <rocket>
+                                <client-id>3</client-id>
+                                <id>${id}</id>
+                                <name>Mobile Three (2)</name>
+                                <body-diameter-m>0.075</body-diameter-m>
+                                <mmt-diameter-mm>29</mmt-diameter-mm>
+                                <mmt-length-mm>208</mmt-length-mm>
+                                <mmt-count>3</mmt-count>
+                                <weight-kg>0.065</weight-kg>
+                                <cd>0.5</cd>
+                                <guide-length-m>2</guide-length-m>
+                              </rocket>
+                            </rockets>
+                          </saverockets-request>`;
+          post('/api/v1/saverockets.xml', update).then(updated => {
+            expect(created).toBeValidXML(API_SCHEMA);
+            expect(updated).toMatchN(/<client-id>/, 1);
+            expect(updated).toMatch(/<client-id>3<\/client-id>/);
+            expect(updated).toMatchN(/<id>/, 1);
+            expect(updated).toMatch(/<name>Mobile Three \(2\)<\/name>/);
+            expect(updated).toMatchN(/<status>updated<\/status>/, 1);
+            expect(updated).not.toMatch(/<error>/);
+
+            let list = `<getrockets-request>
+                          <username>flier.fred@gmail.com</username>
+                          <password>secret</password>
+                        </getrockets-request>`;
+            post('/api/v1/getrockets.xml', list).then(listed => {
+              expect(listed).toMatchN(/<rocket>/, 4);
+              expect(listed).toMatch(/<name>Mobile Three \(2\)<\/name>/);
+              expect(listed).toMatch(/<body-diameter-m>0.075<\/body-diameter-m>/);
+              expect(listed).toMatch(/<mmt-diameter-mm>29<\/mmt-diameter-mm>/);
+              expect(listed).toMatch(/<mmt-length-mm>208<\/mmt-length-mm>/);
+              expect(listed).toMatch(/<mmt-count>3<\/mmt-count>/);
+              expect(listed).toMatch(/<weight-kg>0.065<\/weight-kg>/);
+              expect(listed).toMatch(/<cd>0.5<\/cd>/);
+              expect(listed).toMatch(/<guide-length-m>2<\/guide-length-m>/);
+              expect(listed).toBeExpected(/<(id|created-on|updated-on)>[^<]*/g, '<$1>...');
+              done();
+            }).catch(e => {
+              fail(e);
+              done();
+            });
+          }).catch(e => {
+            fail(e);
+            done();
+          });
         }).catch(e => {
           fail(e);
           done();

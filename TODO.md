@@ -34,15 +34,15 @@ This page lists the things supported in the old site which haven't yet been reim
 
 ## API
 
-Re-implement API for JSON and XML (`/api/1`) plus backwards-compatible endpoints (`/servlets`).
+Re-implement API for JSON and XML (`/api/v1`) plus backwards-compatible endpoints (`/servlets`).
 
- * saverocket (new)
  * motorguide
 
-## Phone App
+## Mobile App
 
- * re-implement TCTG on latest Cordova using updated API
- * add support for bi-directional sync of rockets
+ * update TCTG to latest Cordova
+ * switch to updated (JSON) API
+ * add support for saving rockets entered into the app
 
 
 # Old Site Pages

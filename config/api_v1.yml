@@ -10,7 +10,7 @@ info:
   license:
     name: ISC license
     url: 'https://opensource.org/licenses/ISC'
-  version: 1.0.2
+  version: 1.0.3
 
 host: www.thrustcurve.org
 basePath: /api/v1
@@ -152,7 +152,7 @@ paths:
     post:
       tags:
         - account
-      description: The POST method specifies JSON object with account credentials.
+      description: The POST method specifies a JSON object with account credentials.
       consumes:
         - application/json
       produces:
@@ -160,7 +160,7 @@ paths:
       parameters:
         - in: body
           name: body
-          description: Account credential. At least username must be specified.
+          description: Account credentials. At least username must be specified.
           required: true
           schema:
             $ref: '#/definitions/GetRocketsRequest'
@@ -173,7 +173,7 @@ paths:
     post:
       tags:
         - account
-      description: The POST method specifies JSON object with account credentials and rockets.
+      description: The POST method specifies a JSON object with account credentials and rockets.
       consumes:
         - application/json
       produces:
@@ -190,6 +190,27 @@ paths:
           description: Saved rocket status.
           schema:
             $ref: '#/definitions/SaveRocketsResponse'
+  /motorguide.json:
+    post:
+      tags:
+        - guide
+      description: The POST method specifies a JSON object with the rocket info.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Rocket information and search criteria
+          required: true
+          schema:
+            $ref: '#/definitions/MotorGuideRequest'
+      responses:
+        '200':
+          description: Motors for this rocket
+          schema:
+            $ref: '#/definitions/MotorGuideResponse'
 
 definitions:
   MetadataRequest:
@@ -390,7 +411,7 @@ definitions:
             error:
               description: error in criterion specification
               type: string
-              example: Invalid commonName value "C6".
+              example: Invalid commonName value "X6".
       matches:
         description: number of matches of all criteria (and)
         type: integer
@@ -406,67 +427,88 @@ definitions:
               type: string
               example: 5872d0980002310000000015
             manufacturer:
+              description: manufacturer full name
               type: string
               example: Estes Industries
             manufacturerAbbrev:
+              description: manufacturer abbreviation
               type: string
               example: Estes
             designation:
+              description: manufacturer designation
               type: string
               example: C6
             commonName:
+              description: common name of motor
               type: string
               example: C6
             impulseClass:
+              description: letter class of motor total impulse
               type: string
               example: C
             diameter:
+              description: motor diameter in millimeters
               type: number
               example: 18
             length:
+              description: motor length in millimeters
               type: number
               example: 70
             type:
+              description: type of motor
               type: string
               example: SU
             avgThrustN:
+              description: average thrust in Newtons
               type: number
               example: 4.7
             maxThrustN:
+              description: maximum thrust in Newtons
               type: number
               example: 14.1
             totImpulseNs:
+              description: total impulse in Newton-seconds
               type: number
               example: 8.8
             burnTimeS:
+              description: burn time in seconds
               type: number
               example: 1.9
             dataFiles:
+              description: number of data files
               type: integer
               example: 3
             infoUrl:
+              description: ThrustCurve info URL
               type: string
               format: url
               example: 'https://nar.org/SandT/pdf/Estes/C6.pdf'
             totalWeightG:
+              description: total weight in grams
               type: number
               example: 24
             propWeightG:
+              description: propellant weight in grams
               type: number
               example: 11
             delays:
+              description: available delays
               type: string
               example: '0,3,5,7'
             caseInfo:
+              description: case info if any
               type: string
-              example: ''
+              example: 'RMS 40/120'
             propInfo:
+              description: propellant type
               type: string
-              example: ''
+              example: Blue Thunder
             sparky:
+              description: if this motor produces sparks
               type: boolean
               example: false
             updatedOn:
+              description: last updated date of motor info
               type: string
               format: date
               example: '2014-12-02'
@@ -748,3 +790,191 @@ definitions:
         description: any errors that occurred
         type: string
         example: Missing name for rocket #1.
+
+  MotorGuideRequest:
+    type: object
+    description: rocket information and search criteria
+    properties:
+      rocket:
+        description: rocket to find motors for
+        type: object
+        properties:
+          name:
+            description: name of rocket (optional)
+            type: string
+            example: Alpha III
+          bodyDiameterM:
+            description: body diameter in meters
+            type: number
+            example: 0.025
+          mmtDiameterMm:
+            description: motor mount tube diameter in millimeters
+            type: number
+            example: 18
+          mmtLengthMm:
+            description: motor mount tube length in millimeters
+            type: number
+            example: 70
+          weightKg:
+            description: dry weight of rocket in kilograms
+            type: number
+            example: 0.045
+          cd:
+            description: coefficient of drag of rocket
+            type: number
+            example: 0.25
+          guideLengthM:
+            description: length of launch guide in meters
+            type: number
+            example: 1.0
+      manufacturer:
+        description: manufacturer name or abbreviation
+        type: string
+        example: Estes
+      impulseClass:
+        description: letter class of motor
+        type: string
+        example: C
+      type:
+        description: motor type
+        type: string
+        enum:
+          - SU
+          - reload
+          - hybrid
+        example: SU
+      availability:
+        description: motor current availability
+        type: string
+        enum:
+          - regular
+          - occasional
+          - OOP
+          - available
+          - all
+        example: available
+      maxResults:
+        description: maximum number of results returned
+        type: integer
+        example: 25
+  MotorGuideResponse:
+    type: object
+    description: motors for this rocket
+    properties:
+      criteria:
+        description: the search criteria with errors and matches
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              description: name of search criterion
+              type: string
+              example: commonName
+            value:
+              description: value of search criterion
+              type: string
+              example: C6
+            matches:
+              description: number of matches of this criterion
+              type: integer
+              example: 3
+            error:
+              description: error in criterion specification
+              type: string
+              example: 'Invalid commonName "X6".'
+      matches:
+        description: number of matches of all criteria (and)
+        type: integer
+        example: 25
+      results:
+        type: array
+        description: motors for this rocket
+        items:
+          type: object
+          properties:
+            motorId:
+              description: unique ID of motor
+              type: string
+              example: 56a40928000231000000001f
+            manufacturer:
+              description: manufacturer full name
+              type: string
+              example: Estes Industries
+            manufacturerAbbrev:
+              description: manufacturer abbreviation
+              type: string
+              example: Estes
+            designation:
+              description: manufacturer designation
+              type: string
+              example: D11
+            commonName:
+              description: common name of motor
+              type: string
+              example: D11
+            thrustToWeight:
+              description: thrust:weight ratio
+              type: number
+              example: 0.674
+            simulationsRun:
+              description: number of simulations run
+              type: number
+              example: 1
+            liftoffTime:
+              description: time until liftoff in seconds
+              type: number
+              example: 0.02
+            burnoutTime:
+              description: time until burnout in seconds
+              type: number
+              example: 1.86
+            apogeeTime:
+              description: time until apogee in seconds
+              type: number
+              example: 12.61
+            maxAcceleration:
+              description: maximum acceleration in meters/second/second
+              type: number
+              example: 266.037
+            guideVelocity:
+              description: velocity off launch guide in meters/second
+              type: number
+              example: 15.273
+            maxVelocity:
+              description: maximum velocity in meters/second
+              type: number
+              example: 144.364
+            burnoutAltitude:
+              type: number
+              description: altitude at burnout in meters
+              example: 162.242
+            maxAltitude:
+              description: maximum altitude in meters
+              type: number
+              example: 817.075
+            optimalDelay:
+              description: ideal delay in seconds
+              type: number
+              example: 10.75
+            status:
+              description: motor usability status
+              type: string
+              enum:
+                - ok
+                - 5-to-1
+                - guide-vel
+                - too-low
+              example: ok
+      okCount:
+        description: number of motors that work
+        type: integer
+        example: 16
+      failedCount:
+        description: number of motors that didn't work
+        type: integer
+        example: 9
+      error:
+        description: any errors that occurred
+        type: string
+        example: 'Invalid rocket cd value.'

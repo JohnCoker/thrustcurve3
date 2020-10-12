@@ -16,6 +16,7 @@ const express = require('express'),
       units = require('../lib/units'),
       metadata = require('../lib/metadata'),
       parsers = require('../simulate/parsers'),
+      flightsim = require('../simulate/flightsim'),
       data = require('../render/data'),
       api1 = require('../lib/api');
 
@@ -223,15 +224,41 @@ router.post([APIPrefix + 'metadata.xml', LegacyPrefix + 'metadata'], xmlParser, 
  * /api/v1/search
  * Search for motors, either as XML or JSON.
  */
+function criteriaQueries(req, cache, criteria, criteriaInfo, queries) {
+  Object.keys(criteria).map(crit => {
+    let info = {
+      name: crit,
+      value: criteria[crit],
+    };
+
+    let critErrs = new errors.Collector();
+    let one = {};
+    one[crit] = criteria[crit];
+    let query = api1.searchQuery(one, cache, critErrs);
+    if (critErrs.errorCount() > 0) {
+      info.error = critErrs.lastError().message;
+      info.matches = 0;
+    } else {
+      queries.push(function(cb) {
+        req.db.Motor.count(query, function(err, count) {
+          if (err)
+            return cb(err);
+          info.matches = count;
+          cb(null, count);
+        });
+      });
+    }
+    criteriaInfo.push(info);
+  });
+}
+
 function doSearch(req, res, format) {
   const request = api1.getRequest(req, 'search-request');
   const errs = new errors.Collector();
 
-  let maxResults = api1.getElement(request, "max-results", api1.intValue, errs);
-  if (maxResults == null)
-    maxResults = 20;
-  else if (maxResults <= 0)
-    maxResults = -1;
+  format.root('search-response', (req.isLegacy ? '2016' : '2020') + '/SearchResponse');
+
+  const maxResults = api1.getMaxResults(request, errs);
 
   let resultMatches = 0;
 
@@ -239,34 +266,9 @@ function doSearch(req, res, format) {
     let query = api1.searchQuery(request, cache, errs);
     let criteria = api1.searchCriteria(request);
 
-    format.root('search-response', (req.isLegacy ? '2016' : '2020') + '/SearchResponse');
     let criteriaInfo = [];
     let queries = [];
-    Object.keys(criteria).map(crit => {
-      let info = {
-        name: crit,
-        value: criteria[crit],
-      };
-
-      let critErrs = new errors.Collector();
-      let one = {};
-      one[crit] = criteria[crit];
-      let query = api1.searchQuery(one, cache, critErrs);
-      if (critErrs.errorCount() > 0) {
-        info.error = critErrs.lastError().message;
-        info.matches = 0;
-      } else {
-        queries.push(function(cb) {
-          req.db.Motor.count(query, function(err, count) {
-            if (err)
-              return cb(err);
-            info.matches = count;
-            cb(null, count);
-          });
-        });
-      }
-      criteriaInfo.push(info);
-    });
+    criteriaQueries(req, cache, criteria, criteriaInfo, queries);
 
     let results = [];
     if (errs.errorCount() === 0) {
@@ -402,9 +404,7 @@ function doDownload(req, res, format) {
     }
   }
 
-  let maxResults = api1.getElement(request, "max-results");
-  if (isNaN(maxResults) || maxResults <= 0)
-    maxResults = -1;
+  const maxResults = api1.getMaxResults(request, errs, -1);
 
   metadata.get(req, function(cache) {
     let query = api1.downloadQuery(request, cache, errs);
@@ -754,6 +754,181 @@ router.post(APIPrefix + 'saverockets.json', jsonParser, function(req, res, _next
 });
 router.post(APIPrefix + 'saverockets.xml', xmlParser, function(req, res, _next) {
   doSaveRockets(req, res, new data.XMLFormat());
+});
+
+
+/*
+ * /api/v1/motorguide
+ * Find motors that work for a rocket design.
+ */
+const MinGuideVelocity = 14.9,
+      MinThrustWeight = 4.5;
+
+function minAltitude(motor) {
+  return 10.0 * (Math.log(motor.totalImpulse) / Math.log(2));
+}
+
+function doMotorGuide(req, res, format) {
+  const request = api1.getRequest(req, 'motorguide-request');
+  const errs = new errors.Collector();
+
+  format.root('motorguide-response', (req.isLegacy ? '2014' : '2020') + '/MotorGuideResponse');
+
+  let criteriaInfo = [];
+  let criteriaMatches = 0;
+  let results = [];
+  let okCount = 0, failedCount = 0;
+  function send() {
+    format.elementListFull('criteria', criteriaInfo, { matches: criteriaMatches });
+    format.elementListFull('results', results,
+                           { 'ok-count': okCount, 'failed-count': failedCount }, true);
+    format.error(errs);
+    format.send(res, errs.hasErrors());
+  }
+
+  const maxResults = api1.getMaxResults(request, errs);
+
+  const conditions = {
+    temperature: 20,
+    altitude: 0,
+  };
+
+  metadata.get(req, function(cache) {
+    let rocket = api1.guideRocket(req, request, errs);
+    let search = api1.searchQuery(request, cache, errs);
+    if (rocket == null || errs.hasErrors()) {
+      send();
+      return;
+    }
+
+    let criteria = api1.searchCriteria(request);
+    let queries = [];
+    criteriaQueries(req, cache, criteria, criteriaInfo, queries);
+    async.parallel(queries, success(req, res, _results => {
+      req.db.Motor.count(search).exec(success(req, res, function(matchCount) {
+        criteriaMatches = matchCount;
+        if (matchCount < 1) {
+          send();
+          return;
+        }
+        search.diameter = { $gt: rocket.mmtDiameter - metadata.MotorDiameterTolerance,
+                            $lt: rocket.mmtDiameter + metadata.MotorDiameterTolerance };
+        search.length = { $lt: rocket.mmtLength + metadata.MotorDiameterTolerance };
+        req.db.Motor.find(search)
+                    .sort({ totalImpulse: 1 })
+                    .exec(success(req, res, function(motors) {
+          req.db.SimFile.find({ _motor: { $in: _.pluck(motors, '_id') } })
+                        .sort({ _motor: 1, updatedAt: -1 })
+                        .exec(success(req, res, function(simfiles) {
+            // for each motor, get what info we can
+            motors.forEach(motor => {
+
+              // simulation inputs for this motor
+              let simInputs = _.extend({}, rocket, {
+                motorInitialMass: flightsim.motorInitialMass(motor),
+                motorBurnoutMass: flightsim.motorBurnoutMass(motor),
+              });
+
+              // for each motor, run the first simulation we can
+              let motorFiles = _.filter(simfiles, function(f) {
+                return f._motor.toString() == motor._id.toString();
+              });
+              let simulation;
+              motorFiles.forEach(motorFile => {
+                // parse the data in the sim file
+                let data = parsers.parseData(motorFile.format, motorFile.data, new errors.Collector());
+                if (data != null) {
+                  let simErrors = new errors.Collector();
+                  simulation = flightsim.simulate(simInputs, data, conditions, simErrors);
+                }
+              });
+
+              // determine if this motor works or not
+              let ttw = (motor.avgThrust / flightsim.GravityMSL) / (simInputs.rocketMass + simInputs.motorInitialMass);
+              let result = {};
+              if (simulation != null) {
+                // simulation; check guide velocity and min altitude
+                if (simulation.guideVelocity < MinGuideVelocity)
+                  result.status = 'guide-vel';
+                else if (simulation.maxAltitude > 0 && result.maxAltitude < minAltitude(motor))
+                  result.status = 'too-low';
+              } else {
+                // no simulation; check thrust/weight ratio
+                if (ttw < MinThrustWeight)
+                  result.status = '5-to-1';
+              }
+              if (result.status != null) {
+                failedCount++;
+              } else {
+                result.status = 'ok';
+                okCount++;
+              }
+
+              // set up motor info
+              result['motor-id'] = motor._id.toString();
+              result.manufacturer = cache.manufacturers.byId(motor._manufacturer).name;
+              result['manufacturer-abbrev'] = cache.manufacturers.byId(motor._manufacturer).abbrev;
+              result.designation = motor.designation;
+              result['common-name'] = motor.commonName;
+              result['thrust-to-weight'] = ttw;
+              result['simulations-run'] = 0;
+
+              // add the simulation info if we have it
+              if (simulation != null) {
+                result['simulations-run'] = 1;
+                result['liftoff-mass'] = simulation.liftoffMass;
+                result['burnout-mass'] = simulation.burnoutMass;
+                result['liftoff-time'] = simulation.liftoffTime;
+                result['burnout-time'] = simulation.burnoutTime;
+                result['apogee-time'] = simulation.apogeeTime;
+                result['max-acceleration'] = simulation.maxAcceleration;
+                result['guide-velocity'] = simulation.guideVelocity;
+                result['max-velocity'] = simulation.maxVelocity;
+                result['burnout-altitude'] = simulation.burnoutAltitude;
+                result['max-altitude'] = simulation.maxAltitude;
+                if (simulation.apogeeTime > simulation.burnoutTime)
+                  result['optimal-delay'] = simulation.apogeeTime - simulation.burnoutTime;
+              }
+
+              results.push(result);
+            });
+
+            // if we have motors that work, drop the failures
+            if (okCount > 0)
+              results = results.filter(r => r.status === 'ok');
+            if (maxResults > 0 && results.length > maxResults)
+              results.length = maxResults;
+
+            if (results.length > 0 && req.isLegacy) {
+              // map motor IDs
+              req.db.IntIdMap.map(motors, success(req, res, function(ints) {
+                results.forEach(result => {
+                  let index = motors.indexOf(motors.find(m => m._id.toString() === result['motor-id']));
+                  result['motor-id'] = ints[index];
+                });
+                send();
+              }));
+            } else {
+              send();
+            }
+          }));
+        }));
+      }));
+    }));
+  });
+}
+
+router.get(APIPrefix + 'motorguide.json', function(req, res, _next) {
+  doMotorGuide(req, res, new data.JSONFormat());
+});
+router.post(APIPrefix + 'motorguide.json', jsonParser, function(req, res, _next) {
+  doMotorGuide(req, res, new data.JSONFormat());
+});
+router.get(APIPrefix + 'motorguide.xml', function(req, res, _next) {
+  doMotorGuide(req, res, new data.XMLFormat());
+});
+router.post([APIPrefix + 'motorguide.xml', LegacyPrefix + 'motorguide'], xmlParser, function(req, res, _next) {
+  doMotorGuide(req, res, new data.XMLFormat());
 });
 
 

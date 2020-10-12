@@ -1,0 +1,18 @@
+{
+  "criteria": [
+    {
+      "name": "manufacturer",
+      "value": "Kosdon",
+      "matches": 42
+    },
+    {
+      "name": "impulseClass",
+      "value": "A",
+      "matches": 6
+    }
+  ],
+  "matches": 0,
+  "results": [],
+  "okCount": 0,
+  "failedCount": 0
+}

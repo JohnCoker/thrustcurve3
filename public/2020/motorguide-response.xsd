@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ASCII"?>
+<?xml-stylesheet type="text/xsl" href="/xs3p.xsl"?>
+<xs:schema version="2020.1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="http://www.thrustcurve.org/2020/MotorGuideResponse"
+ xmlns="http://www.thrustcurve.org/2020/MotorGuideResponse"
+ elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This schema defines the response returned by the ThrustCurve.org motor guide XML API.
+      For more information, see the documentation at https://www.thrustcurve.org/info/api.html
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="motorguide-response">
+    <xs:complexType>
+      <xs:sequence>
+
+        <!-- the search criteria are returned, along with the number of matches -->
+	<xs:element name="criteria">
+          <xs:complexType>
+            <xs:sequence>
+	      <xs:element name="criterion" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
+                    <xs:element name="value" type="xs:string"/>
+                    <xs:element name="matches" type="xs:integer"/>
+                    <xs:element name="error" type="xs:string" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:complexType>
+	      </xs:element>
+              <xs:element name="matches" type="xs:integer"/>
+            </xs:sequence>
+          </xs:complexType>
+	</xs:element>
+
+        <!-- the list of results is always present, but may be empty -->
+	<xs:element name="results">
+          <xs:complexType>
+            <xs:sequence>
+	      <xs:element name="result" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <!-- status, always present -->
+                    <xs:element name="status">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="ok"/>
+                          <xs:enumeration value="5-to-1"/>
+                          <xs:enumeration value="guide-vel"/>
+                          <xs:enumeration value="too-low"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+
+                    <!-- motor info, always present -->
+                    <xs:element name="motor-id">
+                       <xs:simpleType>
+                         <xs:restriction base="xs:string">
+                           <xs:pattern value="[0-9A-Fa-f]+"/>
+                         </xs:restriction>
+                       </xs:simpleType>
+                    </xs:element>
+	            <xs:element name="manufacturer" type="xs:string"/>
+	            <xs:element name="manufacturer-abbrev" type="xs:string"/>
+	            <xs:element name="designation" type="xs:string"/>
+	            <xs:element name="common-name" type="xs:string"/>
+                    <xs:element name="thrust-to-weight" type="xs:decimal"/>
+                    <xs:element name="simulations-run" type="xs:integer"/>
+
+                    <!-- simulation results, present if simulations-run > 0 -->
+                    <xs:element name="liftoff-mass" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="burnout-mass" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="liftoff-time" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="burnout-time" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="apogee-time" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="max-acceleration" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="guide-velocity" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="max-velocity" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="burnout-altitude" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="max-altitude" type="xs:decimal" minOccurs="0"/>
+                    <xs:element name="optimal-delay" type="xs:decimal" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:complexType>
+	      </xs:element>
+            </xs:sequence>
+            <xs:attribute name="ok-count" type="xs:integer"/>
+            <xs:attribute name="failed-count" type="xs:integer"/>
+          </xs:complexType>
+	</xs:element>
+
+        <!-- if a general error occurred more detail is returned -->
+	<xs:element name="error" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

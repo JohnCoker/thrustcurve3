@@ -2,7 +2,7 @@
 <getrockets-response xmlns="http://www.thrustcurve.org/2015/GetRocketsResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2015/GetRocketsResponse http://www.thrustcurve.org/2015/getrockets-response.xsd">
     <results>
         <rocket>
-            <id>1000002</id>
+            <id>1000001</id>
             <name>Alpha III</name>
             <body-diameter-m>0.024891999999999997</body-diameter-m>
             <mmt-diameter-mm>18</mmt-diameter-mm>
@@ -16,7 +16,7 @@
             <updated-on>2020-09-27</updated-on>
         </rocket>
         <rocket>
-            <id>1000001</id>
+            <id>1000003</id>
             <name>Versatile</name>
             <body-diameter-m>0.033782</body-diameter-m>
             <mmt-diameter-mm>24</mmt-diameter-mm>

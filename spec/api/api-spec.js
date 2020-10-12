@@ -1218,6 +1218,399 @@ describe("API v1", function() {
       });
     });
   });
+  describe("motorguide", function() {
+    const API_SCHEMA = "2020/motorguide-response.xsd";
+    const LEGACY_SCHEMA = "2014/motorguide-response.xsd";
+    describe("missing values", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "rocket": {
+                          "name": "Empty"
+                        }
+                      }`;
+        post('/api/v1/motorguide.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"error": *"Invalid rocket bodyDiameterM value./);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Empty</name>
+                        </rocket>
+                      </motorguide-request>`;
+        post('/api/v1/motorguide.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatch(/<error>Invalid rocket body-diameter-m value./);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("legacy", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Empty</name>
+                        </rocket>
+                      </motorguide-request>`;
+        post('/servlets/motorguide', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatch(/<error>Invalid rocket body-diameter-m value./);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("unmatched-criteria", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "rocket": {
+                          "name": "Sample",
+                          "bodyDiameterM": 0.024892,
+                          "mmtDiameterMm": 18,
+                          "mmtLengthMm": 76.2,
+                          "weightKg": 0.0340194,
+                          "cd": 0.4,
+                          "guideLengthM": 0.9144
+                        },
+                        "manufacturer": "Kosdon",
+                        "impulseClass": "A"
+                      }`;
+        post('/api/v1/motorguide.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"matches": *[1-9][0-9]*/, 2);
+          expect(response).toMatch(/"matches": *0,/);
+          expect(response).toMatch(/"okCount": *0,/);
+          expect(response).toMatch(/"failedCount": *0/);
+          expect(response).not.toMatch(/"error":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>18</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.0340194</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                        <manufacturer>Kosdon</manufacturer>
+                        <impulseClass>A</impulseClass>
+                      </motorguide-request>`;
+        post('/api/v1/motorguide.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 2);
+          expect(response).toMatch(/<matches>42<\/matches>/);
+          expect(response).toMatch(/<matches>6<\/matches>/);
+          expect(response).toMatch(/<matches>0<\/matches>/);
+          expect(response).toMatch(/<results ok-count="0" failed-count="0"\/>/);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("legacy", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>18</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.0340194</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                        <manufacturer>Kosdon</manufacturer>
+                        <impulseClass>A</impulseClass>
+                      </motorguide-request>`;
+        post('/servlets/motorguide', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 2);
+          expect(response).toMatch(/<matches>42<\/matches>/);
+          expect(response).toMatch(/<matches>6<\/matches>/);
+          expect(response).toMatch(/<matches>0<\/matches>/);
+          expect(response).toMatch(/<results ok-count="0" failed-count="0"\/>/);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("unmatched-mmt", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "rocket": {
+                          "name": "Sample",
+                          "bodyDiameterM": 0.024892,
+                          "mmtDiameterMm": 29,
+                          "mmtLengthMm": 76.2,
+                          "weightKg": 0.0340194,
+                          "cd": 0.4,
+                          "guideLengthM": 0.9144
+                        },
+                        "impulseClass": "D"
+                      }`;
+        post('/api/v1/motorguide.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"matches": *10,/);
+          expect(response).toMatchN(/"motorId"/, 0);
+          expect(response).toMatch(/"okCount": *0,/);
+          expect(response).toMatch(/"failedCount": *0/);
+          expect(response).not.toMatch(/"error":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>29</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.0340194</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                        <impulseClass>D</impulseClass>
+                      </motorguide-request>`;
+        post('/api/v1/motorguide.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 1);
+          expect(response).toMatchN(/<result>/, 0);
+          expect(response).toMatch(/<matches>10<\/matches>/);
+          expect(response).toMatch(/<results ok-count="0" failed-count="0"\/>/);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("legacy", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>29</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.0340194</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                        <impulseClass>D</impulseClass>
+                      </motorguide-request>`;
+        post('/servlets/motorguide', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 1);
+          expect(response).toMatchN(/<result>/, 0);
+          expect(response).toMatch(/<matches>10<\/matches>/);
+          expect(response).toMatch(/<results ok-count="0" failed-count="0"\/>/);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("no-criteria", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "rocket": {
+                          "name": "Sample",
+                          "bodyDiameterM": 0.024892,
+                          "mmtDiameterMm": 18,
+                          "mmtLengthMm": 76.2,
+                          "weightKg": 0.085,
+                          "cd": 0.4,
+                          "guideLengthM": 0.9144
+                        }
+                      }`;
+        post('/api/v1/motorguide.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"matches":/, 1);
+          expect(response).toMatch(/"matches": *280,/);
+          expect(response).toMatchN(/"motorId"/, 5);
+          expect(response).toMatch(/"okCount": 5,/);
+          expect(response).toMatch(/"failedCount": 7/);
+          expect(response).toMatchN(/"status": *"ok"/, 5);
+          expect(response).not.toMatch(/"error":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>18</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.085</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                      </motorguide-request>`;
+        post('/api/v1/motorguide.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 0);
+          expect(response).toMatch(/<matches>280<\/matches>/);
+          expect(response).toMatchN(/<result>/, 5);
+          expect(response).toMatchN(/<status>ok<\/status>/, 5);
+          expect(response).toMatch(/<results ok-count="5" failed-count="7">/);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("legacy", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>18</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.085</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                      </motorguide-request>`;
+        post('/servlets/motorguide', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 0);
+          expect(response).toMatch(/<matches>280<\/matches>/);
+          expect(response).toMatchN(/<result>/, 5);
+          expect(response).toMatchN(/<status>ok<\/status>/, 5);
+          expect(response).toMatch(/<results ok-count="5" failed-count="7">/);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+    describe("all-failed", function() {
+      it("JSON", function(done) {
+        const body = `{
+                        "rocket": {
+                          "name": "Sample",
+                          "bodyDiameterM": 0.024892,
+                          "mmtDiameterMm": 18,
+                          "mmtLengthMm": 76.2,
+                          "weightKg": 0.283,
+                          "cd": 0.4,
+                          "guideLengthM": 0.9144
+                        }
+                      }`;
+        post('/api/v1/motorguide.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatchN(/"matches":/, 1);
+          expect(response).toMatch(/"matches": *280,/);
+          expect(response).toMatchN(/"motorId"/, 12);
+          expect(response).toMatch(/"okCount": 0,/);
+          expect(response).toMatch(/"failedCount": 12/);
+          expect(response).toMatchN(/"status": *"guide-vel"/, 12);
+          expect(response).not.toMatch(/"error":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("XML", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>18</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.283</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                      </motorguide-request>`;
+        post('/api/v1/motorguide.xml', body).then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 0);
+          expect(response).toMatchN(/<result>/, 12);
+          expect(response).toMatch(/<matches>280<\/matches>/);
+          expect(response).toMatch(/<results ok-count="0" failed-count="12">/);
+          expect(response).toMatchN(/<status>guide-vel<\/status>/, 12);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("legacy", function(done) {
+        const body = `<motorguide-request>
+                        <rocket>
+                          <name>Sample</name>
+                          <body-diameter-m>0.024892</body-diameter-m>
+                          <mmt-diameter-mm>18</mmt-diameter-mm>
+                          <mmt-length-mm>76.2</mmt-length-mm>
+                          <weight-kg>0.283</weight-kg>
+                          <cd>0.4</cd>
+                          <guide-length-m>0.914</guide-length-m>
+                        </rocket>
+                      </motorguide-request>`;
+        post('/servlets/motorguide', body).then(response => {
+          expect(response).toBeValidXML(LEGACY_SCHEMA);
+          expect(response).toMatchN(/<criterion>/, 0);
+          expect(response).toMatchN(/<result>/, 12);
+          expect(response).toMatch(/<matches>280<\/matches>/);
+          expect(response).toMatch(/<results ok-count="0" failed-count="12">/);
+          expect(response).toMatchN(/<status>guide-vel<\/status>/, 12);
+          expect(response).not.toMatch(/<error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+    });
+  });
 
   afterAll(function() {
     if (updateExpected)

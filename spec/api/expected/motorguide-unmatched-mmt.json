@@ -1,0 +1,13 @@
+{
+  "criteria": [
+    {
+      "name": "impulseClass",
+      "value": "D",
+      "matches": 10
+    }
+  ],
+  "matches": 10,
+  "results": [],
+  "okCount": 0,
+  "failedCount": 0
+}

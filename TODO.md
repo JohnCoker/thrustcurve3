@@ -32,12 +32,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * user administration
 
-## API
-
-Re-implement API for JSON and XML (`/api/v1`) plus backwards-compatible endpoints (`/servlets`).
-
- * motorguide
-
 ## Mobile App
 
  * update TCTG to latest Cordova
@@ -105,8 +99,8 @@ This table lists all pages of the old site and will be filled in as work proceed
 | servlets/metadata   | api/1/metadata.*             | ✓ | API |
 | servlets/search     | api/1/search.*               | ✓ | API |
 | servlets/download   | api/1/download.*             | ✓ | API |
-| servlets/getrockets | api/1/getrockets.*           |   | API |
-| servlets/motorguide | api/1/motorguide.*           |   | API |
+| servlets/getrockets | api/1/getrockets.*           | ✓ | API |
+| servlets/motorguide | api/1/motorguide.*           | ✓ | API |
 
 Note that the new site takes a more REST-style approach for data display, using paths
 that contain names rather than generic pages with ID query parameters.

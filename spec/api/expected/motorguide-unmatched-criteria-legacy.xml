@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<motorguide-response xmlns="http://www.thrustcurve.org/2014/MotorGuideResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2014/MotorGuideResponse http://www.thrustcurve.org/2014/motorguide-response.xsd">
+    <criteria>
+        <criterion>
+            <name>manufacturer</name>
+            <value>Kosdon</value>
+            <matches>42</matches>
+        </criterion>
+        <criterion>
+            <name>impulseClass</name>
+            <value>A</value>
+            <matches>6</matches>
+        </criterion>
+        <matches>0</matches>
+    </criteria>
+    <results ok-count="0" failed-count="0"/>
+</motorguide-response>

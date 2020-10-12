@@ -39,7 +39,7 @@ The "compatible endpoints" listed are those that were supported by the v2 site.
 </p>
 
 <p>
-There are five actions supported, all of which use HTTP POST methods:
+There are six actions supported:
 </p>
 <ul>
 <li><a href="#metadata">metadata</a>: get search criteria</li>
@@ -51,25 +51,42 @@ There are five actions supported, all of which use HTTP POST methods:
 </ul>
 
 <p>
-Each action supports three endpoints:
+Each action supports multiple endpoints:
 </p>
 <ul>
-<li>JSON: request is query string or JSON object, response is a JSON object
-<li>XML: request is query string or XML element, response is an XML element
-<li>compatible: request and response are XML elements (deprecated)
+<li>JSON: request is query string (GET) or JSON object (POST), response is a JSON object
+<li>XML: request is query string (GET) or XML element (POST), response is an XML element
+<li>compatible: request (POST) and response are XML elements (deprecated)
 </ul>
 
 <p>
 The compatible endpoints are a legacy of the previous version of this site and have not changed (nor will they
 change in future).
-The XML endpoint is close to the compatible endpoint, but has some changes and will continue to evolve.
+The XML endpoint is close to the compatible endpoint, but has some changes
+(the 2020 XML schema versions include those changes).
 The JSON and XML endpoints are versioned and new versions may be introduced over time.
 </p>
 
 <p>
-For those updating their code from the compatible (<code>/servlets</code>) to the newer (<code>/api/v1</code>)
-endpoints, the main difference is that IDs are not integers. In the newer APIs they are longer hexadecimal numbers
-instead of short integers, but if your code treats the IDs as strings, there is no real difference.
+While useful for web mashups, the API was designed to be used by
+<a href="simulators.html">rocket simulator programs</a>
+so it does not require being called from a browser nor does it require any headers to be sent.
+</p>
+
+<p>
+For those updating their code from the compatible (<code>/servlets</code>) to the newer
+(<code>/api/v1</code>) endpoints, the main difference is that IDs are not integers.
+In the newer APIs they are 24-digit hexadecimal numbers (such as "5f81c94736f9725a10f26a56"),
+but if your code treats the IDs as strings there is no real difference.
+Note that there are often more fields in the newer responses.
+</p>
+
+<p>
+Finally, all measurements in this API use
+<a href="https://en.wikipedia.org/wiki/International_System_of_Units" target="_blank">SI (MKS) units</a>,
+except for motor mount tubes which are in millimeters.
+Note that while the web site and mobile app offer a choice of units in user preferences,
+internally they operate in SI for simplicity.
 </p>
 
 <p>
@@ -77,9 +94,9 @@ There is a <a href="/api/v1/swagger.json">OpenAPI (Swagger) spec</a> for the JSO
 <a class="url" href="https://swagger.io/tools/swagger-inspector/" target="_blank">Swagger Inspector</a>
 to explore the API with it.
 You can
-<a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0" target="_blank">Browse the hosted documentation</a>
+<a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.3" target="_blank">Browse the hosted documentation</a>
 or point Swagger Insector (or similar OpenAPI tool) at <code>https://www.thrustcurve.org/api/v1/swagger.json</code>
-or browse
+.
 </p>
 
 <p>
@@ -106,7 +123,7 @@ The metadata API doesn't return stats or data on individual motors, but instead 
 </p>
 
 <ul>
-<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0#/metadata" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.3#/metadata" target="_blank">Swagger documentation for the JSON API</a></li>
 <li><a href="/2014/metadata-request.xsd" target="_blank">XSD for the XML API request</a>
 <li><a href="/2008/metadata-response.xsd" target="_blank">XSD for the XML API response</a>
 </ul>
@@ -143,7 +160,7 @@ returns data on specific motors in the the database. This API could be used to d
 </p>
 
 <ul>
-<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0#/search" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.3#/search" target="_blank">Swagger documentation for the JSON API</a></li>
 <li><a href="/2020/search-request.xsd" target="_blank">XSD for the XML API request</a>
 <li><a href="/2020/search-response.xsd" target="_blank">XSD for the XML API response</a>
 </ul>
@@ -170,7 +187,7 @@ The request specifies one or more motors and may also specify criteria for the s
 </p>
 
 <ul>
-<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.0#/download" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.3#/download" target="_blank">Swagger documentation for the JSON API</a></li>
 <li><a href="/2020/download-request.xsd" target="_blank">XSD for the XML API request</a>
 <li><a href="/2020/download-response.xsd" target="_blank">XSD for the XML API response</a>
 </ul>
@@ -205,7 +222,7 @@ any user whose email address you know.
 </p>
 
 <ul>
-<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.2#/account/post_getrockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.3#/account/post_getrockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
 <li><a href="/2015/getrockets-request.xsd" target="_blank">XSD for the XML API request</a>
 <li><a href="/2020/getrockets-response.xsd" target="_blank">XSD for the XML API response</a>
 </ul>
@@ -231,7 +248,7 @@ of rockets to save.
 </p>
 
 <ul>
-<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.2#/account/post_saverockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.3#/account/post_saverockets_json" target="_blank">Swagger documentation for the JSON API</a></li>
 <li><a href="/2020/saverockets-request.xsd" target="_blank">XSD for the XML API request</a>
 <li><a href="/2020/saverockets-response.xsd" target="_blank">XSD for the XML API response</a>
 </ul>
@@ -245,6 +262,29 @@ device, but could potentially be useful to save rocket definitions created in ot
 <a name="motorguide"></a>
 <h2>Motor Guide</h2>
 
+<table class="endpoint">
+<tr><th>JSON</th><td class="url">/api/v1/motorguide.json</td></tr>
+<tr><th>XML</th><td class="url">/api/v1/motorguide.xml</td></tr>
+<tr><th>compatible</th><td class="url">/servlets/motorguide</td></tr>
+</table>
+
+<p>
+The motorguide API is used to find motors that will work for a rocket.
+The request specifies key information on the rocket (same the info entered into the motor
+guide page).
+</p>
+
+<ul>
+<li><a href="https://app.swaggerhub.com/apis/JCSW7/thrust-curve_org_api/1.0.3#/account/post_motorguide_json" target="_blank">Swagger documentation for the JSON API</a></li>
+<li><a href="/2014/motorguide-request.xsd" target="_blank">XSD for the XML API request</a>
+<li><a href="/2020/motorguide-response.xsd" target="_blank">XSD for the XML API response</a>
+</ul>
+
+<p>
+This API is used to power the <a href="mobile.html">mobile app</a> feature of the same name.
+It can also be used to find working motors by external sites or programs that have
+rocket design information.
+</p>
 
 
 <textarea id="copy" style="width: 0; height: 0; border: none; outline: none; margin: 0; resize: none;"></textarea>

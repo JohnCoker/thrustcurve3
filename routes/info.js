@@ -55,7 +55,7 @@ router.get('/glossary.shtml', function(req, res, next) {
 });
 
 router.get('/info/mobile.html', function(req, res, next) {
-  res.render('info/mobile', locals(defaults, 'Smart Phone App'));
+  res.render('info/mobile', locals(defaults, 'Mobile App'));
 });
 router.get('/mobile.shtml', function(req, res, next) {
   res.redirect(301, '/info/mobile.html');

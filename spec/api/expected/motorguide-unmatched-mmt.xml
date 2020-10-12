@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<motorguide-response xmlns="http://www.thrustcurve.org/2020/MotorGuideResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2020/MotorGuideResponse http://www.thrustcurve.org/2020/motorguide-response.xsd">
+    <criteria>
+        <criterion>
+            <name>impulseClass</name>
+            <value>D</value>
+            <matches>10</matches>
+        </criterion>
+        <matches>10</matches>
+    </criteria>
+    <results ok-count="0" failed-count="0"/>
+</motorguide-response>

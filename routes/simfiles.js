@@ -468,7 +468,7 @@ router.get('/simfiles/:id/dataerrors.html', function(req, res, next) {
   metadata.getManufacturers(req, function(manufacturers) {
     let errfiles = [];
     let failCount = 0, totalCount = 0;
-    let q;
+    let q = {};
     if (req.body.id !== '*' && req.body.id !== '-')
       q = simFileQuery(req);
     let cursor = req.db.SimFile.find(q).populate('_motor').cursor();

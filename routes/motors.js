@@ -625,6 +625,15 @@ router.get('/motors/missingstats.html', function(req, res, next) {
       or.push(c);
     }
   }
+  let impulseStat = {
+    field: 'impulseClass',
+    label: 'Impulse Class',
+    missing: 0,
+  };
+  stats.push(impulseStat);
+
+  // also make sure impulseClass is set
+  or.push({ impulseClass: { $not: { $regex: /^[A-O]$/ } } });
 
   // search for all available motors with a missing or invalid value for any of those stats
   query = {
@@ -651,6 +660,13 @@ router.get('/motors/missingstats.html', function(req, res, next) {
             names += ', ';
           names += stat.label;
         }
+      }
+      if (motor.impulseClass !== motor.commonName.replace(/^[^A-Z]*([A-Z]).*$/, '$1')) {
+        missing.push('impulseClass');
+        impulseStat.missing++;
+        if (names !== '')
+          names += ', ';
+        names += 'Impulse Class';
       }
       motor.missingStats = missing;
       motor.missingStatNames = names;

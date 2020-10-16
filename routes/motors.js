@@ -174,6 +174,8 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           isReloadCase: motor.type == 'reload' && motor.caseInfo,
           editLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html'
         });
+        if (simfiles.length > 0)
+          details.thrustCurveLink = req.helpers.motorLink(manufacturer, motor) + 'thrustcurve.svg';
 
         if (req.user) {
           // check if this is a favorite motor
@@ -205,6 +207,32 @@ router.get('/motorsearch.jsp', function(req, res, next) {
   } else {
     res.redirect(301, searchLink);
   }
+});
+
+router.get('/motors/:mfr/:desig/thrustcurve.svg', function(req, res, next) {
+  getMotor(req, res, true, true, function(motor, manufacturer, classCount) {
+    req.db.SimFile.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).exec(req.success(function(simfiles) {
+      let data = simfiles.reduce((prev, simfile) => {
+        if (prev != null)
+          return prev;
+        return parsers.parseData(simfile.format, simfile.data, new errors.Collector());
+      }, null);
+      if (data == null) {
+        res.status(400).send('no simfiles to graph');
+        return;
+      }
+
+      let unit;
+      if (req.query && req.query.unit)
+        unit = req.query.unit;
+      graphs.sendThrustCurve(res, {
+        data,
+        width: 600,
+        height: 350,
+        unit: unit,
+      });
+    }));
+  });
 });
 
 var classHistograms = {};
@@ -827,9 +855,9 @@ router.get('/motors/recent.html', function(req, res, next) {
  * /motors/compare.html
  * Compare different motors, renders with motors/compare.hbs template.
  */
-const impulseBurnTimeImg = '/motors/compare-impulseBurnTime.svg',
-      impulseAvgThrustImg = '/motors/compare-impulseAvgThrust.svg',
-      thrustCurveImg = '/motors/compare-thrustCurve.svg';
+const comp_impulseBurnTimeImg = '/motors/compare-impulseBurnTime.svg',
+      comp_impulseAvgThrustImg = '/motors/compare-impulseAvgThrust.svg',
+      comp_thrustCurveImg = '/motors/compare-thrustCurve.svg';
 
 function compare(req, res, ids) {
   if (ids && ids.length > 0) {
@@ -849,9 +877,9 @@ function compare(req, res, ids) {
         impulseClasses: classes,
         multiClasses: classes.length > 1,
         singleClass: classes.length == 1 ? classes[0].letter : undefined,
-        impulseBurnTimeImg: impulseBurnTimeImg + query,
-        impulseAvgThrustImg: impulseAvgThrustImg + query,
-        thrustCurveImg: thrustCurveImg + query,
+        impulseBurnTimeImg: comp_impulseBurnTimeImg + query,
+        impulseAvgThrustImg: comp_impulseAvgThrustImg + query,
+        thrustCurveImg: comp_thrustCurveImg + query,
       }));
     }));
   } else {
@@ -870,7 +898,7 @@ router.post('/motors/compare.html', function(req, res, next) {
   compare(req, res, req.body.motors);
 });
 
-router.get(impulseBurnTimeImg, function(req, res, next) {
+router.get(comp_impulseBurnTimeImg, function(req, res, next) {
   var ids = req.query.motors;
   if (ids && ids.length > 0) {
     req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName impulseClass totalImpulse burnTime').exec(req.success(function(motors) {
@@ -884,7 +912,7 @@ router.get(impulseBurnTimeImg, function(req, res, next) {
   }
 });
 
-router.get(impulseAvgThrustImg, function(req, res, next) {
+router.get(comp_impulseAvgThrustImg, function(req, res, next) {
   var ids = req.query.motors;
   if (ids && ids.length > 0) {
     req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName impulseClass totalImpulse avgThrust').exec(req.success(function(motors) {
@@ -898,7 +926,7 @@ router.get(impulseAvgThrustImg, function(req, res, next) {
   }
 });
 
-router.get(thrustCurveImg, function(req, res, next) {
+router.get(comp_thrustCurveImg, function(req, res, next) {
   var ids = req.query.motors;
   if (ids && ids.length > 0) {
     req.db.Motor.find({ _id: { $in: ids } }).select('_id commonName burnTime').exec(req.success(function(motors) {

@@ -171,17 +171,11 @@ or
 
 {{#if parsed}}
 <h2>Data Graph</h2>
-<object id="thrustcurve" type="image/svg+xml" data="{{graphLink}}">
-  Sadly, your browser doesn't support SVG images.
-</object>
+<div id="thrustcurve">
+<p class="img"><img src="{{graphLink}}" alt="{{title}}"/></p>
+</div>
 <script type="text/javascript">
-$(document).ready(function() {
-  setTimeout(function() {
-    svgPanZoom('#thrustcurve', {
-      controlIconsEnabled: true
-    });
-  }, 100);
-});
+thrustCurve($('#thrustcurve'));
 </script>
 {{/if}}
 

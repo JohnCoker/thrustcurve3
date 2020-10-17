@@ -276,9 +276,12 @@
 {{/hasPerm}}
 
 {{#if thrustCurveLink}}
-<p>
-<img src="{{thrustCurveLink}}" alt="{{title}}" style="width: 100%;"/>
-</p>
+<div id="thrustcurve">
+<p class="img"><img src="{{thrustCurveLink}}" alt="{{title}}"/></p>
+</div>
+<script type="text/javascript">
+thrustCurve($('#thrustcurve'));
+</script>
 {{/if}}
 
 <a name="simfiles"></a>

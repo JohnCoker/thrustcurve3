@@ -179,3 +179,7 @@ ul.alert {
 ol.alert {
   list-style-position: inside;
 }
+
+#thrustcurve img {
+  width: 100%;
+}

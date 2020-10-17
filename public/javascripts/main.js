@@ -71,3 +71,25 @@ function inlineSVG(selector, loaded) {
     });
   });
 }
+
+/**
+ * Set up gadgets related to viewing a thrust curve SVG image in a page.
+ * Mostly this includes a way to change the units, but also some cosmetics.
+ */
+function thrustCurve(div) {
+  $(document).ready(function() {
+    const img = div.find('img');
+    const origUrl = img.attr('src');
+    let toolbar = $('<div class="btn-toolbar pull-right" role="toolbar" aria-label="force units">' +
+                    '<div class="btn-group btn-group-sm" role="group">' +
+                    '<button type="button" class="btn btn-default" title="Newtons">N</button>' +
+                    '<button type="button" class="btn btn-default" title="pounds force">lbf</button>' +
+                    '</div></div>');
+    toolbar.css({ 'margin-top': '-1em' });
+    toolbar.find('button').on('click', function(e) {
+      e.preventDefault();
+      img.attr('src', origUrl + '?unit=' + this.innerText);
+    });
+    div.append(toolbar);
+  });
+}

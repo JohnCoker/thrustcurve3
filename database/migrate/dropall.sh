@@ -20,4 +20,6 @@ db.motorviews.drop()
 db.motorrankings.drop()
 db.favoritemotors.drop()
 db.guideresults.drop()
+db.intidseqs.drop()
+db.intidmaps.drop()
 _EOF_

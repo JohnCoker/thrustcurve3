@@ -29,6 +29,11 @@ h1:first-child {
 #footer-nav {
   margin-botttom: 0;
 }
+@media screen {
+  .print-footer {
+    display: none;
+  }
+}
 
 .sidebar {
   position: relative;
@@ -182,4 +187,84 @@ ol.alert {
 
 #thrustcurve img {
   width: 100%;
+}
+
+@media print {
+  @page {
+    size: letter;
+  }
+  html, body {
+    margin: 0;
+    width: 1024px;
+  }
+  body {
+    padding-top: 0;
+    margin: 0 auto;
+    background: white;
+    color: black;
+    width: 100%;
+    float: none;
+  }
+
+  .navbar .sidebar {
+    display: none !important;
+  }
+
+  a:link, a:visited {
+    background: transparent;
+    color: black;
+    text-decoration: none;
+  }
+  a[href]:after {
+    content: "" !important;
+  }
+
+  .visible-xs {
+    display: none !important;
+  }
+  .hidden-xs {
+    display: block !important;
+  }
+  table.hidden-xs {
+    display: table;
+  }
+  tr.hidden-xs {
+    display: table-row !important;
+  }
+  th.hidden-xs, td.hidden-xs {
+    display: table-cell !important;
+  }
+  .hidden-xs.hidden-print {
+    display: none !important;
+  }
+  .hidden-sm {
+    display: none !important;
+  }
+  .visible-sm, .visible-md, .visible-lg {
+    display: block !important;
+  }
+  table.visible-sm, table.visible-md, table.visible-lg {
+    display: table;
+  }
+  tr.visible-sm, tr.visible-md, tr.visible-lg {
+    display: table-row !important;
+  }
+  th.visible-sm, td.visible-sm, th.visible-md, td.visible-md, th.visible-lg, td.visible-lg {
+    display: table-cell !important;
+  }
+
+  .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate {
+    display: none;
+  }
+
+  .print-footer {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+  }
+  .print-footer img {
+    opacity: 0.5;
+    z-index: -1;
+  }
 }

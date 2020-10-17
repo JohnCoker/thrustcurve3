@@ -20,9 +20,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
 ## Motor Guide
 
- * support for printing multiple pages of results
- * add loaded weight to results
- * verify results are consistent run-to-run
  * use visual styles in spreadsheets
  * compare motors from results
 

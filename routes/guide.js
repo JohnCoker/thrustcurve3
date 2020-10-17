@@ -384,7 +384,7 @@ function doRunGuide(req, res, rocket) {
 
                 // query all sim files for the motors that fit
                 req.db.SimFile.find({ _motor: { $in: _.pluck(motors, '_id') } })
-                  .sort({ _motor: 1, updatedAt: -1 })
+                  .sort({ updatedAt: -1 })
                   .exec(req.success(function(simfiles) {
                     var motor, result, motorFiles, simmed, data, simInputs, simOutput, simErrors, i, j;
 

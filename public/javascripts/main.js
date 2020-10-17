@@ -9,7 +9,6 @@
 function setupTable(selector, options, next) {
   $(document).ready(function() {
     if (!options) options = {};
-
     var table = $(selector),
         pageLength = (options.expand && $(window).height() > 900) ? 20 : 10,
         numRows = table.find('tbody tr').length,
@@ -35,6 +34,18 @@ function setupTable(selector, options, next) {
 
     if (next)
       next(dt);
+
+    if (options.bPaginate == null || options.bPaginate === true) {
+      let pageLen = 20;
+      window.onbeforeprint = e => {
+        if (dt.page.len() > 0)
+          pageLen = dt.page.len();
+        dt.page.len(-1).draw('page');
+      };
+      window.onafterprint = e => {
+        dt.page.len(pageLen).draw('page');
+      };
+    }
   });
 }
 

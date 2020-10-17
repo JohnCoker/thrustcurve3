@@ -133,7 +133,8 @@ setupTable('#mmt-list', {
     <tr>
       <th>Designation</th>
       <th class="visible-md visible-lg">Manufacturer</th>
-      <th class="visible-lg">Diam.</th>
+      <th class="visible-lg" title="MMT diameter">Diam.</th>
+      <th class="visible-lg" title="loaded (liftoff) mass">Weight</th>
       <th class="number" title="thrust-to-weight ratio">T:W</th>
       <th class="number" title="velocity off launch guide">Guide</th>
       <th class="number" title="maximum altitude">Apogee</th>
@@ -147,6 +148,7 @@ setupTable('#mmt-list', {
       <td><a href="{{motorLink manufacturer motor}}">{{motor.designation}}</a></td>
       <td class="visible-md visible-lg">{{manufacturer.abbrev}}</td>
       <td class="visible-lg">{{formatMMT motor.diameter}}</td>
+      <td class="visible-lg">{{formatMass simulation.inputs.loadedInitialMass}}</td>
       <td class="number {{#less thrustWeight ../minThrustWeight}}warning{{/less}}" data-sort="{{formatSort thrustWeight}}">{{formatRatio thrustWeight}}</td>
       <td class="number {{#less simulation.guideVelocity ../minGuideVelocity}}warning{{/less}}" data-sort="{{formatSort simulation.guideVelocity}}">{{formatVelocity simulation.guideVelocity}}</td>
       <td class="number" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
@@ -159,7 +161,7 @@ setupTable('#mmt-list', {
 <script type="text/javascript">
 setupTable('#result-list', {
   order: [[4, 'asc']],
-  expand: true
+  expand: true,
 });
 </script>
 {{/if}}

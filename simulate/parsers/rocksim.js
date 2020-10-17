@@ -254,8 +254,9 @@ function combine(data, error) {
       /* jshint ignore:start */
       one = one.replace(/^.*<engine-database[^>]*>\s*<engine-list[^>]*>\s*/s, '')
                .replace(/\s*<\/engine-list[^>]*>\s*<\/engine-database[^>]*>.*$/s, '');
-      text += one + '\n';
       /* jshint ignore:end */
+      one = one.trim();
+      text += one.split(/ *\r?\n/).join('\n') + '\n';
     }
   });
 

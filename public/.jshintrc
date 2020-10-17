@@ -2,5 +2,6 @@
 {
   "node": false,
   "jasmine": false,
-  "browser": "true"
+  "browser": true,
+  "esversion": 6
 }

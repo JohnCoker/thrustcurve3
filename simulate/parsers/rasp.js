@@ -157,7 +157,7 @@ function combine(data, error) {
     }
     if (text !== '' && one.charAt(0) !== ';')
       text += ';\n';
-    text += one + '\n';
+    text += one.split(/ *\r?\n/).join('\n') + '\n';
   });
   return text;
 }

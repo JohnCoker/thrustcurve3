@@ -6,9 +6,9 @@
   "strict": false,
   "undef": true,
   "unused": "vars",
-  "evil": "true",
-  "loopfunc": "true",
-  "esnext": "true",
+  "evil": true,
+  "loopfunc": true,
+  "esnext": true,
   "predef": [
     "beforeAll",
     "afterAll",

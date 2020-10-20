@@ -84,12 +84,19 @@ function doEntryPage(req, res, rockets) {
 }
 
 function doRocketPage(req, res, rockets, rocket) {
-  var mmtDiameter, mmtLength, tempUnit, altUnit;
+  var mmtDiameter, mmtLength, tempUnit, altUnit, ignoreTypes, ignoreManufacturers;
 
   mmtDiameter = units.convertUnitToMKS(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit);
   mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
   tempUnit = units.getUnitPref('temperature').label;
   altUnit = units.getUnitPref('altitude').label;
+  if (req.user != null && req.user.preferences != null) {
+    ignoreTypes = req.user.preferences.ignoreTypes || [];
+    ignoreManufacturers = req.user.preferences.ignoreManufacturers || [];
+  } else {
+    ignoreTypes = [];
+    ignoreManufacturers = [];
+  }
 
   metadata.getRocketMotors(req, rocket, function(fit) {
     let editLink;
@@ -120,10 +127,22 @@ function doRocketPage(req, res, rockets, rocket) {
       types: fit.types,
       typeCount: fit.types.length,
       singleType: fit.types.length == 1 ? fit.types[0] : undefined,
+      chosenTypes: fit.types.map(t => {
+        return {
+          value: t,
+          selected: ignoreTypes.indexOf(t) < 0,
+        };
+      }),
 
       manufacturers: fit.manufacturers,
       manufacturerCount: fit.manufacturers.length,
       singleManufacturer: fit.manufacturers.length == 1 ? fit.manufacturers[0] : undefined,
+      chosenManufacturers: fit.manufacturers.map(m => {
+        return {
+          value: m,
+          selected: ignoreManufacturers.indexOf(m.abbrev) < 0,
+        };
+      }),
 
       submitLink: guidePage,
       editLink: editLink,

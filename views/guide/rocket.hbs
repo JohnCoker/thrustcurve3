@@ -64,8 +64,8 @@ Narrow down the possible motors if desired:
     <div class="col-md-3">
       <label for="types" class="column-title">Types</label>
       <ul class="checkboxes">
-        {{#each types}}
-        <li><input type="checkbox" name="types" value="{{this}}" checked> {{formatType this}}</li>
+        {{#each chosenTypes}}
+        <li><input type="checkbox" name="types" value="{{value}}" {{#if selected}}checked{{/if}}> {{formatType value}}</li>
         {{/each}}
       </ul>
     </div> <!-- types -->
@@ -87,8 +87,8 @@ Narrow down the possible motors if desired:
     <div class="col-md-3">
       <label for="manufacturers" class="column-title">Manufacturers</label>
       <ul class="checkboxes">
-        {{#each manufacturers}}
-        <li><input type="checkbox" name="manufacturers" value="{{_id}}" checked> {{abbrev}}</li>
+        {{#each chosenManufacturers}}
+        <li><input type="checkbox" name="manufacturers" value="{{value._id}}" {{#if selected}}checked{{/if}}> {{value.abbrev}}</li>
         {{/each}}
       </ul>
     </div> <!-- manufacturers -->

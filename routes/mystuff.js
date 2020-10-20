@@ -815,72 +815,131 @@ router.get('/mystuff/rocket/:id/delete.html', authenticated, function(req, res, 
  * Renders with mystuff/prefs.hbs template.
  */
 router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req, res, next) {
-  // normalize preferences
-  var prefs = {},
-      unitSet;
+  metadata.getAvailableMotors(req, function(cache) {
 
-  // first get the default units
-  if (req.user.preferences.defaultUnits)
-    unitSet = units.defaults.get(req.user.preferences.defaultUnits);
-  if (unitSet == null)
-    unitSet = units.defaults[0];
-  prefs.defaultUnits = unitSet.label;
+    // normalize preferences
+    var prefs = {...req.user.preferences},
+        unitSet;
 
-  // resolve each specific unit preference
-  [ 'length',
-    'mass',
-    'force',
-    'velocity',
-    'acceleration',
-    'altitude',
-    'temperature'
-  ].forEach(function(unit) {
-    var prefName = unit + 'Unit',
-        prefValue = req.user.preferences[prefName],
-        value;
+    // first get the default units
+    if (req.user.preferences.defaultUnits)
+      unitSet = units.defaults.get(req.user.preferences.defaultUnits);
+    if (unitSet == null)
+      unitSet = units.defaults[0];
+    prefs.defaultUnits = unitSet.label;
 
-    if (prefValue)
-      value = units[unit].get(prefValue);
-    if (value == null)
-      value = units[unit].get(unitSet[unit]);
-    prefs[prefName] = value.label;
+    // resolve each specific unit preference
+    [ 'length',
+      'mass',
+      'force',
+      'velocity',
+      'acceleration',
+      'altitude',
+      'temperature'
+    ].forEach(function(unit) {
+      var prefName = unit + 'Unit',
+          prefValue = req.user.preferences[prefName],
+          value;
+
+      if (prefValue)
+        value = units[unit].get(prefValue);
+      if (value == null)
+        value = units[unit].get(unitSet[unit]);
+      prefs[prefName] = value.label;
+    });
+
+    // list available motor types
+    let chooseTypes = [];
+    cache.types.forEach(v => {
+      chooseTypes.push({
+        value: v,
+        selected: !(prefs.ignoreTypes != null && prefs.ignoreTypes.indexOf(v) >= 0),
+      });
+    });
+
+    // list available manufacturers
+    let chooseManufacturers = [];
+    cache.manufacturers.forEach(mfr => {
+      chooseManufacturers.push({
+        name: mfr.name,
+        value: mfr.abbrev,
+        selected: !(prefs.ignoreManufacturers && prefs.ignoreManufacturers.indexOf(mfr.abbrev) >= 0),
+      });
+    });
+
+    res.render('mystuff/preferences', locals(req, defaults, {
+      title: 'Preferences',
+      units: units,
+      defaults: units.defaults,
+      prefs: prefs,
+      chooseTypes,
+      chooseManufacturers,
+      submitLink: preferencesLink,
+    }));
   });
-
-  res.render('mystuff/preferences', locals(req, defaults, {
-    title: 'Preferences',
-    units: units,
-    defaults: units.defaults,
-    prefs: prefs,
-    submitLink: preferencesLink,
-  }));
 });
 
 router.post([preferencesLink], authenticated, function(req, res, next) {
-  var change = false;
+  metadata.getAvailableMotors(req, function(cache) {
+    var change = false;
 
-  [ 'defaultUnits',
-    'lengthUnit',
-    'massUnit',
-    'forceUnit',
-    'velocityUnit',
-    'accelerationUnit',
-    'altitudeUnit',
-    'temperatureUnit'
-  ].forEach(function(pref) {
-    var value = req.body[pref];
-    if (value != null && value !== '' && value != req.user.preferences[pref]) {
-      req.user.preferences[pref] = value;
-      change = true;
+    [ 'defaultUnits',
+      'lengthUnit',
+      'massUnit',
+      'forceUnit',
+      'velocityUnit',
+      'accelerationUnit',
+      'altitudeUnit',
+      'temperatureUnit'
+    ].forEach(function(pref) {
+      var value = req.body[pref];
+      if (value != null && value !== '' && value != req.user.preferences[pref]) {
+        req.user.preferences[pref] = value;
+        change = true;
+      }
+    });
+
+    [ 'Types',
+      'Manufacturers'
+    ].forEach(suffix => {
+      let all = cache[suffix.toLowerCase()];
+      if (suffix == 'Manufacturers')
+        all = all.map(mfr => mfr.abbrev);
+
+      let chosen = req.body['choose' + suffix];
+      if (chosen == null)
+        chosen = [];
+      else if (typeof chosen === 'string')
+        chosen = [chosen];
+
+      let ignored = [];
+      all.forEach(opt => {
+        if (chosen.indexOf(opt) < 0)
+          ignored.push(opt);
+      });
+
+      let prefName = 'ignore' + suffix;
+      if (req.user.preferences[prefName] == null || req.user.preferences[prefName].length < 1) {
+        if (ignored.length > 0) {
+          req.user.preferences[prefName] = ignored;
+          change = true;
+        }
+      } else {
+        if (ignored.join() != req.user.preferences[prefName].join()) {
+          req.user.preferences[prefName] = ignored;
+          change = true;
+        }
+      }
+    });
+
+    if (change) {
+      req.user.save(req.success(function(updated) {
+        res.redirect(preferencesLink + '?result=saved');
+      }));
+    } else {
+      res.redirect(preferencesLink + '?result=unchanged');
     }
   });
-
-  if (change) {
-    req.user.save(req.success(function(updated) {
-      res.redirect(preferencesLink + '?result=saved');
-    }));
-  } else {
-    res.redirect(preferencesLink + '?result=unchanged');
-  }
 });
 
 

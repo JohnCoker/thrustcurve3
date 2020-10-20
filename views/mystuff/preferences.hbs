@@ -1,8 +1,8 @@
 <h1>{{title}}</h1>
 
-<p>Choose the units in which you would like various measurements displayed.</p>
-
 <form role="form" class="form-horizontal" name="prefs" action="{{submitLink}}" method="post" data-toggle="validator">
+  <p>Choose the units in which you would like various measurements displayed:</p>
+
   <div class="form-group">
     <label for="name" class="col-sm-3 control-label">Unit Defaults</label>
     <div class="col-sm-9">
@@ -91,6 +91,37 @@
       <span class="help-block with-errors"></span>
     </div>
   </div>
+
+  <p>Choose which motors will be selected by default for the motor guide:</p>
+
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Motor Types</label>
+    <div class="col-sm-9">
+      {{#each chooseTypes}}
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="chooseTypes" value="{{value}}" {{#if selected}}checked="checked"{{/if}}>
+          {{formatType value}}
+        </label>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Manufacturers</label>
+    <div class="col-sm-9">
+      {{#each chooseManufacturers}}
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="chooseManufacturers" value="{{value}}" {{#if selected}}checked="checked"{{/if}}>
+          {{name}}
+        </label>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 form-submit">
       <button type="submit" class="btn btn-primary">Update</button>

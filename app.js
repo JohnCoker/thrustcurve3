@@ -32,6 +32,19 @@ mongoose.connect(config.mongoUrl, function(err) {
     console.error(err);
     process.exit(1);
   }
+
+  // clean up old motor guide results (older than 60 days)
+  if (db && db.GuideResult) {
+    let before = new Date();
+    before.setDate(before.getDate() - 60);
+    before.setHours(0);
+    before.setMinutes(0);
+    before.setSeconds(0);
+    db.GuideResult.deleteMany({ updatedAt: { $lt: before }}, function(err, _result) {
+      if (err)
+        console.error('unable to delete old guide results', err);
+    });
+  }
 });
 
 // site routes grouped by area

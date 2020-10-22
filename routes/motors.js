@@ -15,7 +15,6 @@ const _ = require('underscore'),
       parsers = require('../simulate/parsers'),
       analyze = require('../simulate/analyze'),
       graphs = require('../render/graphs'),
-      svg = require('../render/svg'),
       locals = require('./locals.js'),
       authorized = require('./authorized.js');
 
@@ -256,6 +255,7 @@ function getHistogram(req, cls, stat, cb) {
       return;
     }
 
+    // find bounds
     for (i = 1; i < all.length; i++) {
       v = all[i][stat];
       if (v < min)
@@ -295,13 +295,13 @@ function getHistogram(req, cls, stat, cb) {
 }
 
 router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
-  var stat, format;
-
   // determine the motor statistic
   if (!req.query.stat) {
     res.status(404).send('motor statistic not specified');
     return;
   }
+
+  let stat;
   if (req.query.stat == 'impulse')
     stat = 'totalImpulse';
   else if (req.query.stat == 'thrust')
@@ -314,6 +314,8 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
     res.status(404).send('unknown motor statistic ' + stat);
     return;
   }
+
+  let format;
   if (stat == 'totalImpulse')
     format = function(v) { return units.formatPrefFromMKS(v, 'force', false) + 's'; };
   else if (/Thrust/.test(stat))
@@ -327,60 +329,15 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
   getMotor(req, res, false, false, function(primary) {
     // get the histogram for this impulse class and stat
     getHistogram(req, primary.impulseClass, stat, function(histogram) {
-      var width, height, image, em, descender, w, x, x1, y, i;
-
       if (histogram == null) {
         res.status(404).send('too little data for ' + stat);
         return;
       }
-
-      width = 200;
-      height = 100;
-      image = new svg.Image(width, height);
-
-      em = 10;
-      descender = 1;
-      image.font = em + 'px Helvetica';
-
-      // draw baseline
-      image.strokeStyle = '#ccc';
-      image.moveTo(0, height - 0.5 - em);
-      image.lineTo(width, height - 0.5 - em);
-      image.stroke();
-
-      // minimum value on left
-      image.fillStyle = 'black';
-      image.textAlign = 'left';
-      image.fillText(format(histogram.minX), 0, height - descender);
-
-      // maximum value on left
-      image.textAlign = 'right';
-      image.fillText(format(histogram.maxX), width, height - descender);
-
-      // graph histogram
-      image.fillStyle = '#ccc';
-      x = 0;
-      w = (width - (histogram.n - 1)) / histogram.n;
-      for (i = 0; i < histogram.n; i++) {
-        x1 = x + w;
-        if (histogram.buckets[i] > 0) {
-          y = 2 + (height - 2 - em) * (histogram.buckets[i] / histogram.maxY);
-          image.fillRect(x, (height - em - y), w, y);
-        }
-        x = x1 + 1;
-      }
-
-      // graph primary motor's value
-      if (primary[stat] > 0) {
-        image.strokeStyle = '#9e1a20';
-        image.beginPath();
-        x = 0.5 + ((width - 1) * (primary[stat] - histogram.minX) / histogram.rangeX);
-                image.moveTo(x, 1);
-        image.lineTo(x, height - 1 - em);
-        image.stroke();
-      }
-
-      res.status(200).type(image.format).send(image.render());
+      graphs.sendHistogram(res, {
+        histogram,
+        primary: primary[stat],
+        format: format,
+      });
     });
   });
 });

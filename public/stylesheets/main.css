@@ -127,6 +127,14 @@ table td img.trend {
   width: 16px;
   height: 16px;
 }
+th.action,
+td.action {
+  text-align: center;
+  padding: 5px 0.5em !important;
+}
+th.action::after {
+  display: none !important;
+}
 
 form button,
 form a.btn {

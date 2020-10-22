@@ -54,6 +54,7 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
       <th class="number hidden-xs" title="maximum acceleration">Accel</th>
       <th class="number" title="maximum altitude">Apogee</th>
       <th class="number" title="optimal delay time">Delay</th>
+      <th class="action" title="run details"><i class="fa fa-info-circle"></i></th>
     </tr>
   </thead>
   <tbody>
@@ -70,6 +71,7 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
       <td class="number hidden-xs" data-sort="{{formatSort simulation.maxAccleration}}">{{formatAcceleration simulation.maxAcceleration}}</td>
       <td class="number" data-sort="{{formatSort simulation.maxAltitude}}">{{formatAltitude simulation.maxAltitude}}</td>
       <td class="number" data-sort="{{formatSort optimalDelay}}">{{formatDuration optimalDelay}}</td>
+      <td class="action"><a href="{{detailsLink}}"><i class="fa fa-info-circle"></i></a></td>
     </tr>
   {{/each}}
   </tbody>
@@ -77,14 +79,16 @@ If these aren't what you want, use the back button to adjust the inputs or <a hr
 <script type="text/javascript">
 setupTable('#result-list', {
   order: [[6, 'asc']],
-  expand: true
+  expand: true,
+}, function() {
+  $('#result-list th.action').removeClass('sorting');
 });
 </script>
 {{/if}}
 
 <p>
-See the <a href="{{detailsLink}}">complete results</a> for more details or
+Click on the last column in the table for detailed results for a motor or
+see the <a href="{{completeLink}}">complete results</a> with all motors or
 <a href="{{spreadsheetLink}}">download a spreadsheet</a>
-(or <a href="{{csvLink}}">CSV file</a>)
-with complete results.
+(or <a href="{{csvLink}}">CSV file</a>).
 </p>

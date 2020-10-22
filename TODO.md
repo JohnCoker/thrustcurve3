@@ -21,7 +21,6 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Motor Guide
 
  * use visual styles in spreadsheets
- * compare motors from results
 
 ## Account
 
@@ -31,7 +30,6 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Administration
 
  * user administration
- * remove old guide results from DB
 
 ## Mobile App
 

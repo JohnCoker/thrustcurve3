@@ -17,6 +17,7 @@ const _ = require('underscore'),
       analyze = require('../simulate/analyze'),
       spreadsheet = require('../render/spreadsheet'),
       csv = require('../render/csv'),
+      graphs = require('../render/graphs'),
       locals = require('./locals.js');
 
 const MinGuideVelocity = 14.9,
@@ -547,7 +548,7 @@ router.post(guidePage, function(req, res, next) {
 
 /*
  * /motors/guide/id/summary.html.
- * Motor guide result summary page, renders with guide/summary.hbs.
+ * Motor guide summary results page, renders with guide/summary.hbs.
  */
 function loadGuideResult(req, res, cb) {
   if (!req.db.isId(req.params.id)) {
@@ -570,21 +571,18 @@ function loadGuideResult(req, res, cb) {
     metadata.getManufacturers(req, function(manufacturers) {
       // get all motors that fit
       req.db.Motor.find({ _id: { $in: _.pluck(result.results, '_motor') } }, req.success(function(motors) {
-        var m, r, i;
-
         // complete result elements
-        for (i = 0; i < result.results.length; i++) {
-          r = result.results[i];
-
+        result.results.forEach(r => {
           // set motor and manufacturer
-          m = _.find(motors, function(v) { return v._id.toString() == r._motor.toString(); });
+          let m = _.find(motors, function(v) { return v._id.toString() == r._motor.toString(); });
           if (m) {
             r.motor = m;
             r.manufacturer = manufacturers.byId(m._manufacturer);
           }
 
           r.fail = !r.pass;
-        }
+          r.detailsLink = '/motors/guide/' + req.params.id + '/details/' + r._motor.toString();
+        });
 
         // load rocket if there is one
         if (result._rocket) {
@@ -610,7 +608,7 @@ function doSummaryPage(req, res, rockets) {
       anyResults: result.results.length > 0,
       passResults: passResults,
       multiDiam: _.uniq(_.map(passResults, r => r.motor.diameter)).length > 1,
-      detailsLink: '/motors/guide/' + result._id + '/details.html',
+      completeLink: '/motors/guide/' + result._id + '/complete.html',
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
       csvLink: '/motors/guide/' + result._id + '/spreadsheet.csv',
       restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
@@ -628,7 +626,11 @@ router.get('/motors/guide/:id/summary.html', function(req, res, next) {
   }
 });
 
-function doDetailsPage(req, res, rockets) {
+/*
+ * /motors/guide/id/complete.html.
+ * Motor guide complete results page, renders with guide/complete.hbs.
+ */
+function doCompletePage(req, res, rockets) {
   loadGuideResult(req, res, function(result) {
     var adapters = false,
         i;
@@ -638,8 +640,8 @@ function doDetailsPage(req, res, rockets) {
         adapters = true;
     }
 
-    res.render('guide/details', locals(req, defaults, {
-      title: "Motor Guide Details",
+    res.render('guide/complete', locals(req, defaults, {
+      title: "Motor Guide Complete Results",
       rockets: rockets,
       result: result,
       allResults: result.results,
@@ -656,14 +658,113 @@ function doDetailsPage(req, res, rockets) {
   });
 }
 
-router.get('/motors/guide/:id/details.html', function(req, res, next) {
+router.get('/motors/guide/:id/complete.html', function(req, res, next) {
   if (req.user) {
     req.db.Rocket.find({ _contributor: req.user._id }, undefined, { sort: { name: 1 } }, req.success(function(rockets) {
-      doDetailsPage(req, res, rockets);
+      doCompletePage(req, res, rockets);
     }));
   } else {
-    doDetailsPage(req, res);
+    doCompletePage(req, res);
   }
+});
+
+/*
+ * /motors/guide/id/details/motorId
+ * Motor guide single run details page, renders with guide/details.hbs.
+ */
+function loadGuideRun(req, res, cb) {
+  loadGuideResult(req, res, result => {
+    let run;
+    if (req.db.isId(req.params.motorId))
+      run = result.results.find(r => r._motor.toString() == req.params.motorId);
+    if (run == null) {
+      res.status(404).send();
+      return;
+    }
+    run.fullResult = result;
+    run.rocket = result.rocket;
+    cb(run);
+  });
+}
+
+router.get('/motors/guide/:id/details/:motorId', function(req, res, next) {
+  loadGuideRun(req, res, function(run) {
+    const comparePrefix = '/motors/guide/' + req.params.id + '/compare/' + req.params.motorId + '/';
+    res.render('guide/details', locals(req, defaults, {
+      title: "Motor Guide Run Details",
+      rocket: run.rocket,
+      motor: run.motor,
+      manufacturer: run.manufacturer,
+      run,
+      otherRunCount: run.fullResult.results.length - 1,
+      isCompare: run.simulation != null && run.fullResult.sim > 1,
+      guideApogeeImg: comparePrefix + 'maxAltitude.svg',
+      guideVelocityImg: comparePrefix + 'maxVelocity.svg',
+      guideAccelerationImg: comparePrefix + 'maxAcceleration.svg',
+      guideWeightImg: comparePrefix + 'loadedInitialMass.svg',
+      summaryLink: '/motors/guide/' + req.params.id + '/summary.html',
+      completeLink: '/motors/guide/' + req.params.id + '/complete.html',
+    }));
+  });
+});
+
+router.get('/motors/guide/:id/compare/:motorId/:file', function(req, res, next) {
+  let stat = req.params.file.replace(/\..*$/, '');
+  let units = stat.replace(/^.*([A-Z][a-z]+)$/, '$1').toLowerCase();
+  function get(r) {
+    if (r.simulation) {
+      if (r.simulation.hasOwnProperty(stat))
+        return r.simulation[stat];
+      if (r.simulation.inputs && r.simulation.inputs.hasOwnProperty(stat))
+        return r.simulation.inputs[stat];
+    }
+  }
+  loadGuideRun(req, res, function(run) {
+    // find bounds
+    let min, max;
+    run.fullResult.results.forEach((r, i) => {
+      let v = get(r);
+      if (v > 0) {
+        if (i == 0)
+          min = max = v;
+        else {
+          min = Math.min(min, v);
+          max = Math.max(max, v);
+        }
+      }
+    });
+    let range = max - min;
+    range += range / 1000;
+
+    // generate histogram
+    const N = 5;
+    let histogram = {
+      stat,
+      n: N,
+      buckets: _.times(N, () => 0),
+      minX: min,
+      maxX: max,
+      rangeX: range,
+      count: 0,
+      maxY: 0,
+    };
+    run.fullResult.results.forEach((r, i) => {
+      let v = get(r);
+      if (v > 0) {
+        let j = Math.floor(((v - min) / range) * histogram.n);
+        histogram.buckets[j]++;
+        if (histogram.buckets[j] > histogram.maxY)
+          histogram.maxY = histogram.buckets[j];
+        histogram.count++;
+      }
+    });
+
+    graphs.sendHistogram(res, {
+      histogram: histogram,
+      primary: get(run),
+      units,
+    });
+  });
 });
 
 /*

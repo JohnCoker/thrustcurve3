@@ -818,7 +818,7 @@ router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req
   metadata.getAvailableMotors(req, function(cache) {
 
     // normalize preferences
-    var prefs = {...req.user.preferences},
+    var prefs = {},
         unitSet;
 
     // first get the default units
@@ -849,6 +849,7 @@ router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req
     });
 
     // list available motor types
+    prefs.ignoreTypes = req.user.preferences.ignoreTypes || [];
     let chooseTypes = [];
     cache.types.forEach(v => {
       chooseTypes.push({
@@ -858,6 +859,7 @@ router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req
     });
 
     // list available manufacturers
+    prefs.ignoreManufacturers = req.user.preferences.ignoreManufacturers || [];
     let chooseManufacturers = [];
     cache.manufacturers.forEach(mfr => {
       chooseManufacturers.push({

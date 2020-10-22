@@ -768,6 +768,75 @@ function thrustCurveComparison(spec) {
   return image;
 }
 
+function histogram(spec) {
+  if (spec == null || spec.histogram == null)
+    return;
+
+  let width, height;
+  if (spec.width >= 1 && spec.height >= 1) {
+    width = spec.width;
+    height = spec.height;
+  } else {
+    width = 200;
+    height = 100;
+  }
+
+  function format(v) {
+    if (spec.format)
+      return spec.format(v);
+    if (spec.units)
+      return units.formatPrefFromMKS(v, spec.units, false);
+    else
+      return v.toFixed(1);
+  }
+
+  const image = new svg.Image(width, height);
+
+  let em = 10;
+  let descender = 1;
+  image.font = em + 'px Helvetica';
+
+  // draw baseline
+  image.strokeStyle = '#ccc';
+  image.moveTo(0, height - 0.5 - em);
+  image.lineTo(width, height - 0.5 - em);
+  image.stroke();
+
+  // minimum value on left
+  image.fillStyle = 'black';
+  image.textAlign = 'left';
+  image.fillText(format(spec.histogram.minX), 0, height - descender);
+
+  // maximum value on left
+  image.textAlign = 'right';
+  image.fillText(format(spec.histogram.maxX), width, height - descender);
+
+  // graph histogram
+  image.fillStyle = '#ccc';
+  let x = 0;
+  let w = (width - (spec.histogram.n - 1)) / spec.histogram.n;
+  for (let i = 0; i < spec.histogram.n; i++) {
+    let x1 = x + w;
+    if (spec.histogram.buckets[i] > 0) {
+      let y = 2 + (height - 2 - em) * (spec.histogram.buckets[i] / spec.histogram.maxY);
+      image.fillRect(x, (height - em - y), w, y);
+    }
+    x = x1 + 1;
+  }
+
+  // graph primary motor's value
+  if (spec.primary > 0) {
+    image.strokeStyle = '#9e1a20';
+    image.beginPath();
+    x = 0.5 + ((width - 1) * (spec.primary - spec.histogram.minX) / spec.histogram.rangeX);
+            image.moveTo(x, 1);
+    image.lineTo(x, height - 1 - em);
+    image.stroke();
+  }
+
+  return image;
+}
+
 /**
  * The <b>graphs</b> module builds chart images for thrust curves and
  * simulation results.
@@ -877,6 +946,40 @@ module.exports = {
    */
   sendThrustCurveComparison: function(res, spec) {
     var image = thrustCurveComparison(spec);
+    if (image == null) {
+      res.status(500).send();
+      return false;
+    } else {
+      res.type(image.format).send(image.render());
+      return true;
+    }
+  },
+
+  /**
+   * Build a histgram chart for multiple motors and return it.
+   * If an error occurs, null is returned.
+   * @function
+   * @param {object} spec chart information
+   * @param {number} spec.width target image width
+   * @param {height} spec.height target image width
+   * @param {object} spec.histogram histogram of values
+   * @param {number} [spec.primary] primary value to highlight
+   * @param {function} [spec.format] function to format a value
+   * @param {string} [spec.units] category of unit to use
+   * @return {object} constructed image object
+   */
+  histogram,
+
+  /**
+   * Build a histogram chart for multiple motors and send it to the response.
+   * If an error occurs, 500 status is sent.
+   * @function
+   * @param {object} res Express response object
+   * @param {object} spec chart information (see #histogram)
+   * @return {boolean} true if image sent
+   */
+  sendHistogram: function(res, spec) {
+    var image = histogram(spec);
     if (image == null) {
       res.status(500).send();
       return false;

@@ -104,7 +104,7 @@ function noSimFile(req, res) {
  */
 router.get('/simfiles/:id/', function(req, res, next) {
   getSimFile(req, res, function(simfile) {
-    req.db.SimFileNote.find({ _simfile: simfile._id }, undefined, { sort: { updatedAt: -1 } })
+    req.db.SimFileNote.find({ _simFile: simfile._id }, undefined, { sort: { updatedAt: -1 } })
                       .populate('_contributor')
                       .exec(req.success(function(notes) {
       var errs, parsed, stats;
@@ -114,6 +114,9 @@ router.get('/simfiles/:id/', function(req, res, next) {
       parsed = parsers.parseData(simfile.format, simfile.data, errs);
       if (parsed != null)
         stats = analyze.stats(parsed, errs);
+
+      // edit link on notes
+      notes.forEach(n => n.editNoteLink = '/notes/simfile/' + n._id + '/edit.html');
 
       // render the file details
       res.render('simfiles/details', locals(defaults, {
@@ -132,6 +135,7 @@ router.get('/simfiles/:id/', function(req, res, next) {
         downloadLink: req.helpers.simfileLink(simfile) + 'download/' + simFileName(simfile),
         pointsLink: req.helpers.simfileLink(simfile) + 'points/' + simFileName(simfile, '.csv'),
         outboxLink: '/outbox/add/' + simfile._id + '/',
+        addNoteLink: '/notes/simfile/' + simfile._id + '/add.html',
       }));
     }));
   });

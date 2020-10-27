@@ -189,9 +189,10 @@ thrustCurve($('#thrustcurve'));
       <th class="subject">{{subject}}</a></td>
       <th><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>
       <th>{{formatDate updatedAt}}</td>
+      <th class="action">{{#if editNoteLink}}<a href={{editNoteLink}}><i class="fa fa-edit"></i></a></th>{{else}}&nbsp;{{/if}}</th>
     </tr>
     <tr class="content">
-      <td colspan="3">{{renderBBCode content}}</td>
+      <td colspan="4">{{renderBBCode content}}</td>
     </tr>
   {{/each}}
 </table>

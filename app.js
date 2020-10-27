@@ -58,6 +58,7 @@ const index = require('./routes/index'),
       guide = require('./routes/guide'),
       browser = require('./routes/browser'),
       mystuff = require('./routes/mystuff'),
+      notes = require('./routes/notes'),
       admin = require('./routes/admin'),
       api_v1 = require('./routes/api_v1');
 
@@ -271,6 +272,7 @@ app.use('/', contributors);
 app.use('/', guide);
 app.use('/', browser);
 app.use('/', mystuff);
+app.use('/', notes);
 app.use('/', admin);
 
 // handle other routes as 404

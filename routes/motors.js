@@ -161,6 +161,11 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
             initialThrust /= n;
         }
 
+        // edit link on notes
+        notes.forEach(n => {
+          n.editNoteLink = '/notes/motor/' + n._id + '/edit.html';
+        });
+
         var details = locals(defaults, {
           title: req.helpers.motorFullName(manufacturer, motor),
           manufacturer: manufacturer,
@@ -171,7 +176,8 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           classCount: classCount,
           isCompare: classCount >= 5,
           isReloadCase: motor.type == 'reload' && motor.caseInfo,
-          editLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html'
+          editLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html',
+          addNoteLink: '/notes/motor/' + motor._id + '/add.html',
         });
         if (simfiles.length > 0)
           details.thrustCurveLink = req.helpers.motorLink(manufacturer, motor) + 'thrustcurve.svg';

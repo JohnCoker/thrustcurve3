@@ -7,10 +7,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * flag motors favorited by other users
 
-## Contribution
-
- * add/edit/delete motor and simfile notes
-
 ## Search
 
  * search by motor case
@@ -59,7 +55,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | certification.shtml | info/certification.html      | ✓ | general info |
 | contribsearch.jsp   | contributors/list.html       | ✓ | contribution |
 | contribute.shtml    | info/contribute.html         | ✓ | general info |
-| deletenote.jsp      |                              |   | contribution |
+| deletenote.jsp      | notes/*/delete.html          | ✓ | contribution |
 | deleterocket.jsp    | mystuff/rocket/*/delete.html | ✓ | account |
 | deletesimfile.jsp   | simfiles/*/delete.html       | ✓ | contribution |
 | download.jsp        | simfiles/*/download.html     | ✓ | outbox |
@@ -91,7 +87,7 @@ This table lists all pages of the old site and will be filled in as work proceed
 | tctracer.shtml      | info/tctracer.html           | ✓ | general info |
 | updatecontrib.jsp   | mystuff/profile.html         | ✓ | account |
 | updatemotor.jsp     | motors/*/edit.html           | ✓ | admin |
-| updatenote.jsp      |                              |   | contribution |
+| updatenote.jsp      | notes/*/edit.html            | ✓ | contribution |
 | updaterocket.jsp    | mystuff/rocket/*/edit.html   | ✓ | account |
 | updates.jsp         | motors/updates.html          | ✓ | general info |
 | updatesimfile.jsp   | simfiles/*/edit.html         | ✓ | contribution |

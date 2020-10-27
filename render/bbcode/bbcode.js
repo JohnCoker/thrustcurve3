@@ -8,14 +8,17 @@ const MIME_TYPE = 'text/html';
 
 function makeURL(s) {
   s = s.trim().replace(/"/g, '&quot;');
-  if (!/^http/.test(s))
+  if (!/^[a-z]+:/.test(s))
     s = 'http://' + s;
   return s;
 }
 
 function buildLink(url, anchor) {
-  if (anchor == null || anchor === '')
+  if (anchor == null || anchor === '') {
     anchor = url;
+    if (!/^http/.test(anchor))
+      anchor = anchor.replace(/^[a-z]+:/, '');
+  }
 
   return '<a href="' + makeURL(url) + '">' + expandTags(anchor) + '</a>';
 }
@@ -27,17 +30,32 @@ function expandTags(s) {
       .replace(/\[i\]([^\[]*)\[\/i\]/gi, function(whole, body) {
         return '<i>' + expandTags(body) + '</i>';
       })
+      .replace(/\[tt\]([^\[]*)\[\/tt\]/gi, function(whole, body) {
+        return '<code>' + expandTags(body) + '</code>';
+      })
+      .replace(/\[big\]([^\[]*)\[\/big\]/gi, function(whole, body) {
+        return '<big>' + expandTags(body) + '</big>';
+      })
+      .replace(/\[small\]([^\[]*)\[\/small\]/gi, function(whole, body) {
+        return '<small>' + expandTags(body) + '</small>';
+      })
       .replace(/\[url\]([^\[]*)\[\/url\]/gi, function(whole, url) {
         return buildLink(url);
       })
       .replace(/\[link\]([^\[]*)\[\/link\]/gi, function(whole, url) {
         return buildLink(url);
       })
+      .replace(/\[email\]([^\[]*)\[\/email\]/gi, function(whole, email) {
+        return buildLink('mailto:' + email);
+      })
       .replace(/\[url=([^\]]*)\]([^\[]*)\[\/url\]/gi, function(whole, url, anchor) {
         return buildLink(url, anchor);
       })
       .replace(/\[link=([^\]]*)\]([^\[]*)\[\/link\]/gi, function(whole, url, anchor) {
         return buildLink(url, anchor);
+      })
+      .replace(/\[email=([^\]]*)\]([^\[]*)\[\/email\]/gi, function(whole, email, anchor) {
+        return buildLink('mailto:' + email, anchor);
       });
 
   return s;
@@ -91,7 +109,7 @@ function render(input) {
    */
   input = input.replace(/\[list/gi, "\n\n$&")
                .replace(/\[\/list\]/gi, "$&\n\n");
-  blocks = input.split(/(\n[ \t\m]*\n|\m[ \t\n]\m)\s*/);
+  blocks = input.split(/([ \t\r]*\n){2,}/);
   for (i = 0; i < blocks.length; i++) {
     block = blocks[i].trim();
     if (block === '')

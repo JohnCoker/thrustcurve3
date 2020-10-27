@@ -1,0 +1,211 @@
+<h1>{{title}}</h1>
+
+{{#if isErrors}}
+<div class="alert alert-danger" role="alert">
+Invalid values for note; changes not saved.
+</div>
+{{/if}}
+{{#unless isEditable}}
+<div class="alert alert-danger" role="alert">
+You do may not edit someone else's note.
+</div>
+{{/unless}}
+
+<P>
+The subject of a note is limited to plain text, and the content may be augmented with simple formatting.
+This site supports some of the most common "BBCode" formatting escapes which are
+<a href="#bbcode">described at the bottom</a>.
+HTML is not allowed to avoid problems with malicious content.
+</P>
+
+<form role="form" class="form-horizontal" name="edit-motor" action="{{submitLink}}" method="post" data-toggle="validator">
+  {{#if id}}
+  <input type="hidden" name="id" value="{{id}}" />
+  {{/if}}
+
+  {{#if motor}}
+  <input type="hidden" name="motor" value="{{motor._id}}" />
+  <div class="form-group">
+    <label for="motor" class="col-sm-3 control-label">Motor</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{manufacturer.abbrev}} {{motor.designation}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if simfile}}
+  <input type="hidden" name="simfile" value="{{simfile._id}}" />
+  <div class="form-group">
+    <label for="motor" class="col-sm-3 control-label">Data File</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{simfile.format}} {{simfile.dataSource}}</p>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#unless isMine}}
+  <div class="form-group">
+    <label for="motor" class="col-sm-3 control-label">Contributor</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{contributor.name}}</p>
+    </div>
+  </div>
+  {{/unless}}
+
+  <div class="form-group">
+    <label for="subject" class="col-sm-3 control-label">Subject</label>
+    <div class="col-sm-9">
+      <input class="form-control" name="subject" required value="{{subject}}" />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="content" class="col-sm-3 control-label">Content</label>
+    <div class="col-sm-9">
+      <textarea class="form-control" rows="8" name="content" required>{{content}}</textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+      <button id="preview" class="btn btn-default">Preview</button>
+      {{#if deleteLink}}
+      <button id="delete" class="btn btn-danger">Delete</button>
+      {{/if}}
+    </div>
+  </div>
+  <input type="hidden" name="preview" />
+</form>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#preview').click(function(e) {
+    let form = $('form');
+    form.find('input[name=preview]').val(true);
+    form.submit();
+  });
+  {{#if deleteLink}}
+  $('#delete').click(function(e) {
+    e.preventDefault();
+    if (confirm('Delete note (cannot be undone)?'))
+      window.location = '{{deleteLink}}';
+  });
+  {{/if}}
+});
+</script>
+
+{{#if content}}
+<a name="preview"></a>
+<h2>Preview</h2>
+<table class="table table-bordered notes">
+<tr><th>{{subject}}</th></tr>
+<tr><td>{{renderBBCode content}}</td></tr>
+</table>
+{{/if}}
+
+<a name="bbcode"></a>
+<h2>BBCode</h2>
+
+<p>
+BBCode marks text with escapes that are somewhat like HTML markup, but uses brackets and is much simpler.
+Spans of text are contained within pairs of BBCode tags.
+For example, <tt>[b]important![/b]</tt> will render the text "important!" in bold.
+</p>
+
+<style type="text/css">
+TR.bbcode {
+    vertical-align: top;
+}
+TH.bbcode {
+    font-weight: bold;
+    font-size: 10pt;
+    text-align: left;
+    width: 10%;
+}
+TD.bbcode {
+    font-size: 10pt;
+    text-align: left;
+    width: *;
+}
+</style>
+
+<TABLE BORDER=0 WIDTH="100%">
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">b</TH>
+  <TD CLASS="bbcode">
+   Makes the contained text bold.
+  </TD>
+ </TR>
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">i</TH>
+  <TD CLASS="bbcode">
+   Renders the contained text in italics.
+  </TD>
+ </TR>
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">tt</TH>
+  <TD CLASS="bbcode">
+   Renders the contained text using a "typewriter" font.
+  </TD>
+ </TR>
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">big</TH>
+  <TD CLASS="bbcode">
+   Makes the contained text a bit bigger than the surrounding text.
+  </TD>
+ </TR>
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">small</TH>
+  <TD CLASS="bbcode">
+   Makes the contained text a bit smaller than the surrounding text.
+  </TD>
+ </TR>
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">url</TH>
+  <TD CLASS="bbcode">
+   Makes a clickable HTML hyperlink.
+   The displayed text may be different from the URL if an equal sign
+   is used in the opening tag:
+   <BR><TT>[url=http://www.jcrocket.com/]visit me[/url]</TT>
+  </TD>
+ </TR>
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">email</TH>
+  <TD CLASS="bbcode">
+   Makes a clickable email hyperlink.
+   The displayed text may be different from the email address if an equal
+   sign is used in the opening tag:
+   <BR><TT>[email=john@jcsw.com]mail me[/email]</TT>
+   <BR>
+   Note that the email address is rendered in a way that makes it reasonably
+   safe from email harvesting.
+  </TD>
+ </TR>
+
+ <TR CLASS="bbcode">
+  <TH CLASS="bbcode">list</TH>
+  <TD CLASS="bbcode">
+   Makes a bullet list of items.
+   Each item is indicated by the special tag <TT>[*]</TT>
+   (which does not require a closing tag).
+   For example:
+   <BR><TT>[list][*]first[*]second[/list]</TT>
+  </TD>
+ </TR>
+
+</TABLE>
+
+<p>
+Finally, to include a literal bracket in the output, just double it.
+So, if you need to put an open-bracket in the output, enter "<tt>[[</tt>".
+</p>
+

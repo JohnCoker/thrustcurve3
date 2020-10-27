@@ -328,7 +328,6 @@ function calculate(options, cb) {
               i++;
             }
           }
-          summaryMap = null;
 
           /*
            * Build overall ranking and group rankings.

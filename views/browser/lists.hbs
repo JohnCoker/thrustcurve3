@@ -69,25 +69,56 @@ ul.trail li.current .name {
      <th class="number">Impulse</th>
      <th class="number hidden-xs">Avg Thr</th>
      <th class="number hidden-xs">Burn</th>
+     <th class="action hidden-xs"><input type="checkbox" id="select-all" title="select/deselect all"/></th>
     </tr>
   </thead>
   <tbody>
   {{#each motors}}
-    <tr data-id="{{_id}}">
-      <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
-      <td>{{_manufacturer.abbrev}}</td>
-      <td>{{formatType type}}</td>
-      <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
-      <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
-      <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
-      <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
-    </tr>
+  <tr data-id="{{_id}}">
+    <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
+    <td>{{_manufacturer.abbrev}}</td>
+    <td>{{formatType type}}</td>
+    <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+    <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+    <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+    <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
+    <td class="action hidden-xs"><input type="checkbox" name="select" value="{{_id}}" title="select this motor"/></th>
+  </tr>
   {{/each}}
   </tbody>
 </table>
+<p class="hidden-xs">Choose two or more motors from the list to <a id="compare" href="#">Compare</a>.</p>
 <script type="text/javascript">
 setupTable('#motor-list', {
   order: [[4, 'asc']]
+});
+$('#select-all').click(function(e) {
+  let all = $(this);
+  let state = all.is(':checked');
+  $('#motor-list td input[name=select]').each(function() {
+    $(this).prop('checked', state);
+  });
+});
+$('#motor-list td input[name=select]').click(function(e) {
+  if (!$(this).is(':checked'))
+    $('#select-all').prop('checked', false);
+});
+$('#compare').click(function(e) {
+  e.preventDefault();
+  let motors = '', count = 0;
+  $('#motor-list td input[name=select]').each(function() {
+    let checkbox = $(this);
+    if (checkbox.is(':checked')) {
+      if (motors !== '')
+        motors += '&';
+      motors += 'motors=' + checkbox.val();
+      count++;
+    }
+  });
+  if (count < 2)
+    window.alert('Choose two or more motors from the list above.');
+  else
+    window.location = '/motors/compare.html?' + motors;
 });
 </script>
 {{/if}}

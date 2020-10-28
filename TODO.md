@@ -12,7 +12,6 @@ This page lists the things supported in the old site which haven't yet been reim
  * search by motor case
  * search by propellant type
  * search by propellant color
- * compare single motor to others in search result (a la "Compared with" on motor page)
 
 ## Motor Guide
 

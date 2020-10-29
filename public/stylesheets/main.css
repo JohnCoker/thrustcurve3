@@ -177,7 +177,7 @@ a.favorite i.fa {
 
 img.compare {
   width: 100%;
-  height: 90px;
+  height: auto;
 }
 p.compare-legend {
   margin-top: 0;

@@ -1,5 +1,12 @@
 <h1>{{title}}</h1>
 
+<style type="text/css">
+img.chart, svg {
+  width: 100%;
+  height: auto;
+}
+</style>
+
 {{#unless motors}}
 <p>
 You haven't selected any motors for comparison.
@@ -21,13 +28,13 @@ motors for comparison.
   <div class="col-md-6">
     <h2>Burn Time vs Impulse</h2>
     {{#if impulseBurnTimeImg}}
-    <img id="impulseBurnTime" src="{{impulseBurnTimeImg}}" />
+    <img class="chart" id="impulseBurnTime" src="{{impulseBurnTimeImg}}" />
     {{/if}}
   </div>
   <div class="col-md-6">
     <h2>Avg Thrust vs Impulse</h2>
     {{#if impulseAvgThrustImg}}
-    <img id="impulseAvgThrust" src="{{impulseAvgThrustImg}}" />
+    <img class="chart" id="impulseAvgThrust" src="{{impulseAvgThrustImg}}" />
     {{/if}}
   </div>
 </div>
@@ -35,9 +42,42 @@ motors for comparison.
   <div class="col-md-12">
     <h2>Thrust Curve Overlay</h2>
     {{#if thrustCurveImg}}
-    <img id="thrustCurve" src="{{thrustCurveImg}}" />
+    <img class="chart" id="thrustCurve" src="{{thrustCurveImg}}" />
     {{/if}}
   </div>
+</div>
+
+<div class="hidden-xs">
+<h2>Motor Details</h2>
+<table id="motor-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th>Type</th>
+     <th class="number">Diam</th>
+     <th class="number">Impulse</th>
+     <th class="number">Avg Thr</th>
+     <th class="number">Burn</th>
+     <th class="action"><input type="checkbox" id="select-all" title="select/deselect all"/></th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motors}}
+  <tr data-id="{{_id}}">
+    <td><a href="{{motorLink _manufacturer this}}">{{motorDesignation this}}</td>
+    <td>{{_manufacturer.abbrev}}</td>
+    <td>{{formatType type}}</td>
+    <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
+    <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+    <td class="number" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+    <td class="number" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
+    <td class="action"><input type="checkbox" name="select" value="{{_id}}" title="select this motor"/></th>
+  </tr>
+  {{/each}}
+  </tbody>
+</table>
+<p>Choose two or more motors from the list to <a id="compare" href="#">Compare again</a>.</p>
 </div>
 
 <script type="text/javascript">
@@ -127,6 +167,38 @@ inlineSVG('#impulseBurnTime, #impulseAvgThrust, #thrustCurve', function(svg) {
      .on('show.bs.popover', hoverMotor)
      .on('hide.bs.popover', leaveMotor)
      .click(clickMotor);
+});
+
+setupTable('#motor-list', {
+  order: [[4, 'asc']]
+});
+$('#select-all').click(function(e) {
+  let all = $(this);
+  let state = all.is(':checked');
+  $('#motor-list td input[name=select]').each(function() {
+    $(this).prop('checked', state);
+  });
+});
+$('#motor-list td input[name=select]').click(function(e) {
+  if (!$(this).is(':checked'))
+    $('#select-all').prop('checked', false);
+});
+$('#compare').click(function(e) {
+  e.preventDefault();
+  let motors = '', count = 0;
+  $('#motor-list td input[name=select]').each(function() {
+    let checkbox = $(this);
+    if (checkbox.is(':checked')) {
+      if (motors !== '')
+        motors += '&';
+      motors += 'motors=' + checkbox.val();
+      count++;
+    }
+  });
+  if (count < 2)
+    window.alert('Choose two or more motors from the list above.');
+  else
+    window.location = '/motors/compare.html?' + motors;
 });
 </script>
 

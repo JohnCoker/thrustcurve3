@@ -232,8 +232,8 @@ router.get('/motors/:mfr/:desig/thrustcurve.svg', function(req, res, next) {
         unit = req.query.unit;
       graphs.sendThrustCurve(res, {
         data,
-        width: 600,
-        height: 350,
+        width: 750,
+        height: 450,
         unit: unit,
       });
     }));
@@ -906,8 +906,8 @@ router.get(comp_thrustCurveImg, function(req, res, next) {
         }
         graphs.sendThrustCurveComparison(res, {
           motors: motors,
-          width: 600,
-          height: 400,
+          width: 800,
+          height: 500,
         });
       }));
     }));

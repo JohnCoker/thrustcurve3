@@ -5,6 +5,14 @@ img.chart, svg {
   width: 100%;
   height: auto;
 }
+table.stats th {
+  font-weight: normal;
+  padding-right: 0.8em;
+  text-align: left;
+}
+.popover .arrow {
+  display: none;
+}
 </style>
 
 {{#unless motors}}
@@ -81,7 +89,7 @@ motors for comparison.
 </div>
 
 <script type="text/javascript">
-var Motors = {
+const Motors = {
 {{#each motors}}
   "{{_id}}": {
     title: "{{motorFullName this}}",
@@ -96,7 +104,7 @@ var Motors = {
 };
 
 function popoverTitle() {
-  var svg = $(this),
+  let svg = $(this),
       id, info;
 
   id = svg.attr('id').replace(/[^-]*-/g, '');
@@ -107,26 +115,28 @@ function popoverTitle() {
 }
 
 function popoverContent() {
-  var svg = $(this),
+  let svg = $(this),
       id, info;
 
-  id = svg.attr('id').replace(/[^-]*-/g, '');
+  id = svg.attr('id');
+  let what = /^thrustcurve/.test(id) ? 'line' : 'point';
+  id = id.replace(/[^-]*-/g, '');
   if (id && (info = Motors[id])) {
-    return ('<table class="stats">' +
-            '<tr><td>Diameter:</td><td>' + info.diameter + '</td></tr>\n' +
-            '<tr><td>Tot Impulse:</td><td>' + info.totalImpulse + '</td></tr>\n' +
-            '<tr><td>Avg Thrust:</td><td>' + info.avgThrust + '</td></tr>\n' +
-            '<tr><td>Max Thrust:</td><td>' + info.maxThrust + '</td></tr>\n' +
-            '<tr><td>Burn Time:</td><td>' + info.burnTime + '</td></tr>\n' +
-            '</table>\n' +
-            '<i>click for motor page</i>');
+    return $('<table class="stats">' +
+             '<tr><th>Diameter:</th><td>' + info.diameter + '</td></tr>\n' +
+             '<tr><th>Tot Impulse:</th><td>' + info.totalImpulse + '</td></tr>\n' +
+             '<tr><th>Avg Thrust:</th><td>' + info.avgThrust + '</td></tr>\n' +
+             '<tr><th>Max Thrust:</th><td>' + info.maxThrust + '</td></tr>\n' +
+             '<tr><th>Burn Time:</th><td>' + info.burnTime + '</td></tr>\n' +
+             '</table>\n' +
+             '<small>click ' + what + ' for motor page</small>');
   } else {
     return '';
   }
 }
 
-function hoverMotor() {
-  var svg = $(this),
+function hoverMotor(e) {
+  let svg = $(this),
       id, info;
 
   id = svg.attr('id').replace(/[^-]*-/g, '');
@@ -138,13 +148,13 @@ function hoverMotor() {
   }
 }
 
-function leaveMotor() {
+function leaveMotor(e) {
   $('.motor-point').css('opacity', 1).css('font-weight', 'normal');
   $('.motor-curve').css('opacity', 1).css('font-weight', 'normal');
 }
 
-function clickMotor() {
-  var svg = $(this),
+function clickMotor(e) {
+  let svg = $(this),
       id, info;
 
   id = svg.attr('id').replace(/[^-]*-/g, '');

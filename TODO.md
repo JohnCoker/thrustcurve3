@@ -41,7 +41,7 @@ Note that most of the static pages are the same, with just a consistent ".html" 
 but have moved to the info directory.
 For example "background.shtml" is now "info/background.html" (see `routes/info.js`).
 
-This table lists all pages of the old site and will be filled in as work proceeds.
+This table lists all pages of the old site and the corresponding pages of the new.
 
 | old page            | new page                     | ✓ | area |
 |:--------------------|:-----------------------------|---|:------|

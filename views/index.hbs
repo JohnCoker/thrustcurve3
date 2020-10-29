@@ -1,5 +1,19 @@
 <h1>{{title}}</h1>
 
+<!-- Google rich results -->
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "WebSite",
+  "url": "https://www.thrustcurve.org/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://www.thrustcurve.org/motors/search.html?availability=all&text={motor}",
+    "query-input": "required name=motor"
+  }
+}
+</script>
+
 <p>
 Here you will find manufacturer specs, certified performance data and other info on commercial model rocket motors and high-power rocket motors. Most importantly, you can download thrust curves for use with rocket flight simulators
 (RockSim and OpenRocket among others).

@@ -4,14 +4,11 @@
  */
 'use strict';
 
-const _ = require('underscore'),
-      express = require('express'),
+const express = require('express'),
       router = express.Router(),
-      errors = require('../lib/errors'),
       metadata = require('../lib/metadata'),
       locals = require('./locals.js'),
-      authenticated = require('./authenticated.js'),
-      authorized = require('./authorized.js');
+      authenticated = require('./authenticated.js');
 
 const defaults = {
   layout: 'admin',
@@ -26,7 +23,7 @@ function isInvalid(note) {
 
 function isMyNote(req, note) {
   let contribId = note._contributor._id || note._contributor;
-  return contribId.toString() == req.user._id.toString()
+  return contribId.toString() == req.user._id.toString();
 }
 
 function canEdit(req, note) {
@@ -223,10 +220,7 @@ router.get('/notes/simfile/:fileId/add.html', function(req, res, next) {
 });
 
 function redirectToSimfile(req, res, simfile) {
-  metadata.get(req, cache => {
-    let mfr = cache.manufacturers.byId(simfile._manufacturer);
-    res.redirect(303, '/simfiles/' + simfile._id + '/#notes');
-  });
+  res.redirect(303, '/simfiles/' + simfile._id + '/#notes');
 }
 
 router.post('/notes/simfile/:fileId/add.html', function(req, res, next) {

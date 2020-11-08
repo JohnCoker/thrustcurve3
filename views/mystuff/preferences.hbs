@@ -122,6 +122,20 @@
     </div>
   </div>
 
+  <p>Choose how many rows are shown by default in tables:</p>
+
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Table Page Length</label>
+    <div class="col-sm-9">
+      <select name="tablePageLen" class="form-control">
+        {{#each tablePageLens}}
+        <option value="{{value}}" {{#equal value ../prefs.tablePageLen}}selected{{/equal}}>{{label}}</option>
+        {{/each}}
+      </select>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 form-submit">
       <button type="submit" class="btn btn-primary">Update</button>

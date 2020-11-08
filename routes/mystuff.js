@@ -869,6 +869,17 @@ router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req
       });
     });
 
+    // list table page lengths
+    let tablePageLens = [
+      { label: "auto (10 or 20)", value: null },
+      { label: "10 rows", value: 10 },
+      { label: "20 rows", value: 20 },
+      { label: "50 rows", value: 50 },
+      { label: "all rows", value: -1 },
+    ];
+    if (typeof req.user.preferences.tablePageLen === 'number')
+      prefs.tablePageLen = req.user.preferences.tablePageLen;
+
     res.render('mystuff/preferences', locals(req, defaults, {
       title: 'Preferences',
       units: units,
@@ -876,6 +887,7 @@ router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req
       prefs: prefs,
       chooseTypes,
       chooseManufacturers,
+      tablePageLens,
       submitLink: preferencesLink,
     }));
   });
@@ -933,6 +945,18 @@ router.post([preferencesLink], authenticated, function(req, res, next) {
         }
       }
     });
+
+    let tablePageLen;
+    if (req.body.tablePageLen != null) {
+      tablePageLen = parseInt(req.body.tablePageLen);
+      if (!isFinite(tablePageLen))
+        tablePageLen = null;
+    }
+    if ((tablePageLen == null && req.user.preferences.tablePageLen != null) ||
+        (tablePageLen != null && tablePageLen != req.user.preferences.tablePageLen)) {
+      req.user.preferences.tablePageLen = tablePageLen;
+      change = true;
+    }
 
     if (change) {
       req.user.save(req.success(function(updated) {

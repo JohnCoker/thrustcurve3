@@ -280,6 +280,7 @@ function makeContributorModel(mongoose) {
       temperatureUnit: { type: String, enum: units.temperature.labels },
       ignoreTypes: [{ type: String, enum: MotorTypeEnum }],
       ignoreManufacturers: [String],
+      tablePageLen: Number,
     },
     permissions: {
       editMetadata: Boolean,

@@ -1,4 +1,11 @@
 /**
+ * Return user preferences stored in the global state.
+ */
+function prefs() {
+  return window.$tcprefs || {};
+}
+
+/**
  * Set up dataTables behavior on a rendered HTML table.
  * @function
  * @param {string} selector CSS selector for table
@@ -14,6 +21,9 @@ function setupTable(selector, options, next) {
         numRows = table.find('tbody tr').length,
         gadgets = options.bPaginate === false ? false : numRows > pageLength,
         dt;
+
+    if (typeof prefs().tablePageLen === 'number')
+      pageLength = prefs().tablePageLen;
 
     var opts = _.extend({
       columnDefs: [{targets: 'no-sort', orderable: false}],
@@ -36,14 +46,14 @@ function setupTable(selector, options, next) {
       next(dt);
 
     if (options.bPaginate == null || options.bPaginate === true) {
-      let pageLen = 20;
+      let priorLen = pageLength;
       window.onbeforeprint = e => {
         if (dt.page.len() > 0)
-          pageLen = dt.page.len();
+          priorLen = dt.page.len();
         dt.page.len(-1).draw('page');
       };
       window.onafterprint = e => {
-        dt.page.len(pageLen).draw('page');
+        dt.page.len(priorLen).draw('page');
       };
     }
   });

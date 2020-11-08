@@ -10,7 +10,6 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Search
 
  * search by motor case
- * search by propellant type
  * search by propellant color
 
 ## Motor Guide

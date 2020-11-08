@@ -4,6 +4,8 @@
  */
 'use strict';
 
+const prefs = require('../lib/prefs');
+
 /**
  * Produce a new object with the default and custom locals merged.
  * @param {object} [req] Express request object
@@ -40,6 +42,9 @@ module.exports = function(req, defaults, custom) {
     if (custom.hasOwnProperty(p) && custom[p] != null)
       merged[p] = sanitize(custom[p]);
   }
+
+  // user preferences
+  merged.preferences = prefs.all();
 
   return merged;
 };

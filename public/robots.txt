@@ -1,4 +1,9 @@
 User-agent: *
+Crawl-delay: 120
 Disallow: /mystuff/
 Disallow: /api/
 Disallow: /admin/
+Disallow: /motors/browser.html?*
+Disallow: /motors/search.html?*
+Disallow: /motors/guide.html?*
+Disallow: /outbox/set/

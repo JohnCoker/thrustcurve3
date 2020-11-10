@@ -153,7 +153,7 @@ Find motors that will work using the motor guide:
       <label for="types" class="column-title">Types</label>
       <ul class="checkboxes">
         {{#each types}}
-        <li><input type="checkbox" name="types" value="{{this}}" checked> {{formatType this}}</li>
+        <li><input type="checkbox" name="types" value="{{value}}" {{#if checked}}checked{{/if}}> {{formatType value}}</li>
         {{/each}}
       </ul>
     </div> <!-- types -->
@@ -176,7 +176,7 @@ Find motors that will work using the motor guide:
       <label for="manufacturers" class="column-title">Manufacturers</label>
       <ul class="checkboxes">
         {{#each manufacturers}}
-        <li><input type="checkbox" name="manufacturers" value="{{_id}}" checked> {{abbrev}}</li>
+        <li><input type="checkbox" name="manufacturers" value="{{_id}}" {{#if checked}}checked{{/if}}> {{abbrev}}</li>
         {{/each}}
       </ul>
     </div> <!-- manufacturers -->

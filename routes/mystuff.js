@@ -455,6 +455,21 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
 
       metadata.getRocketMotors(req, rocket, function(fit) {
         if (fit.count > 0) {
+          let prefs = req.user.preferences || {};
+          let types = fit.types.map(t => {
+            return {
+              value: t,
+              checked: prefs.ignoreTypes == null || prefs.ignoreTypes.indexOf(t) < 0,
+            };
+          });
+          let manufacturers = fit.manufacturers.map(m => {
+            return {
+              _id: m._id,
+              name: m.name,
+              abbrev: m.abbrev,
+              checked: prefs.ignoreManufacturers == null || prefs.ignoreManufacturers.indexOf(m.abbrev) < 0,
+            };
+          });
           res.render('mystuff/rocketdetails', locals(req, defaults, {
             title: rocket.name,
             rocket: rocket,
@@ -468,11 +483,11 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
             classCount: fit.impulseClasses.length,
             classRange: fit.classRange,
 
-            types: fit.types,
+            types: types,
             typeCount: fit.types.length,
             singleType: fit.types.length == 1 ? fit.types[0] : undefined,
 
-            manufacturers: fit.manufacturers,
+            manufacturers: manufacturers,
             manufacturerCount: fit.manufacturers.length,
             singleManufacturer: fit.manufacturers.length == 1 ? fit.manufacturers[0] : undefined,
 
@@ -893,7 +908,7 @@ router.get([preferencesLink, '/mystuff/prefs.html'], authenticated, function(req
   });
 });
 
-router.post([preferencesLink], authenticated, function(req, res, next) {
+router.post(preferencesLink, authenticated, function(req, res, next) {
   metadata.getAvailableMotors(req, function(cache) {
     var change = false;
 
@@ -946,7 +961,7 @@ router.post([preferencesLink], authenticated, function(req, res, next) {
       }
     });
 
-    let tablePageLen;
+    let tablePageLen = null;
     if (req.body.tablePageLen != null) {
       tablePageLen = parseInt(req.body.tablePageLen);
       if (!isFinite(tablePageLen))

@@ -170,7 +170,11 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Propellant Info</label>
         <div class="col-sm-6">
-          <p class="form-control-static">{{motor.propellantInfo}}</p>
+          <p class="form-control-static">{{motor.propellantInfo}}
+          {{#if motor.sparky}}
+          <span class="label label-as-badge label-warning">sparky</span>
+          {{/if}}
+          </p>
         </div>
       </div>
       {{/if}}

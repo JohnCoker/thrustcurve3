@@ -94,18 +94,49 @@ advanced search below to search by various attributes.
       </select>
     </div>
   </div>
+  <!--
+  <div class="form-group">
+    <label for="caseInfo" class="col-sm-3 control-label">Motor Case</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="caseInfo">
+        <option value="">(all)</option>
+        {{#each allMotors.cases}}
+        <option {{#equal ../params.caseInfo this}}selected{{/equal}}>{{this}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  -->
+  <div class="form-group">
+    <label for="sparky" class="col-sm-3 control-label">Sparky</label>
+    <div class="col-sm-9">
+    <p>
+      <label class="radio-inline">
+        <input type="radio" name="sparky" value="regular" {{#equal params.sparky 'regular'}}checked{{/equal}}> regular
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="sparky" value="sparky" {{#equal params.sparky 'sparky'}}checked{{/equal}}>
+        <span title="motor ejects burning sparks">sparky</span>
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="sparky" value="all" {{#equal params.sparky 'all'}}checked{{/equal}}> both
+      </label>
+    </div>
+  </div>
   <div class="form-group">
     <label for="availability" class="col-sm-3 control-label">Availability</label>
     <div class="col-sm-9">
     <p>
       <label class="radio-inline">
-        <input type="radio" name="availability" value="regular" {{#equal params.availability 'regular'}}checked{{/equal}}> regular
+        <input type="radio" name="availability" value="available" {{#equal params.availability 'available'}}checked{{/equal}}>
+        <span title="in production">available</span>
       </label>
       <label class="radio-inline">
-        <input type="radio" name="availability" value="available" {{#equal params.availability 'available'}}checked{{/equal}}> available
+        <input type="radio" name="availability" value="OOP" {{#equal params.availability 'OOP'}}checked{{/equal}}>
+        <span title="out of production">OOP</span>
       </label>
       <label class="radio-inline">
-        <input type="radio" name="availability" value="all" {{#equal params.availability 'all'}}checked{{/equal}}> all
+        <input type="radio" name="availability" value="all" {{#equal params.availability 'all'}}checked{{/equal}}> both
       </label>
     </div>
   </div>

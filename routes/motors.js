@@ -452,6 +452,12 @@ function doSearch(req, res, params) {
         else
           query.availability = v;
 
+      } else if (k == 'sparky') {
+        if (v == 'regular')
+          query.sparky = false;
+        else if (v == 'sparky')
+          query.sparky = true;
+
       } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
         if (req.db.Motor.schema.paths[k].instance == 'Number') {
           v = parseFloat(v);
@@ -472,7 +478,9 @@ function doSearch(req, res, params) {
     if (keys.length > 1 || (keys.length == 1 && keys[0] != 'availability'))
       hasParams = true;
 
-    // always create an availability parameter
+    // always initialize radio parameters
+    if (!params.hasOwnProperty('sparky'))
+      params.sparky = 'all';
     if (!params.hasOwnProperty('availability')) {
       params.availability = 'available';
       if (hasParams)

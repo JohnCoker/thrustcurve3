@@ -8,7 +8,7 @@ const express = require('express'),
       router = express.Router(),
       passport = require('passport'),
       crypto = require('crypto'),
-      sendgrid = require('sendgrid'),
+      sendgrid = require('@sendgrid/mail'),
       config = require('../config/server.js'),
       schema = require('../database/schema'),
       units = require('../lib/units'),
@@ -181,8 +181,7 @@ router.get([forgotLink, '/forgotpasswd.jsp'], function(req, res, next) {
 });
 
 router.post(forgotLink, function(req, res, next) {
-  var email = req.body.username.trim();
-
+  const email = req.body.username.trim();
   req.db.Contributor.findOne({ email: email }).exec(req.success(function(user) {
     if (user == null) {
       res.render('mystuff/forgotpasswd', locals(req, defaults, {
@@ -195,37 +194,48 @@ router.post(forgotLink, function(req, res, next) {
     }
 
     crypto.randomBytes(20, function(err, buf) {
-      var token = buf.toString('hex');
+      const token = buf.toString('hex');
+
       user.resetToken = token;
       user.resetExpires = Date.now() + 30 * 60 * 1000; // 30m
       user.save(req.success(function(updated) {
-        var link = 'https://' + req.headers.host + resetLink + "?t=" + token;
+        const link = 'https://' + req.headers.host + resetLink + "?t=" + token;
 
-        sendgrid(config.sendGridUsername, config.sendGridPassword).send({
+        sendgrid.setApiKey(config.sendGridApiKey);
+        sendgrid.send({
           to: email,
           from: 'noreply@thrustcurve.org',
           subject: 'ThrustCurve.org password reset',
-          text: 'You (or someone pretending to be you) requested that your ThrustCurve.org password be reset.\n' +
-                'Please click this link or paste it into your browser address bar to choose a new password:\n\n' +
-                link + '\n\n' +
-                'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-        }, function(err, json) {
-          if (err) {
-            res.status(err.status || 500);
-            res.render('error', {
-              title: 'Email Error',
-              layout: 'mystuff',
-              url: req.url,
-              error: err
-            });
-          } else {
-            res.render('mystuff/forgotpasswd', locals(req, defaults, {
-              title: 'Forgot Password',
-              submitLink: forgotLink,
-              email: email,
-              isSent: true
-            }));
-          }
+          text: `
+You (or someone pretending to be you) requested that your ThrustCurve.org password be reset.
+Please click this link or paste it into your browser address bar to choose a new password:
+
+${link}
+
+If you did not request this, please ignore this email and your password will remain unchanged.
+`,
+          html: `
+<p>You (or someone pretending to be you) requested that your ThrustCurve.org password be reset.
+Please click this link or paste it into your browser address bar to choose a new password:</p>
+<p style="font-size: large;"><a href="${link}">${link}</a></p>
+<p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+<p><img width="200" height="40" src="https://www.thrustcurve.org/images/footer-logo.png" alt="ThrustCurve.org"></p>
+`,
+        }).then(() => {
+          res.render('mystuff/forgotpasswd', locals(req, defaults, {
+            title: 'Forgot Password',
+            submitLink: forgotLink,
+            email: email,
+            isSent: true,
+          }));
+        }).catch(e => {
+          res.status(e.status || 500);
+          res.render('error', {
+            title: 'Email Error',
+            layout: 'mystuff',
+            url: req.url,
+            error: e,
+          });
         });
       }));
     });

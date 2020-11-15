@@ -403,7 +403,7 @@
       "id": "65d6494b-e5b3-48dc-af51-0db6a86fe0cd",
       "comment": "",
       "command": "assertText",
-      "target": "css=.radio-inline:nth-child(2)",
+      "target": "css=.availability .radio-inline:nth-child(1)",
       "targets": [
         ["css=.radio-inline:nth-child(2)", "css:finder"],
         ["xpath=//label[2]", "xpath:position"],
@@ -414,7 +414,7 @@
       "id": "c2214d94-466b-47ab-8571-0cac5f13f963",
       "comment": "",
       "command": "assertChecked",
-      "target": "css=.radio-inline:nth-child(2)>input",
+      "target": "css=.availability .radio-inline:nth-child(1)>input",
       "targets": [
         ["css=.radio-inline:nth-child(2)", "css:finder"],
         ["xpath=//label[2]", "xpath:position"],
@@ -431,16 +431,6 @@
         ["xpath=//button[@type='submit']", "xpath:attributes"],
         ["xpath=//div[9]/div/button", "xpath:position"],
         ["xpath=//button[contains(.,'Submit')]", "xpath:innerText"]
-      ],
-      "value": ""
-    }, {
-      "id": "e0b63993-3e7e-4d13-9070-ee397b7c6e9d",
-      "comment": "",
-      "command": "click",
-      "target": "css=.container:nth-child(10)",
-      "targets": [
-        ["css=.container:nth-child(10)", "css:finder"],
-        ["xpath=//body/div", "xpath:position"]
       ],
       "value": ""
     }, {

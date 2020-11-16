@@ -7,6 +7,7 @@
 const express = require('express'),
       router = express.Router(),
       metadata = require('../lib/metadata'),
+      units = require("../lib/units"),
       locals = require('./locals.js'),
       authorized = require('./authorized.js');
 
@@ -237,5 +238,112 @@ router.post('/admin/certorgs/:id', authorized('metadata'), function(req, res, ne
       metadata.flush();
   }));
 });
+
+/*
+ * /admin/propellants/
+ * List the propellant types by manufactuer, renders with admin/propellants.hbs template.
+ */
+function guessColor(name) {
+  const COLORS = ['white', 'red', 'black', 'orange', 'yellow', 'blue', 'green', 'pink'];
+
+  if (name == null || name === '' || name == 'black powder')
+    return;
+  let words = name.toLowerCase().split(/[^\w]+/);
+
+  // find a word that is a color name
+  let color = words.reduce((found, word) => {
+    if (found != null)
+      return found;
+    return COLORS.find(c => word == c);
+  }, null);
+  if (color == null) {
+    // find a word that starts with a color name
+    color = words.reduce((found, word) => {
+      if (found != null)
+        return found;
+      return COLORS.find(c => word.startsWith(c));
+    }, null);
+  }
+  return color;
+}
+
+router.get('/admin/propellants/', function(req, res, next) {
+  metadata.getManufacturers(req, function(manufacturers) {
+    req.db.Motor.find({ propellantInfo: { $ne: null } }).exec(req.success(function(motors) {
+      let unique = {};
+      motors.forEach(motor => {
+        if (motor.propellantInfo == null || motor.propellantInfo == '')
+          return;
+        const mfr = manufacturers.byId(motor._manufacturer).abbrev;
+        const key = mfr + ' ' + motor.propellantInfo;
+        let entry = unique[key];
+        if (entry == null) {
+          entry = unique[key] = {
+            mfr,
+            name: motor.propellantInfo,
+            count: 0,
+            available: 0,
+            color: guessColor(motor.propellantInfo),
+          };
+        }
+        entry.count++;
+        if (motor.isAvailable)
+          entry.available++;
+      });
+      let names = Object.keys(unique);
+      names.sort((a, b) => a.localeCompare(b));
+      res.render('admin/propellants', locals(defaults, {
+        title: 'Propellant Types',
+        propellants: names.map(n => unique[n]),
+      }));
+    }));
+  });
+});
+
+/*
+ * /admin/cases/
+ * List the case types by manufactuer, renders with admin/cases.hbs template.
+ */
+router.get('/admin/cases/', function(req, res, next) {
+  metadata.getManufacturers(req, function(manufacturers) {
+    req.db.Motor.find({ caseInfo: { $ne: null }, type: { $ne: 'SU' } }).exec(req.success(function(motors) {
+      let unique = {};
+      motors.forEach(motor => {
+        if (motor.caseInfo == null || motor.caseInfo == '')
+          return;
+        const mfr = manufacturers.byId(motor._manufacturer).abbrev;
+        const key = mfr + ' ' + motor.caseInfo;
+        let entry = unique[key];
+        if (entry == null) {
+          entry = unique[key] = {
+            mfr,
+            name: motor.caseInfo,
+            count: 0,
+            available: 0,
+            diameters: [],
+          };
+        }
+        entry.count++;
+        if (motor.isAvailable)
+          entry.available++;
+        let d = units.formatMMTFromMKS(motor.diameter);
+        if (entry.diameters.indexOf(d) < 0)
+          entry.diameters.push(d);
+      });
+      let names = Object.keys(unique);
+      names.sort((a, b) => a.localeCompare(b));
+      res.render('admin/cases', locals(defaults, {
+        title: 'Motor Cases',
+        cases: names.map(n => {
+          let o = unique[n];
+          o.diameters.sort();
+          o.diameter = o.diameters.sort().join();
+          return o;
+        }),
+      }));
+    }));
+  });
+});
+
 
 module.exports = router;

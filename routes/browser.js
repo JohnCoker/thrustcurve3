@@ -143,7 +143,7 @@ const dimensions = [
     label: "Propellant",
     prop: "propellant",
     matchingValues: function(summary) {
-      return _.map(summary.propellants, function(p) { return { label: p, value: p }; });
+      return _.map(summary.propellants, function(p) { return { label: p.name, value: p.name }; });
     },
     applySelection: function(all, query, v) {
       query.propellantInfo = v;
@@ -154,7 +154,7 @@ const dimensions = [
     label: "Case",
     prop: "case",
     matchingValues: function(summary) {
-      return _.map(summary.cases, function(c) { return { label: c, value: c }; });
+      return _.map(summary.cases, function(c) { return { label: c.name, value: c.name }; });
     },
     applySelection: function(all, query, v) {
       query.caseInfo = v;

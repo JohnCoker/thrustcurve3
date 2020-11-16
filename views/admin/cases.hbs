@@ -1,0 +1,35 @@
+<h1>{{title}}</h1>
+
+<p>
+This page shows the unique motor cases by manufacturer for all motors
+(including ones that are out of production).
+</p>
+
+<table id="case-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Manufacturer</th>
+     <th>Case</th>
+     <th class="diameter">Diameter</th>
+     <th class="number">Total</th>
+     <th class="number">Available</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each cases}}
+    <tr data-id="{{_id}}">
+      <td>{{mfr}}</a></td>
+      <td><a href="/motors/search.html?manufacturer={{mfr}}&caseInfo={{name}}&availability=all">{{name}}</a></td>
+      <td class="diameter">{{diameter}}</td>
+      <td class="number">{{count}}</td>
+      <td class="number">{{available}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#certorg-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>

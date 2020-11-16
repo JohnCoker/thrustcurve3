@@ -1,0 +1,35 @@
+<h1>{{title}}</h1>
+
+<p>
+This page shows the unique propellant types by manufacturer for all motors
+(including ones that are out of production).
+</p>
+
+<table id="propellant-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Manufacturer</th>
+     <th>Propellant</th>
+     <th class="number">Total</th>
+     <th class="number">Available</th>
+     <th>Color</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each propellants}}
+    <tr data-id="{{_id}}">
+      <td>{{mfr}}</a></td>
+      <td><a href="/motors/search.html?manufacturer={{mfr}}&propellantInfo={{name}}&availability=all">{{name}}</a></td>
+      <td class="number">{{count}}</td>
+      <td class="number">{{available}}</td>
+      <td>{{color}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#certorg-list', {
+  order: [[0, 'asc']],
+  expand: true
+});
+</script>

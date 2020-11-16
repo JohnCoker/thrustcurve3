@@ -89,24 +89,22 @@ advanced search below to search by various attributes.
       <select class="form-control" name="propellantInfo">
         <option value="">(all)</option>
         {{#each allMotors.propellants}}
-        <option {{#equal ../params.propellantInfo this}}selected{{/equal}}>{{this}}</option>
+        <option data-manufacturers="{{manufacturers}}" {{#equal ../params.propellantInfo name}}selected{{/equal}}>{{name}}</option>
         {{/each}}
       </select>
     </div>
   </div>
-  <!--
   <div class="form-group caseInfo">
     <label for="caseInfo" class="col-sm-3 control-label">Motor Case</label>
     <div class="col-sm-9">
       <select class="form-control" name="caseInfo">
         <option value="">(all)</option>
         {{#each allMotors.cases}}
-        <option {{#equal ../params.caseInfo this}}selected{{/equal}}>{{this}}</option>
+        <option data-diameter="{{diameter}}" data-manufacturers="{{manufacturers}}" {{#equal ../params.caseInfo name}}selected{{/equal}}>{{name}}</option>
         {{/each}}
       </select>
     </div>
   </div>
-  -->
   <div class="form-group sparky">
     <label for="sparky" class="col-sm-3 control-label">Sparky</label>
     <div class="col-sm-9">
@@ -151,6 +149,43 @@ advanced search below to search by various attributes.
 <script type="text/javascript">
 $('form input[type=text]').blur(function(e) {
   this.value = $.trim(this.value).toUpperCase();
+});
+$('form select[name=manufacturer], form select[name=diameter]').change(function(e) {
+  let onlyMfr = $('select[name=manufacturer]').val(),
+      onlyDia = $('select[name=diameter]').val();
+  if (onlyDia !== '')
+    onlyDia = parseFloat(onlyDia);
+
+  let propSelect = $('form select[name=propellantInfo]');
+  propSelect.find('option').removeAttr('hidden');
+  if (onlyMfr) {
+    propSelect.find('option').each(function() {
+      let opt = $(this);
+      let mfrs = opt.attr('data-manufacturers');
+      if (mfrs && mfrs.indexOf(onlyMfr) < 0)
+        opt.attr('hidden', 'hidden');
+    });
+  }
+
+  let caseSelect = $('form select[name=caseInfo]');
+  caseSelect.find('option').removeAttr('hidden');
+  if (onlyMfr || onlyDia) {
+    caseSelect.find('option').each(function() {
+      let opt = $(this);
+      let visible = true;
+
+      let mfrs = opt.attr('data-manufacturers');
+      if (onlyMfr && mfrs && mfrs.indexOf(onlyMfr) < 0)
+        visible = false;
+
+      let dia = opt.attr('data-diameter');
+      if (onlyDia && dia && (dia = parseFloat(dia)) > 0 && Math.abs(dia - onlyDia) > 0.0011)
+        visible = false;
+
+      if (!visible)
+        opt.attr('hidden', 'hidden');
+    });
+  }
 });
 </script>
 {{/unless}}

@@ -2,7 +2,7 @@
   "id": "e2e68c15-dce7-4699-ba08-7989a813fb78",
   "version": "2.0",
   "name": "ThrustCurve",
-  "url": "http://localhost:3000/motors/search.html",
+  "url": "http://localhost:3000/",
   "tests": [{
     "id": "2f958efe-3f8e-465c-abe9-f5bdcea3b26c",
     "name": "index",
@@ -694,6 +694,1365 @@
         ["xpath=//a[contains(.,'C11')]", "xpath:innerText"]
       ],
       "value": "C11"
+    }]
+  }, {
+    "id": "4e93ddf9-c374-45af-8f0c-508cdf1624e6",
+    "name": "guide",
+    "commands": [{
+      "id": "7fde846b-53b1-4ce2-a464-5c9f06345ffa",
+      "comment": "",
+      "command": "open",
+      "target": "http://localhost:3000/mystuff/logout.html",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b872b610-e8d6-4082-83b0-18484717499d",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1233x872",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "fe56417c-84cc-4b38-85fa-3213b1737688",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "ThrustCurve Home",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "cc91a102-1b59-441c-b519-0316bb305d31",
+      "comment": "",
+      "command": "click",
+      "target": "css=.col-md-8 > p:nth-child(3)",
+      "targets": [
+        ["css=.col-md-8 > p:nth-child(3)", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c0cfd850-7479-450b-ad1c-d6fbca27c7b1",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Match a Rocket",
+      "targets": [
+        ["linkText=Match a Rocket", "linkText"],
+        ["css=th:nth-child(2) > .btn", "css:finder"],
+        ["xpath=(//a[contains(text(),'Match a Rocket')])[2]", "xpath:link"],
+        ["xpath=(//a[contains(@href, '/motors/guide.html')])[2]", "xpath:href"],
+        ["xpath=//th[2]/a", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "13e4feb4-ea68-4077-85d4-07054b901e3a",
+      "comment": "",
+      "command": "click",
+      "target": "name=bodyDiameter",
+      "targets": [
+        ["name=bodyDiameter", "name"],
+        ["css=.form-group:nth-child(2) > .col-sm-6 > .form-control", "css:finder"],
+        ["xpath=//input[@name='bodyDiameter']", "xpath:attributes"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "2b4c1ad1-8801-4633-a892-02e6b258a60c",
+      "comment": "",
+      "command": "type",
+      "target": "name=bodyDiameter",
+      "targets": [
+        ["name=bodyDiameter", "name"],
+        ["css=.form-group:nth-child(2) > .col-sm-6 > .form-control", "css:finder"],
+        ["xpath=//input[@name='bodyDiameter']", "xpath:attributes"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "1"
+    }, {
+      "id": "fc528f43-618d-4434-8533-5c5021678c19",
+      "comment": "",
+      "command": "select",
+      "target": "name=bodyDiameterUnit",
+      "targets": [],
+      "value": "label=inches"
+    }, {
+      "id": "9e82238d-74dd-4249-bb97-46b4c93528d4",
+      "comment": "",
+      "command": "type",
+      "target": "name=weight",
+      "targets": [
+        ["name=weight", "name"],
+        ["css=.form-group:nth-child(3) > .col-sm-6 > .form-control", "css:finder"],
+        ["xpath=//input[@name='weight']", "xpath:attributes"],
+        ["xpath=//div[2]/div/input", "xpath:position"]
+      ],
+      "value": "3"
+    }, {
+      "id": "74d02507-91b9-4db5-a803-e9efc272c8cb",
+      "comment": "",
+      "command": "select",
+      "target": "name=weightUnit",
+      "targets": [],
+      "value": "label=ounces"
+    }, {
+      "id": "17bd4809-8ac2-4161-97ca-4ac3a4a950fb",
+      "comment": "",
+      "command": "type",
+      "target": "name=mmtDiameter",
+      "targets": [
+        ["name=mmtDiameter", "name"],
+        ["css=.form-group:nth-child(4) > .col-sm-6 > .form-control", "css:finder"],
+        ["xpath=//input[@name='mmtDiameter']", "xpath:attributes"],
+        ["xpath=//div[3]/div/input", "xpath:position"]
+      ],
+      "value": "24"
+    }, {
+      "id": "fa74b94a-055f-4baa-ae88-fcf016d2e091",
+      "comment": "",
+      "command": "type",
+      "target": "name=mmtLength",
+      "targets": [
+        ["name=mmtLength", "name"],
+        ["css=.form-group:nth-child(5) > .col-sm-6 > .form-control", "css:finder"],
+        ["xpath=//input[@name='mmtLength']", "xpath:attributes"],
+        ["xpath=//div[4]/div/input", "xpath:position"]
+      ],
+      "value": "80"
+    }, {
+      "id": "6be28764-cb4d-4e49-816c-5b27df177460",
+      "comment": "",
+      "command": "click",
+      "target": "name=mmtLengthUnit",
+      "targets": [
+        ["name=mmtLengthUnit", "name"],
+        ["css=.form-group:nth-child(5) > .col-sm-3 > .form-control", "css:finder"],
+        ["xpath=//select[@name='mmtLengthUnit']", "xpath:attributes"],
+        ["xpath=//div[4]/div[2]/select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "8570203c-f4d0-45e2-b0f0-94a1d1370710",
+      "comment": "",
+      "command": "select",
+      "target": "name=mmtLengthUnit",
+      "targets": [],
+      "value": "label=millimeters"
+    }, {
+      "id": "a99095d1-0d3b-4f21-b9a5-4684e56e8fec",
+      "comment": "",
+      "command": "type",
+      "target": "name=guideLength",
+      "targets": [],
+      "value": "1"
+    }, {
+      "id": "13be72f9-503e-4dec-afb9-12459bf23684",
+      "comment": "",
+      "command": "select",
+      "target": "name=guideLengthUnit",
+      "targets": [],
+      "value": "meters"
+    }, {
+      "id": "ea919645-2aa2-43ed-9de8-a088ade6c5db",
+      "comment": "",
+      "command": "click",
+      "target": "css=form[name=guide] button[type=submit]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[12]/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Submit')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "975b875e-ff56-4aa5-b327-7553e4d0562a",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=p:nth-child(2)",
+      "targets": [
+        ["css=p:nth-child(2)", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "cc5dbfec-f5be-4b0e-b79a-5dd67b774814",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=p:nth-child(2)",
+      "targets": [
+        ["css=p:nth-child(2)", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": "20 motors fit the rocket and satisfied the search criteria; 15 worked and 5 did not (20 simulations run).\\nIf these aren't what you want, use the back button to adjust the inputs or start over."
+    }, {
+      "id": "cd2b3164-c7c8-4e3b-b6e5-5f7f6abb251a",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=C11",
+      "targets": [
+        ["linkText=C11", "linkText"],
+        ["css=.odd:nth-child(1) > td:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'C11')]", "xpath:link"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/Estes/C11/')]", "xpath:href"],
+        ["xpath=//td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'C11')]", "xpath:innerText"]
+      ],
+      "value": "C11"
+    }, {
+      "id": "65ad0e94-74ba-4b25-a731-22522dd5946f",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.odd:nth-child(1) > .visible-md",
+      "targets": [
+        ["css=.odd:nth-child(1) > .visible-md", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td[2]", "xpath:idRelative"],
+        ["xpath=//td[2]", "xpath:position"],
+        ["xpath=//td[contains(.,'Estes')]", "xpath:innerText"]
+      ],
+      "value": "Estes"
+    }, {
+      "id": "aa221ebd-6d47-4ba0-853f-658243e2903e",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.odd:nth-child(1) > .number:nth-child(3)",
+      "targets": [
+        ["css=.odd:nth-child(1) > .number:nth-child(3)", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td[3]", "xpath:idRelative"],
+        ["xpath=//td[3]", "xpath:position"],
+        ["xpath=//td[contains(.,'10:1')]", "xpath:innerText"]
+      ],
+      "value": "10:1"
+    }, {
+      "id": "73b3e469-11e2-41cb-a2d7-553dfd7018c6",
+      "comment": "",
+      "command": "click",
+      "target": "css=.odd:nth-child(1) .fa",
+      "targets": [
+        ["css=.odd:nth-child(1) .fa", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td[9]/a/i", "xpath:idRelative"],
+        ["xpath=//a/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f68fef79-a4a4-41ee-8146-7e907d2c0c66",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.form-group:nth-child(3) .form-control-static",
+      "targets": [
+        ["css=.form-group:nth-child(3) .form-control-static", "css:finder"],
+        ["xpath=//div[3]/div/p", "xpath:position"],
+        ["xpath=//p[contains(.,'good')]", "xpath:innerText"]
+      ],
+      "value": "good"
+    }, {
+      "id": "a849939d-f98f-4df6-9661-9749970145c6",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=Estes C11",
+      "targets": [
+        ["linkText=Estes C11", "linkText"],
+        ["css=.form-control-static > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Estes C11')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/Estes/C11/')]", "xpath:href"],
+        ["xpath=//p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Estes C11')]", "xpath:innerText"]
+      ],
+      "value": "Estes C11"
+    }, {
+      "id": "81d74fb6-b66d-4fe7-9a24-a32d006b2e57",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.form-group:nth-child(2) .form-control-static",
+      "targets": [
+        ["css=.form-group:nth-child(2) .form-control-static", "css:finder"],
+        ["xpath=//div[2]/div/p", "xpath:position"],
+        ["xpath=//p[contains(.,'24mm MMT')]", "xpath:innerText"]
+      ],
+      "value": "24mm MMT"
+    }, {
+      "id": "3858c12e-e7ea-4749-8caa-466e1504f0af",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=complete results",
+      "targets": [
+        ["linkText=complete results", "linkText"],
+        ["css=p > a:nth-child(2)", "css:finder"],
+        ["xpath=//a[contains(text(),'complete results')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fb1e665c4d3b1c555ed0f01/complete.html')]", "xpath:href"],
+        ["xpath=//a[2]", "xpath:position"],
+        ["xpath=//a[contains(.,'complete results')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "292d3597-1ef5-4727-987f-97b7db27d943",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Complete Results",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "e0b81079-19ec-4176-af0b-6ccbd7cf1eed",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.odd:nth-child(1) > .danger",
+      "targets": [
+        ["css=.odd:nth-child(1) > .danger", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td[9]", "xpath:idRelative"],
+        ["xpath=//td[9]", "xpath:position"],
+        ["xpath=//td[contains(.,'slow off guide')]", "xpath:innerText"]
+      ],
+      "value": "slow off guide"
+    }, {
+      "id": "13416585-9098-4c13-a966-dd9f28094069",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=summary results",
+      "targets": [
+        ["linkText=summary results", "linkText"],
+        ["css=p > a:nth-child(1)", "css:finder"],
+        ["xpath=//a[contains(text(),'summary results')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fb1e665c4d3b1c555ed0f01/summary.html')]", "xpath:href"],
+        ["xpath=//p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'summary results')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "bdbbbfe8-b10b-4cd0-91d5-a9fb17654eea",
+      "comment": "",
+      "command": "click",
+      "target": "css=#result-list_filter input[type=search]",
+      "targets": [
+        ["css=#result-list_filter .form-control", "css:finder"],
+        ["xpath=//input[@type='search']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_filter']/label/input", "xpath:idRelative"],
+        ["xpath=//label/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "03555d99-3f48-4467-acc8-a8fa4c6b5f3b",
+      "comment": "",
+      "command": "type",
+      "target": "css=#result-list_filter input[type=search]",
+      "targets": [
+        ["css=#result-list_filter .form-control", "css:finder"],
+        ["xpath=//input[@type='search']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_filter']/label/input", "xpath:idRelative"],
+        ["xpath=//label/input", "xpath:position"]
+      ],
+      "value": "F24"
+    }, {
+      "id": "db4e6ee1-f54b-462a-84df-6c1a52036c73",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=F24W",
+      "targets": [
+        ["linkText=F24W", "linkText"],
+        ["css=td:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'F24W')]", "xpath:link"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/F24W/')]", "xpath:href"],
+        ["xpath=//td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F24W')]", "xpath:innerText"]
+      ],
+      "value": "F24W"
+    }, {
+      "id": "ae09aa3f-92e0-4a9e-a8c2-735d40acffae",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.odd > .visible-md",
+      "targets": [
+        ["css=.odd > .visible-md", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td[2]", "xpath:idRelative"],
+        ["xpath=//td[2]", "xpath:position"],
+        ["xpath=//td[contains(.,'AeroTech')]", "xpath:innerText"]
+      ],
+      "value": "AeroTech"
+    }, {
+      "id": "b98d2f99-1573-4e18-9003-e88387841937",
+      "comment": "",
+      "command": "click",
+      "target": "css=.row:nth-child(3)",
+      "targets": [
+        ["css=.row:nth-child(3)", "css:finder"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]", "xpath:idRelative"],
+        ["xpath=//div[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "274a6e1c-61be-4cbb-9255-4f6a60bea358",
+      "comment": "",
+      "command": "assertText",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div", "xpath:position"]
+      ],
+      "value": "Showing 1 to 1 of 1 entries (filtered from 15 total entries)"
+    }, {
+      "id": "6464bb97-9d58-443b-8a07-04e856b87d95",
+      "comment": "",
+      "command": "click",
+      "target": "css=#result-list_filter .form-control",
+      "targets": [
+        ["css=#result-list_filter .form-control", "css:finder"],
+        ["xpath=//input[@type='search']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_filter']/label/input", "xpath:idRelative"],
+        ["xpath=//label/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "98a729f9-510c-431b-ab6f-6fa835c7f1fd",
+      "comment": "",
+      "command": "click",
+      "target": "css=.col-md-8",
+      "targets": [
+        ["css=.col-md-8", "css:finder"],
+        ["xpath=//row/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c8bdaed3-aada-4d3c-9ba9-e77f7fef7855",
+      "comment": "",
+      "command": "type",
+      "target": "css=#result-list_filter input[type=search]",
+      "targets": [
+        ["css=#result-list_filter .form-control", "css:finder"],
+        ["xpath=//input[@type='search']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_filter']/label/input", "xpath:idRelative"],
+        ["xpath=//label/input", "xpath:position"]
+      ],
+      "value": " \\n"
+    }, {
+      "id": "ad7c7f0d-2446-41d7-ae42-77a31cca5a6d",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=E20W",
+      "targets": [
+        ["linkText=E20W", "linkText"],
+        ["css=.odd:nth-child(7) > td:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'E20W')]", "xpath:link"],
+        ["xpath=//table[@id='result-list']/tbody/tr[7]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/E20W/')]", "xpath:href"],
+        ["xpath=//tr[7]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'E20W')]", "xpath:innerText"]
+      ],
+      "value": "E20W"
+    }, {
+      "id": "a176d795-586d-4ad7-b967-5477f88f6ba6",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=My Stuff",
+      "targets": [
+        ["linkText=My Stuff", "linkText"],
+        ["css=.dropdown:nth-child(2) > .dropdown-toggle", "css:finder"],
+        ["xpath=//a[contains(text(),'My Stuff')]", "xpath:link"],
+        ["xpath=//div[@id='navbar']/ul/li[2]/a", "xpath:idRelative"],
+        ["xpath=(//a[contains(@href, '#')])[2]", "xpath:href"],
+        ["xpath=//div[2]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'My Stuff ')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "24397ab1-f1be-41a3-bc6c-9e3c0de05538",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Rockets",
+      "targets": [
+        ["linkText=Rockets", "linkText"],
+        ["css=.open li:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Rockets')]", "xpath:link"],
+        ["xpath=//div[@id='navbar']/ul/li[2]/ul/li[2]/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/mystuff/rockets.html')]", "xpath:href"],
+        ["xpath=//li[2]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Rockets')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "dad8bcbd-8408-4037-bb60-d62c28c63538",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=My Stuff",
+      "targets": [
+        ["linkText=My Stuff", "linkText"],
+        ["css=.dropdown:nth-child(2) > .dropdown-toggle", "css:finder"],
+        ["xpath=//a[contains(text(),'My Stuff')]", "xpath:link"],
+        ["xpath=//div[@id='navbar']/ul/li[2]/a", "xpath:idRelative"],
+        ["xpath=(//a[contains(@href, '#')])[2]", "xpath:href"],
+        ["xpath=//div[2]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'My Stuff ')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c15d17ca-aea4-41e2-98bb-aa18a0b070a6",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Rockets",
+      "targets": [
+        ["linkText=Rockets", "linkText"],
+        ["css=.open li:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Rockets')]", "xpath:link"],
+        ["xpath=//div[@id='navbar']/ul/li[2]/ul/li[2]/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/mystuff/rockets.html')]", "xpath:href"],
+        ["xpath=//li[2]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Rockets')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "34f377cc-3a7b-4669-bb8c-352b9c34a13b",
+      "comment": "",
+      "command": "click",
+      "target": "css=.col-md-8",
+      "targets": [
+        ["css=.col-md-8", "css:finder"],
+        ["xpath=//row/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "4056dec1-f1b4-48fd-8169-a291c2e15154",
+      "comment": "",
+      "command": "type",
+      "target": "name=username",
+      "targets": [
+        ["name=username", "name"],
+        ["css=.form-group:nth-child(1) .form-control", "css:finder"],
+        ["xpath=//input[@name='username']", "xpath:attributes"],
+        ["xpath=//div/input", "xpath:position"]
+      ],
+      "value": "flier.fred@gmail.com"
+    }, {
+      "id": "928df9d3-2bcc-4936-9c81-ca2e149f415a",
+      "comment": "",
+      "command": "type",
+      "target": "name=password",
+      "targets": [
+        ["name=password", "name"],
+        ["css=.form-group:nth-child(2) .form-control", "css:finder"],
+        ["xpath=//input[@name='password']", "xpath:attributes"],
+        ["xpath=//div[2]/div/input", "xpath:position"]
+      ],
+      "value": "secret"
+    }, {
+      "id": "bfed4218-345a-4daa-8c31-fc87c8efca32",
+      "comment": "",
+      "command": "click",
+      "target": "css=button[type=submit]",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[3]/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Log In')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "72aa1de5-7e66-4050-9595-045a89387080",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "My Rockets",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "3aee0f52-849b-45ed-928b-020329ff2766",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=Alpha III",
+      "targets": [
+        ["linkText=Alpha III", "linkText"],
+        ["css=.odd:nth-child(1) a", "css:finder"],
+        ["xpath=//a[contains(text(),'Alpha III')]", "xpath:link"],
+        ["xpath=//table[@id='rocket-list']/tbody/tr/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/mystuff/rocket/5f70ff46e645437e11edd06b/')]", "xpath:href"],
+        ["xpath=//td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Alpha III')]", "xpath:innerText"]
+      ],
+      "value": "Alpha III"
+    }, {
+      "id": "8d403afb-fb44-4a25-a17f-6e42dec97217",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Alpha III",
+      "targets": [
+        ["linkText=Alpha III", "linkText"],
+        ["css=.odd:nth-child(1) a", "css:finder"],
+        ["xpath=//a[contains(text(),'Alpha III')]", "xpath:link"],
+        ["xpath=//table[@id='rocket-list']/tbody/tr/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/mystuff/rocket/5f70ff46e645437e11edd06b/')]", "xpath:href"],
+        ["xpath=//td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Alpha III')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "30a942ed-997e-409f-b47d-c6d0e0684458",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Alpha III",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "6da2378d-04d1-4497-a6e6-faca1f99e275",
+      "comment": "",
+      "command": "click",
+      "target": "css=button[type=submit]",
+      "targets": [
+        ["css=.form-group:nth-child(1)", "css:finder"],
+        ["xpath=//form/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "21bc6f0f-450d-4ce5-a594-93d62bd87820",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Results",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "de33225a-7967-46d9-a05c-2e97cbe2a57e",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=p:nth-child(2)",
+      "targets": [
+        ["css=p:nth-child(2)", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": "12 motors fit Alpha III and satisfied the search criteria; 12 worked (12 simulations run).\\nIf these aren't what you want, use the back button to adjust the inputs or start over."
+    }, {
+      "id": "d4dbc9e2-4f05-42ae-8796-c51c63bb7f0c",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=C6",
+      "targets": [
+        ["linkText=C6", "linkText"],
+        ["css=.odd:nth-child(7) > td:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'C6')]", "xpath:link"],
+        ["xpath=//table[@id='result-list']/tbody/tr[7]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/Estes/C6/')]", "xpath:href"],
+        ["xpath=//tr[7]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'C6')]", "xpath:innerText"]
+      ],
+      "value": "C6"
+    }, {
+      "id": "387a6711-ad83-4e27-a6c5-2229d685853f",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.odd:nth-child(7) > .visible-md",
+      "targets": [
+        ["css=.odd:nth-child(7) > .visible-md", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr[7]/td[2]", "xpath:idRelative"],
+        ["xpath=//tr[7]/td[2]", "xpath:position"]
+      ],
+      "value": "Estes"
+    }, {
+      "id": "558be65a-6dd1-4b94-8eca-946d8d7ca3e8",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=C6",
+      "targets": [
+        ["linkText=C6", "linkText"],
+        ["css=.odd:nth-child(7) > td:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'C6')]", "xpath:link"],
+        ["xpath=//table[@id='result-list']/tbody/tr[7]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/Estes/C6/')]", "xpath:href"],
+        ["xpath=//tr[7]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'C6')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e2bb79d2-b4d7-4063-869c-cc136d1d36a1",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Estes C6",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "34de5335-0695-4e65-bb1a-a7c24905eb05",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=Estes Industries",
+      "targets": [
+        ["linkText=Estes Industries", "linkText"],
+        ["css=.form-group:nth-child(1) a", "css:finder"],
+        ["xpath=//a[contains(text(),'Estes Industries')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/manufacturers/Estes/details.html')]", "xpath:href"],
+        ["xpath=//p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Estes Industries')]", "xpath:innerText"]
+      ],
+      "value": "Estes Industries"
+    }, {
+      "id": "9dec09f0-6ecb-444e-9ba9-4578fc7257df",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.form-group:nth-child(2) .form-control-static",
+      "targets": [
+        ["css=.form-group:nth-child(2) .form-control-static", "css:finder"],
+        ["xpath=//div[2]/div/p", "xpath:position"],
+        ["xpath=//p[contains(.,'C6')]", "xpath:innerText"]
+      ],
+      "value": "C6"
+    }, {
+      "id": "ca6d7b03-74d6-4d34-be7c-45f769bac232",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-group:nth-child(3) > .control-label",
+      "targets": [
+        ["css=.form-group:nth-child(3) > .control-label", "css:finder"],
+        ["xpath=//div[3]/label", "xpath:position"],
+        ["xpath=//label[contains(.,'Common Name')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "2beab4de-378d-47ef-8647-e74029ad0cd2",
+      "comment": "",
+      "command": "executeScript",
+      "target": "window.history.back()",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "4dd0f1ae-554a-4b6c-b6c6-b72caee9a590",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Results",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2e42467b-91b1-4862-8eb7-e384064b385a",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=complete results",
+      "targets": [
+        ["linkText=complete results", "linkText"],
+        ["css=p:nth-child(5) > a:nth-child(1)", "css:finder"],
+        ["xpath=//a[contains(text(),'complete results')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fb1f589c4d3b1c555ed1211/complete.html')]", "xpath:href"],
+        ["xpath=//p[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'complete results')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7e46155a-67c3-4946-931e-380cb77b8dc0",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Complete Results",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "e2395aa7-c375-4042-8fca-d9c404635037",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-group:nth-child(4) .form-control-static",
+      "targets": [
+        ["css=.form-group:nth-child(4) .form-control-static", "css:finder"],
+        ["xpath=//div[4]/div/p", "xpath:position"],
+        ["xpath=//p[contains(.,'0.4')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f1cebfd9-e220-40eb-9274-e573c8084149",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=Alpha III",
+      "targets": [
+        ["linkText=Alpha III", "linkText"],
+        ["css=.form-control-static > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Alpha III')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/mystuff/rocket/5f70ff46e645437e11edd06b/')]", "xpath:href"],
+        ["xpath=//p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Alpha III')]", "xpath:innerText"]
+      ],
+      "value": "Alpha III"
+    }, {
+      "id": "afcbded1-7820-4f96-8c18-eae1e2112f3d",
+      "comment": "",
+      "command": "click",
+      "target": "css=.container:nth-child(11)",
+      "targets": [
+        ["css=.container:nth-child(11)", "css:finder"],
+        ["xpath=//body/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "276e44e3-4e38-4c8a-b0e3-50a0d542016f",
+      "comment": "",
+      "command": "click",
+      "target": "name=result-list_length",
+      "targets": [
+        ["name=result-list_length", "name"],
+        ["css=#result-list_length .form-control", "css:finder"],
+        ["xpath=//select[@name='result-list_length']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_length']/label/select", "xpath:idRelative"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "313c0d7f-c6dc-44f1-880c-06ba67b96971",
+      "comment": "",
+      "command": "select",
+      "target": "name=result-list_length",
+      "targets": [],
+      "value": "label=all"
+    }, {
+      "id": "a43f73e7-91ea-47cd-b4d9-32ebb1594114",
+      "comment": "",
+      "command": "click",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div[3]/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c9d29f51-cd22-466a-a162-ba853de86018",
+      "comment": "",
+      "command": "assertText",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div[3]/div/div", "xpath:position"]
+      ],
+      "value": "Showing 1 to 12 of 12 entries"
+    }, {
+      "id": "d845c1f2-4fee-47ee-a622-362ce94ee5f9",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=D21T",
+      "targets": [
+        ["linkText=D21T", "linkText"],
+        ["css=.success:nth-child(12) > td:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'D21T')]", "xpath:link"],
+        ["xpath=//table[@id='result-list']/tbody/tr[12]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/D21T/')]", "xpath:href"],
+        ["xpath=//tr[12]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'D21T')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "063fa845-e29e-49b1-8809-5ea9d3273f6d",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "AeroTech D21T",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "633afb0e-1804-4989-a993-79240d8f3484",
+    "name": "browser",
+    "commands": [{
+      "id": "139cce0c-5064-4d44-843c-210838de8c5c",
+      "comment": "",
+      "command": "open",
+      "target": "http://localhost:3000/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7e59e4eb-08b8-4623-8afa-9df271da447e",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1233x872",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "d9527c94-ba23-42c6-b9e8-850f67c898fe",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Browse by Type",
+      "targets": [
+        ["linkText=Browse by Type", "linkText"],
+        ["css=th:nth-child(3) > .btn", "css:finder"],
+        ["xpath=(//a[contains(text(),'Browse by Type')])[2]", "xpath:link"],
+        ["xpath=(//a[contains(@href, '/motors/browser.html')])[2]", "xpath:href"],
+        ["xpath=//th[3]/a", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "38c91839-5f8e-4bf6-90dd-4c0e5960dc3d",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Browser",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2ffb1d68-b94e-4a0c-92e9-7627b7038475",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Mid Power",
+      "targets": [
+        ["linkText=Mid Power", "linkText"],
+        ["css=.col-sm-3:nth-child(2) > .column-title > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Mid Power')]", "xpath:link"],
+        ["xpath=(//a[contains(@href, '/motors/browser.html?1category=mpr')])[2]", "xpath:href"],
+        ["xpath=//div[2]/p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Mid Power')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a367a529-730b-4023-9d40-81f2440d34ef",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Browser",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0196dc2b-a892-4ce1-9213-74bd07bf48f7",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.trail .current",
+      "targets": [
+        ["css=.name", "css:finder"],
+        ["xpath=//li[2]/span", "xpath:position"],
+        ["xpath=//span[contains(.,'mid-power')]", "xpath:innerText"]
+      ],
+      "value": "mid-power (66)"
+    }, {
+      "id": "5867b0ec-6fb0-41ee-8840-1fb6acc77b98",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=E",
+      "targets": [
+        ["linkText=E", "linkText"],
+        ["css=.col-sm-2:nth-child(1) li:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'E')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=E')]", "xpath:href"],
+        ["xpath=//div/div/div/ul/li/a", "xpath:position"],
+        ["xpath=//a[contains(.,'E')]", "xpath:innerText"]
+      ],
+      "value": "E"
+    }, {
+      "id": "78ab2b89-458c-4f2d-aa9c-a50a97541c35",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=F",
+      "targets": [
+        ["linkText=F", "linkText"],
+        ["css=.col-sm-2:nth-child(1) li:nth-child(2) > a", "css:finder"],
+        ["xpath=(//a[contains(text(),'F')])[4]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F')]", "xpath:href"],
+        ["xpath=//div/div/div/ul/li[2]/a", "xpath:position"]
+      ],
+      "value": "F"
+    }, {
+      "id": "04db59ca-37cd-446b-a6d7-d8f1ba5a662f",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=G",
+      "targets": [
+        ["linkText=G", "linkText"],
+        ["css=.col-sm-2:nth-child(1) li:nth-child(3) > a", "css:finder"],
+        ["xpath=(//a[contains(text(),'G')])[2]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=G')]", "xpath:href"],
+        ["xpath=//div/div/div/ul/li[3]/a", "xpath:position"]
+      ],
+      "value": "G"
+    }, {
+      "id": "f17044d1-5d07-4234-97f0-75c7a4323ba9",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=F",
+      "targets": [
+        ["linkText=F", "linkText"],
+        ["css=.col-sm-2:nth-child(1) li:nth-child(2) > a", "css:finder"],
+        ["xpath=(//a[contains(text(),'F')])[4]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F')]", "xpath:href"],
+        ["xpath=//div/div/div/ul/li[2]/a", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "33447ebc-0c4e-4b68-8d03-32794c8fb7d7",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Browser",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "af90b86c-bd46-4da8-9cf7-d5884919c3cd",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.trail .current",
+      "targets": [
+        ["css=.name", "css:finder"],
+        ["xpath=//li[3]/span", "xpath:position"],
+        ["xpath=//span[contains(.,'F class')]", "xpath:innerText"]
+      ],
+      "value": "F class (25)"
+    }, {
+      "id": "46e92dea-8d1c-455f-a378-2ffe3e376816",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=24mm",
+      "targets": [
+        ["linkText=24mm", "linkText"],
+        ["css=.col-sm-2:nth-child(3) li:nth-child(1) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'24mm')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F&3diameter=0.0240')]", "xpath:href"],
+        ["xpath=//div[3]/ul/li/a", "xpath:position"],
+        ["xpath=//a[contains(.,'24mm')]", "xpath:innerText"]
+      ],
+      "value": "24mm"
+    }, {
+      "id": "9ccfe48b-4a7d-4b26-aea6-7c6fcb89d28e",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=29mm",
+      "targets": [
+        ["linkText=29mm", "linkText"],
+        ["css=.col-sm-2:nth-child(3) li:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'29mm')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F&3diameter=0.0290')]", "xpath:href"],
+        ["xpath=//div[3]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'29mm')]", "xpath:innerText"]
+      ],
+      "value": "29mm"
+    }, {
+      "id": "599657ce-3d1c-423b-bbf9-69045702b1ff",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=32mm",
+      "targets": [
+        ["linkText=32mm", "linkText"],
+        ["css=.col-sm-2:nth-child(3) li:nth-child(3) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'32mm')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F&3diameter=0.0320')]", "xpath:href"],
+        ["xpath=//div[3]/ul/li[3]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'32mm')]", "xpath:innerText"]
+      ],
+      "value": "32mm"
+    }, {
+      "id": "7a3c93a8-2054-4eff-b9e8-4e5b3bcf7166",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Blackjack",
+      "targets": [
+        ["linkText=Blackjack", "linkText"],
+        ["css=.col-sm-2:nth-child(5) li:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Blackjack')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F&3propellant=Blackjack')]", "xpath:href"],
+        ["xpath=//div[5]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Blackjack')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c998fbf6-f160-4ec6-865a-edcaf53fb3b2",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.trail .current",
+      "targets": [
+        ["css=.name", "css:finder"],
+        ["xpath=//li[4]/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Blackjack')]", "xpath:innerText"]
+      ],
+      "value": "Blackjack (3)"
+    }, {
+      "id": "913cd2fa-1d04-47c6-9d86-c6cda5482a26",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=F12J",
+      "targets": [
+        ["linkText=F12J", "linkText"],
+        ["css=.odd:nth-child(1) a", "css:finder"],
+        ["xpath=//a[contains(text(),'F12J')]", "xpath:link"],
+        ["xpath=//table[@id='motor-list']/tbody/tr/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/F12J/')]", "xpath:href"],
+        ["xpath=//td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F12J')]", "xpath:innerText"]
+      ],
+      "value": "F12J"
+    }, {
+      "id": "478b6230-db4f-4863-b93a-e87f824a5ba7",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=F22J",
+      "targets": [
+        ["linkText=F22J", "linkText"],
+        ["css=.even a", "css:finder"],
+        ["xpath=//a[contains(text(),'F22J')]", "xpath:link"],
+        ["xpath=//table[@id='motor-list']/tbody/tr[2]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/F22J/')]", "xpath:href"],
+        ["xpath=//tr[2]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F22J')]", "xpath:innerText"]
+      ],
+      "value": "F22J"
+    }, {
+      "id": "4f63fedc-b3e2-41cf-a657-4864da44905e",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=F16-RCJ",
+      "targets": [
+        ["linkText=F16-RCJ", "linkText"],
+        ["css=.odd:nth-child(3) a", "css:finder"],
+        ["xpath=//a[contains(text(),'F16-RCJ')]", "xpath:link"],
+        ["xpath=//table[@id='motor-list']/tbody/tr[3]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/F16-RCJ/')]", "xpath:href"],
+        ["xpath=//tr[3]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F16-RCJ')]", "xpath:innerText"]
+      ],
+      "value": "F16-RCJ"
+    }, {
+      "id": "6098d408-530c-4c46-95f0-cdfef4ab454e",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=#motor-list .odd:nth-child(1) > td:nth-child(2)",
+      "targets": [
+        ["css=.odd:nth-child(1) > td:nth-child(2)", "css:finder"],
+        ["xpath=//table[@id='motor-list']/tbody/tr/td[2]", "xpath:idRelative"],
+        ["xpath=//td[2]", "xpath:position"],
+        ["xpath=//td[contains(.,'AeroTech')]", "xpath:innerText"]
+      ],
+      "value": "AeroTech"
+    }, {
+      "id": "f0de7b45-cb05-4003-80c5-5368489b812c",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=F22J",
+      "targets": [
+        ["linkText=F22J", "linkText"],
+        ["css=.even a", "css:finder"],
+        ["xpath=//a[contains(text(),'F22J')]", "xpath:link"],
+        ["xpath=//table[@id='motor-list']/tbody/tr[2]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/F22J/')]", "xpath:href"],
+        ["xpath=//tr[2]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F22J')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c7330aec-9538-44ea-975d-7f7a483106e8",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "AeroTech F22J",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "52d9ad55-cce6-4727-ab0f-81af41150ede",
+      "comment": "",
+      "command": "executeScript",
+      "target": "window.history.back()",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "83af25e6-d213-44a7-b511-9b11ccd79fd4",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=6s",
+      "targets": [
+        ["linkText=6s", "linkText"],
+        ["css=.col-sm-2:nth-child(2) li:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'6s')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F&3propellant=Blackjack&4burnTime=6')]", "xpath:href"],
+        ["xpath=//div/div/div[2]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'6s')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7d911793-e987-40da-a8e6-da3360635f04",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Browser",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "4e5ad60d-5e8e-426d-ae4f-898edd3429ef",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.trail .current",
+      "targets": [
+        ["css=.name", "css:finder"],
+        ["xpath=//li[5]/span", "xpath:position"],
+        ["xpath=//span[contains(.,'6s burn time')]", "xpath:innerText"]
+      ],
+      "value": "6s burn time (1)"
+    }, {
+      "id": "2ab6ec48-9ef7-4d71-a867-26e8dd9fc7f4",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=F class",
+      "targets": [
+        ["linkText=F class", "linkText"],
+        ["css=.trail > li:nth-child(3) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'F class')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F')]", "xpath:href"],
+        ["xpath=//row/div/ul/li[3]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F class')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "96d06bb2-454c-4ce2-9232-5601719a42e4",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Browser",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "6adf993a-8bac-4bb8-8c0f-9d7dfd9f67bf",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.trail .current",
+      "targets": [
+        ["css=.name", "css:finder"],
+        ["xpath=//li[3]/span", "xpath:position"],
+        ["xpath=//span[contains(.,'F class')]", "xpath:innerText"]
+      ],
+      "value": "F class (25)"
+    }, {
+      "id": "efbeb3f5-d84c-491a-aeac-2cb6e3ab727f",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=3s",
+      "targets": [
+        ["linkText=3s", "linkText"],
+        ["css=.col-sm-2:nth-child(4) li:nth-child(3) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'3s')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/browser.html?advanced&1category=mpr&2class=F&3burnTime=3')]", "xpath:href"],
+        ["xpath=//div[4]/ul/li[3]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'3s')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "874b640c-eae6-4136-9f47-448eacb82fd3",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Browser",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "bdb840f0-a046-464f-b73b-2ac4f1c357a0",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.trail .current",
+      "targets": [
+        ["css=.name", "css:finder"],
+        ["xpath=//li[4]/span", "xpath:position"],
+        ["xpath=//span[contains(.,'3s burn time')]", "xpath:innerText"]
+      ],
+      "value": "3s burn time (5)"
+    }, {
+      "id": "23a9f18e-f6f6-4ef3-9022-11166297aa56",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=h2",
+      "targets": [
+        ["css=h2:nth-child(5)", "css:finder"],
+        ["xpath=//h2", "xpath:position"],
+        ["xpath=//h2[contains(.,'Matching Motors')]", "xpath:innerText"]
+      ],
+      "value": "Matching Motors"
+    }, {
+      "id": "3c0e0f1c-5901-4b49-a2a8-500505423874",
+      "comment": "",
+      "command": "assertText",
+      "target": "linkText=F25W",
+      "targets": [
+        ["linkText=F25W", "linkText"],
+        ["css=.odd:nth-child(5) a", "css:finder"],
+        ["xpath=//a[contains(text(),'F25W')]", "xpath:link"],
+        ["xpath=//table[@id='motor-list']/tbody/tr[5]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/F25W/')]", "xpath:href"],
+        ["xpath=//tr[5]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F25W')]", "xpath:innerText"]
+      ],
+      "value": "F25W"
+    }, {
+      "id": "658ec6f0-5d3d-478b-aedc-9372bceef118",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=F25W",
+      "targets": [
+        ["linkText=F25W", "linkText"],
+        ["css=.odd:nth-child(5) a", "css:finder"],
+        ["xpath=//a[contains(text(),'F25W')]", "xpath:link"],
+        ["xpath=//table[@id='motor-list']/tbody/tr[5]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/F25W/')]", "xpath:href"],
+        ["xpath=//tr[5]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'F25W')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "0552eddb-ac27-4223-9fb4-6bbb9cc49843",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "AeroTech F25W",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "205f2fe5-71d3-4c43-8597-74f5c7efc21c",
+      "comment": "",
+      "command": "executeScript",
+      "target": "window.history.back()",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "5c9c1992-e5d2-45ef-a01c-0686ff0aef99",
+      "comment": "",
+      "command": "click",
+      "target": "id=select-all",
+      "targets": [
+        ["id=select-all", "id"],
+        ["css=#select-all", "css:finder"],
+        ["xpath=//input[@id='select-all']", "xpath:attributes"],
+        ["xpath=//table[@id='motor-list']/thead/tr/th[8]/input", "xpath:idRelative"],
+        ["xpath=//th[8]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "2a5feb83-c5b9-4596-bc5a-03f2e8021d02",
+      "comment": "",
+      "command": "click",
+      "target": "id=compare",
+      "targets": [
+        ["id=compare", "id"],
+        ["linkText=Compare", "linkText"],
+        ["css=#compare", "css:finder"],
+        ["xpath=//a[contains(text(),'Compare')]", "xpath:link"],
+        ["xpath=//a[@id='compare']", "xpath:attributes"],
+        ["xpath=(//a[contains(@href, '#')])[5]", "xpath:href"],
+        ["xpath=//p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Compare')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "5ff38bb2-a5c6-436e-a5fb-c98ed2cd5176",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Compare Motors",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "69823ad5-545c-412c-b2ed-80837b41fa62",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.col-md-8 > p",
+      "targets": [
+        ["css=.col-md-8 > p", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": "You selected 5 (F impulse) motors for comparison."
+    }, {
+      "id": "0c76bd2c-2860-4b99-8793-303692bdef7d",
+      "comment": "",
+      "command": "executeScript",
+      "target": "window.history.back()",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "30f4502b-c7c0-435b-bb5f-e178bcf4187b",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Browser",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "646aaaae-15cd-4f0d-8777-f7f048866082",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.trail .current",
+      "targets": [
+        ["css=.name", "css:finder"],
+        ["xpath=//li[4]/span", "xpath:position"],
+        ["xpath=//span[contains(.,'3s burn time')]", "xpath:innerText"]
+      ],
+      "value": "3s burn time (5)"
     }]
   }],
   "suites": [{

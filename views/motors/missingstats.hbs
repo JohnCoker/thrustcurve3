@@ -60,7 +60,7 @@ For more info on what these statistics mean,
   {{#each allStats}}
   <tr class="stat-{{field}}">
     <td>{{label}}</td>
-    <td class="number">{{min}}</td>
+    <td class="number">{{#unless min}}&mdash;{{/unless}}{{min}}</td>
     <td class="number">{{missing}}</td>
   </tr>
   {{/each}}
@@ -68,6 +68,7 @@ For more info on what these statistics mean,
 </table>
 <script type="text/javascript">
 setupTable('#stat-list', {
+  expand: true,
   order: [[2, 'desc']]
 });
 </script>

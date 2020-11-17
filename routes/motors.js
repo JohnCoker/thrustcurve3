@@ -624,12 +624,24 @@ router.get('/motors/missingstats.html', function(req, res, next) {
       or.push(c);
     }
   }
-  let impulseStat = {
+  let classStat = {
     field: 'impulseClass',
     label: 'Impulse Class',
     missing: 0,
   };
-  stats.push(impulseStat);
+  stats.push(classStat);
+  let caseStat = {
+    field: 'caseInfo',
+    label: 'Motor Case',
+    missing: 0,
+  };
+  stats.push(caseStat);
+  let propellantStat = {
+    field: 'propellantInfo',
+    label: 'Propellant Type',
+    missing: 0,
+  };
+  stats.push(propellantStat);
 
   // also make sure impulseClass is set
   or.push({ impulseClass: { $not: { $regex: /^[A-O]$/ } } });
@@ -642,31 +654,36 @@ router.get('/motors/missingstats.html', function(req, res, next) {
   req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } })
               .populate('_manufacturer')
               .exec(req.success(function(results) {
-    var motor, missing, names, stat, v, i, j;
+    for (let i = 0; i < results.length; i++) {
+      let motor = results[i];
+      let missing = [];
+      let names = '';
 
-    for (i = 0; i < results.length; i++) {
-      motor = results[i];
-      missing = [];
-      names = '';
-      for (j = 0; j < stats.length; j++) {
-        stat = stats[j];
-        v = motor[stat.field];
-        if (v == null || v < stat.min) {
-          missing.push(stat.field);
-          stat.missing++;
+      const addMissing = function(stat) {
+        missing.push(stat.field);
+        stat.missing++;
 
-          if (names !== '')
-            names += ', ';
-          names += stat.label;
-        }
-      }
-      if (motor.impulseClass !== motor.commonName.replace(/^[^A-Z]*([A-Z]).*$/, '$1')) {
-        missing.push('impulseClass');
-        impulseStat.missing++;
         if (names !== '')
           names += ', ';
-        names += 'Impulse Class';
+        names += stat.label;
+      };
+
+      // numeric stats
+      for (let j = 0; j < stats.length; j++) {
+        let stat = stats[j];
+        let v = motor[stat.field];
+        if (stat.min > 0 && (v == null || v < stat.min))
+          addMissing(stat);
       }
+
+      // other stats
+      if (motor.impulseClass !== motor.commonName.replace(/^[^A-Z]*([A-Z]).*$/, '$1'))
+        addMissing(classStat);
+      if (motor.type == 'reload' && motor.caseInfo == null)
+        addMissing(caseStat);
+      if (motor.propellantInfo == null)
+        addMissing(propellantStat);
+
       motor.missingStats = missing;
       motor.missingStatNames = names;
     }

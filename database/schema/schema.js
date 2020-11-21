@@ -531,6 +531,21 @@ function makeGuideResultModel(mongoose) {
   return mongoose.model('GuideResult', schema);
 }
 
+function makePropellantInfoModel(mongoose) {
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
+    _manufacturer: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true },
+    name: { type: String, required: true, index: true },
+    flameColor: String,
+    smokeColor: String,
+    sparky: Boolean,
+  }, stdOptions());
+  schema.index({ _manufacturer: 1, name: 1 }, { unique: true });
+  stdHooks(schema);
+  return mongoose.model('PropellantInfo', schema);
+}
+
 function makeIntIdMapModel(mongoose) {
   var counterSchema = new mongoose.Schema({
     _id: { type: String, required: true },
@@ -766,6 +781,14 @@ module.exports = {
    * @return {object} Mongoose model
    */
   GuideResultModel: makeGuideResultModel,
+
+  /**
+   * Produce a Mongoose model for the <em>propellantInfo</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
+  PropellantInfoModel: makePropellantInfoModel,
 
   /**
    * Produce a Mongoose model for the <em>intIdMap</em> collection.

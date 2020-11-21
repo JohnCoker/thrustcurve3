@@ -5,6 +5,18 @@ This page shows the unique propellant types by manufacturer for all motors
 (including ones that are out of production).
 </p>
 
+<style type="text/css">
+#propellant-list>tbody>tr>td {
+  vertical-align: middle;
+}
+#propellant-list td.check {
+  text-align: center;
+}
+#propellant-list td.update button {
+  padding: 2pt 8pt;
+}
+</style>
+
 <table id="propellant-list" class="table table-bordered">
   <thead>
     <tr>
@@ -12,17 +24,27 @@ This page shows the unique propellant types by manufacturer for all motors
      <th>Propellant</th>
      <th class="number">Total</th>
      <th class="number">Available</th>
-     <th>Color</th>
+     <th>Flame</th>
+     <th>Smoke</th>
+     <th>Sparky</th>
+     <th>Update</th>
     </tr>
   </thead>
   <tbody>
   {{#each propellants}}
-    <tr data-id="{{_id}}">
+    <form id="update-{{key}}" method="post">
+      <input type="hidden" name="manufacturer" value="{{mfr}}" />
+      <input type="hidden" name="name" value="{{name}}" />
+    </form>
+    <tr class="entry">
       <td>{{mfr}}</a></td>
       <td><a href="/motors/search.html?manufacturer={{mfr}}&propellantInfo={{name}}&availability=all">{{name}}</a></td>
-      <td class="number">{{count}}</td>
+      <td class="number">{{total}}</td>
       <td class="number">{{available}}</td>
-      <td>{{color}}</td>
+      <td class="input"><input form="update-{{key}}" type="text" name="flameColor" value="{{flameColor}}" /></td>
+      <td class="input"><input form="update-{{key}}" type="text" name="smokeColor" value="{{smokeColor}}" /></td>
+      <td class="check"><input form="update-{{key}}" type="checkbox" name="sparky" {{#if sparky}}checked{{/if}} /></td>
+      <td class="update"><button form="update-{{key}}" class="btn btn-default btn-sm" type="submit">Save</button</td>
     </tr>
   {{/each}}
   </tbody>
@@ -33,3 +55,9 @@ setupTable('#certorg-list', {
   expand: true
 });
 </script>
+
+<p>
+<a href="/admin/propellants/propellants.csv">Download this table</a>
+or
+<a href="/admin/propellants/guess.csv">guess the colors</a>.
+</p>

@@ -136,6 +136,10 @@ td.action {
 th.action::after {
   display: none !important;
 }
+th.center,
+td.center {
+  text-align: center;
+}
 
 form button,
 form a.btn {

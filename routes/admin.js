@@ -9,7 +9,8 @@ const express = require('express'),
       metadata = require('../lib/metadata'),
       units = require("../lib/units"),
       locals = require('./locals.js'),
-      authorized = require('./authorized.js');
+      authorized = require('./authorized.js'),
+      csv = require('../render/csv');
 
 const defaults = {
   layout: 'admin',
@@ -243,9 +244,163 @@ router.post('/admin/certorgs/:id', authorized('metadata'), function(req, res, ne
  * /admin/propellants/
  * List the propellant types by manufactuer, renders with admin/propellants.hbs template.
  */
-function guessColor(name) {
-  const COLORS = ['white', 'red', 'black', 'orange', 'yellow', 'blue', 'green', 'pink'];
+const propellantsLink = '/admin/propellants/';
 
+function loadPropellants(req, cb) {
+  metadata.getManufacturers(req, function(manufacturers) {
+    // load propellant info from DB
+    let unique = {};
+    req.db.PropellantInfo.find({}, req.success(function(info) {
+      info.forEach(info => {
+        const mfr = manufacturers.byId(info._manufacturer).abbrev;
+        const key = mfr + ' ' + info.name;
+        unique[key] = {
+          key: key.replace(/\s+/g, '-'),
+          mfr,
+          name: info.name,
+          total: 0,
+          available: 0,
+          flameColor: info.flameColor,
+          smokeColor: info.smokeColor,
+          sparky: info.sparky || false,
+          _id: info._id,
+        };
+      });
+
+      // augment with all unique propellants
+      req.db.Motor.find({ propellantInfo: { $ne: null } }).exec(req.success(function(motors) {
+        motors.forEach(motor => {
+          if (motor.propellantInfo == null || motor.propellantInfo == '')
+            return;
+          const mfr = manufacturers.byId(motor._manufacturer).abbrev;
+          const key = mfr + ' ' + motor.propellantInfo;
+          let entry = unique[key];
+          if (entry == null) {
+            entry = unique[key] = {
+              key: key.replace(/\s+/g, '-'),
+              mfr,
+              name: motor.propellantInfo,
+              total: 0,
+              available: 0,
+              sparky: false,
+            };
+          }
+        });
+        let names = Object.keys(unique);
+        names.sort((a, b) => a.localeCompare(b));
+        cb(names.map(n => unique[n]));
+      }));
+    }));
+  });
+}
+
+router.get(propellantsLink, function(req, res, next) {
+  loadPropellants(req, function(list) {
+    res.render('admin/propellants', locals(defaults, {
+        title: 'Propellant Types',
+        propellants: list,
+    }));
+  });
+});
+
+router.get(propellantsLink + "propellants.csv", function(req, res, next) {
+  loadPropellants(req, function(list) {
+    let file = new csv.File();
+    file.colLabel('Manufacturer');
+    file.colLabel('Propellant');
+    file.colLabel('Total');
+    file.colLabel('Available');
+    file.colLabel('Flame Color');
+    file.colLabel('Smoke Color');
+    file.colLabel('Sparky');
+    file.row();
+
+    list.forEach(info => {
+      file.col(info.mfr);
+      file.col(info.name);
+      file.col(info.total);
+      file.col(info.available);
+      file.col(info.flameColor);
+      file.col(info.smokeColor);
+      file.col(info.sparky ? "TRUE" : "");
+      file.row();
+    });
+
+    let text = file.produce();
+    res.type(file.mimeType)
+       .attachment('propellants.csv')
+       .end(text);
+  });
+});
+
+router.post(propellantsLink, authorized('metadata'), function(req, res, next) {
+  function trim(s) {
+    if (s != null) {
+      s = s.trim();
+      if (s !== '')
+        return s;
+    }
+  }
+
+  let mfrName = trim(req.body.manufacturer),
+      name = trim(req.body.name),
+      flameColor = trim(req.body.flameColor),
+      smokeColor = trim(req.body.smokeColor),
+      sparky = req.body.sparky || false;
+
+  if (mfrName == null || name == null) {
+    res.status(400).send('Missing manufacturer/propellant name');
+    return;
+  }
+
+  metadata.getManufacturers(req, function(manufacturers) {
+    let mfr = manufacturers.byName(mfrName);
+    if (mfr == null) {
+      res.status(400).send('Invalid manufacturer');
+      return;
+    }
+
+    function done() {
+      res.redirect(propellantsLink, 303);
+    }
+
+    if (flameColor == null && smokeColor == null && !sparky) {
+      // delete the entry if any
+      req.db.PropellantInfo.deleteMany({
+        _manufacturer: mfr._id,
+        name,
+      }, req.success(done));
+    } else {
+      // upsert the entry with values
+      console.log({
+        _manufacturer: mfr._id,
+        name,
+        flameColor,
+        smokeColor,
+        sparky,
+      });
+      req.db.PropellantInfo.findOneAndUpdate({
+        _manufacturer: mfr._id,
+        name,
+      }, {
+        flameColor,
+        smokeColor,
+        sparky,
+      }, {
+        upsert: true,
+      }, req.success(done));
+    }
+  });
+});
+
+/*
+ * /admin/propellants/guess.csv
+ * Download a spreadsheet of the guessed colors from the propellant names.
+ */
+const FLAME = ['red', 'orange', 'yellow', 'blue', 'green', 'pink'];
+const SMOKE = ['white', 'black'];
+
+function guessColor(name, colors) {
   if (name == null || name === '' || name == 'black powder')
     return;
   let words = name.toLowerCase().split(/[^\w]+/);
@@ -254,20 +409,20 @@ function guessColor(name) {
   let color = words.reduce((found, word) => {
     if (found != null)
       return found;
-    return COLORS.find(c => word == c);
+    return colors.find(c => word == c);
   }, null);
   if (color == null) {
     // find a word that starts with a color name
     color = words.reduce((found, word) => {
       if (found != null)
         return found;
-      return COLORS.find(c => word.startsWith(c));
+      return colors.find(c => word.startsWith(c));
     }, null);
   }
   return color;
 }
 
-router.get('/admin/propellants/', function(req, res, next) {
+router.get(propellantsLink + "guess.csv", function(req, res, next) {
   metadata.getManufacturers(req, function(manufacturers) {
     req.db.Motor.find({ propellantInfo: { $ne: null } }).exec(req.success(function(motors) {
       let unique = {};
@@ -279,23 +434,47 @@ router.get('/admin/propellants/', function(req, res, next) {
         let entry = unique[key];
         if (entry == null) {
           entry = unique[key] = {
+            key: key.replace(/\s+/g, '-'),
             mfr,
             name: motor.propellantInfo,
-            count: 0,
+            total: 0,
             available: 0,
-            color: guessColor(motor.propellantInfo),
+            flameColor: guessColor(motor.propellantInfo, FLAME),
+            smokeColor: guessColor(motor.propellantInfo, SMOKE),
+            sparky: false,
           };
         }
-        entry.count++;
+        entry.total++;
         if (motor.isAvailable)
           entry.available++;
+        if (motor.sparky)
+          entry.sparky = true;
       });
+
+      let file = new csv.File();
+      file.colLabel('Manufacturer');
+      file.colLabel('Propellant');
+      file.colLabel('Flame Color');
+      file.colLabel('Smoke Color');
+      file.colLabel('Sparky');
+      file.row();
+
       let names = Object.keys(unique);
       names.sort((a, b) => a.localeCompare(b));
-      res.render('admin/propellants', locals(defaults, {
-        title: 'Propellant Types',
-        propellants: names.map(n => unique[n]),
-      }));
+      names.forEach(n => {
+        let info = unique[n];
+        file.col(info.mfr);
+        file.col(info.name);
+        file.col(info.flameColor);
+        file.col(info.smokeColor);
+        file.col(info.sparky ? "TRUE" : "");
+        file.row();
+      });
+
+      let text = file.produce();
+      res.type(file.mimeType)
+         .attachment('guess.csv')
+         .end(text);
     }));
   });
 });
@@ -318,12 +497,12 @@ router.get('/admin/cases/', function(req, res, next) {
           entry = unique[key] = {
             mfr,
             name: motor.caseInfo,
-            count: 0,
+            total: 0,
             available: 0,
             diameters: [],
           };
         }
-        entry.count++;
+        entry.total++;
         if (motor.isAvailable)
           entry.available++;
         let d = units.formatMMTFromMKS(motor.diameter);

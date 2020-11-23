@@ -273,11 +273,12 @@
 
 </div> <!-- row -->
 
-{{#hasPerm 'motors'}}
 <p>
+<a href="mailto:john@jcsw.com?subject=ThrustCurve.org: {{manufacturer.abbrev}} {{motorDesignation motor}}&body=(please indicate which info is incorrect)">Report incorrect info.</a>
+{{#hasPerm 'motors'}}
 <a href="{{editLink}}">Edit this motor.</a>
-</p>
 {{/hasPerm}}
+</p>
 
 {{#if thrustCurveLink}}
 <div id="thrustcurve">

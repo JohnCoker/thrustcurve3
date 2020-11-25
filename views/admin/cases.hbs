@@ -21,7 +21,7 @@ This page shows the unique motor cases by manufacturer for all motors
       <td>{{mfr}}</a></td>
       <td><a href="/motors/search.html?manufacturer={{mfr}}&caseInfo={{name}}&availability=all">{{name}}</a></td>
       <td class="diameter">{{diameter}}</td>
-      <td class="number">{{total}}</td>
+      <td class="number {{#if few}}warning{{/if}}">{{total}}</td>
       <td class="number">{{available}}</td>
     </tr>
   {{/each}}

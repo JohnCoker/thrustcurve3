@@ -10,7 +10,8 @@ const express = require('express'),
       units = require("../lib/units"),
       locals = require('./locals.js'),
       authorized = require('./authorized.js'),
-      csv = require('../render/csv');
+      csv = require('../render/csv'),
+      helpers = require('../lib/helpers');
 
 const defaults = {
   layout: 'admin',
@@ -285,8 +286,15 @@ function loadPropellants(req, cb) {
               sparky: false,
             };
           }
+          entry.total++;
+          if (motor.isAvailable)
+            entry.available++;
         });
         let names = Object.keys(unique);
+        names.forEach(n => {
+          let entry = unique[n];
+          entry.few = entry.total <= 1;
+        });
         names.sort((a, b) => a.localeCompare(b));
         cb(names.map(n => unique[n]));
       }));
@@ -510,7 +518,11 @@ router.get('/admin/cases/', function(req, res, next) {
           entry.diameters.push(d);
       });
       let names = Object.keys(unique);
-      names.sort((a, b) => a.localeCompare(b));
+      names.forEach(n => {
+        let entry = unique[n];
+        entry.few = entry.total <= 1;
+      });
+      names.sort(helpers.nameCompare);
       res.render('admin/cases', locals(defaults, {
         title: 'Motor Cases',
         cases: names.map(n => {

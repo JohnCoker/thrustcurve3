@@ -39,7 +39,7 @@ This page shows the unique propellant types by manufacturer for all motors
     <tr class="entry">
       <td>{{mfr}}</a></td>
       <td><a href="/motors/search.html?manufacturer={{mfr}}&propellantInfo={{name}}&availability=all">{{name}}</a></td>
-      <td class="number">{{total}}</td>
+      <td class="number {{#if few}}warning{{/if}}">{{total}}</td>
       <td class="number">{{available}}</td>
       <td class="input"><input form="update-{{key}}" type="text" name="flameColor" value="{{flameColor}}" /></td>
       <td class="input"><input form="update-{{key}}" type="text" name="smokeColor" value="{{smokeColor}}" /></td>

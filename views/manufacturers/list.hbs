@@ -26,6 +26,9 @@ tr.inactive {
      <th>Abbrev</th>
      <th class="status">Status</th>
      <th>Web Site</th>
+     {{#hasPerm 'metadata'}}
+     <th>ID</th>
+     {{/hasPerm}}
     </tr>
   </thead>
   <tbody>
@@ -35,6 +38,9 @@ tr.inactive {
       <td>{{abbrev}}</td>
       <td class="status">{{#if active}}active{{else}}&mdash;{{/if}}</td>
       <td>{{#if website}}<a href="{{website}}" target=_blank>{{websiteAnchor website}}</a>{{/if}}</td>
+      {{#hasPerm 'metadata'}}
+      <td>{{_id}}</td>
+      {{/hasPerm}}
     </tr>
   {{/each}}
   </tbody>

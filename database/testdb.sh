@@ -8,4 +8,4 @@ db=test
 cd $(dirname $0)
 pwd
 ./migrate/dropall.sh "$db"
-mongorestore --db "$db" --gzip sample.dump
+mongorestore --db="$db" --gzip sample.dump

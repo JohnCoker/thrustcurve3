@@ -22,4 +22,5 @@ db.favoritemotors.drop()
 db.guideresults.drop()
 db.intidseqs.drop()
 db.intidmaps.drop()
+db.propellantinfos.drop()
 _EOF_

@@ -43,7 +43,7 @@ The last two are meant to be used in testing and you can login with the password
 
 To load the data into a local instance of MongoDB:
 ```
-mongorestore --db thrustcurve --gzip sample.dump
+mongorestore --db=thrustcurve --archive=sample.dump
 ```
 
 Note that the app uses the database "thrustcurve" by default.

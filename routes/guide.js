@@ -343,7 +343,9 @@ function doRunGuide(req, res, rocket) {
       filterCount++;
 
     // limit to available motors
-    filter.availability = { $in: schema.MotorAvailableEnum };
+    if (!req.body.allMotors)
+      filter.availability = { $in: schema.MotorAvailableEnum };
+
     Object.freeze(filter);
 
     // collect selected MMT and adapters

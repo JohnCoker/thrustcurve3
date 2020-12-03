@@ -61,6 +61,7 @@ const index = require('./routes/index'),
       mystuff = require('./routes/mystuff'),
       notes = require('./routes/notes'),
       admin = require('./routes/admin'),
+      util = require('./routes/util'),
       api_v1 = require('./routes/api_v1');
 
 const domain = 'www.thrustcurve.org';
@@ -260,8 +261,9 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-// API route is special
+// API routes are special
 app.use('/', api_v1);
+app.use('/', util);
 
 // UI routes
 app.use(bodyParser.urlencoded({ extended: false }));

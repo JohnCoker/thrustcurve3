@@ -24,7 +24,7 @@
       "id": "9b01940f-2936-40e4-b9eb-d8af4018b7df",
       "comment": "",
       "command": "assertTitle",
-      "target": "ThrustCurve Home",
+      "target": "Rocket Motor Data • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -55,7 +55,7 @@
       "id": "b84fad8b-8d7b-422a-9ef1-1501c13fc16e",
       "comment": "",
       "command": "assertTitle",
-      "target": "ThrustCurve Home",
+      "target": "Rocket Motor Data • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -90,7 +90,7 @@
       "id": "2276c550-29cd-4685-ac43-1a5c8e682e7d",
       "comment": "",
       "command": "assertTitle",
-      "target": "Attribute Search",
+      "target": "Attribute Search • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -123,7 +123,7 @@
       "id": "7dc05e72-54ff-4a00-8773-10d728695894",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Guide",
+      "target": "Motor Guide • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -156,7 +156,7 @@
       "id": "9040a36a-b39b-4868-8f8d-0b8a5462c8de",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -215,7 +215,7 @@
       "id": "366158b0-4082-467d-8797-e15a6f621a4f",
       "comment": "",
       "command": "assertTitle",
-      "target": "Search Results",
+      "target": "Search Results • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -264,7 +264,7 @@
       "id": "e593870e-bb9d-4bd9-8177-95702d80d184",
       "comment": "",
       "command": "assertTitle",
-      "target": "ThrustCurve Home",
+      "target": "Rocket Motor Data • ThrustCurve",
       "targets": [],
       "value": ""
     }]
@@ -289,7 +289,7 @@
       "id": "caaa79ed-0a2a-4702-8363-ca447aa59322",
       "comment": "",
       "command": "assertTitle",
-      "target": "Attribute Search",
+      "target": "Attribute Search • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -493,7 +493,7 @@
       "id": "aa5fcca8-22c0-4d58-961b-185f439d750e",
       "comment": "",
       "command": "assertTitle",
-      "target": "Search Results",
+      "target": "Search Results • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -554,7 +554,7 @@
       "id": "9aa8a191-caf6-47fb-b533-2eb9e144693d",
       "comment": "",
       "command": "assertTitle",
-      "target": "Estes A10",
+      "target": "Estes A10 • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -716,7 +716,7 @@
       "id": "fe56417c-84cc-4b38-85fa-3213b1737688",
       "comment": "",
       "command": "assertTitle",
-      "target": "ThrustCurve Home",
+      "target": "Rocket Motor Data • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -985,7 +985,7 @@
       "id": "292d3597-1ef5-4727-987f-97b7db27d943",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Guide Complete Results",
+      "target": "Motor Guide Complete Results • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1248,7 +1248,7 @@
       "id": "72aa1de5-7e66-4050-9595-045a89387080",
       "comment": "",
       "command": "assertTitle",
-      "target": "My Rockets",
+      "target": "My Rockets • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1285,7 +1285,7 @@
       "id": "30a942ed-997e-409f-b47d-c6d0e0684458",
       "comment": "",
       "command": "assertTitle",
-      "target": "Alpha III",
+      "target": "Alpha III • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1302,7 +1302,7 @@
       "id": "21bc6f0f-450d-4ce5-a594-93d62bd87820",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Guide Results",
+      "target": "Motor Guide Results • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1360,7 +1360,7 @@
       "id": "e2bb79d2-b4d7-4063-869c-cc136d1d36a1",
       "comment": "",
       "command": "assertTitle",
-      "target": "Estes C6",
+      "target": "Estes C6 • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1410,7 +1410,7 @@
       "id": "4dd0f1ae-554a-4b6c-b6c6-b72caee9a590",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Guide Results",
+      "target": "Motor Guide Results • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1431,7 +1431,7 @@
       "id": "7e46155a-67c3-4946-931e-380cb77b8dc0",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Guide Complete Results",
+      "target": "Motor Guide Complete Results • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1534,7 +1534,7 @@
       "id": "063fa845-e29e-49b1-8809-5ea9d3273f6d",
       "comment": "",
       "command": "assertTitle",
-      "target": "AeroTech D21T",
+      "target": "AeroTech D21T • ThrustCurve",
       "targets": [],
       "value": ""
     }]
@@ -1572,7 +1572,7 @@
       "id": "38c91839-5f8e-4bf6-90dd-4c0e5960dc3d",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1593,7 +1593,7 @@
       "id": "a367a529-730b-4023-9d40-81f2440d34ef",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1664,7 +1664,7 @@
       "id": "33447ebc-0c4e-4b68-8d03-32794c8fb7d7",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1821,7 +1821,7 @@
       "id": "c7330aec-9538-44ea-975d-7f7a483106e8",
       "comment": "",
       "command": "assertTitle",
-      "target": "AeroTech F22J",
+      "target": "AeroTech F22J • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1849,7 +1849,7 @@
       "id": "7d911793-e987-40da-a8e6-da3360635f04",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1881,7 +1881,7 @@
       "id": "96d06bb2-454c-4ce2-9232-5601719a42e4",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1913,7 +1913,7 @@
       "id": "874b640c-eae6-4136-9f47-448eacb82fd3",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -1972,7 +1972,7 @@
       "id": "0552eddb-ac27-4223-9fb4-6bbb9cc49843",
       "comment": "",
       "command": "assertTitle",
-      "target": "AeroTech F25W",
+      "target": "AeroTech F25W • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -2015,7 +2015,7 @@
       "id": "5ff38bb2-a5c6-436e-a5fb-c98ed2cd5176",
       "comment": "",
       "command": "assertTitle",
-      "target": "Compare Motors",
+      "target": "Compare Motors • ThrustCurve",
       "targets": [],
       "value": ""
     }, {
@@ -2039,7 +2039,7 @@
       "id": "30f4502b-c7c0-435b-bb5f-e178bcf4187b",
       "comment": "",
       "command": "assertTitle",
-      "target": "Motor Browser",
+      "target": "Motor Browser • ThrustCurve",
       "targets": [],
       "value": ""
     }, {

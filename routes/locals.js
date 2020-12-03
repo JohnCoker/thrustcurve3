@@ -17,19 +17,16 @@ module.exports = function(req, defaults, custom) {
   var merged = {},
       p;
 
-  if (arguments.length < 3) {
-    req = undefined;
-    defaults = arguments[0];
-    custom = arguments[1];
-  }
+  merged.path = req.url;
 
   if (custom == null)
     custom = {};
   else if (typeof custom == 'string')
     custom = { title: custom };
 
-  if (req && req.user)
+  if (req.user)
     merged.username = req.user.name;
+
 
   if (defaults != null) {
     for (p in defaults) {

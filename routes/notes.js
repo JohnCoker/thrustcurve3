@@ -52,7 +52,7 @@ function doEditMotorNote(req, res, note) {
     let deleteLink;
     if (!note.isNew)
       deleteLink = '/notes/motor/' + note._id + '/delete.html';
-    res.render('notes/edit', locals(defaults, {
+    res.render('notes/edit', locals(req, defaults, {
       title: (note.isNew ? 'Add' : 'Edit') + ' Motor Note',
       id: note.isNew ? note._id : null,
       manufacturer: cache.manufacturers.byId(note._motor._manufacturer),
@@ -196,7 +196,7 @@ function doEditSimfileNote(req, res, note) {
     let deleteLink;
     if (!note.isNew)
       deleteLink = '/notes/simfile/' + note._id + '/delete.html';
-    res.render('notes/edit', locals(defaults, {
+    res.render('notes/edit', locals(req, defaults, {
       title: (note.isNew ? 'Add' : 'Edit') + ' File Note',
       id: note.isNew ? note._id : null,
       simfile: note._simFile,

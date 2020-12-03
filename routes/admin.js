@@ -130,7 +130,7 @@ router.get('/sitemap.xml', function(req, res, next) {
  */
 router.get(certOrgList, authorized('metadata'), function(req, res, next) {
   req.db.CertOrg.find(req.success(function(certorgs) {
-    res.render('admin/certorglist', locals(defaults, {
+    res.render('admin/certorglist', locals(req, defaults, {
       title: 'Certification Organizations',
       certorgs: certorgs,
       newLink: '/admin/certorgs/new'
@@ -148,7 +148,7 @@ router.get('/admin/certorgs/:id', authorized('metadata'), function(req, res, nex
   if (req.db.isId(req.params.id))
     id = req.params.id;
   else {
-    res.render('admin/certorgedit', locals(defaults, {
+    res.render('admin/certorgedit', locals(req, defaults, {
       title: 'New Certification Org',
       isNew: true,
       submitLink: '/admin/certorgs/new'
@@ -162,7 +162,7 @@ router.get('/admin/certorgs/:id', authorized('metadata'), function(req, res, nex
       return;
     }
     req.db.Motor.count({ _certOrg: id }, req.success(function(motors) {
-      res.render('admin/certorgedit', locals(defaults, {
+      res.render('admin/certorgedit', locals(req, defaults, {
         title: 'Edit Certification Org',
         certorg: certorg,
         motors: motors,
@@ -304,7 +304,7 @@ function loadPropellants(req, cb) {
 
 router.get(propellantsLink, function(req, res, next) {
   loadPropellants(req, function(list) {
-    res.render('admin/propellants', locals(defaults, {
+    res.render('admin/propellants', locals(req, defaults, {
         title: 'Propellant Types',
         propellants: list,
     }));
@@ -523,7 +523,7 @@ router.get('/admin/cases/', function(req, res, next) {
         entry.few = entry.total <= 1;
       });
       names.sort(helpers.nameCompare);
-      res.render('admin/cases', locals(defaults, {
+      res.render('admin/cases', locals(req, defaults, {
         title: 'Motor Cases',
         cases: names.map(n => {
           let o = unique[n];

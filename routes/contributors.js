@@ -44,7 +44,7 @@ router.get(listLink, function(req, res, next) {
           return 1;
         return 0;
       });
-      res.render('contributors/list', locals(defaults, {
+      res.render('contributors/list', locals(req, defaults, {
         title: 'Data Contributors',
         contributors: contributors,
         total: total
@@ -68,7 +68,7 @@ router.get('/contributors/:id/', function(req, res, next) {
   else if (req.db.isId(req.params.id))
     id = req.params.id;
   else {
-    res.render('contributors/details', locals(defaults, 'Contributor Details'));
+    res.render('contributors/details', locals(req, defaults, 'Contributor Details'));
     return;
   }
 
@@ -83,7 +83,7 @@ router.get('/contributors/:id/', function(req, res, next) {
               simfiles[i]._motor._manufacturer = m;
           }
           req.db.Rocket.find({ _contributor: contributor._id, public: true }, req.success(function(rockets) {
-            res.render('contributors/details', locals(defaults, {
+            res.render('contributors/details', locals(req, defaults, {
               title: contributor.name,
               contributor: contributor,
               simfiles: simfiles,
@@ -92,7 +92,7 @@ router.get('/contributors/:id/', function(req, res, next) {
           }));
         }));
       } else {
-        res.render('contributors/details', locals(defaults, 'Contributor Details'));
+        res.render('contributors/details', locals(req, defaults, 'Contributor Details'));
       }
     }));
   });

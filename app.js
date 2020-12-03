@@ -19,6 +19,7 @@ const process = require('process'),
       SessionMongoStore = require('connect-mongo')(session),
       passport = require('passport'),
       passportLocal = require('passport-local').Strategy,
+      compression = require('compression'),
       config = require('./config/server.js'),
       schema = require('./database/schema'),
       crawlers = require('./lib/crawlers'),
@@ -79,6 +80,7 @@ if (process.env.NODE_ENV === 'production') {
 // view engine setup using Handlebars
 require('handlebars-helper').help(exphbs.handlebars);
 helpers.help(exphbs.handlebars);
+app.use(compression());
 app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', exphbs);
 app.set('view engine', 'hbs');

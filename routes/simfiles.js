@@ -80,7 +80,7 @@ function simFileQuery(req) {
 
 function noMotor(req, res) {
   res.status(404);
-  res.render('notfound', locals(defaults, {
+  res.render('notfound', locals(req, defaults, {
     title: 'Motor Not Found',
     url: req.url,
     status: 404,
@@ -90,7 +90,7 @@ function noMotor(req, res) {
 
 function noSimFile(req, res) {
   res.status(404);
-  res.render('notfound', locals(defaults, {
+  res.render('notfound', locals(req, defaults, {
     title: 'Data File Not Found',
     url: req.url,
     status: 404,
@@ -119,7 +119,7 @@ router.get('/simfiles/:id/', function(req, res, next) {
       notes.forEach(n => n.editNoteLink = '/notes/simfile/' + n._id + '/edit.html');
 
       // render the file details
-      res.render('simfiles/details', locals(defaults, {
+      res.render('simfiles/details', locals(req, defaults, {
         title: req.helpers.motorDesignation(simfile._motor) + ' Data (' + simfile.format + ')',
         simfile: simfile,
         motor: simfile._motor,
@@ -279,7 +279,7 @@ router.get('/simfiles/:id/create.html', authenticated, function(req, res, next) 
       noMotor(req, res);
       return;
     }
-    res.render('simfiles/edit', locals(defaults, {
+    res.render('simfiles/edit', locals(req, defaults, {
       title: 'Contribute Data File',
       isNew: true,
       motor: motor,
@@ -315,7 +315,7 @@ router.get('/simfiles/:id/edit.html', authenticated, function(req, res, next) {
       let errs = new errors.Collector();
       parsers.parseData(simfile.format, simfile.data, errs);
 
-      res.render('simfiles/edit', locals(defaults, {
+      res.render('simfiles/edit', locals(req, defaults, {
         title: 'Edit Data File',
         motor: simfile._motor,
         simfile: simfile,
@@ -342,7 +342,7 @@ function canUpdateFile(req, simfile) {
 
 function noUpdatePerm(req, res) {
   res.status(403);
-  res.render('error', locals(defaults, {
+  res.render('error', locals(req, defaults, {
     title: 'Unauthorized Access',
     url: req.url,
     status: 403,
@@ -381,7 +381,7 @@ function updateFile(req, res, simfile) {
     let errs = new errors.Collector();
     let parsed = parsers.parseData(simfile.format, data, errs);
     if (parsed == null || errs.hasErrors()) {
-      res.render('simfiles/edit', locals(defaults, {
+      res.render('simfiles/edit', locals(req, defaults, {
         title: 'Edit Data File',
         motor: simfile._motor,
         simfile: simfile,
@@ -509,7 +509,7 @@ router.get('/simfiles/:id/dataerrors.html', function(req, res, next) {
           return comp;
         a._motor.designation.localeCompare(b._motor.designation);
       });
-      res.render('simfiles/dataerrors', locals(defaults, {
+      res.render('simfiles/dataerrors', locals(req, defaults, {
         title: 'Data File Errors',
         simfiles: errfiles,
         errorCount: errfiles.length,

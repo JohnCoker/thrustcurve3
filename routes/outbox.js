@@ -44,7 +44,7 @@ function doList(req, res) {
           });
         }
       });
-      res.render('outbox/empty', locals(defaults, {
+      res.render('outbox/empty', locals(req, defaults, {
         sets,
       }));
     });
@@ -76,7 +76,7 @@ function doList(req, res) {
         if (rocksimCount > 0)
           rocksimLink = downloadLink + downloadBasename + '.rse';
           
-        res.render('outbox/list', locals(defaults, {
+        res.render('outbox/list', locals(req, defaults, {
           simfiles,
           totalCount: simfiles.length,
           multiFormat: raspCount > 0 && rocksimCount > 0,
@@ -151,7 +151,7 @@ router.get('/outbox/clear', function(req, res, next) {
  */
 function noFiles(req, res) {
   res.status(404);
-  res.render('notfound', locals(defaults, {
+  res.render('notfound', locals(req, defaults, {
     title: 'No Files to Download',
     url: req.url,
     status: 404,
@@ -226,7 +226,7 @@ router.get(downloadLink + ':file', function(req, res, next) {
   let combiner = getCombiner(file);
   if (combiner == null) {
     res.status(404);
-    res.render('notfound', locals(defaults, {
+    res.render('notfound', locals(req, defaults, {
       title: 'Unsupported Download File Format',
       url: req.url,
       status: 404,
@@ -258,7 +258,7 @@ router.get(setLink + ':file', function(req, res, next) {
   let combiner = getCombiner(file);
   if (combiner == null || combiner.format == null) {
     res.status(404);
-    res.render('notfound', locals(defaults, {
+    res.render('notfound', locals(req, defaults, {
       title: 'Unsupported Download File Format',
       url: req.url,
       status: 404,

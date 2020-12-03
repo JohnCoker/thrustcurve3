@@ -43,7 +43,7 @@ router.get([listLink, '/manufacturers/list.html'], function(req, res, next) {
       results[i].motorsLink = req.helpers.manufacturerLink(results[i]);
       results[i].editLink = '/manufacturers/' + results[i]._id + '/edit.html';
     }
-    res.render('manufacturers/list', locals(defaults, {
+    res.render('manufacturers/list', locals(req, defaults, {
       title: 'Motor Manufacturers',
       manufacturers: results,
       newLink: '/manufacturers/new/edit.html'
@@ -113,7 +113,7 @@ router.get('/manufacturers/:name/details.html', function(req, res, next) {
           range += ' … ' + classes[classes.length - 1].letter;
       }
 
-      res.render('manufacturers/details', locals(defaults, {
+      res.render('manufacturers/details', locals(req, defaults, {
         title: manufacturer.name,
         manufacturer: manufacturer,
         impulseRange: range,
@@ -164,7 +164,7 @@ router.get('/manufacturers/:name/motors.html', function(req, res, next) {
         motorsQuery.availability = { $in: req.db.schema.MotorAvailableEnum };
 
     req.db.Motor.find(motorsQuery, undefined, { sort: { totalImpulse: 1, designation: 1 } }, req.success(function(motors) {
-      res.render('manufacturers/motors', locals(defaults, {
+      res.render('manufacturers/motors', locals(req, defaults, {
         title: manufacturer.abbrev + (impulseClass ? ' ' + impulseClass : '') + ' Motors',
         manufacturer: manufacturer,
         motors: motors,
@@ -184,7 +184,7 @@ router.get('/manufacturers/:name/motors.html', function(req, res, next) {
 router.get('/manufacturers/:id/edit.html', authorized('metadata'), function(req, res, next) {
   req.db.Manufacturer.findOne(mfrQuery(req), req.success(function(result) {
     if (result) {
-      res.render('manufacturers/edit', locals(defaults, {
+      res.render('manufacturers/edit', locals(req, defaults, {
         title: 'Edit ' + result.abbrev,
         manufacturer: result,
         isEdit: true,
@@ -194,7 +194,7 @@ router.get('/manufacturers/:id/edit.html', authorized('metadata'), function(req,
         isUnchanged: req.query.result == 'unchanged'
       }));
     } else {
-      res.render('manufacturers/edit', locals(defaults, {
+      res.render('manufacturers/edit', locals(req, defaults, {
         title: 'New Manufacturer',
         manufacturer: { active: true },
         isNew: true,

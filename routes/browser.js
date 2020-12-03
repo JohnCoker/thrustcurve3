@@ -215,7 +215,7 @@ function renderLists(req, res, trail, match, motors) {
       lists = [];
   }
 
-  res.render('browser/lists', locals(defaults, {
+  res.render('browser/lists', locals(req, defaults, {
     title: 'Motor Browser',
     trail: trail,
     lists: lists,
@@ -316,7 +316,7 @@ router.get(browserPage, function(req, res, next) {
       }
       shuffle(mfrs);
   
-      res.render('browser/intro', locals(defaults, {
+      res.render('browser/intro', locals(req, defaults, {
         title: 'Motor Browser',
         motorCount: caches.availableMotors.count,
         manufacturers: mfrs,

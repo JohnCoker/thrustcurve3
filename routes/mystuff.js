@@ -58,7 +58,7 @@ function getRedirect(req) {
  */
 router.get(loginLink, function(req, res, next) {
   // render the login page
-  res.render('mystuff/login', locals(defaults, {
+  res.render('mystuff/login', locals(req, defaults, {
     title: 'Log In',
     layout: 'info',
     submitLink: loginLink,
@@ -81,7 +81,7 @@ router.post(loginLink, passport.authenticate('local', {
  * Renders with mystuff/register.hbs template.
  */
 router.get(registerLink, function(req, res, next) {
-  res.render('mystuff/register', locals(defaults, {
+  res.render('mystuff/register', locals(req, defaults, {
     title: 'Register',
     layout: 'info',
     info: { showEmail: true },
@@ -130,7 +130,7 @@ router.post(registerLink, function(req, res, next) {
     info.showEmail = false;
 
   if (errors.length > 0) {
-    res.render('mystuff/register', locals(defaults, {
+    res.render('mystuff/register', locals(req, defaults, {
       title: 'Register',
       layout: 'info',
       info: info,

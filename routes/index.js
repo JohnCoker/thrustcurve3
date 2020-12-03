@@ -9,7 +9,8 @@ var express = require('express'),
 
 router.get('/', function(req, res, next) {
   res.render('index', {
-    title: 'ThrustCurve Home',
+    path: '/',
+    title: 'Rocket Motor Data',
     layout: 'home',
     year: new Date().getFullYear(),
   });

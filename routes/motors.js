@@ -166,7 +166,7 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           n.editNoteLink = '/notes/motor/' + n._id + '/edit.html';
         });
 
-        var details = locals(defaults, {
+        var details = locals(req, defaults, {
           title: req.helpers.motorFullName(manufacturer, motor),
           manufacturer: manufacturer,
           motor: motor,
@@ -496,7 +496,7 @@ function doSearch(req, res, params) {
                            .replace(/^[a-z]/, function(l) { return l.toUpperCase(); });
     }
     if (failed) {
-      res.render('motors/search', locals(defaults, {
+      res.render('motors/search', locals(req, defaults, {
         title: 'Search Results',
         allMotors: all,
         availableMotors: available,
@@ -519,7 +519,7 @@ function doSearch(req, res, params) {
           res.redirect(303, req.helpers.motorLink(results[0]));
         } else {
           // show multiple search results
-          res.render('motors/search', locals(defaults, {
+          res.render('motors/search', locals(req, defaults, {
             title: 'Search Results',
             allMotors: all,
             availableMotors: available,
@@ -535,7 +535,7 @@ function doSearch(req, res, params) {
       }));
     } else {
       // render search page without doing query
-      res.render('motors/search', locals(defaults, {
+      res.render('motors/search', locals(req, defaults, {
         title: 'Attribute Search',
         allMotors: all,
         availableMotors: available,
@@ -576,7 +576,7 @@ router.get('/motors/missingdata.html', function(req, res, next) {
     req.db.Motor.find(query, undefined, { sort: { totalImpulse: 1, designation: 1 } })
                 .populate('_manufacturer')
                 .exec(req.success(function(results) {
-        res.render('motors/missingdata', locals(defaults, {
+        res.render('motors/missingdata', locals(req, defaults, {
           title: 'Motors Without Data',
           results: results,
         }));
@@ -688,7 +688,7 @@ router.get('/motors/missingstats.html', function(req, res, next) {
       motor.missingStatNames = names;
     }
 
-    res.render('motors/missingstats', locals(defaults, {
+    res.render('motors/missingstats', locals(req, defaults, {
       title: 'Motors Missing Statistics',
       allStats: stats,
       missingStats: _.filter(stats, function(s) { return s.missing > 0; }),
@@ -748,7 +748,7 @@ router.get('/motors/popular.html', function(req, res, next) {
         }
       });
 
-      res.render('motors/popular', locals(defaults, {
+      res.render('motors/popular', locals(req, defaults, {
         title: 'Popular Motors',
         asOf: ranking.asOf,
         overall: ranking.overall,
@@ -821,7 +821,7 @@ router.get('/motors/recent.html', function(req, res, next) {
           suggestions.length = 3;
       }
 
-      res.render('motors/recent', locals(defaults, {
+      res.render('motors/recent', locals(req, defaults, {
         title: 'Most Recently Viewed',
         motors: motors,
         impulseClasses: classes,
@@ -829,7 +829,7 @@ router.get('/motors/recent.html', function(req, res, next) {
       }));
     }));
   } else {
-    res.render('motors/recent', locals(defaults, {
+    res.render('motors/recent', locals(req, defaults, {
       title: 'Most Recently Viewed',
       motors: [],
       impulseClasses: [],
@@ -859,7 +859,7 @@ function compare(req, res, ids) {
         query += 'motors=' + motors[i]._id;
       }
 
-      res.render('motors/compare', locals(defaults, {
+      res.render('motors/compare', locals(req, defaults, {
         title: 'Compare Motors',
         motors: motors,
         impulseClasses: classes,
@@ -871,7 +871,7 @@ function compare(req, res, ids) {
       }));
     }));
   } else {
-    res.render('motors/compare', locals(defaults, {
+    res.render('motors/compare', locals(req, defaults, {
       title: 'Compare Motors',
       motors: [],
       impulseClasses: [],
@@ -969,7 +969,7 @@ router.get('/motors/updates.html', function(req, res, next) {
             simfiles[i]._motor._manufacturer = manufacturers.byId(simfiles[i]._motor._manufacturer);
         }
 
-        res.render('motors/updates', locals(defaults, {
+        res.render('motors/updates', locals(req, defaults, {
           title: 'Recent Updates',
           motors: motors,
           simfiles: simfiles
@@ -998,7 +998,7 @@ router.get('/motors/:mfr/:desig/edit.html', authorized('motors'), function(req, 
   metadata.get(req, function(caches) {
     if (!req.params.mfr || req.params.mfr == '-') {
       // create a new motor without a manufacturer
-      res.render('motors/edit', locals(defaults, {
+      res.render('motors/edit', locals(req, defaults, {
         title: 'New Motor',
         motor: { availability: 'regular' },
         isNew: true,
@@ -1022,7 +1022,7 @@ router.get('/motors/:mfr/:desig/edit.html', authorized('motors'), function(req, 
             motor.propellantWeight = toMMGS(motor.propellantWeight);
 
             // edit this data
-            res.render('motors/edit', locals(defaults, {
+            res.render('motors/edit', locals(req, defaults, {
               title: 'Edit ' + motor.designation,
               manufacturer: manufacturer,
               motor: motor,
@@ -1038,7 +1038,7 @@ router.get('/motors/:mfr/:desig/edit.html', authorized('motors'), function(req, 
             }));
           } else {
             // create a new motor for this manufacturer
-            res.render('motors/edit', locals(defaults, {
+            res.render('motors/edit', locals(req, defaults, {
               title: 'New Motor',
               manufacturer: manufacturer,
               motor: {

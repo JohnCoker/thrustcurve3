@@ -8,6 +8,7 @@ const express = require('express'),
       router = express.Router(),
       units = require('../lib/units'),
       metadata = require('../lib/metadata'),
+      number = require('../lib/number'),
       locals = require('./locals.js');
 
 const defaults = {
@@ -21,14 +22,16 @@ const listLink = '/contributors/';
  * List of all contributors, renders with contributors/list.hbs template.
  */
 router.get(listLink, function(req, res, next) {
-  req.db.SimFile.aggregate([ { $group: { _id: '$_contributor', count: { $sum: 1 } } } ], req.success(function(results) {
-    var ids = [], map = {}, total = 0,
-        i;
-    for (i = 0; i < results.length; i++) {
-      ids.push(results[i]._id);
-      map[results[i]._id.toString()] = results[i].count;
-      total += results[i].count;
-    }
+  req.db.SimFile.find(req.success(function(simfiles) {
+    let ids = [], map = {}, total = simfiles.length;
+    simfiles.forEach(simfile => {
+      let id = String(simfile._contributor);
+      if (!map.hasOwnProperty(id)) {
+        map[id] = 1;
+        ids.push(simfile._contributor);
+      } else
+        map[id]++;
+    });
     req.db.Contributor.find({ _id: { $in: ids } }).exec(req.success(function(contributors) {
       var i;
       for (i = 0; i < contributors.length; i++)
@@ -52,16 +55,13 @@ router.get(listLink, function(req, res, next) {
     }));
   }));
 });
-router.get('/contribsearch.jsp', function(req, res, next) {
-  res.redirect(301, listLink);
-});
 
 
 /*
  * /contributors/:id/
  * Details of a contributor, renders with contributors/details.hbs template.
  */
-router.get('/contributors/:id/', function(req, res, next) {
+router.get(listLink + ':id/', function(req, res, next) {
   var id;
   if (req.db.isId(req.query.id))
     id = req.query.id;
@@ -96,6 +96,23 @@ router.get('/contributors/:id/', function(req, res, next) {
       }
     }));
   });
+});
+router.get('/contribsearch.jsp', function(req, res, next) {
+  if (number.isPosInt(req.query.id)) {
+    req.db.Contributor.findOne({ migratedId: parseInt(req.query.id) })
+                      .exec(req.success(function(contrib) {
+      if (contrib != null) {
+        // redirect to individual contributor
+        res.redirect(301, listLink + contrib._id + "/");
+      } else {
+        // redirect to list
+        res.redirect(301, listLink);
+      }
+    }));
+  } else {
+    // redirect to list
+    res.redirect(301, listLink);
+  }
 });
 
 /*

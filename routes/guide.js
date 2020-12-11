@@ -18,6 +18,7 @@ const _ = require('underscore'),
       spreadsheet = require('../render/spreadsheet'),
       csv = require('../render/csv'),
       graphs = require('../render/graphs'),
+      helpers = require('../lib/helpers'),
       locals = require('./locals.js');
 
 const MinGuideVelocity = 14.9,
@@ -613,6 +614,7 @@ function doSummaryPage(req, res, rockets) {
       completeLink: '/motors/guide/' + result._id + '/complete.html',
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
       csvLink: '/motors/guide/' + result._id + '/spreadsheet.csv',
+      topLink: '/motors/guide/' + result._id + '/top.html',
       restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
     }));
   });
@@ -625,6 +627,144 @@ router.get('/motors/guide/:id/summary.html', function(req, res, next) {
     }));
   } else {
     doSummaryPage(req, res);
+  }
+});
+
+/*
+ * /motors/guide/id/top.html.
+ * Motor guide top stats page, renders with guide/top.hbs.
+ */
+const TOP_STATS = [
+  {
+    get: r => r.simulation.maxAltitude,
+    label: 'Altitude',
+    format: helpers.formatAltitude,
+  },
+  {
+    get: r => r.simulation.maxVelocity,
+    label: 'Velocity',
+    format: helpers.formatVelocity,
+  },
+  {
+    get: r => r.simulation.maxAcceleration,
+    label: 'Acceleration',
+    format: helpers.formatAcceleration,
+  },
+  {
+    get: r => r.simulation.integratedImpulse,
+    label: 'Impulse',
+    format: helpers.formatImpulse,
+  },
+  {
+    get: r => r.simulation.apogeeTime,
+    label: 'Apogee Time',
+    format: helpers.formatDuration,
+  },
+  {
+    get: r => r.thrustWeight,
+    label: 'Thrust:Weight',
+    format: helpers.formatRatio,
+  },
+  {
+    get: r => r.simulation.guideVelocity,
+    label: 'Guide Velocity',
+    format: helpers.formatVelocity,
+  },
+  {
+    get: r => r.simulation.burnoutTime,
+    label: 'Burn Time',
+    format: helpers.formatDuration,
+  },
+  {
+    get: r => r.optimalDelay,
+    label: 'Coast Time',
+    format: helpers.formatDuration,
+  },
+];
+
+function doTopPage(req, res, rockets) {
+  loadGuideResult(req, res, function(result) {
+    let tables = [];
+    if (result.sim > 1) {
+      let simmed = result.results.filter(r => r.pass && r.simulation != null);
+      TOP_STATS.forEach(stat => {
+        const max = simmed.reduce((max, one) => {
+          let v = stat.get(one);
+          return v > max ? v : max;
+        }, 0);
+
+        function table(sort) {
+          let adjective;
+          if (/Time$/.test(stat.label))
+            adjective = sort > 0 ? "Longest" : "Shortest";
+          else
+            adjective = sort > 0 ? "Highest" : "Lowest";
+
+          const sorted = simmed.slice();
+          sorted.sort((r1, r2) => {
+            const v1 = stat.get(r1),
+                  v2 = stat.get(r2);
+            if (v1 === v2)
+              return 0;
+            if (v1 == null)
+              return 1;
+            if (v2 == null)
+              return -1;
+            if (v1 < v2)
+              return sort;
+            if (v1 > v2)
+              return -sort;
+            return 0;
+          });
+
+          let rows = [];
+          sorted.forEach((one, i) => {
+            if (simmed.length > 12 && i >= 10)
+              return;
+            let v = stat.get(one);
+            if (v == null || !isFinite(v) || v < 0)
+              v = 0;
+            rows.push({
+              index: i,
+              _motor: one._motor,
+              motor: one.motor,
+              detailsLink: '/motors/guide/' + req.params.id + '/details/' + one._motor.toString(),
+              manufacturer: one.manufacturer,
+              value: v,
+              formatted: stat.format(v),
+              percent: Math.round(100 * (max > 0 ? v / max : 1)),
+            });
+          });
+          if (sorted.length > 12)
+            sorted.length = 10;
+          return {
+            label: adjective + ' ' + stat.label,
+            rows,
+            max,
+          };
+        }
+
+        tables.push(table(1));
+        tables.push(table(-1));
+      });
+    }
+    res.render('guide/top', locals(req, defaults, {
+      title: "Motor Guide Top Motors",
+      rockets: rockets,
+      result,
+      tables,
+      summaryLink: '/motors/guide/' + result._id + '/summary.html',
+    }));
+  });
+}
+
+router.get('/motors/guide/:id/top.html', function(req, res) {
+  if (req.user) {
+    req.db.Rocket.find({ _contributor: req.user._id }, undefined, { sort: { name: 1 } }, req.success(function(rockets) {
+      doTopPage(req, res, rockets);
+    }));
+  } else {
+    doTopPage(req, res);
   }
 });
 

@@ -16,6 +16,7 @@ const SVG = svg.contentType,
       AImpulseN = 1.25,
       ChartFill = 'white',
       TitleFill = 'black',
+      LabelFill = 'black',
       GridStroke = '#aaa',
       CurveStroke = '#9e1a20',
       CurveFill = '#e7e7e7',
@@ -25,6 +26,7 @@ const SVG = svg.contentType,
       PointFill = 'white',
       PointWidth = 2,
       PointRadius = 4,
+      PointPad = PointRadius * 1.5,
       AnnotationStroke = '#2e448c',
       AnnotationWidth = 0.5;
 
@@ -582,7 +584,7 @@ function impulseComparison(spec) {
       image.strokeCircle(x, y, PointRadius);
 
       if (label) {
-        image.fillStyle = TitleFill;
+        image.fillStyle = LabelFill;
         if (x > layout.chart.right - layout.chart.width / 10) {
           image.textAlign = 'right';
           image.fillText(label, x - 6, y + layout.em / 3);
@@ -758,7 +760,7 @@ function thrustCurveComparison(spec) {
       i = points.length - 1;
       x = layout.plotX(points[i].time);
       y = layout.plotY(points[i].thrust * yConvert);
-      image.fillStyle = TitleFill;
+      image.fillStyle = LabelFill;
       image.fillText(label, x + CurveWidth, layout.chart.bottom - layout.em / 3);
     }
 
@@ -832,6 +834,145 @@ function histogram(spec) {
             image.moveTo(x, 1);
     image.lineTo(x, height - 1 - em);
     image.stroke();
+  }
+
+  return image;
+}
+
+function scatter(spec) {
+  if (spec == null || spec.points == null)
+    return;
+
+  const em = 10;
+  let width, height;
+  if (spec.width >= 1 && spec.height >= 1) {
+    width = spec.width;
+    height = spec.height;
+  } else {
+    width = DefaultWidth;
+    height = DefaultHeight;
+  }
+  const layout = layoutGraph({
+    width: width,
+    height: height,
+    xMin: 0,
+    xMax: 1,
+    yMin: 0,
+    yMax: 1,
+  });
+  let y0 = 0, y1 = height - 0.5, x0 = 0.5, x1 = width;
+  if (spec.title)
+    y0 = em * 1.5;
+  if (spec.xLegend)
+    y1 -= em + layout.descender;
+  if (spec.yLegend)
+    x0 += em + layout.descender;
+
+  const image = new svg.Image(width, height);
+  image.font = em + 'px Helvetica';
+
+  // fill the chart area
+  image.fillStyle = ChartFill;
+  image.fillRect(x0, y0, width - x0, y1 - y0);
+
+  // draw the title and copyright
+  image.fillStyle = TitleFill;
+  if (spec.title) {
+    image.textAlign = 'left';
+    image.fillText(spec.title, x0, layout.ascender);
+  }
+  image.textAlign = 'right';
+  image.fillText(copyright(), x1, layout.ascender);
+
+  // draw the X axis legend
+  if (spec.xLegend) {
+    image.textAlign = 'center';
+    image.fillText(spec.xLegend, (layout.chart.left + layout.chart.right) / 2, height - layout.descender);
+  }
+
+  // draw the Y axis legend
+  if (spec.yLegend) {
+    image.textAlign = 'center';
+    image.fillTextVert(spec.yLegend, layout.ascender, (layout.chart.top + layout.chart.bottom) / 2);
+  }
+
+  // draw chart border
+  image.strokeStyle = '#ccc';
+  image.moveTo(x0, y0);
+  image.lineTo(x0, y1);
+  image.lineTo(width, y1);
+  image.stroke();
+
+  // draw the points
+  if (spec.points && spec.points.length > 0) {
+    // sort by x value to allow clicking on dot
+    spec.points.sort((a, b) => {
+      if (a.x < b.x)
+        return -1;
+      if (a.x > b.x)
+        return 1;
+      return 0;
+    });
+
+    // make space for labels
+    x0 += PointPad;
+    x1 -= PointPad;
+    y0 += PointPad;
+    y1 -= PointPad;
+
+    let minX = 0, minY = 0, maxX = 0, maxY = 0;
+    spec.points.forEach((pt, i) => {
+      if (i == 0) {
+        minX = maxX = pt.x;
+        minY = maxY = pt.y;
+      } else {
+        minX = Math.min(pt.x, minX);
+        minY = Math.min(pt.y, minY);
+        maxX = Math.max(pt.x, maxX);
+        maxY = Math.max(pt.y, maxY);
+      }
+    });
+    if (minX >= maxX) {
+      minX -= 1;
+      maxX += 1;
+    }
+    let scaleX = (x1 - x0) / (maxX - minX);
+    if (minY >= maxY) {
+      minY -= 1;
+      maxY += 1;
+    }
+    let scaleY = (y1 - y0) / (maxY - minY);
+
+    image.textAlign = 'center';
+    spec.points.forEach(pt => {
+      let x = x0 + (pt.x - minX) * scaleX;
+      let y = y1 - (pt.y - minY) * scaleY;
+
+      if (pt.link)
+        image.beginA(pt.link);
+
+      // draw the dot
+      image.fillStyle = PointFill;
+      image.lineWidth = PointWidth;
+      image.strokeStyle = CurveStroke;
+      image.fillCircle(x, y, PointRadius);
+      image.strokeCircle(x, y, PointRadius);
+
+      // draw the label
+      if (pt.label) {
+        image.fillStyle = LabelFill;
+        if (x > layout.chart.right - layout.chart.width / 10) {
+          image.textAlign = 'right';
+          image.fillText(pt.label, x - PointPad, y + layout.em / 3);
+        } else {
+          image.textAlign = 'left';
+          image.fillText(pt.label, x + PointPad, y + layout.em / 3);
+        }
+      }
+
+      if (pt.link)
+        image.endA();
+    });
   }
 
   return image;
@@ -980,6 +1121,43 @@ module.exports = {
    */
   sendHistogram: function(res, spec) {
     var image = histogram(spec);
+    if (image == null) {
+      res.status(500).send();
+      return false;
+    } else {
+      res.type(image.format).send(image.render());
+      return true;
+    }
+  },
+
+  /**
+   * Build a scatter plot for multiple motors and return it.
+   * If an error occurs, null is returned.
+   * @function
+   * @param {object} spec chart information
+   * @param {number} spec.width target image width
+   * @param {height} spec.height target image width
+   * @param {object} spec.xLegend X axis legend
+   * @param {object} spec.yLegend Y axis legend
+   * @param {object[]} spec.points data points to chart
+   * @param {number} spec.points.x X value
+   * @param {number} spec.points.y Y value
+   * @param {string} spec.points.label point label
+   * @param {string} [spec.points.link] details link
+   * @return {object} constructed image object
+   */
+  scatter,
+
+  /**
+   * Build a scatter plot for multiple motors and send it to the response.
+   * If an error occurs, 500 status is sent.
+   * @function
+   * @param {object} res Express response object
+   * @param {object} spec chart information (see #scatter)
+   * @return {boolean} true if image sent
+   */
+  sendScatter: function(res, spec) {
+    var image = scatter(spec);
     if (image == null) {
       res.status(500).send();
       return false;

@@ -393,6 +393,16 @@ class Image {
     this._text += this._indent + '</g>\n';
   }
 
+  beginA(url) {
+    this._text += this._indent + '<a href="' + url + '">\n';
+    this._indent += ' ';
+  }
+
+  endA(url) {
+    this._indent = this._indent.replace(/ $/, '');
+    this._text += this._indent + '</a>\n';
+  }
+
   render() {
     return this._text + '</svg>';
   }

@@ -407,4 +407,35 @@ describe("svg", function() {
       expect(child.children[1].name).toBe('rect');
     });
   });
+  describe("link", function() {
+    var image;
+    it("construct", function() {
+      image = new svg.Image(300, 200);
+      expect(image).toBeDefined();
+      expect(image.width).toBe(300);
+      expect(image.height).toBe(200);
+    });
+    it("beginA", function() {
+      image.beginA('http://foo.com/');
+    });
+    it("rects", function() {
+      image.strokeRect(25, 25, 275, 150);
+      image.fillRect(100, 100, 200, 100);
+    });
+    it("endA", function() {
+      image.endA();
+    });
+    it("render", function() {
+      var text = image.render();
+      expect(text).toBeDefined();
+      var xml = xmlparser(text).root;
+      expect(xml.name).toBe('svg');
+      var child = xml.children[0];
+      expect(child.name).toBe('a');
+      expect(child.attributes.href).toBe('http://foo.com/');
+      expect(child.children.length).toBe(2);
+      expect(child.children[0].name).toBe('rect');
+      expect(child.children[1].name).toBe('rect');
+    });
+  });
 });

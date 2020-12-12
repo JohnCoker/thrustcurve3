@@ -4,6 +4,11 @@ Disallow: /mystuff/
 Disallow: /api/
 Disallow: /admin/
 Disallow: /motors/browser.html?*
+Allow: /motors/browser.html$
 Disallow: /motors/search.html?*
+Allow: /motors/search.html$
 Disallow: /motors/guide.html?*
+Allow: /motors/guide.html$
+Disallow: /motors/guide/
 Disallow: /outbox/set/
+Sitemap: https://www.thrustcurve.org/sitemap.xml

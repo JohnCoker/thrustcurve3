@@ -1537,6 +1537,198 @@
       "target": "AeroTech D21T • ThrustCurve",
       "targets": [],
       "value": ""
+    }, {
+      "id": "cdea14d4-4fdd-4b74-8ae6-95fa85f049c7",
+      "comment": "",
+      "command": "executeScript",
+      "target": "window.history.back()",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7637c8ba-a82e-49b6-a21b-db012dd8c9b4",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Complete Results • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "af48e84c-9693-4bfa-b2fa-960b9ee3a69d",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=summary results",
+      "targets": [
+        ["linkText=summary results", "linkText"],
+        ["css=p:nth-child(8) > a:nth-child(1)", "css:finder"],
+        ["xpath=//a[contains(text(),'summary results')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fd44aa3dedea10df2982f8d/summary.html')]", "xpath:href"],
+        ["xpath=//row/div/p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'summary results')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "86f28046-1217-4590-8923-24cbb19bb4a6",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Results • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7cc0d1e8-71c5-43ec-a071-8009e4f8056a",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "linkText=most extreme motors",
+      "targets": [
+        ["linkText=most extreme motors", "linkText"],
+        ["css=a:nth-child(4)", "css:finder"],
+        ["xpath=//a[contains(text(),'most extreme motors')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fd44aa3dedea10df2982f8d/top.html')]", "xpath:href"],
+        ["xpath=//a[4]", "xpath:position"],
+        ["xpath=//a[contains(.,'most extreme motors')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a7d4565a-a4cf-47fb-a470-73241bab5292",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=most extreme motors",
+      "targets": [
+        ["linkText=most extreme motors", "linkText"],
+        ["css=a:nth-child(4)", "css:finder"],
+        ["xpath=//a[contains(text(),'most extreme motors')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fd44aa3dedea10df2982f8d/top.html')]", "xpath:href"],
+        ["xpath=//a[4]", "xpath:position"],
+        ["xpath=//a[contains(.,'most extreme motors')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "40cde3b2-2cda-4f19-90b5-ea3ff6943475",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Top Motors • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "3be65405-2f14-47aa-a335-ed40e6917886",
+      "comment": "",
+      "command": "click",
+      "target": "css=p:nth-child(2)",
+      "targets": [
+        ["css=p:nth-child(2)", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "b5811d2e-a9eb-4c50-ba55-e98b97db59aa",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=p:nth-child(2)",
+      "targets": [
+        ["css=p:nth-child(2)", "css:finder"],
+        ["xpath=//p", "xpath:position"]
+      ],
+      "value": "The most extreme results of the 12 simulations run for Alpha III."
+    }, {
+      "id": "2598f029-017d-4ddc-9653-828dd6969b75",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=summary results",
+      "targets": [
+        ["linkText=summary results", "linkText"],
+        ["css=p:nth-child(5) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'summary results')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fd44aa3dedea10df2982f8d/summary.html')]", "xpath:href"],
+        ["xpath=//p[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'summary results')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "bb65463d-507a-4fe1-ab67-229bd788e995",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Results • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "aaa95dff-281c-46cb-8a2f-521bb67716d9",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=compare them on a plot",
+      "targets": [
+        ["linkText=compare them on a plot", "linkText"],
+        ["css=a:nth-child(5)", "css:finder"],
+        ["xpath=//a[contains(text(),'compare them on a plot')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fd44aa3dedea10df2982f8d/plot.html')]", "xpath:href"],
+        ["xpath=//a[5]", "xpath:position"],
+        ["xpath=//a[contains(.,'compare them on a plot')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "afaf6b52-fca2-4c05-81e0-64fba87f4c5c",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Motor Plot • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "c48cb062-701b-4999-a416-2ba6c101c099",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=a:nth-child(15) > text",
+      "targets": [
+        ["css=a:nth-child(15) > text", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "3e459575-48a1-41c0-84f4-6de1e80e16dd",
+      "comment": "",
+      "command": "click",
+      "target": "css=a:nth-child(15) > text",
+      "targets": [
+        ["css=a:nth-child(15) > text", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "f531ca27-20f6-43a9-8fc6-d3705a1100d6",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Run Details • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0313f261-8138-43e7-9e1d-b6eac99b1ba5",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "linkText=AeroTech D10W",
+      "targets": [
+        ["linkText=AeroTech D10W", "linkText"],
+        ["css=.form-group:nth-child(2) a", "css:finder"],
+        ["xpath=//a[contains(text(),'AeroTech D10W')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/D10W/')]", "xpath:href"],
+        ["xpath=//div[2]/div/p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'AeroTech D10W')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "31ce1a90-5062-4ccb-966c-9e687fed2008",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=summary results",
+      "targets": [
+        ["linkText=summary results", "linkText"],
+        ["css=p:nth-child(3) > a:nth-child(1)", "css:finder"],
+        ["xpath=//a[contains(text(),'summary results')]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/motors/guide/5fd44be2dedea10df2982fb1/summary.html')]", "xpath:href"],
+        ["xpath=//row/div/p/a", "xpath:position"],
+        ["xpath=//a[contains(.,'summary results')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "8e026fdb-1528-4e81-8073-3ab92328f09e",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Motor Guide Results • ThrustCurve",
+      "targets": [],
+      "value": ""
     }]
   }, {
     "id": "633afb0e-1804-4989-a993-79240d8f3484",

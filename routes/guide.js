@@ -34,6 +34,65 @@ const defaults = {
 
 const guidePage = '/motors/guide.html';
 
+// statistics to show in top and compare pages
+const RESULT_STATS = [
+  {
+    get: r => r.simulation.maxAltitude,
+    label: 'Altitude',
+    format: helpers.formatAltitude,
+  },
+  {
+    get: r => r.simulation.maxVelocity,
+    label: 'Velocity',
+    format: helpers.formatVelocity,
+  },
+  {
+    get: r => r.simulation.maxAcceleration,
+    label: 'Acceleration',
+    format: helpers.formatAcceleration,
+  },
+  {
+    get: r => r.simulation.integratedImpulse,
+    label: 'Impulse',
+    format: helpers.formatImpulse,
+  },
+  {
+    get: r => r.simulation.apogeeTime,
+    label: 'Apogee Time',
+    format: helpers.formatDuration,
+  },
+  {
+    get: r => r.thrustWeight,
+    label: 'Thrust:Weight',
+    format: helpers.formatRatio,
+  },
+  {
+    get: r => r.simulation.guideVelocity,
+    label: 'Guide Velocity',
+    format: helpers.formatVelocity,
+  },
+  {
+    get: r => r.simulation.burnoutTime,
+    label: 'Burn Time',
+    format: helpers.formatDuration,
+  },
+  {
+    get: r => r.optimalDelay,
+    label: 'Coast Time',
+    format: helpers.formatDuration,
+  },
+];
+RESULT_STATS[0].first = true;
+RESULT_STATS[1].second = true;
+RESULT_STATS.forEach((stat, i) => {
+  stat.index = i;
+  Object.freeze(stat);
+});
+RESULT_STATS.byLabel = function(name) {
+  return this.filter(stat => stat.label.toLowerCase() === name.trim().toLowerCase())[0];
+};
+Object.freeze(RESULT_STATS);
+
 /*
  * /motors/guide.html
  * Motor guide setup page, renders with guide/entry.hbs or guide/rocket.hbs templates.
@@ -615,6 +674,7 @@ function doSummaryPage(req, res, rockets) {
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
       csvLink: '/motors/guide/' + result._id + '/spreadsheet.csv',
       topLink: '/motors/guide/' + result._id + '/top.html',
+      plotLink: '/motors/guide/' + result._id + '/plot.html',
       restartLink: result._rocket ? (guidePage + '?rocket=' + result._rocket) : guidePage,
     }));
   });
@@ -634,60 +694,12 @@ router.get('/motors/guide/:id/summary.html', function(req, res, next) {
  * /motors/guide/id/top.html.
  * Motor guide top stats page, renders with guide/top.hbs.
  */
-const TOP_STATS = [
-  {
-    get: r => r.simulation.maxAltitude,
-    label: 'Altitude',
-    format: helpers.formatAltitude,
-  },
-  {
-    get: r => r.simulation.maxVelocity,
-    label: 'Velocity',
-    format: helpers.formatVelocity,
-  },
-  {
-    get: r => r.simulation.maxAcceleration,
-    label: 'Acceleration',
-    format: helpers.formatAcceleration,
-  },
-  {
-    get: r => r.simulation.integratedImpulse,
-    label: 'Impulse',
-    format: helpers.formatImpulse,
-  },
-  {
-    get: r => r.simulation.apogeeTime,
-    label: 'Apogee Time',
-    format: helpers.formatDuration,
-  },
-  {
-    get: r => r.thrustWeight,
-    label: 'Thrust:Weight',
-    format: helpers.formatRatio,
-  },
-  {
-    get: r => r.simulation.guideVelocity,
-    label: 'Guide Velocity',
-    format: helpers.formatVelocity,
-  },
-  {
-    get: r => r.simulation.burnoutTime,
-    label: 'Burn Time',
-    format: helpers.formatDuration,
-  },
-  {
-    get: r => r.optimalDelay,
-    label: 'Coast Time',
-    format: helpers.formatDuration,
-  },
-];
-
 function doTopPage(req, res, rockets) {
   loadGuideResult(req, res, function(result) {
     let tables = [];
     if (result.sim > 1) {
       let simmed = result.results.filter(r => r.pass && r.simulation != null);
-      TOP_STATS.forEach(stat => {
+      RESULT_STATS.forEach(stat => {
         const max = simmed.reduce((max, one) => {
           let v = stat.get(one);
           return v > max ? v : max;
@@ -766,6 +778,75 @@ router.get('/motors/guide/:id/top.html', function(req, res) {
   } else {
     doTopPage(req, res);
   }
+});
+
+/*
+ * /motors/guide/id/plot.html.
+ * Motor guide plot motors page, renders with guide/plot.hbs.
+ */
+function doPlotPage(req, res, rockets) {
+  loadGuideResult(req, res, function(result) {
+    res.render('guide/plot', locals(req, defaults, {
+      title: "Motor Guide Motor Plot",
+      rockets: rockets,
+      result,
+      stats: RESULT_STATS,
+      firstStat: RESULT_STATS[0],
+      secondStat: RESULT_STATS[1],
+      summaryLink: '/motors/guide/' + result._id + '/summary.html',
+      chartLink: '/motors/guide/' + result._id + '/plot.svg',
+    }));
+  });
+}
+
+router.get('/motors/guide/:id/plot.html', function(req, res) {
+  if (req.user) {
+    req.db.Rocket.find({ _contributor: req.user._id }, undefined, { sort: { name: 1 } }, req.success(function(rockets) {
+      doPlotPage(req, res, rockets);
+    }));
+  } else {
+    doPlotPage(req, res);
+  }
+});
+
+router.get('/motors/guide/:id/plot.svg', function(req, res) {
+  console.log(req.query);
+  const xStat = RESULT_STATS.byLabel(req.query.x);
+  const yStat = RESULT_STATS.byLabel(req.query.y);
+  if (xStat == null || yStat == null) {
+    req.status(400).send("invalid x,y statistics");
+    return;
+  }
+
+  loadGuideResult(req, res, function(result) {
+    let title;
+    if (result.rocket && result.rocket.name)
+      title = result.rocket.name + ' Motor Plot';
+    else
+      title = 'Motor Guide Plot';
+
+    let points = [];
+    if (result.sim > 0) {
+      let simmed = result.results.filter(r => r.pass && r.simulation != null);
+      simmed.forEach(one => {
+        points.push({
+          x: xStat.get(one),
+          y: yStat.get(one),
+          label: one.motor.designation,
+          link: one.detailsLink,
+        });
+      });
+    }
+
+    graphs.sendScatter(res, {
+      title: title,
+      width: 600,
+      height: 450,
+      xLegend: xStat.label,
+      yLegend: yStat.label,
+      points: points,
+    });
+  });
 });
 
 /*

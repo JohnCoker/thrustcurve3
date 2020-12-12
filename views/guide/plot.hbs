@@ -1,0 +1,62 @@
+<h1>{{title}}</h1>
+{{#if rockets}}
+{{#extend "sidebar-extra"}}
+  <h2>My Rockets</h2>
+  <ul class="links">
+  {{#each rockets}}
+    <li><a href="/motors/guide.html?rocket={{_id}}">{{name}}</a></li>
+  {{/each}}
+  <li><a href="/mystuff/rocket/new/edit.html">Add&hellip;</a></li>
+  </ul>
+{{/extend}}
+{{/if}}
+
+{{#each result.warnings}}
+<div class="alert alert-warning" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+<style type="text/css">
+img.chart, svg.chart {
+  width: 100%;
+  height: auto;
+}
+</style>
+
+<p>
+Compare 
+<select name="y-axis">
+  {{#each stats}}
+  <option {{#if first}}selected{{/if}}>{{label}}
+  {{/each}}
+</select>
+(Y) to
+<select name="x-axis">
+  {{#each stats}}
+  <option {{#if second}}selected{{/if}}>{{label}}
+  {{/each}}
+</select>
+(X).
+</p>
+
+<p class="chart">
+<img class="chart" src="{{chartLink}}?y={{firstStat.label}}&x={{secondStat.label}}" />
+</p>
+
+<p>
+Back to the <a href="{{summaryLink}}">summary results</a>.
+</p>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('select').on('change', function(e) {
+    let x = $('select[name=x-axis]').val(),
+        y = $('select[name=y-axis]').val();
+        url = "{{chartLink}}?x=" + encodeURIComponent(x) + '&y=' + encodeURIComponent(y);
+    $('p.chart').empty().append('<img class="chart" src="' + url + '"/>');
+    inlineSVG('img.chart');
+  });
+  inlineSVG('img.chart');
+});
+</script>

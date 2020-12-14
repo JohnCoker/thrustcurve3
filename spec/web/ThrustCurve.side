@@ -966,7 +966,7 @@
         ["xpath=//div[2]/div/p", "xpath:position"],
         ["xpath=//p[contains(.,'24mm MMT')]", "xpath:innerText"]
       ],
-      "value": "24mm MMT"
+      "value": "24 mm MMT"
     }, {
       "id": "3858c12e-e7ea-4749-8caa-466e1504f0af",
       "comment": "",
@@ -1874,7 +1874,7 @@
       "id": "46e92dea-8d1c-455f-a378-2ffe3e376816",
       "comment": "",
       "command": "assertText",
-      "target": "linkText=24mm",
+      "target": "linkText=24 mm",
       "targets": [
         ["linkText=24mm", "linkText"],
         ["css=.col-sm-2:nth-child(3) li:nth-child(1) > a", "css:finder"],
@@ -1883,12 +1883,12 @@
         ["xpath=//div[3]/ul/li/a", "xpath:position"],
         ["xpath=//a[contains(.,'24mm')]", "xpath:innerText"]
       ],
-      "value": "24mm"
+      "value": "24 mm"
     }, {
       "id": "9ccfe48b-4a7d-4b26-aea6-7c6fcb89d28e",
       "comment": "",
       "command": "assertText",
-      "target": "linkText=29mm",
+      "target": "linkText=29 mm",
       "targets": [
         ["linkText=29mm", "linkText"],
         ["css=.col-sm-2:nth-child(3) li:nth-child(2) > a", "css:finder"],
@@ -1897,12 +1897,12 @@
         ["xpath=//div[3]/ul/li[2]/a", "xpath:position"],
         ["xpath=//a[contains(.,'29mm')]", "xpath:innerText"]
       ],
-      "value": "29mm"
+      "value": "29 mm"
     }, {
       "id": "599657ce-3d1c-423b-bbf9-69045702b1ff",
       "comment": "",
       "command": "assertText",
-      "target": "linkText=32mm",
+      "target": "linkText=32 mm",
       "targets": [
         ["linkText=32mm", "linkText"],
         ["css=.col-sm-2:nth-child(3) li:nth-child(3) > a", "css:finder"],
@@ -1911,7 +1911,7 @@
         ["xpath=//div[3]/ul/li[3]/a", "xpath:position"],
         ["xpath=//a[contains(.,'32mm')]", "xpath:innerText"]
       ],
-      "value": "32mm"
+      "value": "32 mm"
     }, {
       "id": "7a3c93a8-2054-4eff-b9e8-4e5b3bcf7166",
       "comment": "",
@@ -2027,7 +2027,7 @@
       "id": "83af25e6-d213-44a7-b511-9b11ccd79fd4",
       "comment": "",
       "command": "click",
-      "target": "linkText=6s",
+      "target": "linkText=6 s",
       "targets": [
         ["linkText=6s", "linkText"],
         ["css=.col-sm-2:nth-child(2) li:nth-child(2) > a", "css:finder"],
@@ -2054,7 +2054,7 @@
         ["xpath=//li[5]/span", "xpath:position"],
         ["xpath=//span[contains(.,'6s burn time')]", "xpath:innerText"]
       ],
-      "value": "6s burn time (1)"
+      "value": "6 s burn time (1)"
     }, {
       "id": "2ab6ec48-9ef7-4d71-a867-26e8dd9fc7f4",
       "comment": "",
@@ -2091,7 +2091,7 @@
       "id": "efbeb3f5-d84c-491a-aeac-2cb6e3ab727f",
       "comment": "",
       "command": "click",
-      "target": "linkText=3s",
+      "target": "linkText=3 s",
       "targets": [
         ["linkText=3s", "linkText"],
         ["css=.col-sm-2:nth-child(4) li:nth-child(3) > a", "css:finder"],
@@ -2118,7 +2118,7 @@
         ["xpath=//li[4]/span", "xpath:position"],
         ["xpath=//span[contains(.,'3s burn time')]", "xpath:innerText"]
       ],
-      "value": "3s burn time (5)"
+      "value": "3 s burn time (5)"
     }, {
       "id": "23a9f18e-f6f6-4ef3-9022-11166297aa56",
       "comment": "",
@@ -2244,7 +2244,7 @@
         ["xpath=//li[4]/span", "xpath:position"],
         ["xpath=//span[contains(.,'3s burn time')]", "xpath:innerText"]
       ],
-      "value": "3s burn time (5)"
+      "value": "3 s burn time (5)"
     }]
   }],
   "suites": [{

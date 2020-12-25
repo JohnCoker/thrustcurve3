@@ -354,198 +354,254 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
  * General motor search, renders with motors/search.hbs template.
  */
 function doSearch(req, res, params) {
-  metadata.getMotors(req, function(all, available) {
-    var query = {},
-        sort = { totalImpulse: 1, designation: 1 },
-        options,
-        hasParams, failed, isFresh, paramNames,
-        keys, k, v, m, i;
+  metadata.getPropellantInfo(req, function(propInfo) {
+    metadata.getMotors(req, function(all, available) {
+      var query = {},
+          sort = { totalImpulse: 1, designation: 1 },
+          options,
+          hasParams, failed, isFresh, paramNames,
+          keys, k, v, m, i;
 
-    params = _.extend({}, params);
-    hasParams = false;
-    failed = false;
-    isFresh = true;
-    keys = Object.keys(params);
-    if (keys.length > 0)
-      isFresh = false;
-    for (i = 0; i < keys.length; i++) {
-      k = keys[i];
-      v = params[k];
-      if (v == null) {
-        delete params[k];
-        continue;
-      }
-      v = v.toString().trim();
-      if (v === '') {
-        delete params[k];
-        continue;
-      }
+      params = _.extend({}, params);
+      hasParams = false;
+      failed = false;
+      isFresh = true;
+      keys = Object.keys(params);
+      if (keys.length > 0)
+        isFresh = false;
+      for (i = 0; i < keys.length; i++) {
+        k = keys[i];
+        v = params[k];
+        if (v == null) {
+          delete params[k];
+          continue;
+        }
+        v = v.toString().trim();
+        if (v === '') {
+          delete params[k];
+          continue;
+        }
 
-      if (k == 'manufacturer' || k == 'mfr') {
-        m = all.manufacturers.byName(v);
-        if (m != null)
-          query._manufacturer = m._id;
-        else
-          failed = true;
+        if (k == 'manufacturer' || k == 'mfr') {
+          m = all.manufacturers.byName(v);
+          if (m != null)
+            query._manufacturer = m._id;
+          else
+            failed = true;
 
-      } else if (k == 'certOrg' || k == 'cert') {
-        m = all.certOrgs.byName(v);
-        if (m != null)
-          query._certOrg = m._id;
-        else
-          failed = true;
+        } else if (k == 'certOrg' || k == 'cert') {
+          m = all.certOrgs.byName(v);
+          if (m != null)
+            query._certOrg = m._id;
+          else
+            failed = true;
 
-      } else if (k == 'designation') {
-        v = metadata.toDesignation(v);
-        query.$or = [
-          { designation: v },
-          { altDesignation: v },
-        ];
+        } else if (k == 'designation') {
+          v = metadata.toDesignation(v);
+          query.$or = [
+            { designation: v },
+            { altDesignation: v },
+          ];
 
-      } else if (k == 'commonName') {
-        v = metadata.toCommonName(v);
-        query.$or = [
-          { commonName: v },
-          { altName: v },
-        ];
+        } else if (k == 'commonName') {
+          v = metadata.toCommonName(v);
+          query.$or = [
+            { commonName: v },
+            { altName: v },
+          ];
 
-      } else if (k == 'name') {
-        query.$or = [
-          { designation: metadata.toDesignation(v) },
-          { altDesignation: metadata.toDesignation(v) },
-          { commonName: metadata.toCommonName(v) },
-          { altName: metadata.toCommonName(v) },
-        ];
+        } else if (k == 'name') {
+          query.$or = [
+            { designation: metadata.toDesignation(v) },
+            { altDesignation: metadata.toDesignation(v) },
+            { commonName: metadata.toCommonName(v) },
+            { altName: metadata.toCommonName(v) },
+          ];
 
-      } else if (k == 'diameter') {
-        v = parseFloat(v);
-        if (v > 0) {
-          if (v > 1)
-            v /= 1000;
-          query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
-        } else
-          failed = true;
-
-      } else if (k == 'impulseClass') {
-        v = metadata.toImpulseClass(v);
-        query.impulseClass = v;
-
-      } else if (k == 'length') {
-        v = parseFloat(v);
-        if (v > 0)
-          query.length = { $lt: v + metadata.MotorDiameterTolerance };
-        else
-          failed = true;
-
-      } else if (k == 'text') {
-        let cn = v.toUpperCase();
-        if (metadata.isCommonName(cn))
-          query.$or = [ { commonName: cn }, { altName: cn } ];
-        else
-          query.$text = { $search: v };
-
-      } else if (k == 'availability') {
-        if (v == 'available')
-          query.availability = { $in: req.db.schema.MotorAvailableEnum };
-        else if (v == 'all')
-          ; // no restriction
-        else
-          query.availability = v;
-
-      } else if (k == 'sparky') {
-        if (v == 'regular')
-          query.sparky = false;
-        else if (v == 'sparky')
-          query.sparky = true;
-
-      } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
-        if (req.db.Motor.schema.paths[k].instance == 'Number') {
+        } else if (k == 'diameter') {
           v = parseFloat(v);
           if (v > 0) {
-            query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
+            if (v > 1)
+              v /= 1000;
+            query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
           } else
             failed = true;
+
+        } else if (k == 'impulseClass') {
+          v = metadata.toImpulseClass(v);
+          query.impulseClass = v;
+
+        } else if (k == 'length') {
+          v = parseFloat(v);
+          if (v > 0)
+            query.length = { $lt: v + metadata.MotorDiameterTolerance };
+          else
+            failed = true;
+
+        } else if (k == 'text') {
+          let cn = v.toUpperCase();
+          if (metadata.isCommonName(cn))
+            query.$or = [ { commonName: cn }, { altName: cn } ];
+          else
+            query.$text = { $search: v };
+
+        } else if (k == 'availability') {
+          if (v == 'available')
+            query.availability = { $in: req.db.schema.MotorAvailableEnum };
+          else if (v == 'all')
+            ; // no restriction
+          else
+            query.availability = v;
+
+        } else if (k == 'sparky') {
+          if (v == 'regular')
+            query.sparky = false;
+          else if (v == 'sparky')
+            query.sparky = true;
+
+        } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
+          if (req.db.Motor.schema.paths[k].instance == 'Number') {
+            v = parseFloat(v);
+            if (v > 0) {
+              query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
+            } else
+              failed = true;
+          } else {
+            query[k] = v;
+          }
+
+        } else if (k == 'flameColor' || k == 'smokeColor') {
+          // handle later
+
         } else {
-          query[k] = v;
+          delete params[k];
         }
-      } else {
-        delete params[k];
       }
-    }
 
-    // see if we have any selective query parameters
-    keys = Object.keys(query);
-    if (keys.length > 1 || (keys.length == 1 && keys[0] != 'availability'))
-      hasParams = true;
+      // apply flame and/or smoke color
+      if (query.propellantInfo == null && (params.flameColor || params.smokeColor)) {
+        let matches = [];
+        propInfo.forEach(info => {
+          let match = true;
+          if (params.flameColor != null && params.flameColor != info.flameColor)
+            match = false;
+          if (params.smokeColor != null && params.smokeColor != info.smokeColor)
+            match = false;
+          if (match)
+            matches.push(info.name);
+        });
+        query.propellantInfo = { $in: matches };
+      }
 
-    // always initialize radio parameters
-    if (!params.hasOwnProperty('sparky'))
-      params.sparky = 'all';
-    if (!params.hasOwnProperty('availability')) {
-      params.availability = 'available';
-      if (hasParams)
-        query.availability = { $in: req.db.schema.MotorAvailableEnum };
-    }
+      // see if we have any selective query parameters
+      keys = Object.keys(query);
+      if (keys.length > 1 || (keys.length == 1 && keys[0] != 'availability'))
+        hasParams = true;
 
-    keys = Object.keys(params);
-    paramNames = '';
-    for (i = 0; i < keys.length; i++) {
-      if (i > 0)
-        paramNames += ", ";
-      paramNames += keys[i].replace(/[A-Z]/, function(l) { return ' ' + l; })
-                           .replace(/^[a-z]/, function(l) { return l.toUpperCase(); });
-    }
-    if (failed) {
-      res.render('motors/search', locals(req, defaults, {
-        title: 'Search Results',
-        allMotors: all,
-        availableMotors: available,
-        params: params,
-        multiParams: keys.length > 1,
-        paramNames: paramNames,
-        results: [],
-        isFresh: isFresh,
-        isSearchDone: true,
-        isNoneFound: true
-      }));
-    } else if (hasParams) {
-      // perform search
-      req.db.Motor.find(query, options).sort(sort).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
-        if (results.length == 1) {
-          // record this as a search view
-          recordView(req, results[0], 'search');
+      // always initialize radio parameters
+      if (!params.hasOwnProperty('sparky'))
+        params.sparky = 'all';
+      if (!params.hasOwnProperty('availability')) {
+        params.availability = 'available';
+        if (hasParams)
+          query.availability = { $in: req.db.schema.MotorAvailableEnum };
+      }
 
-          // redirect to single result
-          res.redirect(303, req.helpers.motorLink(results[0]));
-        } else {
-          // show multiple search results
-          res.render('motors/search', locals(req, defaults, {
-            title: 'Search Results',
-            allMotors: all,
-            availableMotors: available,
-            params: params,
-            multiParams: keys.length > 1,
-            paramNames: paramNames,
-            results: results,
-            isFresh: isFresh,
-            isSearchDone: true,
-            isNoneFound: results.length < 1
-          }));
-        }
-      }));
-    } else {
-      // render search page without doing query
-      res.render('motors/search', locals(req, defaults, {
-        title: 'Attribute Search',
-        allMotors: all,
-        availableMotors: available,
-        params: params,
-        multiParams: keys.length > 1,
-        paramNames: paramNames,
-        isFresh: isFresh,
-        isSearchDone: false
-      }));
-    }
+      // collect query parameter names
+      keys = Object.keys(params);
+      paramNames = '';
+      for (i = 0; i < keys.length; i++) {
+        if (i > 0)
+          paramNames += ", ";
+        paramNames += keys[i].replace(/[A-Z]/, function(l) { return ' ' + l; })
+                             .replace(/^[a-z]/, function(l) { return l.toUpperCase(); });
+      }
+
+      // set up propellant flame and smoke colors
+      function colors(dest, which) {
+        const key = which + 'Color';
+        let map = new Map();
+        propInfo.forEach(info => {
+          let v = info[key];
+          if (v == null || v === '')
+            return;
+          let e = map.get(v);
+          if (e == null) {
+            e = {
+              manufacturers: [],
+              name: v,
+            };
+            map.set(v, e);
+          }
+          let mfr = all.manufacturers.byId(info._manufacturer);
+          if (mfr && e.manufacturers.indexOf(mfr.abbrev) < 0)
+            e.manufacturers.push(mfr.abbrev);
+        });
+        map.forEach(e => dest.push(e));
+        dest.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      let flameColors = [], smokeColors = [];
+      colors(flameColors, 'flame');
+      colors(smokeColors, 'smoke');
+
+      if (failed) {
+        res.render('motors/search', locals(req, defaults, {
+          title: 'Search Results',
+          allMotors: all,
+          availableMotors: available,
+          flameColors,
+          smokeColors,
+          params: params,
+          multiParams: keys.length > 1,
+          paramNames: paramNames,
+          results: [],
+          isFresh: isFresh,
+          isSearchDone: true,
+          isNoneFound: true
+        }));
+      } else if (hasParams) {
+        // perform search
+        req.db.Motor.find(query, options).sort(sort).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
+          if (results.length == 1) {
+            // record this as a search view
+            recordView(req, results[0], 'search');
+
+            // redirect to single result
+            res.redirect(303, req.helpers.motorLink(results[0]));
+          } else {
+            // show multiple search results
+            res.render('motors/search', locals(req, defaults, {
+              title: 'Search Results',
+              allMotors: all,
+              availableMotors: available,
+              flameColors,
+              smokeColors,
+              params: params,
+              multiParams: keys.length > 1,
+              paramNames: paramNames,
+              results: results,
+              isFresh: isFresh,
+              isSearchDone: true,
+              isNoneFound: results.length < 1
+            }));
+          }
+        }));
+      } else {
+        // render search page without doing query
+        res.render('motors/search', locals(req, defaults, {
+          title: 'Attribute Search',
+          allMotors: all,
+          availableMotors: available,
+          flameColors,
+          smokeColors,
+          params: params,
+          multiParams: keys.length > 1,
+          paramNames: paramNames,
+          isFresh: isFresh,
+          isSearchDone: false
+        }));
+      }
+    });
   });
 }
 

@@ -85,11 +85,29 @@ advanced search below to search by various attributes.
   </div>
   <div class="form-group propellantInfo">
     <label for="propellantInfo" class="col-sm-3 control-label">Propellant</label>
-    <div class="col-sm-9">
+    <div class="col-sm-9" style="margin-bottom: 2pt;">
       <select class="form-control" name="propellantInfo">
         <option value="">(all)</option>
         {{#each allMotors.propellants}}
         <option data-manufacturers="{{manufacturers}}" {{#equal ../params.propellantInfo name}}selected{{/equal}}>{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <label for="flameColor" class="col-sm-1 col-sm-offset-4 control-label">Flame</label>
+    <div class="col-sm-3">
+      <select class="form-control" name="flameColor">
+        <option value="">(all)</option>
+        {{#each flameColors}}
+        <option data-manufacturers="{{manufacturers}}" {{#equal ../params.flameColor name}}selected{{/equal}}>{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <label for="smokeColor" class="col-sm-1 control-label">Smoke</label>
+    <div class="col-sm-3">
+      <select class="form-control" name="smokeColor">
+        <option value="">(all)</option>
+        {{#each smokeColors}}
+        <option data-manufacturers="{{manufacturers}}" {{#equal ../params.smokeColor name}}selected{{/equal}}>{{name}}</option>
         {{/each}}
       </select>
     </div>
@@ -150,23 +168,29 @@ advanced search below to search by various attributes.
 $('form input[type=text]').blur(function(e) {
   this.value = $.trim(this.value).toUpperCase();
 });
-$('form select[name=manufacturer], form select[name=diameter]').change(function(e) {
+function updateSelects() {
   let onlyMfr = $('select[name=manufacturer]').val(),
       onlyDia = $('select[name=diameter]').val();
   if (onlyDia !== '')
     onlyDia = parseFloat(onlyDia);
 
-  let propSelect = $('form select[name=propellantInfo]');
-  propSelect.find('option').removeAttr('hidden');
-  if (onlyMfr) {
-    propSelect.find('option').each(function() {
-      let opt = $(this);
-      let mfrs = opt.attr('data-manufacturers');
-      if (mfrs && mfrs.indexOf(onlyMfr) < 0)
-        opt.attr('hidden', 'hidden');
-    });
+  // filter only by manufacturer
+  function filterMfr(select) {
+    select.find('option').removeAttr('hidden');
+    if (onlyMfr) {
+      select.find('option').each(function() {
+        let opt = $(this);
+        let mfrs = opt.attr('data-manufacturers');
+        if (mfrs && mfrs.indexOf(onlyMfr) < 0)
+          opt.attr('hidden', 'hidden');
+      });
+    }
   }
+  filterMfr($('form select[name=propellantInfo]'));
+  filterMfr($('form select[name=flameColor]'));
+  filterMfr($('form select[name=smokeColor]'));
 
+  // filter by manufacturer and diameter
   let caseSelect = $('form select[name=caseInfo]');
   caseSelect.find('option').removeAttr('hidden');
   if (onlyMfr || onlyDia) {
@@ -186,6 +210,10 @@ $('form select[name=manufacturer], form select[name=diameter]').change(function(
         opt.attr('hidden', 'hidden');
     });
   }
+}
+$('form select[name=manufacturer], form select[name=diameter]').change(updateSelects);
+$(document).ready(function(e) {
+  setTimeout(updateSelects, 1);
 });
 </script>
 {{/unless}}

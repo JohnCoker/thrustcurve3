@@ -694,6 +694,250 @@
         ["xpath=//a[contains(.,'C11')]", "xpath:innerText"]
       ],
       "value": "C11"
+    }, {
+      "id": "c213f50d-c3e9-4a48-a867-b9d8d7edb8f4",
+      "comment": "",
+      "command": "open",
+      "target": "http://localhost:3000/motors/search.html",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "379f8c05-ae56-44c9-a28b-fbba4867f735",
+      "comment": "",
+      "command": "click",
+      "target": "name=manufacturer",
+      "targets": [
+        ["name=manufacturer", "name"],
+        ["css=.manufacturer .form-control", "css:finder"],
+        ["xpath=//select[@name='manufacturer']", "xpath:attributes"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e90af8d4-94d2-4198-85c5-4b1c70951df3",
+      "comment": "",
+      "command": "select",
+      "target": "name=manufacturer",
+      "targets": [],
+      "value": "label=AeroTech"
+    }, {
+      "id": "e9830d0c-dad2-4ec6-86ff-dc2b8282f06c",
+      "comment": "",
+      "command": "click",
+      "target": "name=flameColor",
+      "targets": [
+        ["name=flameColor", "name"],
+        ["css=.col-sm-3:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=//select[@name='flameColor']", "xpath:attributes"],
+        ["xpath=//div[2]/select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "0cabb5b1-1e01-4714-a9a8-3fc58d73620d",
+      "comment": "",
+      "command": "select",
+      "target": "name=flameColor",
+      "targets": [],
+      "value": "label=green"
+    }, {
+      "id": "0f65e72c-c0c4-49f8-b92a-ce6085e0cdc4",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[11]/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Submit')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c5cd6611-f1ee-4b8f-84b0-c674088df7e9",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Search Results • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "3ccc62d3-9532-4264-8ac7-5ecdcea8dc2c",
+      "comment": "",
+      "command": "click",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "46933f70-e6d1-4550-ace6-17ee18f105df",
+      "comment": "",
+      "command": "assertText",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div", "xpath:position"]
+      ],
+      "value": "Showing 1 to 10 of 11 entries"
+    }, {
+      "id": "31d1df50-588a-49cb-8750-0dd04b69424d",
+      "comment": "",
+      "command": "click",
+      "target": "css=.even:nth-child(2) > td:nth-child(1)",
+      "targets": [
+        ["css=.even:nth-child(2) > td:nth-child(1)", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr[2]/td", "xpath:idRelative"],
+        ["xpath=//tr[2]/td", "xpath:position"],
+        ["xpath=//td[contains(.,'G76G')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "dc83a174-e25b-40ca-bf81-c98748432ba3",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "linkText=G76G",
+      "targets": [
+        ["linkText=G76G", "linkText"],
+        ["css=.even:nth-child(2) a", "css:finder"],
+        ["xpath=//a[contains(text(),'G76G')]", "xpath:link"],
+        ["xpath=//table[@id='result-list']/tbody/tr[2]/td/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/motors/AeroTech/G76G/')]", "xpath:href"],
+        ["xpath=//tr[2]/td/a", "xpath:position"],
+        ["xpath=//a[contains(.,'G76G')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "9a8e07b5-dd76-4d49-b7f3-7a884d924845",
+      "comment": "",
+      "command": "executeScript",
+      "target": "window.history.back()",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7b66b992-6319-422a-9b77-7e6726d17408",
+      "comment": "",
+      "command": "click",
+      "target": "name=flameColor",
+      "targets": [
+        ["name=flameColor", "name"],
+        ["css=.col-sm-3:nth-child(4) > .form-control", "css:finder"],
+        ["xpath=//select[@name='flameColor']", "xpath:attributes"],
+        ["xpath=//div[2]/select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "813c9771-a740-4565-aaae-ca7b833f35b6",
+      "comment": "",
+      "command": "select",
+      "target": "name=flameColor",
+      "targets": [],
+      "value": "label=(all)"
+    }, {
+      "id": "29e0974b-a546-40a3-85ce-fb3304cb756f",
+      "comment": "",
+      "command": "click",
+      "target": "name=smokeColor",
+      "targets": [
+        ["name=smokeColor", "name"],
+        ["css=.col-sm-3:nth-child(6) > .form-control", "css:finder"],
+        ["xpath=//select[@name='smokeColor']", "xpath:attributes"],
+        ["xpath=//div[3]/select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ae4f4036-1347-4cce-b3a1-677b3e66fdc2",
+      "comment": "",
+      "command": "select",
+      "target": "name=smokeColor",
+      "targets": [],
+      "value": "label=black"
+    }, {
+      "id": "26dcd33d-6f0a-4ee7-aa06-e874272afa95",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn-primary",
+      "targets": [
+        ["css=.btn-primary", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[11]/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Submit')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e9a43927-52e4-45fb-9c96-5b05b2933ebf",
+      "comment": "",
+      "command": "click",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "a31ca6cb-603c-4cdd-b870-8c089c8d11ca",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Search Results • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "15085bbf-b179-4165-8f28-4e93d508e991",
+      "comment": "",
+      "command": "click",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "41a4b21d-f4a6-41ab-85c8-44e68441c07e",
+      "comment": "",
+      "command": "assertText",
+      "target": "id=result-list_info",
+      "targets": [
+        ["id=result-list_info", "id"],
+        ["css=#result-list_info", "css:finder"],
+        ["xpath=//div[@id='result-list_info']", "xpath:attributes"],
+        ["xpath=//div[@id='result-list_wrapper']/div[3]/div/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div", "xpath:position"]
+      ],
+      "value": "Showing 1 to 10 of 20 entries"
+    }, {
+      "id": "ed354fba-6c63-4e02-a4b3-33b6a74a2240",
+      "comment": "",
+      "command": "click",
+      "target": "css=.odd:nth-child(1) > td:nth-child(1)",
+      "targets": [
+        ["css=.odd:nth-child(1) > td:nth-child(1)", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td", "xpath:idRelative"],
+        ["xpath=//td", "xpath:position"],
+        ["xpath=//td[contains(.,'E11J')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f0267d84-8b66-4a70-868d-aac61491b991",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.odd:nth-child(1) > td:nth-child(1)",
+      "targets": [
+        ["css=.odd:nth-child(1) > td:nth-child(1)", "css:finder"],
+        ["xpath=//table[@id='result-list']/tbody/tr/td", "xpath:idRelative"],
+        ["xpath=//td", "xpath:position"],
+        ["xpath=//td[contains(.,'E11J')]", "xpath:innerText"]
+      ],
+      "value": "E11J"
     }]
   }, {
     "id": "4e93ddf9-c374-45af-8f0c-508cdf1624e6",

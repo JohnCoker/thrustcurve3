@@ -3,5 +3,6 @@
   "node": false,
   "jasmine": false,
   "browser": true,
-  "esversion": 6
+  "esversion": 6,
+  "eqnull": true
 }

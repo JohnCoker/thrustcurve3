@@ -166,7 +166,7 @@ function loadPropellants(req, cb) {
       // augment with all unique propellants
       req.db.Motor.find({ propellantInfo: { $ne: null } }).exec(req.success(function(motors) {
         motors.forEach(motor => {
-          if (motor.propellantInfo == null || motor.propellantInfo == '')
+          if (motor.propellantInfo == null || motor.propellantInfo === '')
             return;
           const mfr = manufacturers.byId(motor._manufacturer).abbrev;
           const key = mfr + ' ' + motor.propellantInfo;
@@ -275,13 +275,6 @@ router.post(propellantsLink, authorized('metadata'), function(req, res, next) {
       }, req.success(done));
     } else {
       // upsert the entry with values
-      console.log({
-        _manufacturer: mfr._id,
-        name,
-        flameColor,
-        smokeColor,
-        sparky,
-      });
       req.db.PropellantInfo.findOneAndUpdate({
         _manufacturer: mfr._id,
         name,
@@ -330,7 +323,7 @@ router.get(propellantsLink + "guess.csv", function(req, res, next) {
     req.db.Motor.find({ propellantInfo: { $ne: null } }).exec(req.success(function(motors) {
       let unique = {};
       motors.forEach(motor => {
-        if (motor.propellantInfo == null || motor.propellantInfo == '')
+        if (motor.propellantInfo == null || motor.propellantInfo === '')
           return;
         const mfr = manufacturers.byId(motor._manufacturer).abbrev;
         const key = mfr + ' ' + motor.propellantInfo;
@@ -391,7 +384,7 @@ router.get('/admin/cases/', function(req, res, next) {
     req.db.Motor.find({ caseInfo: { $ne: null }, type: { $ne: 'SU' } }).exec(req.success(function(motors) {
       let unique = {};
       motors.forEach(motor => {
-        if (motor.caseInfo == null || motor.caseInfo == '')
+        if (motor.caseInfo == null || motor.caseInfo === '')
           return;
         const mfr = manufacturers.byId(motor._manufacturer).abbrev;
         const key = mfr + ' ' + motor.caseInfo;

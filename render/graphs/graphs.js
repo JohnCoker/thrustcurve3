@@ -922,7 +922,7 @@ function scatter(spec) {
 
     let minX = 0, minY = 0, maxX = 0, maxY = 0;
     spec.points.forEach((pt, i) => {
-      if (i == 0) {
+      if (i === 0) {
         minX = maxX = pt.x;
         minY = maxY = pt.y;
       } else {

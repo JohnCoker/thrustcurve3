@@ -419,8 +419,6 @@ function doRunGuide(req, res, rocket) {
       if (req.user != null && req.body.favoriteMotors) {
         req.db.FavoriteMotor.find({ _contributor: req.user._id })
                             .exec(req.success(function(favorites) {
-          console.log('\n\nfavorites:');
-          console.log(favorites);
           filter._id = { $in: favorites.map(f => f._motor) };
           Object.freeze(filter);
           cb(filter, filterCount);
@@ -829,7 +827,6 @@ router.get('/motors/guide/:id/plot.html', function(req, res) {
 });
 
 router.get('/motors/guide/:id/plot.svg', function(req, res) {
-  console.log(req.query);
   const xStat = RESULT_STATS.byLabel(req.query.x);
   const yStat = RESULT_STATS.byLabel(req.query.y);
   if (xStat == null || yStat == null) {
@@ -967,7 +964,7 @@ router.get('/motors/guide/:id/compare/:motorId/:file', function(req, res, next) 
     run.fullResult.results.forEach((r, i) => {
       let v = get(r);
       if (v > 0) {
-        if (i == 0)
+        if (i === 0)
           min = max = v;
         else {
           min = Math.min(min, v);

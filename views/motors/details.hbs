@@ -222,6 +222,18 @@
           </p>
         </div>
       </div>
+      <div class="form-group">
+        <label class="col-sm-6 control-label">HazMat Shipping</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">
+          {{#if motor.hazmatExempt}}
+            <span class="label label-as-badge label-success">exempt</span>
+          {{else}}
+            <span class="label label-as-badge label-warning">HazMat</span>
+          {{/if}}
+          </p>
+        </div>
+      </div>
 
       {{#if username}}
       <div class="form-group">

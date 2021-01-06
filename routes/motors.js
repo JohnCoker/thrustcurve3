@@ -454,16 +454,38 @@ function doSearch(req, res, params) {
             query.availability = v;
 
         } else if (k == 'sparky') {
-          if (v == 'regular')
+          if (v == 'regular' || v == 'false')
             query.sparky = false;
-          else if (v == 'sparky')
+          else if (v == 'sparky' || v == 'false')
             query.sparky = true;
+
+        } else if (k == 'class1') {
+          if (v == 'true' || v == 'on' || v == 'class1')
+            query.propellantWeight = { $lte: 0.125 };
+          else if (v == 'false' || v == 'off' || v == 'regular')
+            query.propellantWeight = { $gt: 0.125 };
+
+        } else if (k == 'hazmatExempt') {
+          if (v == 'regular' || v == 'false' || v == 'off')
+            query.hazmatExempt = false;
+          else if (v == 'exempt' || v == 'true' || v == 'on')
+            query.hazmatExempt = true;
 
         } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
           if (req.db.Motor.schema.paths[k].instance == 'Number') {
+            let op = '=';
+            if (/^[<>]/.test(v)) {
+              op = v[0];
+              v = v.substring(1).trim();
+            }
             v = parseFloat(v);
-            if (v > 0) {
-              query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
+            if (isFinite(v)) {
+              if (op == '<')
+                query[k] = { $lt: v * 1.01 };
+              else if (op == '>')
+                query[k] = { $gt: v * 0.99 };
+              else
+                query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
             } else
               failed = true;
           } else {
@@ -501,6 +523,10 @@ function doSearch(req, res, params) {
       // always initialize radio parameters
       if (!params.hasOwnProperty('sparky'))
         params.sparky = 'all';
+      if (!params.hasOwnProperty('class1'))
+        params.class1 = 'all';
+      if (!params.hasOwnProperty('hazmatExempt'))
+        params.hazmatExempt = 'all';
       if (!params.hasOwnProperty('availability')) {
         params.availability = 'available';
         if (hasParams)
@@ -1148,7 +1174,7 @@ function parseMMGS(s) {
 }
 
 function doSubmit(req, res, motor) {
-  var isNew = false, isChanged = false;
+  let isNew = false, isChanged = false;
 
   if (motor == null) {
     motor = {};
@@ -1172,9 +1198,8 @@ function doSubmit(req, res, motor) {
     'dataSheet',
     'availability',
   ].forEach(function(p) {
-    var s;
     if (req.hasBodyProperty(p)) {
-      s = req.body[p].trim();
+      let s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {
           motor[p] = undefined;
@@ -1199,16 +1224,15 @@ function doSubmit(req, res, motor) {
   // date values
   [ 'certDate',
   ].forEach(function(p) {
-    var s, d;
     if (req.hasBodyProperty(p)) {
-      s = req.body[p].trim();
+      let s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {
           motor[p] = undefined;
           isChanged = true;
         }
       } else {
-        d = new Date(s);
+        let d = new Date(s);
         if (motor[p] == null || d.toISOString() != d.toISOString()) {
           motor[p] = d;
           isChanged = true;
@@ -1224,16 +1248,15 @@ function doSubmit(req, res, motor) {
     'burnTime',
     'isp',
   ].forEach(function(p) {
-    var s, n;
     if (req.hasBodyProperty(p)) {
-      s = req.body[p].trim();
+      let s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {
           motor[p] = undefined;
           isChanged = true;
         }
       } else {
-        n = parseValue(s);
+        let n = parseValue(s);
         if (n != motor[p]) {
           motor[p] = n;
           isChanged = true;
@@ -1248,16 +1271,15 @@ function doSubmit(req, res, motor) {
     'totalWeight',
     'propellantWeight',
   ].forEach(function(p) {
-    var s, n;
     if (req.hasBodyProperty(p)) {
-      s = req.body[p].trim();
+      let s = req.body[p].trim();
       if (s === '') {
         if (motor[p] != null) {
           motor[p] = undefined;
           isChanged = true;
         }
       } else {
-        n = parseMMGS(s);
+        let n = parseMMGS(s);
         if (n != motor[p]) {
           motor[p] = n;
           isChanged = true;
@@ -1266,8 +1288,29 @@ function doSubmit(req, res, motor) {
     }
   });
 
+  // boolean values
+  [ 'sparky',
+    'hazmatExempt',
+  ].forEach(function(p) {
+    console.log('\n\n\n', p, req.hasBodyProperty(p), req.body[p]);
+    console.log(p + '-present', req.hasBodyProperty(p + '-present'), req.body[p + '-present']);
+    if (req.hasBodyProperty(p)) {
+      let s = req.body[p].trim();
+      let b = s > 0 || s == 'true' || s == 'on';
+      if (b !== motor[p]) {
+        motor[p] = b;
+        isChanged = true;
+      }
+    } else if (req.hasBodyProperty(p + '-present')) {
+      if (motor[p] !== false) {
+        motor[p] = false;
+        isChanged = true;
+      }
+    }
+  });
+
   req.db.Manufacturer.findOne({ _id: motor._manufacturer }, req.success(function(manufacturer) {
-    var url;
+    let url;
     if (manufacturer)
       url = '/motors/' + encodeURIComponent(manufacturer.abbrev) + '/' + encodeURIComponent(motor.designation) + '/edit.html';
     else

@@ -139,6 +139,40 @@ advanced search below to search by various attributes.
       </label>
     </div>
   </div>
+  <div class="form-group class1">
+    <label for="class1" class="col-sm-3 control-label">Class 1 Motor</label>
+    <div class="col-sm-9">
+    <p>
+      <label class="radio-inline">
+        <input type="radio" name="class1" value="class1" {{#equal params.class1 'class1'}}checked{{/equal}}>
+        <span title="">under 125g</span>
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="class1" value="regular" {{#equal params.class1 'regular'}}checked{{/equal}}>
+        <span title="motor ejects burning sparks">larger motors</span>
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="class1" value="all" {{#equal params.class1 'all'}}checked{{/equal}}> both
+      </label>
+    </div>
+  </div>
+  <div class="form-group hazmatExempt">
+    <label for="hazmatExempt" class="col-sm-3 control-label">HazMat Shipping</label>
+    <div class="col-sm-9">
+    <p>
+      <label class="radio-inline">
+        <input type="radio" name="hazmatExempt" value="regular" {{#equal params.hazmatExempt 'regular'}}checked{{/equal}}>
+        <span title="must be shipped as hazardous material">HazMat</span>
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="hazmatExempt" value="exempt" {{#equal params.hazmatExempt 'exempt'}}checked{{/equal}}>
+        <span title="may be shipped without restriction">exempt</span>
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="hazmatExempt" value="all" {{#equal params.hazmatExempt 'all'}}checked{{/equal}}> both
+      </label>
+    </div>
+  </div>
   <div class="form-group availability">
     <label for="availability" class="col-sm-3 control-label">Availability</label>
     <div class="col-sm-9">

@@ -249,14 +249,12 @@ No changes to save;
       <span class="help-block with-errors"></span>
     </div>
   </div>
-  <div class="form-group website">
-    <label for="dataSheet" class="col-sm-3 control-label">Data Sheet</label>
+  <div class="form-group">
+    <label for="sparky" class="col-sm-3 control-label">Sparky</label>
     <div class="col-sm-9">
-      <div class="input-group">
-        <input type="url" class="form-control" name="dataSheet"
-               placeholder="http://..." value="{{motor.dataSheet}}">
-        <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
-      </div>
+      <input type="hidden" name="sparky-present" value="true" />
+      <input type="checkbox" class="form-check-input position-static" name="sparky"
+             {{#if motor.sparky}}checked="checked"{{/if}}>
       <span class="help-block with-errors"></span>
     </div>
   </div>
@@ -270,6 +268,26 @@ No changes to save;
         <option {{#equal ../motor.availability this}}selected{{/equal}}>{{this}}</option>
         {{/each}}
       </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="hazmatExempt" class="col-sm-3 control-label">HazMat Exempt</label>
+    <div class="col-sm-9">
+      <input type="hidden" name="hazmatExempt-present" value="true" />
+      <input type="checkbox" class="form-check-input position-static" name="hazmatExempt"
+             {{#if motor.hazmatExempt}}checked="checked"{{/if}}>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group website">
+    <label for="dataSheet" class="col-sm-3 control-label">Data Sheet</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <input type="url" class="form-control" name="dataSheet"
+               placeholder="http://..." value="{{motor.dataSheet}}">
+        <span class="input-group-addon"><a href="#" class="test"><i class="fa fa-external-link"></i></a></span>
+      </div>
+      <span class="help-block with-errors"></span>
     </div>
   </div>
 

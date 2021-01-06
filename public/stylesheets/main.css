@@ -170,6 +170,10 @@ form p.form-control-static.id {
 .form-submit {
   margin-top: 5px;
 }
+.form-horizontal .form-check-input.position-static {
+  position: relative;
+  top: 0.5em;
+}
 
 a.favorite {
   color: #2e448c;

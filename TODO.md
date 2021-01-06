@@ -7,6 +7,10 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * flag motors favorited by other users
 
+## Search
+
+ * search for plugged motors
+
 ## Motor Guide
 
  * use visual styles in spreadsheets

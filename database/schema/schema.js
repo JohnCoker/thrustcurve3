@@ -400,12 +400,16 @@ function makeRocketModel(mongoose) {
     public: Boolean,
     bodyDiameter: Number,
     bodyDiameterUnit: { type: String, enum: units.length.labels },
+    bodyDiameterMKS: Number,
     weight: Number,
     weightUnit: { type: String, enum: units.mass.labels },
+    weightMKS: Number,
     mmtDiameter: Number,
     mmtDiameterUnit: { type: String, enum: units.length.labels },
+    mmtDiameterMKS: Number,
     mmtLength: Number,
     mmtLengthUnit: { type: String, enum: units.length.labels },
+    mmtLengthMKS: Number,
     mmtCount: { type: Number, min: 1, default: 1 },
     adapters: [{
       mmtDiameter: Number,
@@ -418,10 +422,29 @@ function makeRocketModel(mongoose) {
     cd: { type: Number, min: 0.1 },
     guideLength: Number,
     guideLengthUnit: { type: String, enum: units.length.labels },
+    guideLengthMKS: Number,
     website: { type: String, match: UrlRegex },
     comments: String
   }, stdOptions());
   stdHooks(schema);
+  schema.pre('save', function(next) {
+    // update the MKS value from the entered value and unit
+    ['bodyDiameter', 'mmtDiameter', 'mmtLength', 'guideLength'].forEach(which => {
+      const unit = which + 'Unit', mks = which + 'MKS';
+      if (this[which] > 0 && this[unit] != null)
+        this[mks] = units.convertUnitToMKS(this[which], 'length', this[unit]);
+      else
+        this[mks] = null;
+    });
+    ['weight'].forEach(which => {
+      const unit = which + 'Unit', mks = which + 'MKS';
+      if (this[which] > 0 && this[unit] != null)
+        this[mks] = units.convertUnitToMKS(this[which], 'mass', this[unit]);
+      else
+        this[mks] = null;
+    });
+    next();
+  });
   return mongoose.model('Rocket', schema);
 }
 

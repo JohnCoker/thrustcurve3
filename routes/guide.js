@@ -103,8 +103,9 @@ function doEntryPage(req, res, rockets) {
     if (req.user != null)
       q._contributor = { $ne: req.user._id };
     req.db.Rocket.find(q, undefined, { sort: { updatedAt: -1 } })
+                 .limit(10)
                  .populate('_contributor').exec(req.success(function(pubRockets) {
-      var lengthUnit = units.getUnitPref('length').label,
+      let lengthUnit = units.getUnitPref('length').label,
           massUnit = units.getUnitPref('mass').label,
           tempUnit = units.getUnitPref('temperature').label,
           altUnit = units.getUnitPref('altitude').label,
@@ -249,6 +250,53 @@ router.get(guidePage, function(req, res, next) {
 });
 router.get(['/guidepage.jsp', '/motorguide.jsp'], function(req, res, next) {
   res.redirect(301, guidePage);
+});
+
+
+/*
+ * /motors/guiderockets.html
+ * Search public rockets to run guide, renders with guide/publicrockets.hbs.
+ */
+router.get('/motors/guiderockets.html', function(req, res) {
+  let q = { public: true };
+  if (req.user != null)
+    q._contributor = { $ne: req.user._id };
+
+  let criteria = 0;
+  if (req.query.name != null && req.query.name.trim() !== '') {
+    q.name = new RegExp(req.query.name.trim().replace(/[?.*+{}\[\]()|\\^$]/g, "\\$&"), "i");
+    criteria++;
+  }
+  if (req.query.bodyDiameter > 0 && req.query.bodyDiameterUnit != null) {
+    let v = units.convertUnitToMKS(req.query.bodyDiameter, 'length', req.query.bodyDiameterUnit);
+    q.bodyDiameterMKS = { $gt: v * 0.95, $lt: v * 1.05 };
+    criteria++;
+  }
+  if (req.query.mmtDiameter > 0 && req.query.mmtDiameterUnit != null) {
+    let v = units.convertUnitToMKS(req.query.mmtDiameter, 'length', req.query.mmtDiameterUnit);
+    q.mmtDiameterMKS = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
+    criteria++;
+  }
+
+  const title = "Search Public Rockets";
+
+  if (criteria > 0) {
+    req.db.Rocket.find(q, undefined, { sort: { updatedAt: -1 } })
+                 .populate('_contributor').exec(req.success(function(rockets) {
+      res.render('guide/publicrockets', locals(req, defaults, {
+        title,
+        publicCount: rockets.length,
+        publicRockets: rockets,
+        searched: true,
+      }));
+    }));
+  } else {
+    res.render('guide/publicrockets', locals(req, defaults, {
+      title,
+      publicCount: 0,
+      searched: false,
+    }));
+  }
 });
 
 

@@ -18,7 +18,6 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Account
 
  * search other contributors
- * search for entered rockets
  * copy a rocket (mine or others')
 
 ## Administration

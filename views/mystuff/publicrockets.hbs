@@ -1,0 +1,40 @@
+<h1>{{title}}</h1>
+
+{{#if publicRockets}}
+<p>
+Here are the rockets that matched your search. Click on the name to use it as a starting point for your own.
+</p>
+<table id="public-rockets" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th class="number">Body Diam</th>
+      <th class="number">Weight</th>
+      <th class="number">MMT Diam</th>
+      <th class="number">MMT Len</th>
+      <th>Owner</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each publicRockets}}
+    <tr>
+      <td><a href="{{copyLink}}">{{name}}</a></td>
+      <td class="number" data-sort="{{formatSort bodyDiameter 'length' bodyDiameterUnit}}">{{formatLength bodyDiameter bodyDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort weight 'mass' weightUnit}}">{{formatMass weight weightUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtDiameter 'length' mmtDiameterUnit}}">{{formatLength mmtDiameter mmtDiameterUnit}}</td>
+      <td class="number" data-sort="{{formatSort mmtLength 'length' mmtLengthUnit}}">{{formatLength mmtLength mmtLengthUnit}}</td>
+      <td>{{_contributor.name}}</td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setupTable('#public-rockets', {
+  order: [[0,'asc']]
+});
+</script>
+{{else}}
+<p>
+No other people's public rockets matched your search criteria.
+</p>
+{{/if}}

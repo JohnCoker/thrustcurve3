@@ -22,6 +22,7 @@ const loginLink = '/mystuff/login.html',
       resetLink = '/mystuff/resetpasswd.html',
       favoritesLink = '/mystuff/favorites.html',
       rocketsLink = '/mystuff/rockets.html',
+      searchLink = '/mystuff/publicrockets.html',
       preferencesLink = '/mystuff/preferences.html',
       profileLink = '/mystuff/profile.html';
 
@@ -436,12 +437,67 @@ router.post('/mystuff/removefavorite.html', authenticated, function(req, res, ne
  */
 router.get(rocketsLink, authenticated, function(req, res, next) {
   req.db.Rocket.find({ _contributor: req.user._id }, req.success(function(rockets) {
+    let lengthUnit = units.getUnitPref('length').label,
+        massUnit = units.getUnitPref('mass').label;
     res.render('mystuff/rockets', locals(req, defaults, {
       title: 'My Rockets',
       rockets: rockets,
-      isDeleted: req.query.result == 'deleted'
+      isDeleted: req.query.result == 'deleted',
+      lengthUnits: units.length,
+      massUnits: units.mass,
+      bodyDiameterUnit: lengthUnit,
+      mmtDiameterUnit: 'mm',
+      weightUnit: massUnit,
+      searchLink,
     }));
   }));
+});
+
+
+/*
+ * /mystuff/publicrockets.html
+ * Renders with mystuff/publicrockets.hbs template.
+ */
+router.get(searchLink, authenticated, function(req, res, next) {
+  let q = { public: true, _contributor: { $ne: req.user._id } };
+
+  let criteria = 0;
+  if (req.query.name != null && req.query.name.trim() !== '') {
+    q.name = new RegExp(req.query.name.trim().replace(/[?.*+{}\[\]()|\\^$]/g, "\\$&"), "i");
+    criteria++;
+  }
+  if (req.query.bodyDiameter > 0 && req.query.bodyDiameterUnit != null) {
+    let v = units.convertUnitToMKS(req.query.bodyDiameter, 'length', req.query.bodyDiameterUnit);
+    q.bodyDiameterMKS = { $gt: v * 0.95, $lt: v * 1.05 };
+    criteria++;
+  }
+  if (req.query.mmtDiameter > 0 && req.query.mmtDiameterUnit != null) {
+    let v = units.convertUnitToMKS(req.query.mmtDiameter, 'length', req.query.mmtDiameterUnit);
+    q.mmtDiameterMKS = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
+    criteria++;
+  }
+
+  const title = "Search Public Rockets",
+        template = 'mystuff/publicrockets';
+
+  if (criteria > 0) {
+    req.db.Rocket.find(q, undefined, { sort: { updatedAt: -1 } })
+                 .populate('_contributor').exec(req.success(function(rockets) {
+      rockets.forEach(r => r.copyLink = '/mystuff/rocket/' + r._id + '/copy.html');
+      res.render(template, locals(req, defaults, {
+        title,
+        publicCount: rockets.length,
+        publicRockets: rockets,
+        searched: true,
+      }));
+    }));
+  } else {
+    res.render(template, locals(req, defaults, {
+      title,
+      publicCount: 0,
+      searched: false,
+    }));
+  }
 });
 
 
@@ -507,6 +563,7 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
             isUnchanged: req.query.result == 'unchanged',
             editLink: '/mystuff/rocket/' + id + '/edit.html',
             deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+            copyLink: '/mystuff/rocket/' + id + '/copy.html',
             guideLink: '/motors/guide.html',
           }));
         } else {
@@ -520,6 +577,7 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
             isUnchanged: req.query.result == 'unchanged',
             editLink: '/mystuff/rocket/' + id + '/edit.html',
             deleteLink: '/mystuff/rocket/' + id + '/delete.html',
+            copyLink: '/mystuff/rocket/' + id + '/copy.html',
           }));
         }
       });
@@ -733,6 +791,35 @@ router.post('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, n
     }));
   } else {
     doSubmitRocket(req, res);
+  }
+});
+
+/*
+ * /mystuff/rocket/id/copy.html
+ * Renders with mystuff/editrocket.hbs template.
+ */
+router.get('/mystuff/rocket/:id/copy.html', authenticated, function(req, res, next) {
+  const id = req.params.id;
+  if (req.db.isId(id)) {
+    req.db.Rocket.findOne({ $or: [ { _contributor: req.user._id }, { public: true } ], _id: id },
+                          req.success(function(rocket) {
+      if (rocket == null) {
+        res.redirect(303, rocketsLink);
+        return;
+      }
+      res.render('mystuff/editrocket', locals(req, defaults, {
+        title: 'Copy Rocket',
+        isNew: true,
+        rocket: rocket.toObject(),
+        lengthUnits: units.length,
+        massUnits: units.mass,
+        finishes: metadata.CdFinishes,
+        submitLink: '/mystuff/rocket/new/edit.html',
+        cancelLink: '/mystuff/rocket/' + id + '/',
+      }));
+    }));
+  } else {
+    res.redirect(303, rocketsLink);
   }
 });
 

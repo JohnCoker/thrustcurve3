@@ -58,17 +58,6 @@
                 <li><a href="/motors/recent.html">Recently Viewed</a></li>
               </ul>
             </li>
-            <li class="dropdown" title="my rockets and favorites">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Stuff <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="/mystuff/favorites.html">Favorites</a></li>
-                <li><a href="/mystuff/rockets.html">Rockets</a></li>
-                <li><a href="/mystuff/preferences.html">Preferences</a></li>
-                <li><a href="/mystuff/profile.html">Profile</a></li>
-                <li><a href="/outbox/">Outbox{{outboxSuffix}}</a></li>
-                <li><a href="/mystuff/logout.html">Log Out</a></li>
-              </ul>
-            </li>
             <li class="dropdown" title="rocket motor information">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Info <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -104,6 +93,22 @@
               </ul>
             </li>
             {{/hasPerm}}
+            {{#hasLogin}}
+            <li class="dropdown" title="my rockets and favorites">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Stuff <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/mystuff/favorites.html">Favorites</a></li>
+                <li><a href="/mystuff/rockets.html">Rockets</a></li>
+                <li><a href="/mystuff/preferences.html">Preferences</a></li>
+                <li><a href="/mystuff/profile.html">Profile</a></li>
+                <li><a href="/outbox/">Outbox{{outboxSuffix}}</a></li>
+                <li><a href="/mystuff/logout.html">Log Out</a></li>
+              </ul>
+            </li>
+            {{/hasLogin}}
+            {{#noLogin}}
+            <li><a href="/mystuff/login.html">Log In</a></li>
+            {{/noLogin}}
           </ul>
           <form class="navbar-form navbar-right" method="get" action="/motors/search.html">
             <input type="hidden" name="availability" value="all">

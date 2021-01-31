@@ -1383,55 +1383,10 @@
       ],
       "value": "E20W"
     }, {
-      "id": "a176d795-586d-4ad7-b967-5477f88f6ba6",
-      "comment": "",
-      "command": "click",
-      "target": "linkText=My Stuff",
-      "targets": [
-        ["linkText=My Stuff", "linkText"],
-        ["css=.dropdown:nth-child(2) > .dropdown-toggle", "css:finder"],
-        ["xpath=//a[contains(text(),'My Stuff')]", "xpath:link"],
-        ["xpath=//div[@id='navbar']/ul/li[2]/a", "xpath:idRelative"],
-        ["xpath=(//a[contains(@href, '#')])[2]", "xpath:href"],
-        ["xpath=//div[2]/ul/li[2]/a", "xpath:position"],
-        ["xpath=//a[contains(.,'My Stuff ')]", "xpath:innerText"]
-      ],
-      "value": ""
-    }, {
-      "id": "24397ab1-f1be-41a3-bc6c-9e3c0de05538",
-      "comment": "",
-      "command": "click",
-      "target": "linkText=Rockets",
-      "targets": [
-        ["linkText=Rockets", "linkText"],
-        ["css=.open li:nth-child(2) > a", "css:finder"],
-        ["xpath=//a[contains(text(),'Rockets')]", "xpath:link"],
-        ["xpath=//div[@id='navbar']/ul/li[2]/ul/li[2]/a", "xpath:idRelative"],
-        ["xpath=//a[contains(@href, '/mystuff/rockets.html')]", "xpath:href"],
-        ["xpath=//li[2]/ul/li[2]/a", "xpath:position"],
-        ["xpath=//a[contains(.,'Rockets')]", "xpath:innerText"]
-      ],
-      "value": ""
-    }, {
-      "id": "dad8bcbd-8408-4037-bb60-d62c28c63538",
-      "comment": "",
-      "command": "click",
-      "target": "linkText=My Stuff",
-      "targets": [
-        ["linkText=My Stuff", "linkText"],
-        ["css=.dropdown:nth-child(2) > .dropdown-toggle", "css:finder"],
-        ["xpath=//a[contains(text(),'My Stuff')]", "xpath:link"],
-        ["xpath=//div[@id='navbar']/ul/li[2]/a", "xpath:idRelative"],
-        ["xpath=(//a[contains(@href, '#')])[2]", "xpath:href"],
-        ["xpath=//div[2]/ul/li[2]/a", "xpath:position"],
-        ["xpath=//a[contains(.,'My Stuff ')]", "xpath:innerText"]
-      ],
-      "value": ""
-    }, {
       "id": "c15d17ca-aea4-41e2-98bb-aa18a0b070a6",
       "comment": "",
       "command": "click",
-      "target": "linkText=Rockets",
+      "target": "linkText=Log In",
       "targets": [
         ["linkText=Rockets", "linkText"],
         ["css=.open li:nth-child(2) > a", "css:finder"],
@@ -1486,6 +1441,36 @@
         ["xpath=//button[@type='submit']", "xpath:attributes"],
         ["xpath=//div[3]/div/button", "xpath:position"],
         ["xpath=//button[contains(.,'Log In')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "dad8bcbd-8408-4037-bb60-d62c28c63538",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=My Stuff",
+      "targets": [
+        ["linkText=My Stuff", "linkText"],
+        ["css=.dropdown:nth-child(2) > .dropdown-toggle", "css:finder"],
+        ["xpath=//a[contains(text(),'My Stuff')]", "xpath:link"],
+        ["xpath=//div[@id='navbar']/ul/li[2]/a", "xpath:idRelative"],
+        ["xpath=(//a[contains(@href, '#')])[2]", "xpath:href"],
+        ["xpath=//div[2]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'My Stuff ')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "24397ab1-f1be-41a3-bc6c-9e3c0de05538",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Rockets",
+      "targets": [
+        ["linkText=Rockets", "linkText"],
+        ["css=.open li:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Rockets')]", "xpath:link"],
+        ["xpath=//div[@id='navbar']/ul/li[2]/ul/li[2]/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/mystuff/rockets.html')]", "xpath:href"],
+        ["xpath=//li[2]/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Rockets')]", "xpath:innerText"]
       ],
       "value": ""
     }, {

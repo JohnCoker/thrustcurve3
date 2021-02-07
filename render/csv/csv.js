@@ -85,6 +85,11 @@ class File {
     }
   }
 
+  emptyCols(n) {
+    while (n-- > 0)
+      this.col('');
+  }
+
   produce() {
     if (this._col > 0) {
       this._data += '\r\n';

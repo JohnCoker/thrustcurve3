@@ -545,6 +545,7 @@ function makeGuideResultModel(mongoose) {
       _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor' },
       mmt: { type: String, required: true },
       thrustWeight: { type: Number, required: true },
+      recoveredMass: { type: Number, required: true },
       simulation: { type: mongoose.Schema.Types.Mixed },
       optimalDelay: { type: Number },
       pass: { type: Boolean, required: true },

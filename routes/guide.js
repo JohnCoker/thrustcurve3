@@ -548,7 +548,8 @@ function doRunGuide(req, res, rocket) {
                         result = {
                           _motor: motor._id,
                           mmt: mmt.name,
-                          thrustWeight: (cluster * motor.avgThrust / flightsim.GravityMSL) / (mmtInputs.rocketMass + simInputs.motorInitialMass)
+                          thrustWeight: (cluster * motor.avgThrust / flightsim.GravityMSL) / (mmtInputs.rocketMass + simInputs.motorInitialMass),
+                          recoveredMass: simInputs.rocketMass + simInputs.motorBurnoutMass,
                         };
   
                         // for each motor, run the first simulation we can
@@ -1176,7 +1177,8 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     motorsSheet.setLabel(row, 14, 'Velocity', 'velocity');
     motorsSheet.setLabel(row, 15, 'Accel', 'acceleration');
     motorsSheet.setLabel(row, 16, 'Delay', 'duration');
-    motorsSheet.setLabel(row, 17, 'Result');
+    motorsSheet.setLabel(row, 17, 'Recover', 'mass');
+    motorsSheet.setLabel(row, 18, 'Result');
     row++;
 
     for (i = 0; i < result.results.length; i++) {
@@ -1201,7 +1203,8 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
         motorsSheet.setUnit  (row, 15, r.simulation.maxAcceleration, 'acceleration');
       }
       motorsSheet.setNumber(row, 16, r.optimalDelay, 1);
-      motorsSheet.setString(row, 17, r.reason || 'good');
+      motorsSheet.setUnit  (row, 17, r.recoveredMass, 'mass');
+      motorsSheet.setString(row, 18, r.reason || 'good');
       row++;
     }
 
@@ -1250,6 +1253,7 @@ router.get('/motors/guide/:id/spreadsheet.csv', function(req, res, next) {
     file.colLabel('Velocity', 'velocity');
     file.colLabel('Accel', 'acceleration');
     file.colLabel('Delay', 'duration');
+    file.colLabel('Recover', 'mass');
     file.colLabel('Result');
     file.row();
 
@@ -1276,6 +1280,7 @@ router.get('/motors/guide/:id/spreadsheet.csv', function(req, res, next) {
       } else
         file.emptyCols(9);
       file.colNumber(r.optimalDelay, 1);
+      file.colUnit(r.recoveredMass, 'mass');
       file.col(r.reason || 'good');
       file.row();
     }

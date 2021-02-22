@@ -168,6 +168,7 @@ describe("flightsim", function() {
         expect(result.burnoutTime).toBeCloseTo(7.0, 1);
         expect(result.apogeeTime).toBeCloseTo(27.4, 1);
         expect(result.guideVelocity).toBeCloseTo(23.3, 1);
+        expect(result.stableDist).toBeCloseTo(1.7, 1);
         expect(result.maxAcceleration).toBeCloseTo(76.9, 1);
         expect(result.maxVelocity).toBeCloseTo(315.0, 1);
         expect(result.burnoutAltitude).toBeCloseTo(1487.4, 1);
@@ -180,6 +181,7 @@ describe("flightsim", function() {
       const conditions = {
         temp: 35,
         baseAlt: 1207,
+        stableVel: 20,
       };
       var result;
       it("simulateRocket", function() {
@@ -203,6 +205,7 @@ describe("flightsim", function() {
         expect(result.burnoutTime).toBeCloseTo(7.0, 1);
         expect(result.apogeeTime).toBeCloseTo(28.8, 1);
         expect(result.guideVelocity).toBeCloseTo(23.3, 1);
+        expect(result.stableDist).toBeCloseTo(2.9, 1);
         expect(result.maxAcceleration).toBeCloseTo(77.2, 1);
         expect(result.maxVelocity).toBeCloseTo(324.2, 1);
         expect(result.burnoutAltitude).toBeCloseTo(1517.1, 1);

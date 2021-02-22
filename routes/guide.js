@@ -21,8 +21,7 @@ const _ = require('underscore'),
       helpers = require('../lib/helpers'),
       locals = require('./locals.js');
 
-const MinGuideVelocity = 14.9,
-      MinThrustWeight = 4.5;
+const MinThrustWeight = 4.5;
 
 function minAltitude(motor) {
   return 10.0 * (Math.log(motor.totalImpulse) / Math.log(2));
@@ -97,6 +96,11 @@ Object.freeze(RESULT_STATS);
  * /motors/guide.html
  * Motor guide setup page, renders with guide/entry.hbs or guide/rocket.hbs templates.
  */
+const TEMP_F = 75;
+const TEMP_C = 20;
+const STABLE_VEL_FTS = 50;
+const STABLE_VEL_MS = 15;
+
 function doEntryPage(req, res, rockets) {
   metadata.getAvailableMotors(req, function(available) {
     let q = { public: true };
@@ -109,6 +113,7 @@ function doEntryPage(req, res, rockets) {
           massUnit = units.getUnitPref('mass').label,
           tempUnit = units.getUnitPref('temperature').label,
           altUnit = units.getUnitPref('altitude').label,
+          velUnit = units.getUnitPref('velocity').label,
           guideDefault = units.defaultGuideLength();
 
       res.render('guide/entry', locals(req, defaults, {
@@ -124,10 +129,13 @@ function doEntryPage(req, res, rockets) {
           guideLengthUnit: guideDefault.unit,
         },
         conditions: {
-          temperature: tempUnit === '℉' ? 75 : 20,
+          temperature: tempUnit === '℉' ? TEMP_F : TEMP_C,
           temperatureUnit: tempUnit,
           altitude: 0,
           altitudeUnit: altUnit,
+          stableVel: velUnit == 'ft/s' ? STABLE_VEL_FTS
+                                       : units.convertUnitFromMKS(STABLE_VEL_MS, 'velocity', velUnit),
+          stableVelUnit: velUnit,
         },
         schema: schema,
         metadata: available,
@@ -135,6 +143,7 @@ function doEntryPage(req, res, rockets) {
         massUnits: units.mass,
         temperatureUnits: units.temperature,
         altitudeUnits: units.altitude,
+        velocityUnits: units.velocity,
         finishes: metadata.CdFinishes,
         submitLink: guidePage,
         rocketsLink: '/mystuff/rockets.html',
@@ -146,12 +155,12 @@ function doEntryPage(req, res, rockets) {
 }
 
 function doRocketPage(req, res, rockets, rocket) {
-  var mmtDiameter, mmtLength, tempUnit, altUnit, ignoreTypes, ignoreManufacturers;
-
-  mmtDiameter = units.convertUnitToMKS(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit);
-  mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
-  tempUnit = units.getUnitPref('temperature').label;
-  altUnit = units.getUnitPref('altitude').label;
+  let mmtDiameter = units.convertUnitToMKS(rocket.mmtDiameter, 'length', rocket.mmtDiameterUnit);
+  let mmtLength = units.convertUnitToMKS(rocket.mmtLength, 'length', rocket.mmtLengthUnit);
+  let tempUnit = units.getUnitPref('temperature').label;
+  let altUnit = units.getUnitPref('altitude').label;
+  let velUnit = units.getUnitPref('velocity').label;
+  let ignoreTypes, ignoreManufacturers;
   if (req.user != null && req.user.preferences != null) {
     ignoreTypes = req.user.preferences.ignoreTypes || [];
     ignoreManufacturers = req.user.preferences.ignoreManufacturers || [];
@@ -172,13 +181,17 @@ function doRocketPage(req, res, rockets, rocket) {
       mmtLength: mmtLength,
       fit: fit,
       conditions: {
-        temperature: tempUnit === '℉' ? 75 : 20,
+        temperature: tempUnit === '℉' ? TEMP_F : TEMP_C,
         temperatureUnit: tempUnit,
         altitude: 0,
         altitudeUnit: altUnit,
+        stableVel: velUnit == 'ft/s' ? STABLE_VEL_FTS
+                                     : units.convertUnitFromMKS(STABLE_VEL_MS, 'velocity', velUnit),
+        stableVelUnit: velUnit,
       },
       temperatureUnits: units.temperature,
       altitudeUnits: units.altitude,
+      velocityUnits: units.velocity,
 
       motorCount: fit.count,
 
@@ -410,11 +423,14 @@ function doRunGuide(req, res, rocket) {
     conditions = {
       temp: units.convertUnitToMKS(req.body.temperature, 'temperature', req.body.temperatureUnit),
       baseAlt: units.convertUnitToMKS(req.body.altitude, 'altitude', req.body.altitudeUnit),
+      stableVel: units.convertUnitToMKS(req.body.stableVel, 'velocity', req.body.stableVelUnit),
     };
     if (conditions.temp == null || isNaN(conditions.temp))
       conditions.temp = flightsim.DefaultConditions.temp;
     if (conditions.baseAlt == null || isNaN(conditions.baseAlt))
       conditions.baseAlt = flightsim.DefaultConditions.baseAlt;
+    if (conditions.stableVel == null || isNaN(conditions.stableVel))
+      conditions.stableVel = flightsim.DefaultConditions.stableVel;
     Object.freeze(conditions);
 
     // collect selected MMT and adapters
@@ -577,9 +593,11 @@ function doRunGuide(req, res, rocket) {
                         // determine if this motor works or not
                         if (result.simulation) {
                           // simulation; check guide velocity and min altitude
-                          if (result.simulation.guideVelocity < MinGuideVelocity)
+                          let minVel = conditions.stableVel || 15;
+                          if (result.simulation.guideVelocity < minVel)
                             result.reason = 'slow off guide';
-                          else if (result.simulation.maxAltitude && result.maxAltitude < minAltitude(motor))
+                          else if (result.simulation.maxAltitude &&
+                                   result.maxAltitude < minAltitude(motor))
                             result.reason = 'apogee too low';
                         } else {
                           // no simulation; check thrust/weight ratio
@@ -928,6 +946,8 @@ function doCompletePage(req, res, rockets) {
         adapters = true;
     }
 
+    if (result.conditions.stableVel == null)
+      result.conditions.stableVel = 15;
     res.render('guide/complete', locals(req, defaults, {
       title: "Motor Guide Complete Results",
       rockets: rockets,
@@ -935,7 +955,7 @@ function doCompletePage(req, res, rockets) {
       allResults: result.results,
       multiMMT: result.mmts.length > 1,
       adapters: adapters,
-      minGuideVelocity: MinGuideVelocity,
+      minGuideVelocity: result.conditions.stableVel || 15,
       minThrustWeight: MinThrustWeight,
       summaryLink: '/motors/guide/' + result._id + '/summary.html',
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
@@ -1116,6 +1136,10 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
       row++;
     }
 
+    rocketSheet.setLabel(row, 0, 'Stable Velocity', 'velocity');
+    rocketSheet.setUnit(row, 1, result.conditions.stableVel || 15, 'velocity');
+    row++;
+
     rocketSheet.setLabel(row, 0, 'Motors Searched');
     rocketSheet.setNumber(row, 1, result.filtered, 0);
     row++;
@@ -1169,16 +1193,17 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     motorsSheet.setLabel(row,  6, 'T:W');
     motorsSheet.setLabel(row,  7, 'Weight', 'mass');
     motorsSheet.setLabel(row,  8, 'Liftoff', 'duration');
-    motorsSheet.setLabel(row,  9, 'Guide', 'velocity');
-    motorsSheet.setLabel(row, 10, 'Burnout', 'altitude');
-    motorsSheet.setLabel(row, 11, 'Burnout', 'duration');
-    motorsSheet.setLabel(row, 12, 'Apogee', 'altitude');
-    motorsSheet.setLabel(row, 13, 'Apogee', 'duration');
-    motorsSheet.setLabel(row, 14, 'Velocity', 'velocity');
-    motorsSheet.setLabel(row, 15, 'Accel', 'acceleration');
-    motorsSheet.setLabel(row, 16, 'Delay', 'duration');
-    motorsSheet.setLabel(row, 17, 'Recover', 'mass');
-    motorsSheet.setLabel(row, 18, 'Result');
+    motorsSheet.setLabel(row,  9, 'Stable', 'length');
+    motorsSheet.setLabel(row, 10, 'Guide', 'velocity');
+    motorsSheet.setLabel(row, 11, 'Burnout', 'altitude');
+    motorsSheet.setLabel(row, 12, 'Burnout', 'duration');
+    motorsSheet.setLabel(row, 13, 'Apogee', 'altitude');
+    motorsSheet.setLabel(row, 14, 'Apogee', 'duration');
+    motorsSheet.setLabel(row, 15, 'Velocity', 'velocity');
+    motorsSheet.setLabel(row, 16, 'Accel', 'acceleration');
+    motorsSheet.setLabel(row, 17, 'Delay', 'duration');
+    motorsSheet.setLabel(row, 18, 'Recover', 'mass');
+    motorsSheet.setLabel(row, 19, 'Result');
     row++;
 
     for (i = 0; i < result.results.length; i++) {
@@ -1194,17 +1219,18 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
       if (r.simulation) {
         motorsSheet.setUnit  (row,  7, r.simulation.inputs.loadedInitialMass, 'mass');
         motorsSheet.setNumber(row,  8, r.simulation.liftoffTime, 2);
-        motorsSheet.setUnit  (row,  9, r.simulation.guideVelocity, 'velocity');
-        motorsSheet.setUnit  (row, 10, r.simulation.burnoutAltitude, 'altitude');
-        motorsSheet.setNumber(row, 11, r.simulation.burnoutTime, 1);
-        motorsSheet.setUnit  (row, 12, r.simulation.maxAltitude, 'altitude');
-        motorsSheet.setNumber(row, 13, r.simulation.apogeeTime, 1);
-        motorsSheet.setUnit  (row, 14, r.simulation.maxVelocity, 'velocity');
-        motorsSheet.setUnit  (row, 15, r.simulation.maxAcceleration, 'acceleration');
+        motorsSheet.setUnit  (row,  9, r.simulation.stableDist, 'length');
+        motorsSheet.setUnit  (row, 10, r.simulation.guideVelocity, 'velocity');
+        motorsSheet.setUnit  (row, 11, r.simulation.burnoutAltitude, 'altitude');
+        motorsSheet.setNumber(row, 12, r.simulation.burnoutTime, 1);
+        motorsSheet.setUnit  (row, 13, r.simulation.maxAltitude, 'altitude');
+        motorsSheet.setNumber(row, 14, r.simulation.apogeeTime, 1);
+        motorsSheet.setUnit  (row, 15, r.simulation.maxVelocity, 'velocity');
+        motorsSheet.setUnit  (row, 16, r.simulation.maxAcceleration, 'acceleration');
       }
-      motorsSheet.setNumber(row, 16, r.optimalDelay, 1);
-      motorsSheet.setUnit  (row, 17, r.recoveredMass, 'mass');
-      motorsSheet.setString(row, 18, r.reason || 'good');
+      motorsSheet.setNumber(row, 17, r.optimalDelay, 1);
+      motorsSheet.setUnit  (row, 18, r.recoveredMass, 'mass');
+      motorsSheet.setString(row, 19, r.reason || 'good');
       row++;
     }
 
@@ -1245,6 +1271,7 @@ router.get('/motors/guide/:id/spreadsheet.csv', function(req, res, next) {
     file.colLabel('T:W');
     file.colLabel('Weight', 'mass');
     file.colLabel('Liftoff', 'duration');
+    file.colLabel('Stable', 'length');
     file.colLabel('Guide', 'velocity');
     file.colLabel('Burnout', 'altitude');
     file.colLabel('Burnout', 'duration');
@@ -1270,6 +1297,7 @@ router.get('/motors/guide/:id/spreadsheet.csv', function(req, res, next) {
       if (r.simulation) {
         file.colUnit(r.simulation.inputs.loadedInitialMass, 'mass');
         file.colNumber(r.simulation.liftoffTime, 2);
+        file.colUnit  (r.simulation.stableDist, 'length');
         file.colUnit  (r.simulation.guideVelocity, 'velocity');
         file.colUnit  (r.simulation.burnoutAltitude, 'altitude');
         file.colNumber(r.simulation.burnoutTime, 1);

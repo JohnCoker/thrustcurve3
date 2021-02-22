@@ -533,6 +533,7 @@ function makeGuideResultModel(mongoose) {
     conditions: {
       temp: { type: Number },
       baseAlt: { type: Number },
+      stableVel: { type: Number },
     },
     warnings: [ { type: String, required: true } ],
     filters: { type: Number, required: true },

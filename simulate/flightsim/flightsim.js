@@ -19,6 +19,8 @@ const DefaultConditions = {
   temp: 20,
   // launch altitude aboce MSL (m)
   baseAlt: 0,
+  // stable guide velocity (m/s)
+  stableVel: 15,
 };
 Object.freeze(DefaultConditions);
 
@@ -44,7 +46,8 @@ function simulateRocket(rocket, motor, data, conditions, error) {
 
 function simulate(inputs, data, conditions, error) {
   var stats, curve,
-      tLiftoff, tBurnout, tApogee, velGuide, accMax, velMax, altBurnout, altMax, impulse,
+      tLiftoff, tBurnout, tApogee, velGuide, stableDist,
+      accMax, velMax, altBurnout, altMax, impulse,
       t, dt, mass, dm, acc, vel, alt, liftoff, fDrag, fThrust;
 
   if (arguments.length == 3 && typeof conditions == 'function') {
@@ -145,6 +148,8 @@ function simulate(inputs, data, conditions, error) {
     if (vel > 0) {
       if (alt >= inputs.guideLength && velGuide <= 0)
         velGuide = vel;
+      if (stableDist == null && conditions.stableVel > 0 && vel >= conditions.stableVel)
+        stableDist = alt;
     }
 
     // keep track of maximum values
@@ -189,6 +194,7 @@ function simulate(inputs, data, conditions, error) {
     burnoutTime: tBurnout,
     apogeeTime: tApogee,
     guideVelocity: velGuide,
+    stableDist,
     maxAcceleration: accMax,
     maxVelocity: velMax,
     burnoutAltitude: altBurnout,

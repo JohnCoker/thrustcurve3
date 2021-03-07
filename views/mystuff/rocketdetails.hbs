@@ -128,78 +128,9 @@ by
 fit the rocket's motor mount tube{{#if rocket.adapters}} or adapters{{/if}}.
 If this doesn't seem right, check that the MMT diameter and length above are correct.
 {{#unless rocket.adapters}}
-You can <a href="/motors/search.html?diameter={{mmtDiameter}}&length={{mmtLength}}">search for these motors</a>
-or <a href="/motors/browser.html?diameter={{mmtDiameter}}&length={{mmtLength}}">browse them</a>.
+You can <a href="/motors/search.html?diameter={{mmtDiameter}}&length={{mmtLength}}">search for motors</a>,
+<a href="/motors/browser.html?diameter={{mmtDiameter}}&length={{mmtLength}}">browse for them</a> or
+<a href="/motors/guide.html?rocket={{rocket.id}}">run the motor guide</a>.
 {{/unless}}
 </p>
-<p>
-Find motors that will work using the motor guide:
-</p>
-<form name="guide" action="{{guideLink}}" method="post">
-  <input type="hidden" name="rocket" value="{{rocket._id}}">
-  <div class="row">
-    {{#unless singleClass}}
-    <div class="col-md-3">
-      <label for="classes" class="column-title">Classes</label>
-      <ul class="checkboxes">
-        {{#each classes}}
-        <li><input type="checkbox" name="classes" value="{{this}}" checked> {{this}}</li>
-        {{/each}}
-      </ul>
-    </div> <!-- classes -->
-    {{/unless}}
-
-    {{#unless singleType}}
-    <div class="col-md-3">
-      <label for="types" class="column-title">Types</label>
-      <ul class="checkboxes">
-        {{#each types}}
-        <li><input type="checkbox" name="types" value="{{value}}" {{#if checked}}checked{{/if}}> {{formatType value}}</li>
-        {{/each}}
-      </ul>
-    </div> <!-- types -->
-    {{/unless}}
-
-    {{#if rocket.adapters}}
-    <div class="col-md-3">
-      <label for="adapters" class="column-title">Adapters</label>
-      <ul class="checkboxes">
-        <li><input type="checkbox" name="adapters" value="-" checked> None</li>
-        {{#each rocket.adapters}}
-        <li><input type="checkbox" name="adapters" value="{{@index}}" checked> {{formatLength mmtDiameter mmtDiameterUnit}}</li>
-        {{/each}}
-      </ul>
-    </div> <!-- adapters -->
-    {{/if}}
-
-    {{#unless singleManufacturer}}
-    <div class="col-md-3">
-      <label for="manufacturers" class="column-title">Manufacturers</label>
-      <ul class="checkboxes">
-        {{#each manufacturers}}
-        <li><input type="checkbox" name="manufacturers" value="{{_id}}" {{#if checked}}checked{{/if}}> {{abbrev}}</li>
-        {{/each}}
-      </ul>
-    </div> <!-- manufacturers -->
-    {{/unless}}
-  </div> <!-- row -->
-
-  <div class="form-group">
-    <div class="form-check">
-      <input type="checkbox" class="form-check-input" name="allMotors">
-      Include out-of-production motors
-    </div>
-    <div class="form-check">
-      <input type="checkbox" class="form-check-input" name="favoriteMotors">
-      Limit to favorite motors
-    </div>
-  </div> <!-- row -->
-
-  <div class="form-group">
-    <div class="form-submit">
-      <button type="submit" class="btn btn-primary">Submit</button>
-      <button type="reset" class="btn btn-default">Reset</button>
-    </div>
-  </div>
-</form>
 {{/if}}

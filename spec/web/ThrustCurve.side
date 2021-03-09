@@ -1521,11 +1521,25 @@
       "id": "6da2378d-04d1-4497-a6e6-faca1f99e275",
       "comment": "",
       "command": "click",
-      "target": "css=button[type=submit]",
+      "target": "linkText=Match Rocket",
       "targets": [
         ["css=.form-group:nth-child(1)", "css:finder"],
         ["xpath=//form/div", "xpath:position"]
       ],
+      "value": ""
+    }, {
+      "id": "70b45508-f3c1-4c02-bd1a-775eefb3b7ff",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Alpha III • ThrustCurve",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "3d0b36f7-8081-4349-8602-206a2e90a1d8",
+      "comment": "",
+      "command": "click",
+      "target": "css=button[type=submit]",
+      "targets": [],
       "value": ""
     }, {
       "id": "21bc6f0f-450d-4ce5-a594-93d62bd87820",

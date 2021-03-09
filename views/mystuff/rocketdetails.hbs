@@ -127,10 +127,13 @@ by
 {{#unless singleManufacturer}}{{manufacturerCount}} manufacturers{{/unless}}
 fit the rocket's motor mount tube{{#if rocket.adapters}} or adapters{{/if}}.
 If this doesn't seem right, check that the MMT diameter and length above are correct.
-{{#unless rocket.adapters}}
-You can <a href="/motors/search.html?diameter={{mmtDiameter}}&length={{mmtLength}}">search for motors</a>,
-<a href="/motors/browser.html?diameter={{mmtDiameter}}&length={{mmtLength}}">browse for them</a> or
-<a href="/motors/guide.html?rocket={{rocket.id}}">run the motor guide</a>.
-{{/unless}}
 </p>
 {{/if}}
+
+<p>
+<a class="btn btn-primary" href="/motors/search.html?diameter={{mmtDiameter}}&length={{mmtLength}}">Search Size</a>
+&nbsp;
+<a class="btn btn-primary" href="/motors/guide.html?rocket={{rocket.id}}">Match Rocket</a>
+&nbsp;
+<a class="btn btn-primary" href="/motors/browser.html?diameter={{mmtDiameter}}&length={{mmtLength}}">Browse Diameter</a>
+</p>

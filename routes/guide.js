@@ -96,10 +96,20 @@ Object.freeze(RESULT_STATS);
  * /motors/guide.html
  * Motor guide setup page, renders with guide/entry.hbs or guide/rocket.hbs templates.
  */
-const TEMP_F = 75;
 const TEMP_C = 20;
-const STABLE_VEL_FTS = 50;
 const STABLE_VEL_MS = 15;
+
+function dfltTemperature(tempUnit) {
+  return tempUnit === '℉' ? 75 : TEMP_C;
+}
+
+function dfltStableVel(velUnit) {
+  if (velUnit == 'ft/s')
+    return 50;
+  if (velUnit == 'mph')
+    return 34;
+  return units.convertUnitFromMKS(STABLE_VEL_MS, 'velocity', velUnit);
+}
 
 function doEntryPage(req, res, rockets) {
   metadata.getAvailableMotors(req, function(available) {
@@ -129,12 +139,11 @@ function doEntryPage(req, res, rockets) {
           guideLengthUnit: guideDefault.unit,
         },
         conditions: {
-          temperature: tempUnit === '℉' ? TEMP_F : TEMP_C,
+          temperature: dfltTemperature(tempUnit),
           temperatureUnit: tempUnit,
           altitude: 0,
           altitudeUnit: altUnit,
-          stableVel: velUnit == 'ft/s' ? STABLE_VEL_FTS
-                                       : units.convertUnitFromMKS(STABLE_VEL_MS, 'velocity', velUnit),
+          stableVel: dfltStableVel(velUnit),
           stableVelUnit: velUnit,
         },
         schema: schema,
@@ -181,12 +190,11 @@ function doRocketPage(req, res, rockets, rocket) {
       mmtLength: mmtLength,
       fit: fit,
       conditions: {
-        temperature: tempUnit === '℉' ? TEMP_F : TEMP_C,
+        temperature: dfltTemperature(tempUnit),
         temperatureUnit: tempUnit,
         altitude: 0,
         altitudeUnit: altUnit,
-        stableVel: velUnit == 'ft/s' ? STABLE_VEL_FTS
-                                     : units.convertUnitFromMKS(STABLE_VEL_MS, 'velocity', velUnit),
+        stableVel: dfltStableVel(velUnit),
         stableVelUnit: velUnit,
       },
       temperatureUnits: units.temperature,
@@ -593,7 +601,7 @@ function doRunGuide(req, res, rocket) {
                         // determine if this motor works or not
                         if (result.simulation) {
                           // simulation; check guide velocity and min altitude
-                          let minVel = conditions.stableVel || 15;
+                          let minVel = conditions.stableVel || STABLE_VEL_MS;
                           if (result.simulation.guideVelocity < minVel)
                             result.reason = 'slow off guide';
                           else if (result.simulation.maxAltitude &&
@@ -955,7 +963,7 @@ function doCompletePage(req, res, rockets) {
       allResults: result.results,
       multiMMT: result.mmts.length > 1,
       adapters: adapters,
-      minGuideVelocity: result.conditions.stableVel || 15,
+      minGuideVelocity: result.conditions.stableVel || STABLE_VEL_MS,
       minThrustWeight: MinThrustWeight,
       summaryLink: '/motors/guide/' + result._id + '/summary.html',
       spreadsheetLink: '/motors/guide/' + result._id + '/spreadsheet.xlsx',
@@ -1137,7 +1145,7 @@ router.get('/motors/guide/:id/spreadsheet.xlsx', function(req, res, next) {
     }
 
     rocketSheet.setLabel(row, 0, 'Stable Velocity', 'velocity');
-    rocketSheet.setUnit(row, 1, result.conditions.stableVel || 15, 'velocity');
+    rocketSheet.setUnit(row, 1, result.conditions.stableVel || STABLE_VEL_MS, 'velocity');
     row++;
 
     rocketSheet.setLabel(row, 0, 'Motors Searched');

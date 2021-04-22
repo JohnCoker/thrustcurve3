@@ -6,6 +6,8 @@ This page lists the things supported in the old site which haven't yet been reim
 ## General
 
  * flag motors favorited by other users
+ * add "inserted length" field on motors
+ * support uploading cert. documents
 
 ## Search
 
@@ -14,10 +16,17 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Motor Guide
 
  * use visual styles in spreadsheets
+ * auto-save rocket changes
+ * make complete results link more visible
+ * make MMT size a combo box
 
 ## Account
 
  * search other contributors
+
+## Contributing
+
+ * introduce captcha for posting notes or add user verification
 
 ## Administration
 

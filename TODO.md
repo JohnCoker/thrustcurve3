@@ -17,8 +17,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * use visual styles in spreadsheets
  * auto-save rocket changes
- * make complete results link more visible
- * make MMT size a combo box
 
 ## Account
 

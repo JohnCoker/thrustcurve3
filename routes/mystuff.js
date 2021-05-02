@@ -593,52 +593,58 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
  */
 router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, next) {
   var id = req.params.id;
+  metadata.getAllMotors(req, function(metadata) {
+    if (req.db.isId(id)) {
+      req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+        if (rocket == null) {
+          res.redirect(303, rocketsLink);
+          return;
+        }
+        res.render('mystuff/editrocket', locals(req, defaults, {
+          title: 'Edit Rocket',
+          isNew: false,
+          rocket: rocket,
+          lengthUnits: units.length,
+          massUnits: units.mass,
+          finishes: metadata.CdFinishes,
+          mmtDiametersMM: metadata.diametersMM(),
+          mmtDiameterIsMM: rocket.mmtDiameterUnit === 'mm',
+          submitLink: '/mystuff/rocket/' + id + '/edit.html',
+          adapterLink: '/mystuff/rocket/' + id + '/adapter.html',
+          cancelLink: '/mystuff/rocket/' + id + '/',
+        }));
+      }));
+    } else {
+      // add new rocket
+      var lengthUnit = units.getUnitPref('length').label,
+          massUnit = units.getUnitPref('mass').label,
+          guideDefault = units.defaultGuideLength();
 
-  if (req.db.isId(id)) {
-    req.db.Rocket.findOne({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
-      if (rocket == null) {
-        res.redirect(303, rocketsLink);
-        return;
-      }
       res.render('mystuff/editrocket', locals(req, defaults, {
-        title: 'Edit Rocket',
-        isNew: false,
-        rocket: rocket,
+        title: 'Add Rocket',
+        isNew: true,
+        rocket: {
+          'public': true,
+          bodyDiameterUnit: lengthUnit,
+          weightUnit: massUnit,
+          mmtDiameter: 18,
+          mmtDiameterUnit: 'mm',
+          mmtLengthUnit: lengthUnit,
+          mmtCount: 1,
+          cd: 0.6,
+          guideLength: guideDefault.value,
+          guideLengthUnit: guideDefault.unit,
+        },
         lengthUnits: units.length,
         massUnits: units.mass,
         finishes: metadata.CdFinishes,
-        submitLink: '/mystuff/rocket/' + id + '/edit.html',
-        adapterLink: '/mystuff/rocket/' + id + '/adapter.html',
-        cancelLink: '/mystuff/rocket/' + id + '/',
+        mmtDiametersMM: metadata.diametersMM(),
+        mmtDiameterIsMM: true,
+        submitLink: '/mystuff/rocket/new/edit.html',
+        cancelLink: '/mystuff/rockets.html',
       }));
-    }));
-  } else {
-    // add new rocket
-    var lengthUnit = units.getUnitPref('length').label,
-        massUnit = units.getUnitPref('mass').label,
-        guideDefault = units.defaultGuideLength();
-
-    res.render('mystuff/editrocket', locals(req, defaults, {
-      title: 'Add Rocket',
-      isNew: true,
-      rocket: {
-        'public': true,
-        bodyDiameterUnit: lengthUnit,
-        weightUnit: massUnit,
-        mmtDiameterUnit: 'mm',
-        mmtLengthUnit: lengthUnit,
-        mmtCount: 1,
-        cd: 0.6,
-        guideLength: guideDefault.value,
-        guideLengthUnit: guideDefault.unit,
-      },
-      lengthUnits: units.length,
-      massUnits: units.mass,
-      finishes: metadata.CdFinishes,
-      submitLink: '/mystuff/rocket/new/edit.html',
-      cancelLink: '/mystuff/rockets.html',
-    }));
-  }
+    }
+  });
 });
 router.get('/updaterocket.jsp', function(req, res, next) {
   var id = req.query.id;
@@ -752,16 +758,20 @@ function doSubmitRocket(req, res, rocket) {
     url = '/mystuff/rocket/' + rocket._id + '/edit.html';
 
   if (errors.length > 0) {
-    res.render('mystuff/editrocket', locals(req, defaults, {
-      title: isNew ? 'Add Rocket' : 'Edit Rocket',
-      isNew: isNew,
-      rocket: rocket,
-      lengthUnits: units.length,
-      massUnits: units.mass,
-      finishes: metadata.CdFinishes,
-      errors: errors,
-      submitLink: url
-    }));
+    metadata.getAllMotors(req, function(metadata) {
+      res.render('mystuff/editrocket', locals(req, defaults, {
+        title: isNew ? 'Add Rocket' : 'Edit Rocket',
+        isNew: isNew,
+        rocket: rocket,
+        lengthUnits: units.length,
+        massUnits: units.mass,
+        finishes: metadata.CdFinishes,
+        mmtDiametersMM: metadata.diametersMM(),
+        mmtDiameterIsMM: rocket.mmtDiameterUnit === 'mm',
+        errors: errors,
+        submitLink: url
+      }));
+    });
   } else if (isNew) {
     req.db.Rocket.create(new req.db.Rocket(rocket), req.success(function(updated) {
       url = '/mystuff/rocket/' + updated._id + '/';
@@ -807,16 +817,20 @@ router.get('/mystuff/rocket/:id/copy.html', authenticated, function(req, res, ne
         res.redirect(303, rocketsLink);
         return;
       }
-      res.render('mystuff/editrocket', locals(req, defaults, {
-        title: 'Copy Rocket',
-        isNew: true,
-        rocket: rocket.toObject(),
-        lengthUnits: units.length,
-        massUnits: units.mass,
-        finishes: metadata.CdFinishes,
-        submitLink: '/mystuff/rocket/new/edit.html',
-        cancelLink: '/mystuff/rocket/' + id + '/',
-      }));
+      metadata.getAllMotors(req, function(metadata) {
+        res.render('mystuff/editrocket', locals(req, defaults, {
+          title: 'Copy Rocket',
+          isNew: true,
+          rocket: rocket.toObject(),
+          lengthUnits: units.length,
+          massUnits: units.mass,
+          finishes: metadata.CdFinishes,
+          mmtDiametersMM: metadata.diametersMM(),
+          mmtDiameterIsMM: rocket.mmtDiameterUnit === 'mm',
+          submitLink: '/mystuff/rocket/new/edit.html',
+          cancelLink: '/mystuff/rocket/' + id + '/',
+        }));
+      });
     }));
   } else {
     res.redirect(303, rocketsLink);

@@ -92,17 +92,16 @@ Otherwise, you can try the guide out by entering the info here.
   <div class="form-group">
     <label for="mmtDiameter" class="col-sm-3 control-label" title="diameter of motor mount tube">MMT Diameter</label>
     <div class="col-sm-6">
-      <input type="number" class="form-control" name="mmtDiameter"
-             step="0.001" min="0.001" required
-             value="{{rocket.mmtDiameter}}">
+      <select class="form-control" name="mmtDiameter" required>
+        {{#each mmtDiametersMM}}
+	<option value="{{this}}" {{#equal this ../rocket.mmtDiameter}}selected{{/equal}}>{{this}}</option>
+	{{/each}}
+      </select>
       <span class="help-block with-errors"></span>
     </div>
     <div class="col-sm-3">
-      <select class="form-control" name="mmtDiameterUnit" required>
-        {{#each lengthUnits}}
-	<option value="{{label}}" {{#equal label ../rocket.mmtDiameterUnit}}selected{{/equal}}>{{description}}</option>
-	{{/each}}
-      </select>
+      <p class="form-control-static">millimeters</p>
+      <input type="hidden" name="mmtDiameterUnit" value="mm">
     </div>
   </div>
   <div class="form-group">
@@ -339,17 +338,16 @@ setupTable('#public-rockets', {
   <div class="form-group">
     <label for="mmtDiameter" class="col-sm-3 control-label" title="diameter of motor mount tube">MMT Diameter</label>
     <div class="col-sm-6">
-      <input type="number" class="form-control" name="mmtDiameter"
-             step="0.001" min="0.001"
-             value="{{rocket.mmtDiameter}}">
+      <select class="form-control" name="mmtDiameter">
+        {{#each mmtDiametersMM}}
+	<option {{#equal this ../rocket.mmtDiameter}}selected{{/equal}}>{{this}}</option>
+	{{/each}}
+      </select>
       <span class="help-block with-errors"></span>
     </div>
     <div class="col-sm-3">
-      <select class="form-control" name="mmtDiameterUnit">
-        {{#each lengthUnits}}
-	<option value="{{label}}" {{#equal label ../rocket.mmtDiameterUnit}}selected{{/equal}}>{{description}}</option>
-	{{/each}}
-      </select>
+      <p class="form-control-static">millimeters</p>
+      <input type="hidden" name="mmtDiameterUnit" value="mm">
     </div>
   </div>
   <div class="form-group">

@@ -1039,14 +1039,9 @@
     }, {
       "id": "17bd4809-8ac2-4161-97ca-4ac3a4a950fb",
       "comment": "",
-      "command": "type",
+      "command": "select",
       "target": "name=mmtDiameter",
-      "targets": [
-        ["name=mmtDiameter", "name"],
-        ["css=.form-group:nth-child(4) > .col-sm-6 > .form-control", "css:finder"],
-        ["xpath=//input[@name='mmtDiameter']", "xpath:attributes"],
-        ["xpath=//div[3]/div/input", "xpath:position"]
-      ],
+      "targets": [],
       "value": "24"
     }, {
       "id": "fa74b94a-055f-4baa-ae88-fcf016d2e091",
@@ -1060,25 +1055,6 @@
         ["xpath=//div[4]/div/input", "xpath:position"]
       ],
       "value": "80"
-    }, {
-      "id": "6be28764-cb4d-4e49-816c-5b27df177460",
-      "comment": "",
-      "command": "click",
-      "target": "name=mmtLengthUnit",
-      "targets": [
-        ["name=mmtLengthUnit", "name"],
-        ["css=.form-group:nth-child(5) > .col-sm-3 > .form-control", "css:finder"],
-        ["xpath=//select[@name='mmtLengthUnit']", "xpath:attributes"],
-        ["xpath=//div[4]/div[2]/select", "xpath:position"]
-      ],
-      "value": ""
-    }, {
-      "id": "8570203c-f4d0-45e2-b0f0-94a1d1370710",
-      "comment": "",
-      "command": "select",
-      "target": "name=mmtLengthUnit",
-      "targets": [],
-      "value": "label=millimeters"
     }, {
       "id": "a99095d1-0d3b-4f21-b9a5-4684e56e8fec",
       "comment": "",

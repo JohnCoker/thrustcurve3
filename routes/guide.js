@@ -132,6 +132,7 @@ function doEntryPage(req, res, rockets) {
         rocket: {
           bodyDiameterUnit: lengthUnit,
           weightUnit: massUnit,
+          mmtDiameter: 18,
           mmtDiameterUnit: 'mm',
           mmtLengthUnit: lengthUnit,
           cd: 0.6,
@@ -153,6 +154,7 @@ function doEntryPage(req, res, rockets) {
         temperatureUnits: units.temperature,
         altitudeUnits: units.altitude,
         velocityUnits: units.velocity,
+        mmtDiametersMM: available.diametersMM(),
         finishes: metadata.CdFinishes,
         submitLink: guidePage,
         rocketsLink: '/mystuff/rockets.html',

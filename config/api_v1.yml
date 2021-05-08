@@ -320,6 +320,10 @@ definitions:
     type: object
     description: motor search query criteria
     properties:
+      id:
+        description: motor unique identifer
+        type: string
+        example: 56a40928000231000000001f
       manufacturer:
         description: manufacturer name or abbreviation
         type: string

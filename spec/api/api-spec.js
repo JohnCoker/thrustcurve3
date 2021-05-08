@@ -385,6 +385,41 @@ describe("API v1", function() {
           done();
         });
       });
+      it("manufacturer XML", function(done) {
+        get('/api/v1/search.xml?manufacturer=Estes').then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatch(/Estes/);
+          expect(response).not.toMatch(/AeroTech/);
+          expect(response).toMatchN(/<result>/, 20);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("invalid JSON", function(done) {
+        get('/api/v1/search.json?imaginary=4').then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"error": *"Invalid search criterion \\"imaginary\\"./);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("invalid XML", function(done) {
+        get('/api/v1/search.xml?imaginary=4').then(response => {
+          expect(response).toBeValidXML(API_SCHEMA);
+          expect(response).toMatch(/<error>Invalid search criterion "imaginary".<\/error>/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
     });
     describe("POST", function() {
       it("manufacturer legacy", function(done) {
@@ -712,7 +747,7 @@ describe("API v1", function() {
           expect(response).toMatch(/<name>Secret Project<\/name>/);
           expect(response).toMatch(/<name>Versatile<\/name>/);
           expect(response).not.toMatch(/<adapter>/);
-          expect(response).toBeExpected();
+          expect(response).toBeExpected(/<id>100000\d<\/id>/g, '<id>100000x<\/id>');
           done();
         }).catch(e => {
           fail(e);
@@ -766,7 +801,7 @@ describe("API v1", function() {
           expect(response).toMatch(/<name>Versatile<\/name>/);
           expect(response).not.toMatch(/<name>Secret Project<\/name>/);
           expect(response).not.toMatch(/<adapter>/);
-          expect(response).toBeExpected();
+          expect(response).toBeExpected(/<id>100000\d<\/id>/g, '<id>100000x<\/id>');
           done();
         }).catch(e => {
           fail(e);

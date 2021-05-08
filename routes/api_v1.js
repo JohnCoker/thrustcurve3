@@ -263,7 +263,7 @@ function doSearch(req, res, format) {
   let resultMatches = 0;
 
   metadata.get(req, function(cache) {
-    let query = api1.searchQuery(request, cache, errs);
+    let query = api1.searchQuery(request, cache, errs, true);
     let criteria = api1.searchCriteria(request);
 
     let criteriaInfo = [];

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search-response xmlns="http://www.thrustcurve.org/2020/SearchResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2020/SearchResponse http://www.thrustcurve.org/2020/search-response.xsd">
+    <criteria>
+        <matches>0</matches>
+    </criteria>
+    <results/>
+    <error>Invalid search criterion "imaginary".</error>
+</search-response>

@@ -203,6 +203,9 @@ describe("data", function() {
       it("oneMoreThing", function() {
 	expect(JSONFormat.kebabCase('oneMoreThing')).toBe('one-more-thing');
       });
+      it("getThingUUID", function() {
+        expect(JSONFormat.kebabCase('getThingUUID')).toBe('get-thing-uuid');
+      });
     });
 
     describe("value", function() {

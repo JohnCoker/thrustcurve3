@@ -333,7 +333,7 @@ class JSONFormat extends Format {
   }
 
   static kebabCase(name) {
-    return name.replace(/([a-z0-9]+)([A-Z])/g, function(m, p1, p2) {
+    return name.replace(/([a-z0-9]+)([A-Z]+)/g, function(m, p1, p2) {
       return p1 + '-' + p2.toLowerCase();
     });
   }

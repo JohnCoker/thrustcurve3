@@ -193,6 +193,21 @@ describe("data", function() {
       });
     });
 
+    describe("kebabCase", function() {
+      it("thing", function() {
+	expect(JSONFormat.kebabCase('thing')).toBe('thing');
+      });
+      it("theThing", function() {
+	expect(JSONFormat.kebabCase('theThing')).toBe('the-thing');
+      });
+      it("oneMoreThing", function() {
+	expect(JSONFormat.kebabCase('oneMoreThing')).toBe('one-more-thing');
+      });
+      it("getThingUUID", function() {
+        expect(JSONFormat.kebabCase('getThingUUID')).toBe('get-thing-uuid');
+      });
+    });
+
     describe("value", function() {
       it("undefined", function() {
 	expect(JSONFormat.value()).toBe(null);

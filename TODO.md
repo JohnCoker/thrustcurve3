@@ -29,6 +29,7 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Administration
 
  * user administration
+ * cert. letter upload (https://www.dropbox.com/l/scl/AAA-ToxcBpRKVVLY0x_EuIMcTeI9aCqz5Rc)
 
 ## Mobile App
 

@@ -263,7 +263,8 @@ function doSearch(req, res, format) {
   let resultMatches = 0;
 
   metadata.get(req, function(cache) {
-    let query = api1.searchQuery(request, cache, errs, true);
+    let strict = req.isLegacy ? false : ['max-results', 'data-fields'];
+    let query = api1.searchQuery(request, cache, errs, strict);
     let criteria = api1.searchCriteria(request);
 
     let criteriaInfo = [];

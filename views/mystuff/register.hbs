@@ -12,7 +12,7 @@ Otherwise you can create one here.
 Basic features work without an account, but more is available if you are logged in.
 </p>
 
-<form role="form" class="form-horizontal" name="register" action="{{submitLink}}" method="post" data-toggle="validator">
+<form id="register-form" role="form" class="form-horizontal" name="register" action="{{submitLink}}" method="post" data-toggle="validator">
   <div class="form-group">
     <label for="name" class="col-sm-3 control-label">Full Name</label>
     <div class="col-sm-9">
@@ -44,6 +44,12 @@ Basic features work without an account, but more is available if you are logged 
   </div>
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <div class="g-recaptcha"
+        data-sitekey="6LcdXBQbAAAAAMHUJ_gBDjsS2Hn5f6MJFZbNflJo"
+        data-callback="onSubmit">
+      </div>
+    </div>
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
       {{#if redirect}}
       <input type="hidden" name="redirect" value="{{redirect}}" />
       {{/if}}
@@ -57,3 +63,10 @@ Basic features work without an account, but more is available if you are logged 
 If you previously registered but have forgotten your password,
 <a href="/mystuff/forgotpasswd.html">click here to reset it</a>.
 </p>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+function onSubmit(token) {
+  document.getElementById("register-form").submit();
+}
+</script>

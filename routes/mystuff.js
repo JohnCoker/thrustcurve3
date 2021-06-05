@@ -9,6 +9,7 @@ const express = require('express'),
       passport = require('passport'),
       crypto = require('crypto'),
       sendgrid = require('@sendgrid/mail'),
+      https = require('https'),
       config = require('../config/server.js'),
       schema = require('../database/schema'),
       units = require('../lib/units'),
@@ -96,7 +97,7 @@ router.get(['/register.jsp'], function(req, res, next) {
 
 router.post(registerLink, function(req, res, next) {
   // collect parameters
-  var info = {}, errors = [],
+  let info = {}, errors = [], captcha,
       v;
 
   v = req.body.name.trim();
@@ -130,7 +131,7 @@ router.post(registerLink, function(req, res, next) {
   else
     info.showEmail = false;
 
-  if (errors.length > 0) {
+  function sendErrors() {
     res.render('mystuff/register', locals(req, defaults, {
       title: 'Register',
       layout: 'info',
@@ -138,35 +139,71 @@ router.post(registerLink, function(req, res, next) {
       errors: errors,
       submitLink: registerLink,
     }));
+  }
+  if (errors.length > 0) {
+    sendErrors();
     return;
   }
 
-  // make sure the email isn't already in use
-  req.db.Contributor.findOne({ email: info.email }, req.success(function(existing) {
-    if (existing) {
-      res.render('mystuff/forgotpasswd', {
-        title: 'Forgot Password',
-        layout: 'info',
-        email: info.email,
-        errors: ['Email address already registered.'],
-        submitLink: forgotLink,
-      });
-      return;
+  // check captcha
+  let data = ('secret=' + process.env.RECAPTCHA_SECRET +
+              '&response=' + encodeURIComponent(req.body['g-recaptcha-response']));
+  console.log('\n\n');
+  console.log(data);
+  let post = https.request({
+    hostname: 'www.google.com',
+    port: 443,
+    path: '/recaptcha/api/siteverify',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': data.length,
+      'Accept': 'application/json',
     }
+  }, rsp => {
+    rsp.on('data', d => {
+      let r;
+      try {
+        r = JSON.parse(d.toString());
+      } catch (e) {
+      }
+      console.log('response', r);
+      if (r == null || r.success !== true) {
+        errors.push('Please solve the captcha.');
+        sendErrors();
+      } else {
+        // make sure the email isn't already in use
+        req.db.Contributor.findOne({ email: info.email }, req.success(function(existing) {
+          if (existing) {
+            res.render('mystuff/forgotpasswd', {
+              title: 'Forgot Password',
+              layout: 'info',
+              email: info.email,
+              errors: ['Email address already registered.'],
+              submitLink: forgotLink,
+            });
+            return;
+          }
 
-    // create the user and log them in
-    info.lastLogin = new Date();
-    var model = new req.db.Contributor(info);
-    model.save(req.success(function(updated) {
-      req.login(updated, function(err) {
-        if (err)
-          return next(err);
+          // create the user and log them in
+          info.lastLogin = new Date();
+          var model = new req.db.Contributor(info);
+          model.save(req.success(function(updated) {
+            req.login(updated, function(err) {
+              if (err)
+                return next(err);
 
-        var redirect = req.body.redirect || req.query.redirect || profileLink;
-        res.redirect(redirect);
-      });
-    }));
-  }));
+              var redirect = req.body.redirect || req.query.redirect || profileLink;
+              res.redirect(redirect);
+            });
+          }));
+        }));
+      }
+    });
+  });
+  post.on('error', next);
+  post.write(data);
+  post.end();
 });
 
 

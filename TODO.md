@@ -22,10 +22,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * search other contributors
 
-## Contributing
-
- * introduce captcha for posting notes or add user verification
-
 ## Administration
 
  * user administration

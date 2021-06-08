@@ -317,7 +317,10 @@ thrustCurve($('#thrustcurve'));
   <tbody>
   {{#each simfiles}}
     <tr data-id="{{_id}}">
-      <td><a href="{{simfileLink this}}">{{format}}</a></td>
+      <td>
+        <a href="{{simfileLink this}}" title="file details">{{format}}</a>
+        <a href="{{simfileDownloadLink this}}" title="download file"><span class="label label-as-badge label-primary"><i class="fa fa-download"></i></label></a>
+      </td>
       <td>{{dataSource}}</td>
       <td>{{formatDate updatedAt}}</td>
       <td><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>

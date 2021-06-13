@@ -208,7 +208,7 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Data Sheet</label>
         <div class="col-sm-6">
-          <p class="form-control-static"><a href="{{motor.dataSheet}}" target="_blank">{{websiteAnchor motor.dataSheet}}</a></p>
+          <p class="form-control-static"><a href="{{motor.dataSheet}}" target="_blank">{{downloadAnchor motor.dataSheet}}</a></p>
         </div>
       </div>
       {{/if}}
@@ -287,8 +287,12 @@
 
 <p>
 <a href="mailto:john@jcsw.com?subject=ThrustCurve.org: {{manufacturer.abbrev}} {{motorDesignation motor}}&body=(please indicate which info is incorrect)">Report incorrect info.</a>
+{{#if hasCerts}}
+<a href="{{certLink}}">View certification docs ({{certCount}}).</a>
+{{/if}}
 {{#hasPerm 'motors'}}
 <a href="{{editLink}}">Edit this motor.</a>
+<a href="{{addCertLink}}">Upload cert doc.</a>
 {{/hasPerm}}
 </p>
 

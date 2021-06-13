@@ -6,6 +6,7 @@
 
 const express = require('express'),
       router = express.Router(),
+      async = require('async'),
       metadata = require('../lib/metadata'),
       units = require("../lib/units"),
       locals = require('./locals.js'),
@@ -424,5 +425,139 @@ router.get('/admin/cases/', function(req, res, next) {
   });
 });
 
+
+/*
+ * /admin/certdocs
+ * Overall summary of certification documents.
+ */
+router.get('/admin/certdocs/', authorized('motors'), function(req, res, next) {
+  req.db.MotorCert.count(req.success(function(count) {
+    res.render('admin/certdocs', locals(req, defaults, {
+      title: 'Certification Docs',
+      totalCount: count,
+      loadLink: '/admin/certdocs/loadlinks.html',
+    }));
+  }));
+});
+
+/*
+ * /admin/certdocs/loadlinks.html
+ * Find links to certification letters and load them into the DB.
+ */
+function download(url, cb, forward) {
+  let http;
+  if (/^https:\/\//.test(url))
+    http = require('https');
+  else if (/^http:\/\//.test(url))
+    http = require('http');
+  else
+    return cb(null);
+
+  let fileName = decodeURI(url.replace(/^.*\//, '').replace(/#.*$/, ''));
+
+  http.get(url, res => {
+    if (res.statusCode >= 300 && res.statusCode < 400) {
+      if (forward == null)
+        forward = 0;
+      if (forward < 3 && res.headers['location'])
+        download(res.headers['location'], cb, forward + 1);
+      else
+        cb(null);
+      res.destroy();
+      return;
+    }
+    if (res.statusCode != 200) {
+      res.destroy();
+      return cb(null);
+    }
+
+    let chunks = [];
+    res.on('data', function(chunk) {
+      chunks.push(chunk);
+    }).on('end', function() {
+      let content = Buffer.concat(chunks);
+      let contentType = res.headers['content-type'];
+      if (contentType != null)
+        contentType = contentType.replace(/;.*$/, '').trim();
+      if (contentType === 'application/pdf' ||
+          contentType === 'application/msword' ||
+          contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        cb({ fileName, contentType, content });
+      } else {
+        return cb({ fileName, contentType });
+      }
+    });
+  }).on('error', function(err) {
+    cb(null);
+  });
+}
+
+router.get('/admin/certdocs/loadlinks.html', authorized('motors'), function(req, res, next) {
+  req.db.Motor.find({ dataSheet: { $ne: null } }).exec(req.success(function(motors) {
+    let downloads = [];
+    let invalid = 0, cleared = 0, dups = 0, added = [];
+    motors.forEach((motor, i) => {
+      downloads.push(cb => {
+        download(motor.dataSheet, file => {
+          if (file == null) {
+            invalid++;
+            motor.dataSheet = null;
+            motor.save();
+            cleared++;
+            return cb(null, { motor });
+          }
+          if (motor.certDate != null && file.fileName != null && file.contentType != null && file.content != null) {
+            req.db.MotorCert.find({ _motor: motor._id }, req.success(function(existing) {
+              let dup = existing.find(c => Buffer.compare(file.content, c.content) == 0);
+              if (dup != null) {
+                dups++;
+                return cb(null, { motor });
+              }
+              let cert = new req.db.MotorCert({
+                _motor: motor,
+                _contributor: req.user,
+                _certOrg: motor._certOrg,
+                certDate: motor.certDate,
+                contentType: file.contentType,
+                fileName: file.fileName,
+                content: file.content,
+              });
+              added.push(cert);
+              cb(null, { motor, file });
+            }));
+          } else {
+            invalid++;
+            cb(null, { motor });
+          }
+        });
+      });
+    });
+    async.parallel(downloads, req.success(results => {
+      if (added.length > 0) {
+        req.db.MotorCert.insertMany(added, req.success(updated => {
+          res.render('admin/certdocs_loadlinks', locals(req, defaults, {
+            title: 'Load Certification Docs',
+            downloadCount: downloads.length,
+            invalidCount: invalid,
+            addedCount: updated.length,
+            added: updated,
+            dupCount: dups,
+            clearedCount: cleared,
+          }));
+        }));
+      } else {
+        res.render('admin/certdocs_loadlinks', locals(req, defaults, {
+          title: 'Load Certification Docs',
+          downloadCount: downloads.length,
+          invalidCount: invalid,
+          addedCount: 0,
+          added: [],
+          dupCount: dups,
+          clearedCount: cleared,
+        }));
+      }
+    }));
+  }));
+});
 
 module.exports = router;

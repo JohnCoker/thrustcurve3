@@ -1,0 +1,82 @@
+<h1>{{title}}</h1>
+
+{{#if isErrors}}
+<div class="alert alert-danger" role="alert">
+Invalid values for certification; changes not saved.
+</div>
+{{/if}}
+
+<p>
+Supported file formats:
+<ul>
+  <li><b>.pdf</b>: Adobe Acrobat</li>
+  <li><b>.doc</b>: Microsoft Word (old)</li>
+  <li><b>.docx</b>: Microsoft Word (new)</li>
+</ul>
+The maximum file size is 500Kb. Please make sure this is the certification letter for <i>only</i> this motor.
+</p>
+
+<form role="form" class="form-horizontal" name="add-cert"
+      action="{{submitLink}}" method="post" enctype="multipart/form-data"
+      data-toggle="validator">
+  <input type="hidden" name="motor" value="{{motor._id}}" />
+  <div class="form-group">
+    <label for="motor" class="col-sm-3 control-label">Motor</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{manufacturer.abbrev}} {{motor.designation}}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="certOrg" class="col-sm-3 control-label">Certified By</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="certOrg" required>
+      <option></option>
+      {{#each certOrgs}}
+        <option value="{{_id}}">{{name}}</option>
+      {{/each}}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="certDate" class="col-sm-3 control-label">Cert. Date</label>
+    <div class="col-sm-9">
+      <input type="date" class="form-control" name="certDate" required>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="file" class="col-sm-3 control-label">File</label>
+    <div class="col-sm-9">
+      <input type="file" class="form-control-static" name="file" accept=".pdf,.doc,.docx" required>
+      <span class="info"></span>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+  </div>
+</form>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('input[type=file]').on('input', function(e) {
+    let file = this.files[0];
+    let err = '';
+    if (file && file.size > 500000) {
+      if (file.size >= 1000000)
+        err = (file.size / 1000000).toFixed(1) + "Mb";
+      else
+        err = (file.size / 1000).toFixed(0) + "Kb";
+      err += ' is too large (max 500Kb)';
+    }
+    this.setCustomValidity(err);
+  });
+});
+</script>

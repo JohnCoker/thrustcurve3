@@ -1,0 +1,43 @@
+<h1>{{title}}</h1>
+
+<p>
+This page shows the known certification documents for this motor.
+See <a href="/info/certification.html">Motor Certification</a> for more info.
+If you know of a missing document,
+<a href="mailto:john@jcsw.com?subject=ThrustCurve.org: {{manufacturer.abbrev}} {{motorDesignation motor}}&body=(please provide link or attach file)">please contribute it.</a>
+</p>
+</p>
+
+{{#if hasCerts}}
+<table id="cert-list" class="table table-bordered certs">
+  <thead>
+    <tr>
+     <th>Organization</th>
+     <th>Cert. Date</th>
+     <th>Contributor</th>
+     <th>Download</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each certs}}
+    <tr data-id="{{_id}}" {{#if added}}class="success"{{/if}}>
+      <td>{{_certOrg.name}}</td>
+      <td>{{formatDate certDate}}</td>
+      <td><a href="{{contributorLink _contributor}}">{{_contributor.name}}</a></td>
+      <td><a href="/motors/cert/{{_id}}/{{fileName}}">{{fileName}}</a></td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+{{else}}
+<p>
+There are no known certification documents.
+</p>
+{{/if}}
+
+{{#hasPerm 'motors'}}
+<p>
+<a href="{{addCertLink}}">Upload a cert doc.</a>
+</p>
+{{/hasPerm}}
+

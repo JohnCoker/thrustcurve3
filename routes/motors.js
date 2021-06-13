@@ -6,6 +6,7 @@
 
 const _ = require('underscore'),
       express = require('express'),
+      fileUpload = require('express-fileupload'),
       router = express.Router(),
       errors = require('../lib/errors'),
       metadata = require('../lib/metadata'),
@@ -66,8 +67,10 @@ function getMotor(req, res, parents, redirect, cb) {
             res.status(404).send('unknown motor designation ' + req.params.desig);
         } else {
           // count all the motors in this class
-          getClassCount(req, motor.impulseClass, function(count) {
-            cb(motor, manufacturer, count);
+          getClassCount(req, motor.impulseClass, function(classCount) {
+            req.db.MotorCert.count({ _motor: motor._id }, req.success(function(certCount) {
+              cb(motor, manufacturer, { classCount, certCount });
+            }));
           });
         }
       }));
@@ -135,7 +138,7 @@ function recordView(req, motor, source) {
 }
 
 router.get('/motors/:mfr/:desig/', function(req, res, next) {
-  getMotor(req, res, true, true, function(motor, manufacturer, classCount) {
+  getMotor(req, res, true, true, function(motor, manufacturer, info) {
     req.db.SimFile.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).populate('_contributor').exec(req.success(function(simfiles) {
       req.db.MotorNote.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).populate('_contributor').exec(req.success(function(notes) {
         var initialThrust, parsed, stats, n, i;
@@ -173,10 +176,14 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           simfiles: simfiles,
           initialThrust: initialThrust,
           notes: notes,
-          classCount: classCount,
-          isCompare: classCount >= 5,
+          classCount: info.classCount,
+          isCompare: info.classCount >= 5,
+          certCount: info.certCount,
+          hasCerts: info.certCount > 0,
           isReloadCase: motor.type == 'reload' && motor.caseInfo,
           editLink: req.helpers.motorLink(manufacturer, motor) + 'edit.html',
+          certLink: req.helpers.motorLink(manufacturer, motor) + 'cert.html',
+          addCertLink: req.helpers.motorLink(manufacturer, motor) + 'addcert.html',
           addNoteLink: '/notes/motor/' + motor._id + '/add.html',
         });
         if (simfiles.length > 0)
@@ -215,7 +222,7 @@ router.get('/motorsearch.jsp', function(req, res, next) {
 });
 
 router.get('/motors/:mfr/:desig/thrustcurve.svg', function(req, res, next) {
-  getMotor(req, res, true, true, function(motor, manufacturer, classCount) {
+  getMotor(req, res, true, true, function(motor, manufacturer) {
     req.db.SimFile.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).exec(req.success(function(simfiles) {
       let data = simfiles.reduce((prev, simfile) => {
         if (prev != null)
@@ -1292,8 +1299,6 @@ function doSubmit(req, res, motor) {
   [ 'sparky',
     'hazmatExempt',
   ].forEach(function(p) {
-    console.log('\n\n\n', p, req.hasBodyProperty(p), req.body[p]);
-    console.log(p + '-present', req.hasBodyProperty(p + '-present'), req.body[p + '-present']);
     if (req.hasBodyProperty(p)) {
       let s = req.body[p].trim();
       let b = s > 0 || s == 'true' || s == 'on';
@@ -1344,6 +1349,117 @@ router.post('/motors/:mfr/:desig/edit.html', authorized('motors'), function(req,
     // add new motor
     doSubmit(req, res);
   }
+});
+
+/*
+ * /motors/:mfr/:desig/cert.html
+ * View certification documents.
+ */
+router.get('/motors/:mfr/:desig/cert.html', function(req, res, next) {
+  getMotor(req, res, false, false, function(motor, manufacturer) {
+    req.db.MotorCert.find({ _motor: motor._id }, undefined, { sort: { certDate: -1 } })
+                    .populate('_contributor _certOrg')
+                    .exec(req.success(function(certs) {
+      let added;
+      if (req.query && req.query.added) {
+        certs.forEach(cert => {
+          if (cert._id.toString() === req.query.added) {
+            cert.added = true;
+            added = cert;
+          }
+        });
+      }
+      res.render('motors/cert', locals(req, defaults, {
+        title: req.helpers.motorFullName(manufacturer, motor) + ' Certification',
+        manufacturer: manufacturer,
+        motor: motor,
+        certs: certs,
+        certCount: certs.length,
+        hasCerts: certs.length > 0,
+        added: added,
+        motorLink: req.helpers.motorLink(manufacturer, motor),
+        addCertLink: req.helpers.motorLink(manufacturer, motor) + 'addcert.html',
+      }));
+    }));
+  });
+});
+
+router.get('/motors/:mfr/:desig/addcert.html', authorized('motors'), function(req, res, next) {
+  metadata.get(req, function(caches) {
+    getMotor(req, res, false, false, function(motor, manufacturer) {
+      res.render('motors/addcert', locals(req, defaults, {
+        title: 'Upload Certification Doc.',
+        manufacturer: manufacturer,
+        motor: motor,
+        certOrgs: caches.certOrgs.filter(o => o.abbrev != 'UNC'),
+        isErrors: false,
+        submitLink: req.helpers.motorLink(manufacturer, motor) + 'addcert.html',
+      }));
+    });
+  });
+});
+
+function upload() {
+  return fileUpload({
+    limits: { fileSize: 500000 },
+    abortOnLimit: true,
+    debug: false,
+  });
+}
+
+router.post('/motors/:mfr/:desig/addcert.html', authorized('motors'), upload(), function(req, res, next) {
+  metadata.get(req, function(caches) {
+    getMotor(req, res, false, false, function(motor, manufacturer) {
+      let certOrg, certDate, file, isErrors = false;
+      if (!req.hasBodyProperty("certOrg") || (certOrg = caches.certOrgs.byId(req.body.certOrg)) == null)
+        isErrors = true;
+      if (!req.hasBodyProperty("certDate") || (certDate = new Date(req.body.certDate)) == 'Invalid Date')
+        isErrors = true;
+      if (req.files == null || req.files.file == null)
+        isErrors = true;
+      else
+        file = req.files.file;
+      if (isErrors) {
+        res.render('motors/addcert', locals(req, defaults, {
+          title: 'Upload Certification Doc.',
+          manufacturer: manufacturer,
+          motor: motor,
+          certOrgs: caches.certOrgs.filter(o => o.abbrev != 'UNC'),
+          isErrors: true,
+          submitLink: req.helpers.motorLink(manufacturer, motor) + 'addcert.html',
+        }));
+      } else {
+        let cert = new req.db.MotorCert({
+          _motor: motor,
+          _contributor: req.user,
+          _certOrg: certOrg,
+          certDate,
+          contentType: file.mimetype,
+          fileName: file.name,
+          content: file.data,
+        });
+        cert.save(req.success(function(updated) {
+          res.redirect(301, req.helpers.motorLink(manufacturer, motor) + 'cert.html?added=' + updated._id);
+        }));
+      }
+    });
+  });
+});
+
+router.get("/motors/cert/:id/:file", function(req, res, next) {
+  let id = req.params.id;
+  if (!req.db.isId(id)) {
+    res.status(404).send('missing certification ID');
+    return;
+  }
+  req.db.MotorCert.findOne({ _id: id }, req.success(function(cert) {
+    if (cert == null) {
+      res.status(404).send('unknown certification ID');
+      return;
+    }
+    res.type(cert.contentType)
+       .send(cert.content);
+  }));
 });
 
 module.exports = router;

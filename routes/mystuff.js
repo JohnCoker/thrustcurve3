@@ -148,8 +148,6 @@ router.post(registerLink, function(req, res, next) {
   // check captcha
   let data = ('secret=' + process.env.RECAPTCHA_SECRET +
               '&response=' + encodeURIComponent(req.body['g-recaptcha-response']));
-  console.log('\n\n');
-  console.log(data);
   let post = https.request({
     hostname: 'www.google.com',
     port: 443,
@@ -167,7 +165,6 @@ router.post(registerLink, function(req, res, next) {
         r = JSON.parse(d.toString());
       } catch (e) {
       }
-      console.log('response', r);
       if (r == null || r.success !== true) {
         errors.push('Please solve the captcha.');
         sendErrors();

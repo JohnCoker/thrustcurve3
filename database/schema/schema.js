@@ -346,6 +346,22 @@ function makeContributorModel(mongoose) {
   return mongoose.model('Contributor', schema);
 }
 
+function makeMotorCertModel(mongoose) {
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
+    _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true },
+    _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
+    _certOrg: { type: mongoose.Schema.Types.ObjectId, ref: 'CertOrg', required: true },
+    certDate: { type: dateOnly(mongoose), required: true },
+    contentType: { type: String, required: true, match: /^[-\w.]+\/[-\w.+]+$/ },
+    fileName: { type: String, required: true },
+    content: { type: Buffer, required: true }
+  }, stdOptions());
+  stdHooks(schema);
+  return mongoose.model('MotorCert', schema);
+}
+
 function makeMotorNoteModel(mongoose) {
   var schema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now, required: true },
@@ -743,6 +759,14 @@ module.exports = {
    * @return {object} Mongoose model
    */
   ContributorModel: makeContributorModel,
+
+  /**
+   * Produce a Mongoose model for the <em>motorcerts</em> collection.
+   * @function
+   * @param {object} mongoose connected Mongoose module
+   * @return {object} Mongoose model
+   */
+  MotorCertModel: makeMotorCertModel,
 
   /**
    * Produce a Mongoose model for the <em>motornotes</em> collection.

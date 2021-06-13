@@ -131,6 +131,7 @@ const db = Object.create(null, {
   CertOrg: { value: schema.CertOrgModel(mongoose) },
   Motor: { value: schema.MotorModel(mongoose) },
   Contributor: { value: schema.ContributorModel(mongoose) },
+  MotorCert: { value: schema.MotorCertModel(mongoose) },
   MotorNote: { value: schema.MotorNoteModel(mongoose) },
   SimFile: { value: schema.SimFileModel(mongoose) },
   SimFileNote: { value: schema.SimFileNoteModel(mongoose) },

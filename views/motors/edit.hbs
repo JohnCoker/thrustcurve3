@@ -279,6 +279,15 @@ No changes to save;
       <span class="help-block with-errors"></span>
     </div>
   </div>
+  <div class="form-group">
+    <label for="csfmApproved" class="col-sm-3 control-label">CSFM Approved</label>
+    <div class="col-sm-9">
+      <input type="hidden" name="csfmApproved-present" value="true" />
+      <input type="checkbox" class="form-check-input position-static" name="csfmApproved"
+             {{#if motor.csfmApproved}}checked="checked"{{/if}}>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
   <div class="form-group website">
     <label for="dataSheet" class="col-sm-3 control-label">Data Sheet</label>
     <div class="col-sm-9">

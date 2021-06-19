@@ -222,8 +222,9 @@
           </p>
         </div>
       </div>
+
       <div class="form-group">
-        <label class="col-sm-6 control-label">HazMat Shipping</label>
+        <label class="col-sm-6 control-label"><span title="hazardous materials">HazMat</span> Shipping</label>
         <div class="col-sm-6">
           <p class="form-control-static">
           {{#if motor.hazmatExempt}}
@@ -234,6 +235,17 @@
           </p>
         </div>
       </div>
+
+      {{#if motor.csfmApproved}}
+      <div class="form-group">
+        <label class="col-sm-6 control-label"><span title="California State Fire Marshall">CSFM</span> Approved</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">
+            <span class="label label-as-badge label-success">approved</span>
+          </p>
+        </div>
+      </div>
+      {{/if}}
 
       {{#if username}}
       <div class="form-group">

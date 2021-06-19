@@ -478,6 +478,12 @@ function doSearch(req, res, params) {
           else if (v == 'exempt' || v == 'true' || v == 'on')
             query.hazmatExempt = true;
 
+        } else if (k == 'csfmApproved') {
+          if (v == 'unapproved' || v == 'false' || v == 'off')
+            query.csfmApproved = false;
+          else if (v == 'approved' || v == 'true' || v == 'on')
+            query.csfmApproved = true;
+
         } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
           if (req.db.Motor.schema.paths[k].instance == 'Number') {
             let op = '=';
@@ -534,6 +540,8 @@ function doSearch(req, res, params) {
         params.class1 = 'all';
       if (!params.hasOwnProperty('hazmatExempt'))
         params.hazmatExempt = 'all';
+      if (!params.hasOwnProperty('csfmApproved'))
+        params.csfmApproved = 'all';
       if (!params.hasOwnProperty('availability')) {
         params.availability = 'available';
         if (hasParams)
@@ -1298,6 +1306,7 @@ function doSubmit(req, res, motor) {
   // boolean values
   [ 'sparky',
     'hazmatExempt',
+    'csfmApproved',
   ].forEach(function(p) {
     if (req.hasBodyProperty(p)) {
       let s = req.body[p].trim();

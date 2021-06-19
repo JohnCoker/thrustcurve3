@@ -177,6 +177,7 @@ function makeMotorModel(mongoose) {
     propellantInfo: String,
     sparky: { type: Boolean, default: false },
     hazmatExempt: { type: Boolean, default: false },
+    csfmApproved: { type: Boolean, default: false },
     dataSheet: { type: String, match: UrlRegex },
     availability: { type: String, required: true, enum: MotorAvailabilityEnum }
   }, stdOptions({

@@ -157,7 +157,7 @@ advanced search below to search by various attributes.
     </div>
   </div>
   <div class="form-group hazmatExempt">
-    <label for="hazmatExempt" class="col-sm-3 control-label">HazMat Shipping</label>
+    <label for="hazmatExempt" class="col-sm-3 control-label"><span title="hazardous material">HazMat</span> Shipping</label>
     <div class="col-sm-9">
     <p>
       <label class="radio-inline">
@@ -170,6 +170,23 @@ advanced search below to search by various attributes.
       </label>
       <label class="radio-inline">
         <input type="radio" name="hazmatExempt" value="all" {{#equal params.hazmatExempt 'all'}}checked{{/equal}}> both
+      </label>
+    </div>
+  </div>
+  <div class="form-group csfmApproved">
+    <label for="csfmApproved" class="col-sm-3 control-label"><span title="California State Fire Marshal">CSFM</span> Approved</label>
+    <div class="col-sm-9">
+    <p>
+      <label class="radio-inline">
+        <input type="radio" name="csfmApproved" value="approved" {{#equal params.csfmApproved 'approved'}}checked{{/equal}}>
+        <span title="may be flown in California">approved</span>
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="csfmApproved" value="unapproved" {{#equal params.csfmApproved 'unapproved'}}checked{{/equal}}>
+        <span title="may NOT be flown in California">unapproved</span>
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="csfmApproved" value="all" {{#equal params.csfmApproved 'all'}}checked{{/equal}}> both
       </label>
     </div>
   </div>

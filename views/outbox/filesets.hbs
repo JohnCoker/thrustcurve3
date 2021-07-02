@@ -1,0 +1,31 @@
+<h1>{{title}}</h1>
+
+<p>
+Here are sets of motor files for in-production motors by manufacturer.
+Note that when there is more than one entry for a motor, the most recent one is used.
+Also some motors may not have any data files uploaded for one or both formats.
+</p>
+
+<table id="set-list" class="table table-bordered">
+  <thead>
+     <th>Manufacturer</th>
+     <th>RASP</th>
+     <th>RockSim</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each sets}}
+    <tr>
+     <td>{{name}}</td>
+     <td><a href="{{raspLink}}">{{raspFile}}</a></td>
+     <td><a href="{{rockSimLink}}">{{rockSimFile}}</a></td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+
+<p>
+If a motor you want to use is missing from the set you downloaded, consider creating a file for that motor and
+uploading it. See <a href="/info/contribute.html">Contribute Data</a> for how you can do that.
+These sets are produced on demand so they always contain the latest data available.
+</p>

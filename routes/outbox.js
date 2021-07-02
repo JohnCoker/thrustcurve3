@@ -300,4 +300,31 @@ router.get(setLink + ':file', function(req, res, next) {
   });
 });
 
+/*
+ * /outbox/filesets/
+ * List of data file sets by manufacturer.
+ */
+router.get('/outbox/filesets/', function(req, res, next) {
+  metadata.getManufacturers(req, function(manufacturers) {
+    let sets = [];
+    manufacturers.forEach(mfr => {
+      if (mfr.active) {
+        sets.push({
+          manufacturer: mfr,
+          name: mfr.name,
+          abbrev: mfr.abbrev,
+          raspLink: setLink + mfr.abbrev + '.eng',
+          raspFile: mfr.abbrev + '.eng',
+          rockSimLink: setLink + mfr.abbrev + '.rse',
+          rockSimFile: mfr.abbrev + '.rse',
+        });
+      }
+    });
+    res.render('outbox/filesets', locals(req, defaults, {
+      title: 'Manufacturer File Sets',
+      sets,
+    }));
+  });
+});
+
 module.exports = router;

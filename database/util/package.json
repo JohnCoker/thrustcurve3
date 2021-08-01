@@ -1,0 +1,20 @@
+{
+  "name": "util",
+  "version": "1.0.0",
+  "description": "database fixup utilities",
+  "main": "migrate.js",
+  "dependencies": {
+    "async": "^1.5.0",
+    "mongoose": "4.10.8",
+    "mysql": "^2.10.0"
+  },
+  "scripts": {
+    "lint": "jshint *.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3/database/util"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC"
+}

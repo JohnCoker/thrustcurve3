@@ -56,7 +56,12 @@ function getMotor(req, res, parents, redirect, cb) {
         res.status(404).send('unknown manufacturer abbreviation ' + req.params.mfr);
     }
     else {
-      var q = req.db.Motor.findOne({ _manufacturer: manufacturer._id, designation: req.params.desig });
+      var q = req.db.Motor.findOne({ _manufacturer: manufacturer._id,
+                                     $or: [
+                                       { designation: req.params.desig },
+                                       { altDesignation: req.params.desig },
+                                     ],
+                                   });
       if (parents)
         q = q.populate('_relatedMfr _certOrg');
       q.exec(req.success(function(motor) {

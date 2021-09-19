@@ -516,6 +516,14 @@ definitions:
               type: string
               format: date
               example: '2014-12-02'
+            availability:
+              description: motor current availability
+              type: string
+              enum:
+                - regular
+                - occasional
+                - OOP
+              example: regular
 
   DownloadRequest:
     type: object

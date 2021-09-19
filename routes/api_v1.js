@@ -353,6 +353,7 @@ function doSearch(req, res, format) {
           'prop-info': motor.propellantInfo,
           sparky: motor.sparky,
           'updated-on': motor.updatedAt,
+          availability: motor.availability,
         };
       }));
       format.error(errs);

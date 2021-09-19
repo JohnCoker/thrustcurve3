@@ -29,7 +29,8 @@
       "delays": "3",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000006",
@@ -52,7 +53,8 @@
       "delays": "2,4",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000007",
@@ -75,7 +77,8 @@
       "delays": "2",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a40928000231000000000c",
@@ -98,7 +101,8 @@
       "delays": "0,3,P",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000009",
@@ -121,7 +125,8 @@
       "delays": "4",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a40928000231000000000b",
@@ -144,7 +149,8 @@
       "delays": "0,3,5",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a40928000231000000000e",
@@ -167,7 +173,8 @@
       "delays": "2,4",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000010",
@@ -191,7 +198,8 @@
       "delays": "0,2,4,6",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a40928000231000000001a",
@@ -214,7 +222,8 @@
       "delays": "0,3,5,7",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000015",
@@ -237,7 +246,8 @@
       "delays": "0,3,5,7",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000014",
@@ -259,7 +269,8 @@
       "propWeightG": 11.3,
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000020",
@@ -282,7 +293,8 @@
       "delays": "0,3,5,7",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a40928000231000000001f",
@@ -305,7 +317,8 @@
       "propWeightG": 24.5,
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-18"
+      "updatedOn": "2014-07-18",
+      "availability": "occasional"
     },
     {
       "motorId": "56a4092800023100000003e3",
@@ -328,7 +341,8 @@
       "delays": "0,4,6,8",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a409280002310000000028",
@@ -352,7 +366,8 @@
       "delays": "4,6,8",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a4092800023100000003f8",
@@ -376,7 +391,8 @@
       "delays": "0,4,6,8",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2015-06-03"
+      "updatedOn": "2015-06-03",
+      "availability": "regular"
     },
     {
       "motorId": "56a4092800023100000003e4",
@@ -399,7 +415,8 @@
       "delays": "4,7",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a4092800023100000003f2",
@@ -423,7 +440,8 @@
       "delays": "0, 4, 6, 8",
       "propInfo": "black powder",
       "sparky": false,
-      "updatedOn": "2015-06-03"
+      "updatedOn": "2015-06-03",
+      "availability": "regular"
     },
     {
       "motorId": "56a4092800023100000003e5",
@@ -446,7 +464,8 @@
       "delays": "6",
       "propInfo": "composite",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     },
     {
       "motorId": "56a4092800023100000003e6",
@@ -469,7 +488,8 @@
       "delays": "4,6",
       "propInfo": "composite",
       "sparky": false,
-      "updatedOn": "2014-07-05"
+      "updatedOn": "2014-07-05",
+      "availability": "regular"
     }
   ]
 }

@@ -31,6 +31,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>6</motor-id>
@@ -54,6 +55,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>7</motor-id>
@@ -77,6 +79,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>12</motor-id>
@@ -100,6 +103,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>9</motor-id>
@@ -123,6 +127,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>11</motor-id>
@@ -146,6 +151,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>14</motor-id>
@@ -169,6 +175,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>16</motor-id>
@@ -193,6 +200,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>26</motor-id>
@@ -216,6 +224,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>21</motor-id>
@@ -239,6 +248,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>20</motor-id>
@@ -261,6 +271,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>32</motor-id>
@@ -284,6 +295,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>31</motor-id>
@@ -307,6 +319,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-18</updated-on>
+            <availability>occasional</availability>
         </result>
         <result>
             <motor-id>995</motor-id>
@@ -330,6 +343,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>40</motor-id>
@@ -354,6 +368,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>1016</motor-id>
@@ -378,6 +393,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2015-06-03</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>996</motor-id>
@@ -401,6 +417,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>1010</motor-id>
@@ -425,6 +442,7 @@
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2015-06-03</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>997</motor-id>
@@ -448,6 +466,7 @@
             <prop-info>composite</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
         <result>
             <motor-id>998</motor-id>
@@ -471,6 +490,7 @@
             <prop-info>composite</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
+            <availability>regular</availability>
         </result>
     </results>
 </search-response>

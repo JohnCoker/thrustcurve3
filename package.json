@@ -31,7 +31,7 @@
     "fs": "0.0.2",
     "handlebars": "4.5.3",
     "handlebars-helper": "0.0.12",
-    "jszip": "^3.6.0",
+    "jszip": "^3.7.0",
     "mongodb": "^3.6.4",
     "mongoose": "4.10.8",
     "mongoose-dateonly": "^1.0.3",

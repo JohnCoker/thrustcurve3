@@ -27,6 +27,7 @@ const StaticMap = [
   // information pages
   { path: '/info/api.html',           priority: 0.5 },
   { path: '/info/background.html',    priority: 0.5 },
+  { path: '/info/privacy.html',       priority: 0.5 },
   { path: '/info/certification.html', priority: 0.5 },
   { path: '/info/contribute.html',    priority: 0.5 },
   { path: '/info/glossary.html',      priority: 0.5 },

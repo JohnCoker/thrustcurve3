@@ -33,6 +33,10 @@ router.get('/background.shtml', function(req, res, next) {
   res.redirect(301, '/info/background.html');
 });
 
+router.get('/info/privacy.html', function(req, res, next) {
+  res.render('info/privacy', locals(req, defaults, 'Privacy Policy'));
+});
+
 router.get('/info/certification.html', function(req, res, next) {
   res.render('info/certification', locals(req, defaults, 'Motor Certification'));
 });

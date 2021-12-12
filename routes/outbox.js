@@ -97,7 +97,7 @@ function doList(req, res) {
 router.get([outboxLink, '/outbox.html'], function(req, res, next) {
   doList(req, res);
 });
-router.get('/outbox.jsp', function(req, res, next) {
+router.get(['/outbox.jsp', '/download.jsp'], function(req, res, next) {
   res.redirect(301, outboxLink);
 });
 

@@ -657,6 +657,21 @@ router.get(searchLink, function(req, res, next) {
 router.get('/searchpage.jsp', function(req, res, next) {
   res.redirect(301, searchLink);
 });
+router.get('/cgi-bin/search.pl', function(req, res, next) {
+  // minor adjustments to old search
+  let query = '';
+  Object.keys(req.query).forEach(p => {
+    let v = req.query[p];
+    if (v == null || v === '' || v === '(all)')
+      return;
+    if (p === 'class')
+      p = 'impulseClass';
+    if (p === 'diameter' && /^\d+$/.test(v))
+      v = v / 1000;
+    query += (query === '' ? '?' : '&') + p + '=' + encodeURIComponent(v);
+  });
+  res.redirect(301, searchLink + query);
+});
 
 router.post(searchLink, function(req, res, next) {
   doSearch(req, res, req.body);

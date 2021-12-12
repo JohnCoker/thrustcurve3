@@ -3,6 +3,10 @@ Crawl-delay: 120
 Disallow: /mystuff/
 Disallow: /api/
 Disallow: /admin/
+Disallow: /outbox/
+Disallow: /simfiles/*/create.html
+Disallow: /notes/motor/*/add.html
+Disallow: /notes/simfile/*/add.html
 Disallow: /motors/browser.html?*
 Allow: /motors/browser.html$
 Disallow: /motors/search.html?*

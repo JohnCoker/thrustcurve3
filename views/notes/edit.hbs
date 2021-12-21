@@ -10,6 +10,11 @@ Invalid values for note; changes not saved.
 You do may not edit someone else's note.
 </div>
 {{/unless}}
+{{#notVerified}}
+<div class="alert alert-danger" role="alert">
+You must <a href="/mystuff/verify.html">verify your email address</a> before adding a note.
+</div>
+{{/notVerified}}
 
 <P>
 The subject of a note is limited to plain text, and the content may be augmented with simple formatting.

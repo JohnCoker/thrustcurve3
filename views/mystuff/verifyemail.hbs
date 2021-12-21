@@ -1,0 +1,17 @@
+<h1>{{title}}</h1>
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+{{#if isSent}}
+<div class="alert alert-success" role="alert">
+Email sent to {{email}} with instructions.
+</div>
+{{/if}}
+
+<p>
+Your email address must be verified in order for you to post notes on motors and data files.
+This allows us to intercept advertising messages posted by bots. Thanks for your understanding.
+</p>

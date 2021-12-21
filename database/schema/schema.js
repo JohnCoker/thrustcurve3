@@ -271,6 +271,7 @@ function makeContributorModel(mongoose) {
     website: { type: String, match: UrlRegex },
     _representsMfr: { type: mongoose.Schema.Types.ObjectId, ref: 'Manufacturer' },
     lastLogin: Date,
+    verified: { type: Boolean, default: false },
     preferences: {
       defaultUnits: { type: String, enum: units.defaults.labels },
       lengthUnit: { type: String, enum: units.length.labels },
@@ -294,7 +295,9 @@ function makeContributorModel(mongoose) {
       editPermissions: Boolean,
     },
     resetToken: String,
-    resetExpires: Date
+    resetExpires: Date,
+    verifyToken: String,
+    verifyExpires: Date,
   }, stdOptions());
   stdHooks(schema);
 

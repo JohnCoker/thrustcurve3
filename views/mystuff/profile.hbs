@@ -26,6 +26,10 @@ If you have an affiliation with a rocketry club or your own rocketry web site, y
       <input type="email" name="email" class="form-control" required value="{{info.email}}" />
       <span class="help-block with-errors"></span>
       <input type="checkbox" name="showEmail" {{#if info.showEmail}}checked{{/if}}/> Show email address publicly
+      {{#notVerified}}
+      <br/>
+      <a href="/mystuff/verify.html">Verify this email address</a>
+      {{/notVerified}}
     </div>
   </div>
   <div class="form-group">

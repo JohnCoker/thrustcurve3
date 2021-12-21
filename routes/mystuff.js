@@ -20,6 +20,7 @@ const express = require('express'),
 const loginLink = '/mystuff/login.html',
       registerLink = '/mystuff/register.html',
       forgotLink = '/mystuff/forgotpasswd.html',
+      verifyLink = '/mystuff/verify.html',
       resetLink = '/mystuff/resetpasswd.html',
       favoritesLink = '/mystuff/favorites.html',
       rocketsLink = '/mystuff/rockets.html',
@@ -356,6 +357,76 @@ router.post(resetLink, function(req, res, next) {
         });
       }));
     }
+  });
+});
+
+
+/*
+ * /mystuff/verify.html
+ * Renders with mystuff/verify.hbs template.
+ */
+router.get(verifyLink, authenticated, function(req, res, next) {
+  let token = req.query.token || req.query.t;
+  if (token)
+    token = token.trim();
+
+  let errors = [];
+  if (token != null && token !== '') {
+    if (token === req.user.verifyToken && req.user.verifyExpires > Date.now()) {
+      req.user.verified = true;
+      req.user.verifyToken = null;
+      req.user.verifyExpires = null;
+      req.user.save(req.success(function(updated) {
+        res.redirect(303, profileLink);
+      }));
+      return;
+    }
+    errors.push['Email verification link expired.'];
+  }
+
+  // generate a token and email it
+  crypto.randomBytes(20, function(err, buf) {
+    const token = buf.toString('hex');
+
+    req.user.verifyToken = token;
+    req.user.verifyExpires = Date.now() + 30 * 60 * 1000; // 30m
+    req.user.save(req.success(function(updated) {
+      const link = 'https://' + req.headers.host + verifyLink + "?t=" + token;
+
+      sendgrid.setApiKey(config.sendGridApiKey);
+      sendgrid.send({
+        to: req.user.email,
+        from: 'noreply@thrustcurve.org',
+        subject: 'ThrustCurve.org email verification',
+        text: `
+You requested that your ThrustCurve.org email address be verified.
+Please click this link or paste it into your browser address bar to complete the process:
+
+${link}
+`,
+        html: `
+<p>You requested that your ThrustCurve.org email address be verified.
+Please click this link or paste it into your browser address bar to complete the process:</p>
+<p style="font-size: large;"><a href="${link}">${link}</a></p>
+<p><img width="200" height="40" src="https://www.thrustcurve.org/images/footer-logo.png" alt="ThrustCurve.org"></p>
+`,
+      }).then(() => {
+        res.render('mystuff/verifyemail', locals(req, defaults, {
+          title: 'Verify Email',
+          email: req.user.email,
+          isSent: true,
+          errors,
+        }));
+      }).catch(e => {
+        res.status(e.status || 500);
+        res.render('error', {
+          title: 'Email Error',
+          layout: 'mystuff',
+          url: req.url,
+          error: e,
+        });
+      });
+    }));
   });
 });
 
@@ -1269,8 +1340,10 @@ router.post(profileLink, authenticated, function(req, res, next) {
     }
   };
 
-  // make sure the email isn't already in use
   if (changeEmail && errors.length < 1) {
+    // email will no longer be verified
+    info.verified = false;
+    // make sure the email isn't already in use
     req.db.Contributor.findOne({ email: info.email }, req.success(function(existing) {
       if (existing && existing._id.toString() != info._id.toString())
         errors.push('That new email address is already registered.');

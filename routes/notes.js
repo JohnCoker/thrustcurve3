@@ -8,7 +8,8 @@ const express = require('express'),
       router = express.Router(),
       metadata = require('../lib/metadata'),
       locals = require('./locals.js'),
-      authenticated = require('./authenticated.js');
+      authenticated = require('./authenticated.js'),
+      verified = require('./verified.js');
 
 const defaults = {
   layout: 'admin',
@@ -83,7 +84,7 @@ function redirectToMotor(req, res, motor) {
   });
 }
 
-router.post('/notes/motor/:motorId/add.html', function(req, res, next) {
+router.post('/notes/motor/:motorId/add.html', verified, function(req, res, next) {
   getMotor(req, res, motor => {
     let subject = req.body.subject,
         content = req.body.content;
@@ -139,7 +140,7 @@ router.get('/notes/motor/:id/edit.html', function(req, res, next) {
   getMotorNote(req, res, false, note => doEditMotorNote(req, res, note));
 });
 
-router.post('/notes/motor/:id/edit.html', function(req, res, next) {
+router.post('/notes/motor/:id/edit.html', verified, function(req, res, next) {
   getMotorNote(req, res, true, note => {
     let subject = req.body.subject,
         content = req.body.content;
@@ -223,7 +224,7 @@ function redirectToSimfile(req, res, simfile) {
   res.redirect(303, '/simfiles/' + simfile._id + '/#notes');
 }
 
-router.post('/notes/simfile/:fileId/add.html', function(req, res, next) {
+router.post('/notes/simfile/:fileId/add.html', verified, function(req, res, next) {
   getSimfile(req, res, simfile => {
     let subject = req.body.subject,
         content = req.body.content;

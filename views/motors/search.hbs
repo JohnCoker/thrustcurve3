@@ -74,11 +74,20 @@ advanced search below to search by various attributes.
   </div>
   <div class="form-group diameter">
     <label for="diameter" class="col-sm-3 control-label">Diameter</label>
-    <div class="col-sm-9">
+    <div class="col-sm-9 col-md-4">
       <select class="form-control" name="diameter">
         <option value="">(all)</option>
         {{#each allMotors.diameters}}
         <option value="{{this}}" {{#equal ../params.diameter this}}selected{{/equal}}>{{formatMMT this}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <label for="diameter" class="col-md-1 hidden-sm hidden-xs control-label">to</label>
+    <div class="col-md-4 hidden-sm hidden-xs">
+      <select class="form-control" name="diameter">
+        <option value=""></option>
+        {{#each allMotors.diameters}}
+        <option value="{{this}}">{{formatMMT this}}</option>
         {{/each}}
       </select>
     </div>
@@ -121,6 +130,32 @@ advanced search below to search by various attributes.
         <option data-diameter="{{diameter}}" data-manufacturers="{{manufacturers}}" {{#equal ../params.caseInfo name}}selected{{/equal}}>{{name}}</option>
         {{/each}}
       </select>
+    </div>
+  </div>
+  <div class="form-group avgThrust hidden-xs hidden-sm">
+    <label for="avgThrust" class="col-sm-3 control-label">Avg. Thrust</label>
+    <div class="col-sm-9 col-md-4">
+      <input type="number" step="any" min="0.1" class="form-control" name="avgThrust"
+             placeholder="244N" value="{{params.avgThrust}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <label for="avgThrust" class="col-md-1 hidden-sm hidden-xs control-label">to</label>
+    <div class="col-md-4 hidden-sm hidden-xs">
+      <input type="number" step="any" min="0.1" class="form-control" name="avgThrust">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  <div class="form-group maxThrust hidden-xs hidden-sm">
+    <label for="maxThrust" class="col-sm-3 control-label">Max. Thrust</label>
+    <div class="col-sm-9 col-md-4">
+      <input type="number" step="any" min="0.1" class="form-control" name="maxThrust"
+             placeholder="288N" value="{{params.maxThrust}}">
+      <span class="help-block with-errors"></span>
+    </div>
+    <label for="maxThrust" class="col-md-1 hidden-sm hidden-xs control-label">to</label>
+    <div class="col-md-4 hidden-sm hidden-xs">
+      <input type="number" step="any" min="0.1" class="form-control" name="maxThrust">
+      <span class="help-block with-errors"></span>
     </div>
   </div>
   <div class="form-group sparky">
@@ -270,14 +305,6 @@ $(document).ready(function(e) {
 {{/unless}}
 
 {{#if results}}
-<!--
-query parameters:
-{{#each params}}
-  {{@key}}={{this}}
-{{/each}}
-results: {{length results}}
--->
-
 <table id="result-list" class="table table-bordered">
   <thead>
     <tr>
@@ -287,6 +314,7 @@ results: {{length results}}
      <th class="number">Diam</th>
      <th class="number">Impulse</th>
      <th class="number hidden-xs">Avg Thr</th>
+     <th class="number hidden-sm hidden-xs">Max Thr</th>
      <th class="number hidden-xs">Burn</th>
      <th class="action hidden-xs"><input type="checkbox" id="select-all" title="select/deselect all"/></th>
     </tr>
@@ -300,6 +328,7 @@ results: {{length results}}
     <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
     <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
     <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+    <td class="number hidden-sm hidden-xs" data-sort="{{formatSort maxThrust}}">{{formatForce maxThrust}}</td>
     <td class="number hidden-xs" data-sort="{{formatSort burnTime}}">{{formatDuration burnTime}}</td>
     <td class="action hidden-xs"><input type="checkbox" name="select" value="{{_id}}" title="select this motor"/></th>
   </tr>

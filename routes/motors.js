@@ -363,7 +363,8 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
 
 /*
  * /motors/search.html
- * General motor search, renders with motors/search.hbs template.
+ * General motor search, renders with motors/search.hbs template. Note that if a numeric search value is repeated,
+ * the values are interpreted as a range.
  */
 function doSearch(req, res, params) {
   metadata.getPropellantInfo(req, function(propInfo) {
@@ -372,7 +373,7 @@ function doSearch(req, res, params) {
           sort = { totalImpulse: 1, designation: 1 },
           options,
           hasParams, failed, isFresh, paramNames,
-          keys, k, v, m, i;
+          keys, m, i;
 
       params = _.extend({}, params);
       hasParams = false;
@@ -382,16 +383,28 @@ function doSearch(req, res, params) {
       if (keys.length > 0)
         isFresh = false;
       for (i = 0; i < keys.length; i++) {
-        k = keys[i];
-        v = params[k];
+        let k = keys[i];
+        let v = params[k];
         if (v == null) {
           delete params[k];
           continue;
         }
-        v = v.toString().trim();
-        if (v === '') {
-          delete params[k];
-          continue;
+        let a;
+        if (Array.isArray(v)) {
+          a = v.filter(e => e.trim() !== '');
+          if (a.length == 0) {
+            delete params[k];
+            continue;
+          }
+          v = params[k] = a[0].trim();
+          if (a.length == 1)
+            a = undefined;
+        } else {
+          v = v.trim();
+          if (v === '') {
+            delete params[k];
+            continue;
+          }
         }
 
         if (k == 'manufacturer' || k == 'mfr') {
@@ -431,13 +444,28 @@ function doSearch(req, res, params) {
           ];
 
         } else if (k == 'diameter') {
-          v = parseFloat(v);
-          if (v > 0) {
-            if (v > 1)
-              v /= 1000;
-            query.diameter = { $gt: v - metadata.MotorDiameterTolerance, $lt: v + metadata.MotorDiameterTolerance };
-          } else
-            failed = true;
+          let min = 9e9, max = 0;
+          if (a) {
+            a.forEach(function(v) {
+              v = parseFloat(v);
+              if (v > 0) {
+                if (v > 1)
+                  v /= 1000;
+                min = Math.min(v, min);
+                max = Math.max(v, max);
+              } else
+                failed = true;
+            });
+          } else {
+            v = parseFloat(v);
+            if (v > 0) {
+              if (v > 1)
+                v /= 1000;
+              min = max = v;
+            } else
+              failed = true;
+          }
+          query.diameter = { $gt: min - metadata.MotorDiameterTolerance, $lt: max + metadata.MotorDiameterTolerance };
 
         } else if (k == 'impulseClass') {
           v = metadata.toImpulseClass(v);
@@ -491,21 +519,34 @@ function doSearch(req, res, params) {
 
         } else if (req.db.Motor.schema.paths.hasOwnProperty(k)) {
           if (req.db.Motor.schema.paths[k].instance == 'Number') {
-            let op = '=';
-            if (/^[<>]/.test(v)) {
-              op = v[0];
-              v = v.substring(1).trim();
+            if (a) {
+              let min = 9e9, max = 0;
+              a.forEach(function(v) {
+                v = parseFloat(v);
+                if (v > 0) {
+                  min = Math.min(v, min);
+                  max = Math.max(v, max);
+                } else
+                  failed = true;
+              });
+              query[k] = { $gt: min * 0.99, $lt: max * 1.01 };
+            } else {
+              let op = '=';
+              if (/^[<>]/.test(v)) {
+                op = v[0];
+                v = v.substring(1).trim();
+              }
+              v = parseFloat(v);
+              if (isFinite(v)) {
+                if (op == '<')
+                  query[k] = { $lt: v * 1.01 };
+                else if (op == '>')
+                  query[k] = { $gt: v * 0.99 };
+                else
+                  query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
+              } else
+                failed = true;
             }
-            v = parseFloat(v);
-            if (isFinite(v)) {
-              if (op == '<')
-                query[k] = { $lt: v * 1.01 };
-              else if (op == '>')
-                query[k] = { $gt: v * 0.99 };
-              else
-                query[k] = { $gt: v * 0.95, $lt: v * 1.05 };
-            } else
-              failed = true;
           } else {
             query[k] = v;
           }

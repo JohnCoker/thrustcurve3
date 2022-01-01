@@ -1,0 +1,97 @@
+<h1>{{title}}</h1>
+
+<script type="text/javascript">
+function send(tr, kind, id, what) {
+  let url = location.origin + location.pathname + kind + '/' + id + '/' + what;
+  console.log(url);
+  $.ajax({
+    type: 'POST',
+    url,
+    success: function(data, status, xhr) {
+      tr.hide();
+    },
+    error: function(xhr, status, error) {
+      tr.addClass('bg-danger');
+    },
+  });
+}
+
+function setup(table, kind) {
+  table.find('tbody>tr').each(function() {
+    let tr = $(this);
+    let id = tr.data('id');
+    tr.find('a.spam').click(function(e) {
+      e.preventDefault();
+      send(tr, kind, id, 'spam');
+    });
+    tr.find('a.approve').click(function(e) {
+      e.preventDefault();
+      send(tr, kind, id, 'approve');
+    });
+  });
+}
+</script>
+
+{{#if noNotes}}
+<p>No unreviewed notes; all done!</p>
+{{/if}}
+
+{{#if motorNotes}}
+<h2>Unreviewed Motor Notes</h2>
+
+<table id="motornote-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Subject</th>
+     <th>Content</th>
+     <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motorNotes}}
+    <tr data-id="{{_id}}">
+      <td>{{subject}}</td>
+      <td>{{content}}</td>
+      <td>
+        <a class="spam" href="#">Spam</a>
+        <a class="approve" href="#">Approve</a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setup($('table#motornote-list'), 'motor');
+</script>
+{{/if}}
+
+
+{{#if simFileNotes}}
+<h2>Unreviewed Sim. File Notes</h2>
+
+<table id="simfilenote-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Subject</th>
+     <th>Content</th>
+     <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each simFileNotes}}
+    <tr data-id="{{_id}}">
+      <td>{{subject}}</td>
+      <td>{{content}}</td>
+      <td>
+        <a class="spam" href="#">Spam</a>
+        <a class="approve" href="#">Approve</a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<script type="text/javascript">
+setup($('table#simfilenote-list'), 'simfile');
+</script>
+{{/if}}
+

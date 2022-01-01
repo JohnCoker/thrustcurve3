@@ -374,7 +374,8 @@ function makeMotorNoteModel(mongoose) {
     _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
     subject: { type: String, required: true },
-    content: { type: String, required: true }
+    content: { type: String, required: true },
+    approved: { type: Boolean, default: false },
   }, stdOptions());
   stdHooks(schema);
   return mongoose.model('MotorNote', schema);
@@ -404,7 +405,8 @@ function makeSimFileNoteModel(mongoose) {
     _simFile: { type: mongoose.Schema.Types.ObjectId, ref: 'SimFile', required: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor' },
     subject: { type: String, required: true },
-    content: { type: String, required: true }
+    content: { type: String, required: true },
+    approved: { type: Boolean, default: false },
   }, stdOptions());
   stdHooks(schema);
   return mongoose.model('SimFileNote', schema);

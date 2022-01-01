@@ -19,6 +19,7 @@ const defaults = {
 };
 
 const certOrgList = '/admin/certorgs/';
+const noteReview = '/admin/notes/';
 
 /*
  * /admin/certorgs/
@@ -29,7 +30,7 @@ router.get(certOrgList, authorized('metadata'), function(req, res, next) {
     res.render('admin/certorglist', locals(req, defaults, {
       title: 'Certification Organizations',
       certorgs: certorgs,
-      newLink: '/admin/certorgs/new'
+      newLink: certOrgList + 'new'
     }));
   }));
 });
@@ -47,7 +48,7 @@ router.get('/admin/certorgs/:id', authorized('metadata'), function(req, res, nex
     res.render('admin/certorgedit', locals(req, defaults, {
       title: 'New Certification Org',
       isNew: true,
-      submitLink: '/admin/certorgs/new'
+      submitLink: certOrgList + 'new'
     }));
     return;
   }
@@ -65,7 +66,7 @@ router.get('/admin/certorgs/:id', authorized('metadata'), function(req, res, nex
         isCreated: req.query.result == 'created',
         isSaved: req.query.result == 'saved',
         isUnchanged: req.query.result == 'unchanged',
-        submitLink: '/admin/certorgs/' + id
+        submitLink: certOrgList + id
       }));
     }));
   }));
@@ -122,14 +123,14 @@ router.post('/admin/certorgs/:id', authorized('metadata'), function(req, res, ne
 
     if (isNew) {
       req.db.CertOrg.create(new req.db.CertOrg(certorg), req.success(function(updated) {
-        res.redirect(303, '/admin/certorgs/' + updated._id + '?result=created');
+        res.redirect(303, certOrgList + updated._id + '?result=created');
       }));
     } else if (isChanged) {
       certorg.save(req.success(function() {
-        res.redirect(303, '/admin/certorgs/' + certorg._id + '?result=saved');
+        res.redirect(303, certOrgList + certorg._id + '?result=saved');
       }));
     } else {
-      res.redirect(303, '/admin/certorgs/' + certorg._id + '?result=unchanged');
+      res.redirect(303, certOrgList + certorg._id + '?result=unchanged');
     }
 
     if (isNew || isChanged)
@@ -558,6 +559,53 @@ router.get('/admin/certdocs/loadlinks.html', authorized('motors'), function(req,
       }
     }));
   }));
+});
+
+
+/*
+ * /admin/notes
+ * Review new notes and approve or delete as spam.
+ */
+router.get(noteReview, authorized('motors'), function(req, res, next) {
+  req.db.MotorNote.find({ '$or': [ { approved: false }, { approved: null } ] }, req.success(function(motorNotes) {
+    req.db.SimFileNote.find({ '$or': [ { approved: false }, { approved: null } ] }, req.success(function(simFileNotes) {
+      res.render('admin/notes', locals(req, defaults, {
+        title: 'Review Notes',
+        motorNotes,
+        simFileNotes,
+        bothCount: motorNotes + simFileNotes.length,
+        noNotes: motorNotes + simFileNotes.length == 0,
+      }));
+    }));
+  }));
+});
+
+router.post(noteReview + ':kind/:id/spam', authorized('motors'), function(req, res, next) {
+  if (!req.db.isId(req.params.id))
+    return res.sendStatus(400);
+
+  const model = req.params.kind === 'motor' ? req.db.MotorNote : req.db.SimFileNote;
+  model.findOne({ _id: req.db.mongoose.Types.ObjectId(req.params.id) }, req.success(function(note) {
+    if (note == null)
+      return res.sendStatus(404);
+    req.db.Contributor.deleteOne({ _id: note._contributor }, req.success(function(info) {
+      model.deleteOne({ _id: note.id }, req.success(function() {
+        res.sendStatus(200);
+      }));
+    }));
+  }));
+});
+
+router.post(noteReview + ':kind/:id/approve', authorized('motors'), function(req, res, next) {
+  if (!req.db.isId(req.params.id))
+    return res.sendStatus(400);
+
+  const model = req.params.kind === 'motor' ? req.db.MotorNote : req.db.SimFileNote;
+  model.updateOne({ _id: req.db.mongoose.Types.ObjectId(req.params.id) },
+                  { approved: true },
+                  req.success(function(info) {
+                    res.sendStatus(info.n == 1 ? 200 : 404);
+                  }));
 });
 
 module.exports = router;

@@ -5,6 +5,7 @@
 'use strict';
 
 const _ = require('underscore'),
+      https = require('https'),
       express = require('express'),
       fileUpload = require('express-fileupload'),
       router = express.Router(),
@@ -142,6 +143,8 @@ function recordView(req, motor, source) {
   req.db.MotorView.create(view);
 }
 
+const MOTORCATO = 'https://www.motorcato.org';
+
 router.get('/motors/:mfr/:desig/', function(req, res, next) {
   getMotor(req, res, true, true, function(motor, manufacturer, info) {
     req.db.SimFile.find({ _motor: motor._id }, undefined, { sort: { updatedAt: -1 } }).populate('_contributor').exec(req.success(function(simfiles) {
@@ -194,19 +197,53 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
         if (simfiles.length > 0)
           details.thrustCurveLink = req.helpers.motorLink(manufacturer, motor) + 'thrustcurve.svg';
 
-        if (req.user) {
-          // check if this is a favorite motor
-          details.username = req.user.name;
-          details.addFavoriteLink = '/mystuff/addfavorite.html?motor=' + motor._id;
-          details.removeFavoriteLink = '/mystuff/removefavorite.html?motor=' + motor._id;
-          req.db.FavoriteMotor.findOne({ _contributor: req.user._id, _motor: motor._id }, req.success(function(favorite) {
-            details.favorite = favorite;
+        function finish() {
+          if (req.user) {
+            // check if this is a favorite motor
+            details.username = req.user.name;
+            details.addFavoriteLink = '/mystuff/addfavorite.html?motor=' + motor._id;
+            details.removeFavoriteLink = '/mystuff/removefavorite.html?motor=' + motor._id;
+            req.db.FavoriteMotor.findOne({ _contributor: req.user._id, _motor: motor._id }, req.success(function(favorite) {
+              details.favorite = favorite;
+              res.render('motors/details', details);
+            }));
+          } else {
+            // render the motor details (no user)
             res.render('motors/details', details);
-          }));
-        } else {
-          // render the motor details (no user)
-          res.render('motors/details', details);
+          }
         }
+
+        // get MESS status
+        let url = (MOTORCATO + '/api/1/motor?manufacturer=' + encodeURIComponent(manufacturer.name) +
+                   '&motor=' + motor.commonName);
+        const get = https.get(url, res => {
+          if (res.statusCode != 200)
+            return finish();
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            try {
+              let json = JSON.parse(data);
+              if (json != null && json.result != null) {
+                details.mess = {
+                  failureCount: json.result.failureCount,
+                  searchUrl: MOTORCATO + json.result.searchURL,
+                  reportUrl: (MOTORCATO + '/report?manufacturer=' +
+                              encodeURIComponent(json.result.manufacturer) +
+                              '&motor=' + encodeURIComponent(json.result.motor) +
+                              '&type=' + encodeURIComponent(motor.type)),
+                };
+                if (req.user != null) {
+                  details.mess.reportUrl += ('&name=' + encodeURIComponent(req.user.name) +
+                                             '&email=' + encodeURIComponent(req.user.email));
+                }
+              }
+            } catch (e) {}
+            finish();
+          });
+        });
+        get.on('error', e => finish())
+           .end();
       }));
     }));
   });

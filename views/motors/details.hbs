@@ -308,6 +308,23 @@
 {{/hasPerm}}
 </p>
 
+{{#if mess}}
+<div id="mess">
+  <img class="pull-left" src="https://www.motorcato.org/images/logo64.png" height="40" style="margin-right: 1em;">
+  <p>
+  There are
+  {{#if mess.failureCount}}
+    <a href="{{mess.searchUrl}}" target="_blank">{{mess.failureCount}} reported failures</a>
+  {{else}}
+  no reported failures
+  {{/if}}
+  of this motor in the <b>MESS</b> database.
+  <br/>
+  If you have had a failure, <a href="{{mess.reportUrl}}" target="_blank">please report it on <b>motorcato.org</b></a>.
+  </p>
+</div>
+{{/if}}
+
 {{#if thrustCurveLink}}
 <div id="thrustcurve">
 <p class="img"><img src="{{thrustCurveLink}}" alt="{{title}}"/></p>

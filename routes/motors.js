@@ -181,6 +181,7 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           title: req.helpers.motorFullName(manufacturer, motor),
           manufacturer: manufacturer,
           motor: motor,
+          certified: motor._certOrg != null && motor._certOrg.abbrev != 'UNC',
           simfiles: simfiles,
           initialThrust: initialThrust,
           notes: notes,

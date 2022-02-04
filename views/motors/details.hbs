@@ -179,12 +179,14 @@
       </div>
       {{/if}}
 
+      {{#if certified}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Cert. Org.</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{motor._certOrg.abbrev}}</p>
         </div>
       </div>
+      {{/if}}
 
       {{#if motor.certDate}}
       <div class="form-group">

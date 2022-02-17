@@ -1018,7 +1018,7 @@ router.get('/motors/recent.html', function(req, res, next) {
       }
 
       res.render('motors/recent', locals(req, defaults, {
-        title: 'Most Recently Viewed',
+        title: 'Recently Viewed / Compare',
         motors: motors,
         impulseClasses: classes,
         suggestClasses: suggestions,
@@ -1026,7 +1026,7 @@ router.get('/motors/recent.html', function(req, res, next) {
     }));
   } else {
     res.render('motors/recent', locals(req, defaults, {
-      title: 'Most Recently Viewed',
+      title: 'Recently Viewed / Compare',
       motors: [],
       impulseClasses: [],
       suggestClasses: [],

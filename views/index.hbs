@@ -40,7 +40,7 @@ With well over a thousand data files contributed by many users, you've come to t
   }
   table.features th,
   table.features td {
-    width: 25%;
+    width: 20%;
     text-align: center;
     padding: 1em;
     border-left: 1px solid #9e1a20;
@@ -53,12 +53,18 @@ With well over a thousand data files contributed by many users, you've come to t
       <th><a href="/motors/guide.html" class="btn btn-primary">Match a Rocket</a></th>
       <th><a href="/motors/browser.html" class="btn btn-primary">Browse by Type</a></th>
       <th><a href="/motors/popular.html" class="btn btn-primary">Most Popular</a></th>
+      {{#canCompare}}
+      <th><a href="/motors/recent.html" class="btn btn-primary">Compare</a></th>
+      {{/canCompare}}
     </tr>
     <tr>
       <td>Traditional search based on name and other properties of rocket motors</td>
       <td>Enter some simple information about your rocket and get a listing of the motors that work.</td>
       <td>Find motors of interest by successively narrowing down categories.</td>
       <td>See the motors other people are looking at and which are their favorite.</td>
+      {{#canCompare}}
+      <td>Compare the {{recentSuffix}} motors you've recently viwed.</td>
+      {{/canCompare}}
     </tr>
   </table>
 </div>

@@ -4,7 +4,8 @@
  */
 'use strict';
 
-const units = require('../../lib/units');
+const units = require('../../lib/units'),
+      number = require('../../lib/number');
 
 const CSV = 'text/csv';
 
@@ -66,17 +67,17 @@ class File {
   }
 
   colNumber(num, prec) {
-    if (typeof num != 'number' || isNaN(num) || !isFinite(num))
+    if (typeof num != 'number' || !isFinite(num))
       this.col('');
     else
-      this.col(num.toFixed(prec));
+      this.col(number.toFixed(num, prec));
   }
 
   colUnit(num, unit) {
-    if (typeof num != 'number' || isNaN(num) || !isFinite(num))
+    if (typeof num != 'number' || !isFinite(num))
       this.col('');
     else if (unit === 'mmt')
-      this.colNumber(num, 0);
+      this.colNumber(units.convertMMTFromMKS(num), -1);
     else if (unit === 'duration')
       this.colNumber(num, 1);
     else {

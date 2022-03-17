@@ -5,7 +5,8 @@
 'use strict';
 
 const xlsx = require('xlsx-style'),
-      units = require('../../lib/units');
+      units = require('../../lib/units'),
+      number = require('../../lib/number');
 
 const XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
@@ -80,7 +81,7 @@ class Worksheet {
 
     this.setCell(r, c, {
       t: 'n',
-      v: v.toFixed(Math.max(d, 4)),
+      v: number.toFixed(v, Math.max(d, 4)),
       w: f,
       s: s
     });

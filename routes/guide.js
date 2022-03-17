@@ -1301,8 +1301,8 @@ router.get('/motors/guide/:id/spreadsheet.csv', function(req, res, next) {
       r = result.results[i];
       file.col(r.motor.designation);
       file.col(r.manufacturer.abbrev);
-      file.col(r.mmt, 'mmt');
-      file.col(r.motor.length, 'length');
+      file.colUnit(r.motor.diameter, 'mmt');
+      file.colUnit(r.motor.length, 'length');
       file.col(r.motor.type);
       file.col(r.motor.propellantInfo);
       file.col(r.motor.caseInfo);

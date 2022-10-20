@@ -33,7 +33,7 @@
     "handlebars-helper": "0.0.12",
     "jszip": "^3.6.0",
     "mongodb": "^3.6.4",
-    "mongoose": "4.10.8",
+    "mongoose": "4.13.21",
     "mongoose-dateonly": "^1.0.3",
     "morgan": "^1.6.1",
     "mysql": "^2.10.0",

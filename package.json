@@ -54,6 +54,6 @@
   },
   "devDependencies": {
     "jasmine": "^2.5.2",
-    "mockgoose": "^6.0.8"
+    "mockgoose": "^8.0.4"
   }
 }

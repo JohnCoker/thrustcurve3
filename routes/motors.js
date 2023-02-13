@@ -1346,8 +1346,8 @@ function doSubmit(req, res, motor) {
           isChanged = true;
         }
       } else {
-        let d = new Date(s);
-        if (motor[p] == null || d.toISOString() != d.toISOString()) {
+        let d = new Date(s + 'Z')
+        if (motor[p] == null || motor[p].toISOString() != d.toISOString().replace(/T.*$/, '')) {
           motor[p] = d;
           isChanged = true;
         }

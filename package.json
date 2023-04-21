@@ -32,8 +32,8 @@
     "handlebars": "4.5.3",
     "handlebars-helper": "0.0.12",
     "jszip": "^3.6.0",
-    "mongodb": "^3.6.4",
-    "mongoose": "4.10.8",
+    "mongodb": "^5.3.0",
+    "mongoose": "5.13.17",
     "mongoose-dateonly": "^1.0.3",
     "morgan": "^1.6.1",
     "mysql": "^2.10.0",
@@ -53,7 +53,6 @@
     "yamljs": "^0.2.6"
   },
   "devDependencies": {
-    "jasmine": "^2.5.2",
-    "mockgoose": "^6.0.8"
+    "jasmine": "^2.5.2"
   }
 }

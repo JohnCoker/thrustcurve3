@@ -7,16 +7,21 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * flag motors favorited by other users
  * add "inserted length" field on motors
- * support uploading cert. documents
+ * combined RASP file for multiple motors
 
 ## Search
 
  * search for plugged motors
+ * support diameter range on mobile
+ * move "exempt" option before "hazmat"
+ * NAR contest status
 
 ## Motor Guide
 
  * use visual styles in spreadsheets
  * auto-save rocket changes
+ * flag motors with delays too far from optimal
+ * find common motors for multiple rockets
 
 ## Account
 
@@ -25,13 +30,14 @@ This page lists the things supported in the old site which haven't yet been reim
 ## Administration
 
  * user administration
- * cert. letter upload (https://www.dropbox.com/l/scl/AAA-ToxcBpRKVVLY0x_EuIMcTeI9aCqz5Rc)
 
 ## Mobile App
 
  * update TCTG to latest Cordova
  * switch to updated (JSON) API
  * add support for saving rockets entered into the app
+ * custom min. stable velocity in guide
+ * support compare motors
 
 
 # Old Site Pages

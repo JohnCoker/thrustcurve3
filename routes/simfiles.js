@@ -253,7 +253,7 @@ router.get('/simfiles/:id/points/:file', function(req, res, next) {
     let motor = simfile._motor;
     let csv = `"motor:","${motor._manufacturer.abbrev} ${motor.designation}"\n` +
               `"contributor:","${simfile._contributor.name}"\n` +
-              `"details:","https://www.thrustcurve.org/simfiles/${simfile._id}}/"\n`;
+              `"details:","https://www.thrustcurve.org/simfiles/${simfile._id}/"\n`;
 
     let errs = new errors.Collector();
     let parsed = parsers.parseData(simfile.format, simfile.data, errs);

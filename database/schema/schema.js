@@ -473,7 +473,7 @@ function makeRocketModel(mongoose) {
 function makeMotorViewModel(mongoose) {
   var schema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now, required: true },
-    updatedAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true, index: true },
     _motor: { type: mongoose.Schema.Types.ObjectId, ref: 'Motor', required: true, index: true },
     _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', index: true },
     source: { type: String, enum: MotorViewSourceEnum }

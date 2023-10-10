@@ -5,6 +5,8 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /outbox/
 Disallow: /simfiles/*/create.html
+Disallow: /simfiles/*/download/*
+Disallow: /simfiles/*/points/*
 Disallow: /notes/motor/*/add.html
 Disallow: /notes/simfile/*/add.html
 Disallow: /motors/browser.html?*

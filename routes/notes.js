@@ -80,7 +80,7 @@ router.get('/notes/motor/:motorId/add.html', function(req, res, next) {
 function redirectToMotor(req, res, motor) {
   metadata.get(req, cache => {
     let mfr = cache.manufacturers.byId(motor._manufacturer);
-    res.redirect(303, '/motors/' + mfr.abbrev + '/' + motor.designation + '/#notes');
+    res.redirect(303, req.helpers.motorLink(mfr, motor) + '#notes');
   });
 }
 

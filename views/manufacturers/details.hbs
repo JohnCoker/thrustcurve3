@@ -23,12 +23,14 @@
         </div>
       </div>
 
+      {{#if manufacturer.aliases}}
       <div class="form-group">
         <label class="col-sm-4 control-label">Aliases</label>
         <div class="col-sm-8">
           <p class="form-control-static">{{manufacturer.aliases}}</p>
         </div>
       </div>
+      {{/if}}
 
       {{#if impulseRange}}
       <div class="form-group">

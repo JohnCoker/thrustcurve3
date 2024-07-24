@@ -6,7 +6,7 @@ if [ $# -eq 1 ]; then
 fi
 echo "Dropping all collections in $db..."
 
-exec mongo localhost << _EOF_
+exec mongosh localhost << _EOF_
 use $db
 db.manufacturers.drop()
 db.certorgs.drop()

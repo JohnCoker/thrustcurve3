@@ -10,6 +10,7 @@ Disallow: /simfiles/*/points/*
 Disallow: /notes/motor/*/add.html
 Disallow: /notes/simfile/*/add.html
 Disallow: /motors/browser.html?*
+Disallow: /motors/compare.html
 Allow: /motors/browser.html$
 Disallow: /motors/search.html?*
 Allow: /motors/search.html$

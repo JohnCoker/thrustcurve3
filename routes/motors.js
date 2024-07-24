@@ -1044,8 +1044,27 @@ const comp_impulseBurnTimeImg = '/motors/compare-impulseBurnTime.svg',
       comp_thrustCurveImg = '/motors/compare-thrustCurve.svg';
 
 function compare(req, res, ids) {
-  if (ids && ids.length > 0) {
-    req.db.Motor.find({ _id: { $in: ids } }).populate('_manufacturer').exec(req.success(function(motors) {
+  if (typeof ids === 'string') {
+    ids = ids.trim().split(/ *, */);
+  }
+  if (Array.isArray(ids) && ids.length > 0) {
+    let oids = [];
+    let mids = [];
+    ids.forEach(id => {
+      if (req.db.isId(id))
+        oids.push(id);
+      else if (/^[1-9]\d*/.test(id))
+        mids.push(id);
+    });
+    let q = {};
+    if (oids.length > 0 && mids.length > 0) {
+      q = { $or: [ { _id: { $in: oids } }, { migratedId: { $in: mids } } ] };
+    } else if (mids.length > 0) {
+      q = { migratedId: { $in: mids } };
+    } else {
+      q = { _id: { $in: ids } };
+    }
+    req.db.Motor.find(q).populate('_manufacturer').exec(req.success(function(motors) {
       var classes = extractClasses(motors),
           query = '?', i;
 

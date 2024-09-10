@@ -82,8 +82,18 @@ const PermissionInfo = [
 Object.freeze(PermissionInfo);
 
 function dateOnly(mongoose) {
-  if (DateOnly == null)
+  if (DateOnly == null) {
     DateOnly = require('mongoose-dateonly')(mongoose);
+    DateOnly.prototype.toISOString = function() {
+      function pad(n) {
+        let s = String(n);
+        if (n < 10)
+          s = '0' + n;
+        return s;
+      }
+      return `${this.getFullYear()}-${pad(this.getMonth() + 1)}-${pad(this.getDate())}`;
+    };
+  }
   return DateOnly;
 }
 

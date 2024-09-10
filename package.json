@@ -32,7 +32,7 @@
     "handlebars": "4.5.3",
     "handlebars-helper": "0.0.12",
     "jszip": "^3.6.0",
-    "mongodb": "^5.3.0",
+    "mongodb": "^6.8.0",
     "mongoose": "5.13.17",
     "mongoose-dateonly": "^1.0.3",
     "morgan": "^1.6.1",

@@ -7,7 +7,7 @@
 const errors = require('../../lib/errors'),
       parseNumber = require('../../lib/number').parseNumber;
 
-var tEpsilon = 0.0005;
+var tEpsilon = 0.00001;
 
 function parse(data, error) {
   var lines, fields, info, points, pointErrors, line, point, lastTime, i;

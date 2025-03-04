@@ -46,6 +46,20 @@ mongoose.connect(config.mongoUrl, function(err) {
         console.error('unable to delete old guide results', err);
     });
   }
+
+  // clean up old motor view records (older than a year)
+  if (db && db.MotorView) {
+    let before = new Date();
+    before.setDate(before.getDate() - 365);
+    before.setDate(1);
+    before.setHours(0);
+    before.setMinutes(0);
+    before.setSeconds(0);
+    db.MotorView.deleteMany({ updatedAt: { $lt: before }}, function(err, _result) {
+      if (err)
+        console.error('unable to delete old motor views', err);
+    });
+  }
 });
 
 // site routes grouped by area

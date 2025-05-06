@@ -5,10 +5,11 @@
 'use strict';
 
 const xmlparser = require("xml-parser"),
+      XMLWriter = require('xml-writer'),
       errors = require('../../lib/errors'),
       parseNumber = require('../../lib/number').parseNumber;
 
-var tEpsilon = 0.00005;
+const tEpsilon = 0.00005;
 
 function parse(data, error) {
   var xml, engine, info, dataElt, points, point, lastTime, elt, attrs, attr, value, i, j, n;
@@ -156,7 +157,11 @@ function parse(data, error) {
       if (dataElt == null)
 	dataElt = engine.children[i];
       n++;
-    } else if (engine.children[i].name != 'comments') {
+    } else if (engine.children[i].name == 'comments') {
+      let c = engine.children[i].content.trim();
+      if (c !== '')
+        info.comment = c + '\n';
+    } else {
       error(errors.ROCKSIM_WRONG_DOC, 'unexpected element {1} in engine', engine.children[i].name);
     }
   }
@@ -229,6 +234,80 @@ function parse(data, error) {
   };
 }
 
+function print(parsed, error) {
+  if (parsed == null || parsed.info == null ||
+      parsed.info.name == null || parsed.info.manufacturer == null) {
+    error(errors.INVALID_INFO, 'missing parsed info for RockSim <engine>');
+    return;
+  }
+  if (parsed.points == null || !(parsed.points.length > 1)) {
+    error(errors.MISSING_POINTS, 'missing parsed data points for RockSim <data>');
+    return;
+  }
+  const info = parsed.info;
+
+  const w = new XMLWriter();
+  w.startDocument();
+  w.startElement('engine-database');
+  w.startElement('engine-list');
+
+  // engine element with stat attributes
+  w.startElement('engine');
+  w.writeAttribute('code', info.name);
+  if (parsed.info.manufacturer != null)
+    w.writeAttribute('mfg', info.manufacturer);
+  if (info.delays != null)
+    w.writeAttribute('delays', info.delays);
+  if (info.diameter > 0)
+    w.writeAttribute('dia', nToStr(info.diameter * 1000));
+  if (info.length > 0)
+    w.writeAttribute('len', nToStr(info.length * 1000));
+  if (info.type != null) {
+    if (info.type == 'SU')
+      w.writeAttribute('Type', 'single-use');
+    else if (info.type == 'reload')
+      w.writeAttribute('Type', 'reloadable');
+    else if (info.type == 'hybrid')
+      w.writeAttribute('Type', 'hybrid');
+  }
+  if (info.totalWeight > 0)
+    w.writeAttribute('initWt', nToStr(info.totalWeight * 1000));
+  if (info.propellantWeight > 0)
+    w.writeAttribute('propWt', nToStr(info.propellantWeight * 1000));
+  if (info.totalImpulse > 0)
+    w.writeAttribute('Itot', nToStr(info.totalImpulse));
+  if (info.avgThrust > 0)
+    w.writeAttribute('avgThrust', nToStr(info.avgThrust));
+  if (info.maxThrust > 0)
+    w.writeAttribute('peakThrust', nToStr(info.maxThrust));
+  if (info.burnTime > 0)
+    w.writeAttribute('burn-time', nToStr(info.burnTime));
+  if (info.massFraction > 0)
+    w.writeAttribute('massFrac', nToStr(info.massFraction));
+  if (info.isp > 0)
+    w.writeAttribute('Isp', nToStr(info.isp));
+
+  // comment
+  if (info.comment != null)
+    w.writeElement('comments', info.comment);
+
+  // data points
+  w.startElement('data');
+  parsed.points.forEach(point => {
+    w.startElement('eng-data');
+    w.writeAttribute("t", nToStr(point.time));
+    w.writeAttribute("f", nToStr(point.thrust));
+    w.endElement();
+  });
+
+  w.endDocument();
+  return w.toString().replace(/></g, '>\n<') + '\n';
+}
+
+function nToStr(v) {
+  return v.toFixed(4).replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+}
+
 function combine(data, error) {
   if (data == null || data.length < 1) {
     error(errors.DATA_FILE_EMPTY, 'missing data');
@@ -236,7 +315,7 @@ function combine(data, error) {
   }
 
   let text = '<engine-database>\n' +
-             ' <engine-list>\n';
+             '<engine-list>\n';
 
   data.forEach((one, i) => {
     one = one.trim();
@@ -260,7 +339,7 @@ function combine(data, error) {
     }
   });
 
-  text += ' </engine-list>\n' +
+  text += '</engine-list>\n' +
           '</engine-database>\n';
 
   return text;
@@ -275,7 +354,8 @@ module.exports = {
   format: 'RockSim',
   extension: '.rse',
   mimeType: 'text/x-rse+xml',
-  parse: parse,
-  combine: combine,
+  parse,
+  print,
+  combine,
 };
 Object.freeze(module.exports);

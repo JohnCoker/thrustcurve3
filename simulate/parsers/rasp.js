@@ -7,7 +7,8 @@
 const errors = require('../../lib/errors'),
       parseNumber = require('../../lib/number').parseNumber;
 
-var tEpsilon = 0.00001;
+const tEpsilon = 0.00001;
+const NL = '\n';
 
 function parse(data, error) {
   var lines, fields, info, points, pointErrors, line, point, lastTime, i;
@@ -17,13 +18,20 @@ function parse(data, error) {
     error(errors.DATA_FILE_EMPTY, 'missing data');
     return;
   }
-  lines = data.trim().split('\n');
+  lines = data.trim().split(/\r?\n/);
 
   // skip comments and blank lines
+  let comment;
   for (i = 0; i < lines.length; i++) {
     line = lines[i].trim();
     if (line !== '' && line.charAt(0) != ';')
       break;
+    let c = line.replace(/^;+ ?/, '');
+    if (c === '' && comment == null)
+      continue;
+    if (comment == null)
+      comment = '';
+    comment += c + '\n';
   }
   if (i >= lines.length) {
     error(errors.RASP_INFO_LINE, 'missing motor info line');
@@ -46,7 +54,8 @@ function parse(data, error) {
     delays: fields[3],
     propellantWeight: parseNumber(fields[4]),
     totalWeight: parseNumber(fields[5]),
-    manufacturer: fields[6]
+    manufacturer: fields[6],
+    comment,
   };
 
   // diameter and length must be at least 1mm
@@ -142,6 +151,90 @@ function parse(data, error) {
   };
 }
 
+const INDENT = '   ';
+const SEP    = '  ';
+const PREC   = 3;
+
+function print(parsed, error) {
+  if (parsed == null || parsed.info == null ||
+      parsed.info.name == null || parsed.info.manufacturer == null ||
+      !(parsed.info.diameter > 0) || !(parsed.info.length > 0) ||
+      !(parsed.info.propellantWeight > 0) || !(parsed.info.totalWeight > 0)) {
+    error(errors.INVALID_INFO, 'missing parsed info for RASP header');
+    return;
+  }
+  if (parsed.points == null || !(parsed.points.length > 1)) {
+    error(errors.MISSING_POINTS, 'missing parsed data points for RASP body');
+    return;
+  }
+
+  // comment
+  let s = '';
+  if (parsed.info.comment != null)
+    parsed.info.comment.trimRight().split(/\r?\n/).forEach(line => s += '; ' + line + NL);
+
+  // header line
+  s += parsed.info.name;
+  s += ' ' + nToStr(parsed.info.diameter * 1000, 1, 1, true) + ' ' + nToStr(parsed.info.length * 1000, 1, 0);
+  if (parsed.info.delays != null) {
+    let d = parsed.info.delays.trim().replace(/[^0-9]+/g, '-');
+    d = d.replace(/^-+/, '').replace(/-+$/, '');
+    if (d === '')
+      d = 'P';
+    s += ' ' + d;
+  }
+  s += ' ' + nToStr(parsed.info.propellantWeight, 1, 4, true) + ' ' + nToStr(parsed.info.totalWeight, 1, 4, true);
+  s += ' ' + parsed.info.manufacturer;
+  s += NL;
+
+  // data points
+  {
+    let timeScale = scale(parsed.points, 'time');
+    let thrustScale = scale(parsed.points, 'thrust');
+    let sawZero = false;
+    let tLast = 0;
+    parsed.points.forEach((point, i) => {
+      s += INDENT + nToStr(point.time, timeScale, PREC) + SEP;
+      if (point.thrust > 0) {
+        s += nToStr(point.thrust, thrustScale, PREC);
+      } else {
+        s += nToStr(0, thrustScale, 0);
+        sawZero = true;
+      }
+      s += NL;
+      tLast = Math.max(tLast, point.time);
+    });
+    if (!sawZero) {
+      s += INDENT + nToStr(tLast + 0.001, timeScale, PREC) + SEP + nToStr(0, thrustScale, 0) + NL;
+    }
+  }
+
+  return s;
+}
+
+function scale(points, field) {
+  return points.reduce((prev, point) => Math.max(prev, Math.round(point[field]).toFixed().length), 1);
+}
+
+function nToStr(v, scale, prec, trailingZeros) {
+  let s, l;
+  if (prec < 0)
+    s = String(v);
+  else
+    s = v.toFixed(prec);
+  l = s.indexOf('.');
+  if (l < 1)
+    l = s.length;
+  while (l < scale) {
+    s = ' ' + s;
+    l++;
+  }
+  if (trailingZeros) {
+    s = s.replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '');
+  }
+  return s;
+}
+
 function combine(data, error) {
   if (data == null || data.length < 1) {
     error(errors.DATA_FILE_EMPTY, 'missing data');
@@ -156,8 +249,8 @@ function combine(data, error) {
       return;
     }
     if (text !== '' && one.charAt(0) !== ';')
-      text += ';\n';
-    text += one.split(/ *\r?\n/).join('\n') + '\n';
+      text += ';' + NL;
+    text += one.split(/ *\r?\n/).join(NL) + NL;
   });
   return text;
 }
@@ -171,7 +264,8 @@ module.exports = {
   format: 'RASP',
   extension: '.eng',
   mimeType: 'text/x-rasp+plain',
-  parse: parse,
-  combine: combine,
+  parse,
+  print,
+  combine,
 };
 Object.freeze(module.exports);

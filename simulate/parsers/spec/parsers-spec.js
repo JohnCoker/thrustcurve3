@@ -126,6 +126,31 @@ describe("parsers", function() {
     });
   });
 
+  const J250_RASP =
+    '; J250W DMS\n' +
+    'J250W 54 218.2 14 0.363 0.708 AT\n' +
+    '   0.005 149.863\n' +
+    '   0.016 124.444\n' +
+    '   0.048 224.0\n' +
+    '   0.051 290.723\n' +
+    '   0.077 309.787\n' +
+    '   0.221 324.085\n' +
+    '   0.269 316.141\n' +
+    '   0.497 335.735\n' +
+    '   0.997 324.085\n' +
+    '   1.497 288.605\n' +
+    '   1.713 266.893\n' +
+    '   2.003 210.231\n' +
+    '   2.162 176.87\n' +
+    '   2.487 119.678\n' +
+    '   2.516 125.503\n' +
+    '   2.718 91.612\n' +
+    '   2.766 45.541\n' +
+    '   2.814 18.005\n' +
+    '   2.867 7.943\n' +
+    '   2.902 0.0\n' +
+    ';\n';
+
   describe("parseRASP", function() {
     it("function", function() {
       expect(typeof parsers.parseRASP).toBe('function');
@@ -134,6 +159,10 @@ describe("parsers", function() {
     var parsed;
     it("call", function() {
       var data =
+          '' +
+          ';' +
+          '' +
+          ';' +
           '; AeroTech K550W\n' +
           '; converted from TMT test stand data 1998 (www.tripoli.org)\n' +
           '; provided by ThrustCurve.org (www.thrustcurve.org)\n' +
@@ -155,6 +184,9 @@ describe("parsers", function() {
       expect(parsed.info.delays).toBe('0');
       expect(parsed.info.totalWeight).toBeCloseTo(1.487, 3);
       expect(parsed.info.propellantWeight).toBeCloseTo(0.920, 3);
+      expect(parsed.info.comment).toBe('AeroTech K550W\n' +
+                                       'converted from TMT test stand data 1998 (www.tripoli.org)\n' +
+                                       'provided by ThrustCurve.org (www.thrustcurve.org)\n');
     });
     it("points", function() {
       expect(parsed.points).toBeDefined();
@@ -166,67 +198,7 @@ describe("parsers", function() {
     });
   });
 
-  describe("parseRockSim", function() {
-    it("function", function() {
-      expect(typeof parsers.parseRockSim).toBe('function');
-    });
-
-    var parsed;
-    it("call", function() {
-      var data =
-          '<engine-database>\n' +
-          ' <engine-list>\n' +
-          '  <engine code="K550W" mfg="Aerotech" delays="6,10,14,18" dia="54." len="410." Type="reloadable" ' +
-          'massFrac="58.11" Isp="184.68" peakThrust="853.13" initWt="1515.1" propWt="880.4" Itot="1594.46" ' +
-          'avgThrust="455.561" burn-time="3.5">\n' +
-          '   <comments>\n' +
-          '; AeroTech K550W\n' +
-          '; converted from TMT test stand data 1998 (www.tripoli.org)\n' +
-          '; provided by ThrustCurve.org (www.thrustcurve.org)\n' +
-          '   </comments>\n' +
-          '   <data>\n' +
-          '    <eng-data f="628.15" t="0." m="880.4"/>\n' +
-          '    <eng-data f="0." t="3.5" m="0."/>\n' +
-          '   </data>\n' +
-          '  </engine>\n' +
-          ' </engine-list>\n' +
-          '</engine-database>\n';
-      expect(function() {
-        parsed = parsers.parseData('RockSim', data, errors.print);
-      }).not.toThrow();
-      expect(parsed).toBeDefined();
-      expect(typeof parsed).toBe('object');
-      expect(parsed.format).toBe('RockSim');
-    });
-    it("info", function() {
-      expect(parsed.info.name).toBe('K550W');
-      expect(parsed.info.manufacturer).toBe('Aerotech');
-      expect(parsed.info.delays).toBe('6,10,14,18');
-      expect(parsed.info.diameter).toBe(0.054);
-      expect(parsed.info.length).toBe(0.410);
-      expect(parsed.info.type).toBe('reload');
-      expect(parsed.info.massFraction).toBe(58.11);
-      expect(parsed.info.isp).toBe(184.68);
-      expect(parsed.info.totalWeight).toBeCloseTo(1.515, 3);
-      expect(parsed.info.propellantWeight).toBeCloseTo(0.880, 3);
-      expect(parsed.info.maxThrust).toBe(853.13);
-      expect(parsed.info.avgThrust).toBe(455.561);
-      expect(parsed.info.totalImpulse).toBe(1594.46);
-      expect(parsed.info.burnTime).toBe(3.5);
-    });
-    it("points", function() {
-      expect(parsed.points).toBeDefined();
-      expect(parsed.points.length).toBe(2);
-      expect(parsed.points[0].time).toBe(0);
-      expect(parsed.points[0].thrust).toBe(628.15);
-      expect(parsed.points[0].propellantWeight).toBeCloseTo(0.880, 3);
-      expect(parsed.points[1].time).toBe(3.5);
-      expect(parsed.points[1].thrust).toBe(0);
-      expect(parsed.points[1].propellantWeight).toBe(0);
-    });
-
-    it("CDATA", function() {
-      var data =
+  const J450_ROCKSIM =
           '<engine-database>\n' +
           ' <engine-list>\n' +
           '<engine FDiv="10" FFix="1" FStep="-1." Isp="204.62" Itot="1069.71" Type="reloadable" auto-calc-cg="1" auto-calc-mass="1" avgThrust="459.105" burn-time="2.33" cgDiv="10" cgFix="1" cgStep="-1." code="J450ST" delays="1000" dia="54." exitDia="0." initWt="1196.4" len="326." mDiv="10" mFix="1" mStep="-1." massFrac="44.56" mfg="Animal Motor Works" peakThrust="563.18" propWt="533.1" tDiv="10" tFix="1" tStep="-1." throatDia="0.">\n' +
@@ -277,13 +249,186 @@ describe("parsers", function() {
           '</engine>\n' +
           ' </engine-list>\n' +
           '</engine-database>\n';
-      let parsed;
+
+  describe("parseRockSim", function() {
+    it("function", function() {
+      expect(typeof parsers.parseRockSim).toBe('function');
+    });
+
+    var parsed;
+    it("call", function() {
+      var data =
+          '<engine-database>\n' +
+          ' <engine-list>\n' +
+          '  <engine code="K550W" mfg="Aerotech" delays="6,10,14,18" dia="54." len="410." Type="reloadable" ' +
+          'massFrac="58.11" Isp="184.68" peakThrust="853.13" initWt="1515.1" propWt="880.4" Itot="1594.46" ' +
+          'avgThrust="455.561" burn-time="3.5">\n' +
+          '   <comments>\n' +
+          'AeroTech K550W\n' +
+          'converted from TMT test stand data 1998 (www.tripoli.org)\n' +
+          'provided by ThrustCurve.org (www.thrustcurve.org)\n' +
+          '   </comments>\n' +
+          '   <data>\n' +
+          '    <eng-data f="628.15" t="0." m="880.4"/>\n' +
+          '    <eng-data f="0." t="3.5" m="0."/>\n' +
+          '   </data>\n' +
+          '  </engine>\n' +
+          ' </engine-list>\n' +
+          '</engine-database>\n';
       expect(function() {
         parsed = parsers.parseData('RockSim', data, errors.print);
       }).not.toThrow();
       expect(parsed).toBeDefined();
+      expect(typeof parsed).toBe('object');
+      expect(parsed.format).toBe('RockSim');
+    });
+    it("info", function() {
+      expect(parsed.info.name).toBe('K550W');
+      expect(parsed.info.manufacturer).toBe('Aerotech');
+      expect(parsed.info.delays).toBe('6,10,14,18');
+      expect(parsed.info.diameter).toBe(0.054);
+      expect(parsed.info.length).toBe(0.410);
+      expect(parsed.info.type).toBe('reload');
+      expect(parsed.info.massFraction).toBe(58.11);
+      expect(parsed.info.isp).toBe(184.68);
+      expect(parsed.info.totalWeight).toBeCloseTo(1.515, 3);
+      expect(parsed.info.propellantWeight).toBeCloseTo(0.880, 3);
+      expect(parsed.info.maxThrust).toBe(853.13);
+      expect(parsed.info.avgThrust).toBe(455.561);
+      expect(parsed.info.totalImpulse).toBe(1594.46);
+      expect(parsed.info.burnTime).toBe(3.5);
+      expect(parsed.info.comment).toBe('AeroTech K550W\n' +
+                                       'converted from TMT test stand data 1998 (www.tripoli.org)\n' +
+                                       'provided by ThrustCurve.org (www.thrustcurve.org)\n');
+    });
+    it("points", function() {
+      expect(parsed.points).toBeDefined();
+      expect(parsed.points.length).toBe(2);
+      expect(parsed.points[0].time).toBe(0);
+      expect(parsed.points[0].thrust).toBe(628.15);
+      expect(parsed.points[0].propellantWeight).toBeCloseTo(0.880, 3);
+      expect(parsed.points[1].time).toBe(3.5);
+      expect(parsed.points[1].thrust).toBe(0);
+      expect(parsed.points[1].propellantWeight).toBe(0);
+    });
+
+    it("CDATA", function() {
+      let parsed;
+      expect(function() {
+        parsed = parsers.parseData('RockSim', J450_ROCKSIM, errors.print);
+      }).not.toThrow();
+      expect(parsed).toBeDefined();
       expect(parsed.info.name).toBe('J450ST');
+      expect(parsed.info.comment).toBe('Animal Motor Works 54-1050\n' +
+                                       'AMW J450ST RASP.ENG file made from NAR published data\n' +
+                                       'File produced SEPT 4, 2002\n' +
+                                       'This file my be used or given away. All I ask is that this header\n' +
+                                       'is maintained to give credit to NAR S&T. Thank you, Jack Kane\n' +
+                                       'The total impulse, peak thrust, average thrust and burn time are\n' +
+                                       'the same as the averaged static test data on the NAR web site in\n' +
+                                       'the certification file. The curve drawn with these data points is as\n' +
+                                       'close to the certification curve as can be with such a limited\n' +
+                                       'number of points (32) allowed with wRASP up to v1.6.\n');
       expect(parsed.points.length).toBe(31);
+    });
+  });
+
+  describe("printData", function() {
+    it("function", function() {
+      expect(typeof parsers.printData).toBe('function');
+    });
+
+    it("RASP", function() {
+      const parsed = parsers.parseData('RASP', J250_RASP, errors.print);
+      expect(parsed).toBeDefined();
+      const file = parsers.printData('RASP', parsed, errors.print);
+      expect(file).toBe('; J250W DMS\n' +
+                        'J250W 54 218 14 0.363 0.708 AT\n' +
+                        '   0.005  149.863\n' +
+                        '   0.016  124.444\n' +
+                        '   0.048  224.000\n' +
+                        '   0.051  290.723\n' +
+                        '   0.077  309.787\n' +
+                        '   0.221  324.085\n' +
+                        '   0.269  316.141\n' +
+                        '   0.497  335.735\n' +
+                        '   0.997  324.085\n' +
+                        '   1.497  288.605\n' +
+                        '   1.713  266.893\n' +
+                        '   2.003  210.231\n' +
+                        '   2.162  176.870\n' +
+                        '   2.487  119.678\n' +
+                        '   2.516  125.503\n' +
+                        '   2.718   91.612\n' +
+                        '   2.766   45.541\n' +
+                        '   2.814   18.005\n' +
+                        '   2.867    7.943\n' +
+                        '   2.902    0\n');
+    });
+
+    it("RockSim", function() {
+      const parsed = parsers.parseData('RockSim', J450_ROCKSIM, errors.print);
+      expect(parsed).toBeDefined();
+      const file = parsers.printData('RockSim', parsed, errors.print);
+      expect(file).toBe('<?xml version="1.0"?>\n' +
+                        '<engine-database>\n' +
+                        '<engine-list>\n' +
+                        '<engine code="J450ST" mfg="Animal Motor Works" delays="1000" dia="54" len="326" Type="reloadable" initWt="1196.4" propWt="533.1" Itot="1069.71" avgThrust="459.105" peakThrust="563.18" burn-time="2.33" massFrac="44.56" Isp="204.62">\n' +
+                        '<comments>Animal Motor Works 54-1050\n' +
+                        'AMW J450ST RASP.ENG file made from NAR published data\n' +
+                        'File produced SEPT 4, 2002\n' +
+                        'This file my be used or given away. All I ask is that this header\n' +
+                        'is maintained to give credit to NAR S&amp;T. Thank you, Jack Kane\n' +
+                        'The total impulse, peak thrust, average thrust and burn time are\n' +
+                        'the same as the averaged static test data on the NAR web site in\n' +
+                        'the certification file. The curve drawn with these data points is as\n' +
+                        'close to the certification curve as can be with such a limited\n' +
+                        'number of points (32) allowed with wRASP up to v1.6.\n' +
+                        '</comments>\n' +
+                        '<data>\n' +
+                        '<eng-data t="0" f="0"/>\n' +
+                        '<eng-data t="0.009" f="251.586"/>\n' +
+                        '<eng-data t="0.016" f="376.074"/>\n' +
+                        '<eng-data t="0.03" f="413.45"/>\n' +
+                        '<eng-data t="0.051" f="430.832"/>\n' +
+                        '<eng-data t="0.094" f="423.296"/>\n' +
+                        '<eng-data t="0.162" f="413.149"/>\n' +
+                        '<eng-data t="0.262" f="395.566"/>\n' +
+                        '<eng-data t="0.402" f="420.182"/>\n' +
+                        '<eng-data t="0.495" f="444.898"/>\n' +
+                        '<eng-data t="0.805" f="504.078"/>\n' +
+                        '<eng-data t="1.048" f="536.028"/>\n' +
+                        '<eng-data t="1.223" f="550.597"/>\n' +
+                        '<eng-data t="1.299" f="563.18"/>\n' +
+                        '<eng-data t="1.334" f="555.319"/>\n' +
+                        '<eng-data t="1.47" f="560.042"/>\n' +
+                        '<eng-data t="1.588" f="559.841"/>\n' +
+                        '<eng-data t="1.764" f="546.98"/>\n' +
+                        '<eng-data t="1.921" f="516.838"/>\n' +
+                        '<eng-data t="1.993" f="496.743"/>\n' +
+                        '<eng-data t="2.025" f="499.154"/>\n' +
+                        '<eng-data t="2.047" f="479.16"/>\n' +
+                        '<eng-data t="2.086" f="414.354"/>\n' +
+                        '<eng-data t="2.115" f="344.525"/>\n' +
+                        '<eng-data t="2.141" f="252.29"/>\n' +
+                        '<eng-data t="2.177" f="140.161"/>\n' +
+                        '<eng-data t="2.213" f="82.78"/>\n' +
+                        '<eng-data t="2.239" f="50.347"/>\n' +
+                        '<eng-data t="2.271" f="27.861"/>\n' +
+                        '<eng-data t="2.296" f="12.86"/>\n' +
+                        '<eng-data t="2.33" f="0"/>\n' +
+                        '</data>\n' +
+                        '</engine>\n' +
+                        '</engine-list>\n' +
+                        '</engine-database>\n');
+    });
+
+    it("invalid", function() {
+      let file;
+      expect(function() {
+        file = parsers.printData('invalid', 'lsdkjflsdjflasjflasdjfkladsjfdalkfa', function(msg) {});
+      }).not.toThrow();
+      expect(file).toBeUndefined();
     });
   });
 
@@ -382,6 +527,88 @@ describe("parsers", function() {
       for (let i = 0; i < list.children.length; i++) {
         expect(list.children[i].name).toBe('engine');
       }
+    });
+  });
+
+  describe("computeInfo", function() {
+    it("function", function() {
+      expect(typeof parsers.computeInfo).toBe('function');
+    });
+    it("J450", function() {
+      const parsed = parsers.parseRockSim(J450_ROCKSIM, errors.print);
+      const info = parsers.computeInfo(parsed.points, errors.print);
+      expect(info).toBeDefined();
+      expect(info.name).toBe('J459');
+      expect(info.totalImpulse).toBeCloseTo(parsed.info.totalImpulse, 1);
+      expect(info.avgThrust).toBeCloseTo(parsed.info.avgThrust, 1);
+      expect(info.maxThrust).toBeCloseTo(parsed.info.maxThrust, 1);
+      expect(info.burnTime).toBeCloseTo(parsed.info.burnTime, 2);
+    });
+  });
+
+  describe("mergeData", function() {
+    it("function", function() {
+      expect(typeof parsers.mergeData).toBe('function');
+    });
+    it("single motor", function() {
+      const parsed = parsers.parseRockSim(J450_ROCKSIM, errors.print);
+      const merged = parsers.mergeData([parsed], errors.print);
+      expect(merged).toBeDefined();
+      expect(merged.info).toBeDefined();
+      expect(merged.info.name).toBe('J459');
+      expect(merged.info.totalImpulse).toBeCloseTo(parsed.info.totalImpulse, -1);
+      expect(merged.info.avgThrust).toBeCloseTo(parsed.info.avgThrust, 0);
+      expect(merged.info.maxThrust).toBeCloseTo(parsed.info.maxThrust, 0);
+      expect(merged.info.burnTime).toBeCloseTo(parsed.info.burnTime, 2);
+      expect(merged.info.propellantWeight).toBe(parsed.info.propellantWeight);
+      expect(merged.info.totalWeight).toBe(parsed.info.totalWeight);
+      expect(merged.info.diameter).toBe(parsed.info.diameter);
+      expect(merged.info.length).toBe(parsed.info.length);
+      expect(merged.points).toBeDefined();
+      expect(merged.points.length).toBeLessThan(50);
+    });
+    it("cluster", function() {
+      const parsed = parsers.parseRASP(J250_RASP, errors.print);
+      const expectedInfo = parsers.computeInfo(parsed.points, errors.print);
+      const N = 4;
+      parsed.count = N;
+      const merged = parsers.mergeData([parsed], errors.print);
+      expect(merged).toBeDefined();
+      expect(merged.info).toBeDefined();
+      expect(merged.info.name).toBe('L976');
+      expect(merged.info.totalImpulse).toBeCloseTo(expectedInfo.totalImpulse * N, -1);
+      expect(merged.info.avgThrust).toBeCloseTo(expectedInfo.avgThrust * N, -1);
+      expect(merged.info.maxThrust).toBeCloseTo(expectedInfo.maxThrust * N, 0);
+      expect(merged.info.burnTime).toBeCloseTo(expectedInfo.burnTime, 1);
+      expect(merged.info.propellantWeight).toBe(parsed.info.propellantWeight * N);
+      expect(merged.info.totalWeight).toBe(parsed.info.totalWeight * N);
+      expect(merged.info.diameter).toBe(parsed.info.diameter);
+      expect(merged.info.length).toBe(parsed.info.length);
+      expect(merged.points).toBeDefined();
+      expect(merged.points.length).toBeLessThan(50);
+    });
+    it("stage", function() {
+      const booster = parsers.parseRockSim(J450_ROCKSIM, errors.print);
+      const expectedBooster = parsers.computeInfo(booster.points, errors.print);
+      const sustainer = parsers.parseRASP(J250_RASP, errors.print);
+      const expectedSustainer = parsers.computeInfo(sustainer.points, errors.print);
+      const DELAY = 5;
+      sustainer.offset = DELAY;
+      const expectedImpulse = expectedBooster.totalImpulse + expectedSustainer.totalImpulse;
+      const expectedBurnTime = DELAY + expectedSustainer.burnTime;
+
+      const merged = parsers.mergeData([booster, sustainer], errors.print);
+      expect(merged.info.name).toBe('K224');
+      expect(merged.info.totalImpulse).toBeCloseTo(expectedImpulse, -2);
+      expect(merged.info.avgThrust).toBeCloseTo(expectedImpulse / expectedBurnTime, -1);
+      expect(merged.info.maxThrust).toBeCloseTo(Math.max(expectedBooster.maxThrust, expectedSustainer.maxThrust), -1);
+      expect(merged.info.burnTime).toBeCloseTo(expectedBurnTime, 1);
+      expect(merged.info.propellantWeight).toBe(booster.info.propellantWeight + sustainer.info.propellantWeight);
+      expect(merged.info.totalWeight).toBe(booster.info.totalWeight + sustainer.info.totalWeight);
+      expect(merged.info.diameter).toBe(Math.max(booster.info.diameter, sustainer.info.diameter));
+      expect(merged.info.length).toBe(Math.max(booster.info.length, sustainer.info.length));
+      expect(merged.points).toBeDefined();
+      expect(merged.points.length).toBeLessThan(60);
     });
   });
 });

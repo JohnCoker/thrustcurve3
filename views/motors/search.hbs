@@ -335,7 +335,10 @@ $(document).ready(function(e) {
   {{/each}}
   </tbody>
 </table>
-<p class="hidden-xs">Choose two or more motors from the list to <a id="compare" href="#">Compare</a>.</p>
+<p class="hidden-xs">Choose two or more motors from the list to
+<a id="compare" href="#">Compare</a> or
+<a id="merge" href="#">Merge</a>.
+</p>
 <script type="text/javascript">
 setupTable('#result-list', {
   order: [[4, 'asc']],
@@ -368,6 +371,23 @@ $('#compare').click(function(e) {
     window.alert('Choose two or more motors from the list above.');
   else
     window.location = '/motors/compare.html?' + motors;
+});
+$('#merge').click(function(e) {
+  e.preventDefault();
+  let query = '', count = 0;
+  $('#result-list td input[name=select]').each(function() {
+    let checkbox = $(this);
+    if (checkbox.is(':checked')) {
+      count++;
+      if (query !== '')
+        query += '&';
+      query += 'motor' + count.toFixed() + '=' + checkbox.val();
+    }
+  });
+  if (count < 1)
+    window.alert('Choose one or more motors from the list above.');
+  else
+    window.location = '/motors/merge.html?' + query;
 });
 </script>
 {{/if}}

@@ -51,6 +51,7 @@ column to view the details again or compare several motors by selecting the chec
   </tbody>
 </table>
 <button type="submit" class="btn btn-default" id="compare">Compare Selected Motors</button>
+<button class="btn btn-default" id="merge">Merge Selected Motors</button>
 </form>
 
 <script type="text/javascript">
@@ -63,6 +64,10 @@ function buttonState() {
     $('#compare').removeProp('disabled');
   else
     $('#compare').prop('disabled', 'disabled');
+  if (count > 0)
+    $('#merge').removeProp('disabled');
+  else
+    $('#merge').prop('disabled', 'disabled');
 }
 
 $('a.impulseClass').click(function(e) {
@@ -75,6 +80,13 @@ $('a.impulseClass').click(function(e) {
     input.prop('checked', input.closest('tr').data('class') == letter);
   });
   buttonState();
+});
+
+$('button#merge').click(function(e) {
+  let form = $('form[name=compare]');
+  let q = new URLSearchParams(new FormData(form[0])).toString();
+  window.location = '/motors/merge.html?' + q;
+  return false;
 });
 
 setupTable('#recent-list', {

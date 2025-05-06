@@ -1,0 +1,219 @@
+<h1>{{title}}</h1>
+
+<style type="text/css">
+img.chart, svg {
+  width: 100%;
+  height: auto;
+}
+table.stats th {
+  font-weight: normal;
+  padding-right: 0.8em;
+  text-align: left;
+}
+.popover .arrow {
+  display: none;
+}
+table.info {
+  margin-top: 0;
+}
+table.info th {
+ padding-left: 2em;
+ padding-right: 1em;
+}
+</style>
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">{{this}}</div>
+{{/each}}
+
+{{#unless inputs}}
+<p>
+You haven't selected any motors to merge.
+As you view details of different motors, the ones you've seen most recently will be visible in
+<a href="/motors/recent.html">Recently Viewed</a> and you can merge them.
+You can also merge motors from the <a href="/motors/search.html">Attribute Search</a> results.
+</p>
+{{/unless}}
+
+{{#if inputs}}
+<p>
+{{#if multiInputs}}
+You selected {{length inputs}} motors to merge.
+Increase the <b>count</b> to simulate a cluster and/or the
+<b>offset</b> to simulate staging.
+{{else}}
+You selected a single motor to "merge."
+You can increase the <b>count</b> to simulate a cluster and/or
+duplicate the motor and apply an <b>offset</b> to simulate staging.
+{{/if}}
+</p>
+
+<style type="text/css">
+td.input input {
+  width: 5em;
+}
+td.actions a:not(:first-of-type) {
+  margin-left: 0.2em;
+}
+</style>
+
+<form name="merge" method="get" action="/motors/merge.html">
+<input type="hidden" name="count" value="{{count}}"/>
+<input type="hidden" name="submit" value="true"/>
+<table id="recent-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th title="number of motors in cluster">Count</th>
+     <th title="delay in seconds in start of burn">Offset</th>
+     <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each inputs}}
+    <tr>
+      <td>{{motorDesignation motor}}</td>
+      <td>{{motor._manufacturer.abbrev}}</td>
+      <td class="input count"><input type="number" min="1" name="count{{n}}" value="{{count}}"/></td>
+      <td class="input offset"><input type="number" min="0" step="0.1" name="offset{{n}}" value="{{offset}}"/></td>
+      <td class="actions">
+        <input type="hidden" name="motor{{n}}" value="{{motorId}}"/>
+        <a href="#" class="move-up" title="move up"><i class="fa fa-arrow-up"></i></a>
+        <a href="#" class="move-down" title="move down"><i class="fa fa-arrow-down"></i></a>
+        <a href="#" class="duplicate" title="duplicate this motor"><i class="fa fa-clone"></i></a>
+        <a href="#" class="delete" title="remove this motor"><i class="fa fa-trash"></i></a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<button type="submit" class="btn btn-default">Merge Motors</button>
+</form>
+
+<script type="text/javascript">
+function updateActions() {
+  const form = $('form[name=merge]');
+  const rows = form.find('tbody tr');
+  const count = rows.length;
+  rows.each(function(i) {
+    const tr = $(this);
+    let a = tr.find('a.move-up');
+    if (i > 0)
+      a.removeClass('disabled');
+    else
+      a.addClass('disabled');
+    a = tr.find('a.move-down');
+    if (i + 1 < count)
+      a.removeClass('disabled');
+    else
+      a.addClass('disabled');
+    a = tr.find('a.delete');
+    if (count > 1)
+      a.removeClass('disabled');
+    else
+      a.addClass('disabled');
+  });
+  form.find('input[name=count]').val(count.toFixed());
+}
+
+function renumber() {
+  const form = $('form[name=merge]');
+  let count = 0;
+  form.find('tbody tr').each(function() {
+    const tr = $(this);
+    count++;
+    const suffix = count.toFixed();
+    tr.find('td.count input').attr('name', 'count' + suffix);
+    tr.find('td.offset input').attr('name', 'offset' + suffix);
+    tr.find('td.actions input').attr('name', 'motor' + suffix);
+  });
+  form.find('input[name=count]').val(count.toFixed());
+}
+
+$(document).ready(function() {
+  const form = $('form[name=merge]');
+  const rows = form.find('tbody tr');
+  rows.find('a.move-up').click(function(e) {
+    e.preventDefault();
+    const row = $(this).closest('tr');
+    const prev = row.prev('tr');
+    if (prev.length > 0) {
+      row.detach();
+      row.insertBefore(prev);
+      renumber();
+    }
+    updateActions();
+  });
+  rows.find('a.move-down').click(function(e) {
+    e.preventDefault();
+    const row = $(this).closest('tr');
+    const next = row.next('tr');
+    if (next.length > 0) {
+      row.detach();
+      row.insertAfter(next);
+      renumber();
+    }
+    updateActions();
+  });
+  rows.find('a.duplicate').click(function(e) {
+    e.preventDefault();
+    const row = $(this).closest('tr');
+    const clone = row.clone(true);
+    clone.insertAfter(row);
+    renumber();
+    updateActions();
+  });
+  rows.find('a.delete').click(function(e) {
+    e.preventDefault();
+    const row = $(this).closest('tr');
+    row.remove();
+    renumber();
+    updateActions();
+  });
+
+  updateActions();
+});
+</script>
+{{/if}}
+
+{{#if merged}}
+<h2>Merged Motor Summary</h2>
+<table class="info">
+  <tr>
+    <th>Designation</th>
+    <td>{{merged.info.name}}</td>
+  </tr>
+  <tr>
+    <th>Total Weight</th>
+    <td>{{formatMass merged.info.totalWeight}}</td>
+  </tr>
+  <tr>
+    <th>Prop. Weight</th>
+    <td>{{formatMass merged.info.propellantWeight}}</td>
+  </tr>
+  <tr>
+    <th>Avg. Thrust</th>
+    <td>{{formatForce merged.info.avgThrust}}</td>
+  </tr>
+  <tr>
+    <th>Max. Thrust</th>
+    <td>{{formatForce merged.info.maxThrust}}</td>
+  </tr>
+  <tr>
+    <th>Total Impulse</th>
+    <td>{{formatImpulse merged.info.totalImpulse}}</td>
+  </tr>
+  <tr>
+    <th>Burn Time</th>
+    <td>{{formatDuration merged.info.burnTime}}</td>
+  </tr>
+</table>
+{{/if}}
+
+{{#if curveUrl}}
+<h2>Thrust Curve</h2>
+<div class="curve">
+  <img title="merged thrust curve" src="{{{curveUrl}}}"/>
+</div>
+{{/if}}

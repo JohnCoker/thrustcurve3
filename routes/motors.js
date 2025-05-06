@@ -7,6 +7,7 @@
 const _ = require('underscore'),
       https = require('https'),
       express = require('express'),
+      crypto = require('node:crypto'),
       fileUpload = require('express-fileupload'),
       router = express.Router(),
       errors = require('../lib/errors'),
@@ -1153,6 +1154,128 @@ router.get(comp_thrustCurveImg, function(req, res, next) {
     }));
   } else {
     res.status(400).send('no motors to compare');
+  }
+});
+
+
+/*
+ * /motors/merge.html
+ * Merge multiple motors into a single thrust curve.
+ */
+function merge(req, res, params, submit) {
+  delete req.session.mergedId;
+  delete req.session.graphData;
+
+  // collect the inputs
+  let inputs = [];
+  if (params.motors != null && params.motors.length > 0) {
+    if (Array.isArray(params.motors)) {
+      params.motors.forEach(id => {
+        if (req.db.isId(id))
+          inputs.push({ motorId: id, count: 1, offset: 0 });
+      });
+    } else if (req.db.isId(params.motors)) {
+      inputs.push({ motorId: params.motors, count: 1, offset: 0 });
+    }
+  } else {
+    let count = parseInt(params.count) || 100;
+    for (let i = 0; i <= count; i++) {
+      let id = params['motor' + i.toFixed()];
+      if (req.db.isId(id)) {
+        let count = parseInt(params['count' + i.toFixed()]) || 1;
+        let offset = parseInt(params['offset' + i.toFixed()]) || 0;
+        inputs.push({ motorId: id, count, offset });
+      }
+    }
+  }
+  inputs.forEach((input, i) => input.n = i + 1)
+
+  // query the motors
+  let q = { _id: { $in: inputs.map(i => i.motorId) } };
+  req.db.Motor.find(q).populate('_manufacturer').exec(req.success(function(found) {
+    const allErrors = [];
+    const outputs = {
+      title: 'Merge Motors',
+      inputs,
+      count: inputs.length,
+      multiInputs: inputs.length > 1,
+      errors: allErrors,
+    };
+    if (inputs.length < 1)
+      allErrors.push('No motors selected for merge.');
+    let ids = [];
+    inputs.forEach(input => {
+      input.motor = found.find(m => m._id.toString() == input.motorId);
+      if (input.motor == null)
+        allErrors.push('Motor ID "' + input.motorId + '" not found.');
+      else
+        ids.push(input.motor._id);
+    });
+    if (submit && allErrors.length === 0) {
+      req.db.SimFile.find({ _motor: { $in: ids } }, undefined, { sort: { updatedAt: -1 } })
+                    .exec(req.success(function(simfiles) {
+        inputs.forEach(input => {
+          let file = simfiles.find(f => f._motor.toString() == input.motorId);
+          if (file == null)
+            allErrors.push('No simulator file for ' + input.motor.designation + '.');
+          else {
+            input.file = file;
+            let e = new errors.Collector();
+            let parsed = parsers.parseData(file.format, file.data, e);
+            if (parsed) {
+              input.info = parsed.info;
+              input.points = parsed.points;
+            } else {
+              e.errors.forEach(info => allErrors.push(input.motor.designation + ': ' + info.message + '.'));
+            }
+          }
+        });
+        if (allErrors.length === 0) {
+          function e(code, msg) {
+            allErrors.push('Merge error: ' + msg + '.');
+          }
+          outputs.merged = parsers.mergeData(inputs, e);
+          if (outputs.merged) {
+            let graph = graphs.thrustCurve({
+              data: outputs.merged,
+              width: 750,
+              height: 450,
+            });
+            if (graph) {
+              req.session.mergedId = crypto.randomUUID();
+              req.session.mergedGraph = graph.render();
+              outputs.curveUrl = '/motors/merged/' + req.session.mergedId + '/curve.svg';
+            }
+          }
+        }
+        res.render('motors/merge', locals(req, defaults, outputs));
+      }));
+    } else {
+      res.render('motors/merge', locals(req, defaults, outputs));
+    }
+  }));
+}
+
+router.get('/motors/merge.html', function(req, res, next) {
+  merge(req, res, req.query, req.query.submit == 'true');
+});
+router.post('/motors/merge.html', function(req, res, next) {
+  merge(req, res, req.body, true);
+});
+router.get('/motors/merged/:id/:file', function(req, res, next) {
+  const id = req.params.id;
+  if (!/^[a-z0-9-]+$/.test(id) || req.session.mergedId != id) {
+    res.status(404).end();
+    return;
+  }
+
+  let file = req.params.file;
+  let m;
+  if ((m = /^[a-z0-9_-]+\.svg$/.exec(file)) && req.session.mergedGraph) {
+    res.type(graphs.SVG)
+       .end(req.session.mergedGraph);
+  } else {
+    res.status(404).end();
   }
 });
 

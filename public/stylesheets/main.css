@@ -225,6 +225,11 @@ ol.alert {
   width: 100%;
 }
 
+a.disabled {
+  pointer-events: none;
+  color: #999;
+}
+
 @media print {
   @page {
     size: letter;

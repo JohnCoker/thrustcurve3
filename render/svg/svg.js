@@ -423,6 +423,8 @@ module.exports = {
    */
   format: MIME_TYPE,
 
+  contentType: MIME_TYPE,
+
   /**
    * Construct an image object on which we can draw.
    * @param {number} width
@@ -430,4 +432,3 @@ module.exports = {
    */
   Image: Image,
 };
-

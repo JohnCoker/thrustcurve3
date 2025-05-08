@@ -11,9 +11,10 @@
       <li><a href="/motors/browser.html">Browse by Type</a></li>
       <li><a href="/motors/popular.html">Most Popular</a></li>
       {{#canCompare}}
-      <li><a href="/motors/recent.html"><b>Compare</b>{{recentSuffix}}</a></li>
+      <li><a href="/motors/recent.html">Recently Viewed</a></li>
       {{/canCompare}}
       <li><a href="/outbox/">My Outbox{{outboxSuffix}}</a></li>
+      <li><a href="/motors/merge.html">Merge Motors</a></li>
       <li><a href="/manufacturers/">Manufacturers</a></li>
       <li><a href="/info/glossary.html">Motor Jargon</a></li>
       <li><a href="/info/motorstats.html">Motor Statistics</a></li>
@@ -23,3 +24,142 @@
     {{/block}}
   </div>
 </row>
+
+<div class="modal" id="select-motor" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <big class="modal-title">Select Motor</big>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="clearfix">
+          <div class="spinner spinner-border float-right" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+        <form>
+          <div class="form-group">
+            <label for="manufacturer" class="col-form-label">Manufacturer:</label>
+            <select class="form-control" name="manufacturer" required>
+            <option class="empty" selected disabled></option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="designation" class="col-form-label">Designation:</label>
+            <input type="text" list="motor-designations" class="form-control" name="designation" required></input>
+          </div>
+          <datalist id="motor-designations"></datalist>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary submit">Select</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+function selectMotor(cb) {
+  const dialog = $('#select-motor');
+  const form = dialog.find('form');
+  const button = dialog.find('button.submit');
+  const select = form.find('select[name=manufacturer]');
+  const input = form.find('input[name=designation]');
+  const datalist = form.find('datalist');
+  const spinner = dialog.find('.spinner');
+  form.off('submit');
+  input.val('');
+  button.off('click');
+  button.attr('disabled', 'disabled');
+  let mfr, desig, id;
+
+  if (select.find('option:not(.empty)').length > 0) {
+    // already have manufacturers
+    if (select.val())
+      input.removeAttr('disabled');
+    spinner.hide();
+    mfr = select.val();
+  } else {
+    spinner.show();
+    // load manufacturers
+    input.attr('disabled', 'disabled');
+    fetch('/api/v1/metadata.json?availability=available')
+      .then(r => r.json())
+      .then(j => {
+        j.manufacturers.forEach(m => {
+          select.append($('<option value="' + m.abbrev + '">' + m.name + '</option>'));
+        });
+      })
+      .catch(e => {
+        console.error(e);
+        alert('Unable to load manufacturers!');
+      })
+      .finally(() => spinner.hide);
+    select.on('change', e => {
+      input.attr('disabled', 'disabled');
+      input.val('');
+      button.attr('disabled', 'disabled');
+      datalist.empty();
+      desig = id = null;
+
+      mfr = select.val();
+      if (mfr) {
+        spinner.show();
+        fetch('/api/v1/search.json?manufacturer=' + encodeURIComponent(mfr) + '&availability=available&maxResults=-1')
+          .then(r => r.json())
+          .then(j => {
+            let count = 0;
+            j.results.forEach(m => {
+              datalist.append($('<option value="' + m.designation +
+                                '" data-id="' + m.motorId +
+                                '" data-name="' + m.commonName +
+                                '"></option>'));
+              count++;
+            });
+            if (count > 0)
+              input.removeAttr('disabled')
+          })
+          .catch(e => {
+            console.error(e);
+            alert('Unable to load ' + mfr + ' motors!');
+          })
+          .finally(() => spinner.hide);
+       }
+    });
+  }
+
+  input.on('input', e => {
+    const val = input.val().trim().toUpperCase();
+    let matches = [];
+    datalist.find('option').each(function() {
+      const opt = $(this);
+      const desig = opt.val();
+      if (desig == val || opt.data('name') == val)
+        matches.push({ designation: desig, id: opt.data('id') });
+    });
+    if (matches.length == 1) {
+      desig = matches[0].designation;
+      id = matches[0].id;
+      button.removeAttr('disabled');
+    } else {
+      button.attr('disabled', 'disabled');
+    }
+  });
+
+  function submit(e) {
+    e.preventDefault();
+    if (mfr && desig && id) {
+      dialog.modal('hide');
+      cb(mfr, desig, id);
+    }
+    return false;
+  }
+  form.on('submit', submit);
+  button.on('click', submit);
+
+  dialog.modal();
+}
+</script>

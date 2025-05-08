@@ -1019,7 +1019,7 @@ router.get('/motors/recent.html', function(req, res, next) {
       }
 
       res.render('motors/recent', locals(req, defaults, {
-        title: 'Recently Viewed / Compare',
+        title: 'Recently Viewed',
         motors: motors,
         impulseClasses: classes,
         suggestClasses: suggestions,
@@ -1027,7 +1027,7 @@ router.get('/motors/recent.html', function(req, res, next) {
     }));
   } else {
     res.render('motors/recent', locals(req, defaults, {
-      title: 'Recently Viewed / Compare',
+      title: 'Recently Viewed',
       motors: [],
       impulseClasses: [],
       suggestClasses: [],
@@ -1201,8 +1201,9 @@ function merge(req, res, params, submit) {
       multiInputs: inputs.length > 1,
       errors: allErrors,
     };
-    if (inputs.length < 1)
+    if (inputs.length < 1 && submit) {
       allErrors.push('No motors selected for merge.');
+    }
     let ids = [];
     inputs.forEach(input => {
       input.motor = found.find(m => m._id.toString() == input.motorId);

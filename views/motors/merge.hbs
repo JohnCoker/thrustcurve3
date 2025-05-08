@@ -26,17 +26,16 @@ table.info th {
 <div class="alert alert-danger" role="alert">{{this}}</div>
 {{/each}}
 
-{{#unless inputs}}
 <p>
+{{#unless inputs}}
 You haven't selected any motors to merge.
 As you view details of different motors, the ones you've seen most recently will be visible in
 <a href="/motors/recent.html">Recently Viewed</a> and you can merge them.
 You can also merge motors from the <a href="/motors/search.html">Attribute Search</a> results.
-</p>
+<br/>
+And you can pick motors to merge right here.
 {{/unless}}
-
 {{#if inputs}}
-<p>
 {{#if multiInputs}}
 You selected {{length inputs}} motors to merge.
 Increase the <b>count</b> to simulate a cluster and/or the
@@ -45,6 +44,7 @@ Increase the <b>count</b> to simulate a cluster and/or the
 You selected a single motor to "merge."
 You can increase the <b>count</b> to simulate a cluster and/or
 duplicate the motor and apply an <b>offset</b> to simulate staging.
+{{/if}}
 {{/if}}
 </p>
 
@@ -60,7 +60,7 @@ td.actions a:not(:first-of-type) {
 <form name="merge" method="get" action="/motors/merge.html">
 <input type="hidden" name="count" value="{{count}}"/>
 <input type="hidden" name="submit" value="true"/>
-<table id="recent-list" class="table table-bordered">
+<table id="motor-list" class="table table-bordered">
   <thead>
     <tr>
      <th>Designation</th>
@@ -88,9 +88,9 @@ td.actions a:not(:first-of-type) {
   {{/each}}
   </tbody>
 </table>
-<button type="submit" class="btn btn-default">Merge Motors</button>
+<button type="button" class="btn btn-secondary add">Add Motor</button>
+<button type="submit" class="btn btn-primary">Merge Motors</button>
 </form>
-
 <script type="text/javascript">
 function updateActions() {
   const form = $('form[name=merge]');
@@ -115,6 +115,10 @@ function updateActions() {
       a.addClass('disabled');
   });
   form.find('input[name=count]').val(count.toFixed());
+  if (count > 0)
+    form.find('button[type=submit]').removeAttr('disabled');
+  else
+    form.find('button[type=submit]').attr('disabled', 'disabled');
 }
 
 function renumber() {
@@ -131,9 +135,7 @@ function renumber() {
   form.find('input[name=count]').val(count.toFixed());
 }
 
-$(document).ready(function() {
-  const form = $('form[name=merge]');
-  const rows = form.find('tbody tr');
+function rowClicks(rows) {
   rows.find('a.move-up').click(function(e) {
     e.preventDefault();
     const row = $(this).closest('tr');
@@ -171,11 +173,37 @@ $(document).ready(function() {
     renumber();
     updateActions();
   });
+}
+
+$(document).ready(function() {
+  const form = $('form[name=merge]');
+  rowClicks(form.find('tbody tr'));
+
+  form.find('button.add').click(e => {
+    selectMotor((mfr, desig, id) => {
+      const row = $(`<tr>
+        <td>${desig}</td>
+        <td>${mfr}</td>
+        <td class="input count"><input type="number" min="1" name="" value="1"/></td>
+        <td class="input offset"><input type="number" min="0" step="0.1" name="" value="0"/></td>
+        <td class="actions">
+          <input type="hidden" name="" value="${id}"/>
+          <a href="#" class="move-up" title="move up"><i class="fa fa-arrow-up"></i></a>
+          <a href="#" class="move-down" title="move down"><i class="fa fa-arrow-down"></i></a>
+          <a href="#" class="duplicate" title="duplicate this motor"><i class="fa fa-clone"></i></a>
+          <a href="#" class="delete" title="remove this motor"><i class="fa fa-trash"></i></a>
+        </td>
+      </tr>`);
+      $('table#motor-list tbody').append(row);
+      rowClicks(row);
+      renumber();
+      updateActions();
+    });
+  });
 
   updateActions();
 });
 </script>
-{{/if}}
 
 {{#if merged}}
 <h2>Merged Motor Summary</h2>

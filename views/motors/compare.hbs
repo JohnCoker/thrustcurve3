@@ -15,23 +15,96 @@ table.stats th {
 }
 </style>
 
-{{#unless motors}}
 <p>
+{{#unless motors}}
 You haven't selected any motors for comparison.
 As you view details of different motors, the ones you've seen most recently will be visible in
 <a href="/motors/recent.html">Recently Viewed</a> and you can compare them.
 You can also compare motors from the <a href="/motors/search.html">Attribute Search</a> results.
-</p>
+<br/>And you can pick motors to compare right here.
 {{/unless}}
-
 {{#if motors}}
-<p>
 You selected {{length motors}}
 {{#if multiClasses}}(in {{length impulseClasses}} impulse classes){{/if}}
 {{#if singleClass}}({{singleClass}} impulse){{/if}}
 motors for comparison.
+{{#unless canCompare}}
+You need at least two motors to compare.
+<br/>
+Use the <b>Add Motor</b> button to select more motors.
+{{/unless}}
+{{/if}}
 </p>
 
+<form name="compare" method="get" action="/motors/compare.html">
+<table id="motor-list" class="table table-bordered">
+  <thead>
+    <tr>
+     <th>Designation</th>
+     <th>Manufacturer</th>
+     <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each motors}}
+    <tr>
+      <td>{{motorDesignation this}}</td>
+      <td>{{_manufacturer.abbrev}}</td>
+      <td class="actions">
+        <input type="hidden" name="motors" value="{{_id}}"/>
+        <a href="#" class="delete" title="remove this motor"><i class="fa fa-trash"></i></a>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+<button type="button" class="btn btn-secondary add">Add Motor</button>
+<button type="submit" class="btn btn-primary">Compare Motors</button>
+</form>
+
+<script type="text/javascript">
+function rowClicks(rows) {
+  rows.find('a.delete').click(function(e) {
+    e.preventDefault();
+    const row = $(this).closest('tr');
+    row.remove();
+    renumber();
+    updateActions();
+  });
+}
+
+function updateActions() {
+  const form = $('form[name=compare]');
+  const rows = form.find('tbody tr');
+  if (rows.length > 1)
+    form.find('button[type=submit]').removeAttr('disabled');
+  else
+    form.find('button[type=submit]').attr('disabled', 'disabled');
+}
+
+$(document).ready(function() {
+  const form = $('form[name=compare]');
+  rowClicks(form.find('tbody tr'));
+  form.find('button.add').click(e => {
+    selectMotor((mfr, desig, id) => {
+      const row = $(`<tr>
+        <td>${desig}</td>
+        <td>${mfr}</td>
+        <td class="actions">
+          <input type="hidden" name="motors" value="${id}"/>
+          <a href="#" class="delete" title="remove this motor"><i class="fa fa-trash"></i></a>
+        </td>
+      </tr>`);
+      $('table#motor-list tbody').append(row);
+      rowClicks(row);
+      updateActions();
+    });
+  });
+  updateActions();
+});
+</script>
+
+{{#if canCompare}}
 <div class="row">
   <div class="col-md-6">
     <h2>Burn Time vs Impulse</h2>
@@ -211,5 +284,4 @@ $('#compare').click(function(e) {
     window.location = '/motors/compare.html?' + motors;
 });
 </script>
-
 {{/if}}

@@ -1084,6 +1084,7 @@ function compare(req, res, ids) {
         impulseBurnTimeImg: comp_impulseBurnTimeImg + query,
         impulseAvgThrustImg: comp_impulseAvgThrustImg + query,
         thrustCurveImg: comp_thrustCurveImg + query,
+        canCompare: motors.length > 1,
       }));
     }));
   } else {
@@ -1092,6 +1093,7 @@ function compare(req, res, ids) {
       motors: [],
       impulseClasses: [],
       multiClasses: false,
+      canCompare: false,
     }));
   }
 }

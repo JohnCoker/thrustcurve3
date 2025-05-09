@@ -245,3 +245,10 @@ $(document).ready(function() {
   <img title="merged thrust curve" src="{{{curveUrl}}}"/>
 </div>
 {{/if}}
+{{#if simfiles}}
+<p>
+{{#each simfiles}}
+<a class="btn btn-primary" href="{{url}}">Download {{format}}</a>
+{{/each}}
+</p>
+{{/if}}

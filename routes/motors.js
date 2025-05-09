@@ -1244,11 +1244,22 @@ function merge(req, res, params, submit) {
               width: 750,
               height: 450,
             });
+            req.session.mergedId = crypto.randomUUID();
             if (graph) {
-              req.session.mergedId = crypto.randomUUID();
               req.session.mergedGraph = graph.render();
               outputs.curveUrl = '/motors/merged/' + req.session.mergedId + '/curve.svg';
             }
+            outputs.simfiles = [];
+            parsers.AllFormats.forEach(fmt => {
+              let file = fmt.print(outputs.merged);
+              if (file) {
+                req.session['merged' + fmt.format] = file;
+                outputs.simfiles.push({
+                  format: fmt.format,
+                  url: '/motors/merged/' + req.session.mergedId + '/merged' + fmt.extension,
+                });
+              }
+            });
           }
         }
         res.render('motors/merge', locals(req, defaults, outputs));
@@ -1277,9 +1288,16 @@ router.get('/motors/merged/:id/:file', function(req, res, next) {
   if ((m = /^[a-z0-9_-]+\.svg$/.exec(file)) && req.session.mergedGraph) {
     res.type(graphs.SVG)
        .end(req.session.mergedGraph);
-  } else {
-    res.status(404).end();
+    return;
   }
+  const fmt = parsers.AllFormats.find(fmt => file.endsWith(fmt.extension));
+  if (fmt != null && req.session['merged' + fmt.format]) {
+    res.type(fmt.mimeType)
+       .set('Content-Disposition', 'attachment; filename="' + file.replace(/^.*\//, '') + '"')
+       .end(req.session['merged' + fmt.format]);
+    return;
+  }
+  res.status(404).end();
 });
 
 

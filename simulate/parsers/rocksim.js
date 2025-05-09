@@ -286,6 +286,8 @@ function print(parsed, error) {
     w.writeAttribute('massFrac', nToStr(info.massFraction));
   if (info.isp > 0)
     w.writeAttribute('Isp', nToStr(info.isp));
+  w.writeAttribute("auto-calc-mass", "1");
+  w.writeAttribute("auto-calc-cg", "1");
 
   // comment
   if (info.comment != null)
@@ -293,7 +295,14 @@ function print(parsed, error) {
 
   // data points
   w.startElement('data');
-  parsed.points.forEach(point => {
+  parsed.points.forEach((point, i) => {
+    if (i === 0 && point.time > tEpsilon && point.thrust > 0.0005) {
+      // initial zero point
+      w.startElement('eng-data');
+      w.writeAttribute("t", "0");
+      w.writeAttribute("f", "0");
+      w.endElement();
+    }
     w.startElement('eng-data');
     w.writeAttribute("t", nToStr(point.time));
     w.writeAttribute("f", nToStr(point.thrust));

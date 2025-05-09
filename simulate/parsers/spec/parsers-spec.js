@@ -373,7 +373,7 @@ describe("parsers", function() {
       expect(file).toBe('<?xml version="1.0"?>\n' +
                         '<engine-database>\n' +
                         '<engine-list>\n' +
-                        '<engine code="J450ST" mfg="Animal Motor Works" delays="1000" dia="54" len="326" Type="reloadable" initWt="1196.4" propWt="533.1" Itot="1069.71" avgThrust="459.105" peakThrust="563.18" burn-time="2.33" massFrac="44.56" Isp="204.62">\n' +
+                        '<engine code="J450ST" mfg="Animal Motor Works" delays="1000" dia="54" len="326" Type="reloadable" initWt="1196.4" propWt="533.1" Itot="1069.71" avgThrust="459.105" peakThrust="563.18" burn-time="2.33" massFrac="44.56" Isp="204.62" auto-calc-mass="1" auto-calc-cg="1">\n' +
                         '<comments>Animal Motor Works 54-1050\n' +
                         'AMW J450ST RASP.ENG file made from NAR published data\n' +
                         'File produced SEPT 4, 2002\n' +

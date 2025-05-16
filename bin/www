@@ -2,6 +2,8 @@
 
 if (process.env.NODE_ENV == null)
   process.env.NODE_ENV = 'development';
+if (process.env.DOMAIN == null)
+  process.env.DOMAIN = 'localhost:3000';
 
 /**
  * Module dependencies.

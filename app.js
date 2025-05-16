@@ -78,15 +78,14 @@ const index = require('./routes/index'),
       util = require('./routes/util'),
       api_v1 = require('./routes/api_v1');
 
-const domain = 'www.thrustcurve.org';
 const app = express();
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && process.env.DOMAIN) {
   // force SSL and canonical domain in production (except for API)
   app.use((req, res, next) => {
     let host = req.header('host');
     if (!/^\/(servlets|api)\//.test(req.url) &&
-        (host != null && host != domain || req.header('x-forwarded-proto') !== 'https'))
-      res.redirect(`https://${domain}${req.url}`);
+        (host != null && host != process.env.DOMAIN || req.header('x-forwarded-proto') !== 'https'))
+      res.redirect(`https://${process.env.DOMAIN}${req.url}`);
     else
       next();
   });

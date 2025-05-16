@@ -235,7 +235,8 @@ router.post(forgotLink, function(req, res, next) {
       user.resetToken = token;
       user.resetExpires = Date.now() + 30 * 60 * 1000; // 30m
       user.save(req.success(function(updated) {
-        const link = 'https://' + req.headers.host + resetLink + "?t=" + token;
+        const origin = 'https://' + process.env.DOMAIN;
+        const link = origin + resetLink + "?t=" + token;
 
         sendgrid.setApiKey(config.sendGridApiKey);
         sendgrid.send({
@@ -255,7 +256,7 @@ If you did not request this, please ignore this email and your password will rem
 Please click this link or paste it into your browser address bar to choose a new password:</p>
 <p style="font-size: large;"><a href="${link}">${link}</a></p>
 <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-<p><img width="200" height="40" src="https://www.thrustcurve.org/images/footer-logo.png" alt="ThrustCurve.org"></p>
+<p><img width="200" height="40" src="${origin}/images/footer-logo.png" alt="ThrustCurve.org"></p>
 `,
         }).then(() => {
           res.render('mystuff/forgotpasswd', locals(req, defaults, {

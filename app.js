@@ -27,7 +27,11 @@ const process = require('process'),
 
 // fail if initial connection is impossible
 mongoose.Promise = global.Promise;
-mongoose.connect(config.mongoUrl, function(err) {
+mongoose.connect(config.mongoUrl, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true // This replaces the ensureIndex warning
+}, function(err) {
   if (err) {
     console.error('unable to connect to MongoDB');
     console.error(err);

@@ -1,60 +1,53 @@
 "use strict";
 
 const mongoose = require('mongoose');
-mongoose.Promise = require('bluebird');
-var mockgoose = require('mockgoose');
-
-const schema = require('../../schema');
-const ranking = require('..');
-
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const schema = require('../../schema/schema');
+const ranking = require('../ranking');
 
 describe("ranking", function() {
   let db;
-  var manufacturer = null;
+  let mongoServer;
+  let manufacturer = null;
 
-  beforeAll( function(done) {
-    mockgoose(mongoose).then(function() {
-      mongoose.connect('mongodb://localhost/test')
-      .then( function( err) {
-        if (err){ console.error(err); }
-        expect( err).toBeFalsy();
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+    await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    });
 
-        db = {
-          mongoose: mongoose,
-          Manufacturer: schema.ManufacturerModel(mongoose),
-          Motor: schema.MotorModel(mongoose),
-          MotorView: schema.MotorViewModel(mongoose),
-          MotorRanking: schema.MotorRankingModel(mongoose),
-        };
-        Object.freeze(db);
+    db = {
+      mongoose: mongoose,
+      Manufacturer: schema.ManufacturerModel(mongoose),
+      Motor: schema.MotorModel(mongoose),
+      MotorView: schema.MotorViewModel(mongoose),
+      MotorRanking: schema.MotorRankingModel(mongoose),
+    };
+    Object.freeze(db);
 
-        var mfr = new db.Manufacturer({
-          name: 'Rockets R Us',
-          abbrev: 'RRU',
-          aliases: ['RocketsRUs', 'RRUS'],
-          website: 'http://rocketsrus.com/'
-        });
-        mfr.save()
-        .then( function( saved) {
-          expect( saved).toBeTruthy();
-          manufacturer = saved;
-          done();
-        });
-
-      });
+    var mfr = new db.Manufacturer({
+      name: 'Rockets R Us',
+      abbrev: 'RRU',
+      aliases: ['RocketsRUs', 'RRUS'],
+      website: 'http://rocketsrus.com/'
+    });
+    mfr.save()
+    .then( function( saved) {
+      expect( saved).toBeTruthy();
+      manufacturer = saved;
     });
   });
 
-  afterAll( function( done) {
-    mongoose.models = {};
-    mongoose.disconnect();
-    done();
+  afterAll(async () => {
+    await mongoose.disconnect();
+    await mongoServer.stop();
   });
 
-  afterEach( function(done){
-    mockgoose.reset(function() {
-      done();
-    });
+  beforeEach(async () => {
+    await mongoose.connection.dropDatabase();
   });
 
   it("build", function( done) {

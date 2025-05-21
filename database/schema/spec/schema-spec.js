@@ -2,33 +2,32 @@
 
 const async = require('async'),
       mongoose = require('mongoose'),
-      mockgoose = require('mockgoose'),
+      { MongoMemoryServer } = require('mongodb-memory-server'),
       schema = require('..');
 mongoose.Promise = require('bluebird');
 
 describe('schemas', function() {
-  var startTime;
+  let startTime;
+  let mongoServer;
 
-  beforeAll( function(done) {
-    mockgoose(mongoose).then(function() {
-      mongoose.connect('mongodb://localhost/test', function(err) {
-        startTime = new Date();
-        if (err){ console.error(err); }
-        done(err);
-      });
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+    await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
     });
+    startTime = new Date();
   });
 
-  afterAll( function( done) {
-    mongoose.models = {};
-    mongoose.disconnect();
-    done();
+  afterAll(async () => {
+    await mongoose.disconnect();
+    await mongoServer.stop();
   });
 
-  afterEach( function(done){
-    mockgoose.reset(function() {
-      done();
-    });
+  beforeEach(async () => {
+    await mongoose.connection.dropDatabase();
   });
 
   describe('manufacturer', function() {

@@ -1,0 +1,61 @@
+{
+  "name": "@thrustcurve/api1",
+  "version": "1.0.3",
+  "description": "TypeScript client for the ThrustCurve.org API",
+  "type": "module",
+  "main": "dist/src/api.js",
+  "types": "dist/src/api.d.ts",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "rm -rf dist node_modules",
+    "build": "tsc",
+    "prepare": "npm run build",
+    "setup": "npm install",
+    "test": "node --no-warnings --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' node_modules/jasmine/bin/jasmine.js",
+    "test:watch": "nodemon --watch 'src/**/*.ts' --watch 'spec/**/*.ts' --exec 'npm test'",
+    "lint": "eslint 'src/**/*.ts' 'spec/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' 'spec/**/*.ts' --fix"
+  },
+  "keywords": [
+    "thrustcurve",
+    "rocketry",
+    "api",
+    "client",
+    "typescript",
+    "model-rocket",
+    "motor",
+    "simulation"
+  ],
+  "author": "John Coker <john@jcsw.com> (https://www.thrustcurve.org/)",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/thrustcurve3.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JohnCoker/thrustcurve3/issues"
+  },
+  "homepage": "https://www.thrustcurve.org/info/api.html",
+  "devDependencies": {
+    "@types/jasmine": "^4.3.0",
+    "@types/node": "^18.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "jasmine": "^4.6.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}

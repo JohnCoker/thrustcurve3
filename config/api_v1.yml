@@ -450,6 +450,10 @@ definitions:
               description: letter class of motor total impulse
               type: string
               example: C
+            certOrg:
+              description: certification organization name
+              type: string
+              example: National Association of Rocketry
             diameter:
               description: motor diameter in millimeters
               type: number

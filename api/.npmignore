@@ -1,0 +1,24 @@
+# Source
+src/
+spec/
+tsconfig.json
+eslint.config.js
+
+# Development
+.git/
+.github/
+.vscode/
+.idea/
+*.log
+coverage/
+
+# Dependencies
+node_modules/
+
+# Misc
+.DS_Store
+*.swp
+*.swo
+.env*
+
+# Keep dist/ for publishing

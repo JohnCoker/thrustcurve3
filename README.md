@@ -86,6 +86,7 @@ Most modules are quite small (with a single file being typical).
 
 ```
 thrustcurve3
+├── api
 ├── artwork
 ├── bin
 ├── config

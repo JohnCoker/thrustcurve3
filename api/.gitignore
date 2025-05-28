@@ -31,3 +31,6 @@ coverage/
 # Misc
 .DS_Store
 Thumbs.db
+
+# NPM artifact
+thrustcurve-api1-*.tgz

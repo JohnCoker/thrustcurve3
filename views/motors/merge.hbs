@@ -76,7 +76,7 @@ td.actions a:not(:first-of-type) {
       <td>{{motorDesignation motor}}</td>
       <td>{{motor._manufacturer.abbrev}}</td>
       <td class="input count"><input type="number" min="1" name="count{{n}}" value="{{count}}"/></td>
-      <td class="input offset"><input type="number" min="0" step="0.1" name="offset{{n}}" value="{{offset}}"/></td>
+      <td class="input offset"><input type="number" min="0" step="0.01" name="offset{{n}}" value="{{offset}}"/></td>
       <td class="actions">
         <input type="hidden" name="motor{{n}}" value="{{motorId}}"/>
         <a href="#" class="move-up" title="move up"><i class="fa fa-arrow-up"></i></a>

@@ -1185,7 +1185,7 @@ function merge(req, res, params, submit) {
       let id = params['motor' + i.toFixed()];
       if (req.db.isId(id)) {
         let count = parseInt(params['count' + i.toFixed()]) || 1;
-        let offset = parseInt(params['offset' + i.toFixed()]) || 0;
+        let offset = parseFloat(params['offset' + i.toFixed()]) || 0;
         inputs.push({ motorId: id, count, offset });
       }
     }

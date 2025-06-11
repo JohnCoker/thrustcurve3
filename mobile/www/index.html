@@ -211,15 +211,22 @@
           </p>
           <div class="form-submit">
             <a data-role="button" data-icon="add" href="#rocket-info-stats?add=1"> New Rocket</a>
-            <a data-role="button" data-icon="play" data-click="rocketsHomeSamples"> Sample Rockets</a>
+            <a data-role="button" data-icon="play" data-click="rocketsHomeSamples"> Samples</a>
+            <a class="download" data-role="button" data-icon="download" data-click="rocketsHomeDownload"> Download</a>
           </div>
+          <p>
+            To download your rockets from the server, please enter your
+            <a class="km-widget" href="https://www.thrustcurve.org/">ThrustCurve.org</a>
+            account info in the
+            <a class="km-widget bold" href="#settings-account">Settings</a>.
+          </p>
         </div>
         <ul data-role="listview" data-style="inset" id="rockets-list" data-click="rocketsHomeSelect">
         </ul>
         <footer data-role="footer">
           <div class="km-tabstrip">
             <a data-role="button" data-icon="add" href="#rocket-info-stats?add=1"> New Rocket</a>
-            <a class="download" data-role="button" data-icon="download" data-click="rocketsHomeDownload"> Download</a>
+            <a class="sync" data-role="button" data-icon="refresh" data-click="rocketsHomeSync"> Synchronize</a>
           </div>
         </footer>
       </div>
@@ -679,7 +686,7 @@
       <div data-role="view" data-layout="settings-home-layout" data-title="Account" id="settings-account" data-init="initSettingsAccount" data-after-show="showSettingsAccount" data-before-hide="showSettingsAccount">
         <p class="help">
           It is not necessary to have a ThrustCurve.org login to use this app.
-          However if you have one, rockets you enter online can be downloaded.
+          However if you have one, rockets you enter here can be saved to the server.
         </p>
         <form id="settings-account-form" data-use-native-scrolling="true">
           <ul data-role="listview" data-style="inset">
@@ -705,7 +712,7 @@
         <p>
           The <b>ThrustCurve to-go</b> app is a companion to
           the ThrustCurve.org web site,
-          a shared collection of rocket motor data files.
+          a shared collection of rocket motor data and simulator files.
         </p>
         <p>
           The goal of this app is to provide a way to take enough information with you to
@@ -713,17 +720,19 @@
           the launch site.
         </p>
         <p>
-          Version <span class="version">1.1.3</span>.
-          <br/>
-          Copyright &copy; John Coker, 2020.
-          <br/>
-          All rights under copyright reserved.
-          <br/>
-          wwww.thrustcurve.org/info/mobile.html
+          For a richer experience when online, use the web site;
+          it will adapt to the small screen of your phone.
         </p>
         <div class="form-submit">
           <a data-role="button" data-icon="globe" data-click="settingsAboutWebsite"> ThrustCurve.org</a>
         </div>
+        <p>
+          Version <span class="version">1.2.0</span>.
+          <br/>
+          Copyright &copy; John Coker, 2025.
+          <br/>
+          All rights under copyright reserved.
+        </p>
       </div>
 
       <script type="text/javascript" src="cordova.js"></script>

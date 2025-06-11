@@ -312,7 +312,7 @@
     $.ajax({
       type: 'POST',
       data: request,
-      url: "http://www.thrustcurve.org/servlets/search",
+      url: "https://www.thrustcurve.org/api/v1/search.xml",
       dataType: 'text',
       success: function(data) {
         console.debug(data);
@@ -407,7 +407,7 @@
     $.ajax({
       type: 'POST',
       data: request,
-      url: "http://www.thrustcurve.org/servlets/download",
+      url: "https://www.thrustcurve.org/servlets/download",
       dataType: 'text',
       success: function(data) {
         console.debug(data);

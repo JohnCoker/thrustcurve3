@@ -13,7 +13,7 @@
   };
 
   var settingsAboutWebsite = function(e) {
-    window.open("http://www.thrustcurve.org/mobile.shtml", "_system", "location=yes");
+    window.open("https://www.thrustcurve.org/", "_system", "location=yes");
   };
 
   global.initSettingsAbout = initSettingsAbout;

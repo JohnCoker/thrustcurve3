@@ -252,7 +252,7 @@
     ];
   };
 
-  var parseDownloadResults = function(text) {
+  function parseDownloadResults(text) {
     var xml,
         response = { results: [] },
         elt, n;
@@ -268,34 +268,34 @@
 
       elt = $(this).find('id');
       if (elt.length > 0)
-        result.id = elt.text();
+        result.id = elt.first().text();
 
       elt = $(this).find('name');
       if (elt.length > 0)
-        result.name = elt.text();
+        result.name = elt.first().text();
 
       elt = $(this).find('body-diameter-m');
-      if (elt.length > 0 && (n = parseFloat(elt.text())) > 0)
+      if (elt.length > 0 && (n = parseFloat(elt.first().text())) > 0)
         result.bodyDiam = n;
 
       elt = $(this).find('weight-kg');
-      if (elt.length > 0 && (n = parseFloat(elt.text())) > 0)
+      if (elt.length > 0 && (n = parseFloat(elt.first().text())) > 0)
         result.weight = n;
 
       elt = $(this).find('mmt-diameter-mm');
-      if (elt.length > 0 && (n = parseFloat(elt.text())) > 0)
+      if (elt.length > 0 && (n = parseFloat(elt.first().text())) > 0)
         result.mmtDiam = n / 1000;
 
       elt = $(this).find('mmt-length-mm');
-      if (elt.length > 0 && (n = parseFloat(elt.text())) > 0)
+      if (elt.length > 0 && (n = parseFloat(elt.first().text())) > 0)
         result.mmtLen = n / 1000;
 
       elt = $(this).find('cd');
-      if (elt.length > 0 && (n = parseFloat(elt.text())) > 0)
+      if (elt.length > 0 && (n = parseFloat(elt.first().text())) > 0)
         result.cd = n;
 
       elt = $(this).find('guide-length-m');
-      if (elt.length > 0 && (n = parseFloat(elt.text())) > 0)
+      if (elt.length > 0 && (n = parseFloat(elt.first().text())) > 0)
         result.guideLen = n;
 
       if (result.id == null || result.id === '')
@@ -305,35 +305,34 @@
     });
 
     return response;
-  };
+  }
 
   function mergeDownloadResults(response) {
-    var server, client, i, j, p;
-
     load();
 
     response.loaded = 0;
+    response.unchanged = 0;
     response.created = 0;
     response.updated = 0;
-    for (i = 0; i < response.results.length; i++) {
-      server = response.results[i];
+    for (let i = 0; i < response.results.length; i++) {
+      const server = response.results[i];
       response.loaded++;
 
-      client = null;
-      for (j = 0; j < cache.rockets.length; j++) {
-        if (cache.rockets[j].serverId == server.id) {
-          client = cache.rockets[j];
-          break;
-        }
-      }
+      let client = cache.rockets.find(r => r.serverId == server.id);
       if (client != null) {
-        // update previous download
-        for (j = 0; j < DataProperties.length; j++) {
-          p = DataProperties[j];
-          if (server.hasOwnProperty(p))
+        // update existing rocket
+        let changed = false;
+        for (let j = 0; j < DataProperties.length; j++) {
+          const p = DataProperties[j];
+          if (server.hasOwnProperty(p) && server[p] !== client[p]) {
             client[p] = server[p];
+            changed = true;
+          }
         }
-        response.updated++;
+        if (changed)
+          response.updated++;
+        else
+          response.unchanged++;
       } else {
         // downloaded for first time
         client = clone(server);
@@ -347,11 +346,81 @@
     save();
   }
 
+  function parseUploadResults(text) {
+    const response = { results: [] };
+
+    // remove processing instructions
+    text = text.replace(/^<?[^>]*>\s*/g, '');
+
+    // parse XML now
+    const xml = $.parseXML(text);
+
+    $(xml).find('result').each(function() {
+      let result = {};
+
+      let elt = $(this).find('id');
+      if (elt.length > 0)
+        result.id = elt.first().text();
+
+      elt = $(this).find('client-id');
+      if (elt.length > 0)
+        result.clientId = parseInt(elt.first().text());
+
+      elt = $(this).find('name');
+      if (elt.length > 0)
+        result.name = elt.first().text();
+
+      elt = $(this).find('status');
+      if (elt.length > 0)
+        result.status = elt.first().text();
+
+      if (result.id == null || result.id === '')
+        return;
+
+      response.results.push(result);
+    });
+
+    return response;
+  }
+
+  function mergeUploadResults(response) {
+    load();
+
+    response.created = 0;
+    response.updated = 0;
+    response.unchanged = 0;
+    response.invalid = 0;
+    response.results.forEach(server => {
+      let client = cache.rockets.find(r => r.serverId == server.id);
+      if (client == null) {
+        client = cache.rockets.find(r => r.clientId === server.clientId);
+        if (client != null)
+          client.serverId = server.id;
+      }
+      switch (server.status) {
+      case 'created':
+        response.created++;
+        break;
+      case 'updated':
+        response.updated++;
+        break;
+      case 'unchanged':
+        response.unchanged++;
+        break;
+      default:
+        response.invalid++;
+        break;
+      }
+    });
+
+    save();
+  }
+
+  const BASE_URL = 'https://www.thrustcurve.org/api/v1/';
+
   Rockets.download = function(callback) {
-    if (!Account.isSetup()) {
-      doAlert('Download Rockets', 'Please enter your ThrustCurve.org account in Settings.');
+    if (!checkSetup())
       return;
-    }
 
     var request = '<getrockets-request>\n' +
                   '  <username>' + escapeHtml(Account.email) + '</username>\n' +
@@ -360,7 +429,7 @@
     $.ajax({
       type: 'POST',
       data: request,
-      url: "http://www.thrustcurve.org/servlets/getrockets",
+      url: BASE_URL + 'getrockets.xml',
       dataType: 'text',
       success: function(data) {
         console.debug(data);
@@ -370,7 +439,7 @@
           callback(response);
       },
       error: function(xhr, msg) {
-        console.error('motor search failed' + (xhr ? ' status ' + xhr.status : ''));
+        console.error('rocket download failed' + (xhr ? ' status ' + xhr.status : ''));
         var title = 'Download Error',
             error = parseResponseErrors(xhr);
         if (error == null)
@@ -381,6 +450,92 @@
       }
     });
   };
+
+  Rockets.synchronize = function(callback) {
+    if (!checkSetup())
+      return;
+
+    let saved = 0;
+    function download() {
+      Rockets.download(function(response) {
+        response.uploaded = saved;
+        response.downloaded = response.created + response.updated;
+        if (callback)
+          callback(response);
+      });
+    }
+
+    const client = Rockets.list();
+    if (client.length > 0) {
+      // save any changes we made locally
+      var request = '<saverockets-request>\n' +
+                    '  <username>' + escapeHtml(Account.email) + '</username>\n' +
+                    '  <password>' + escapeHtml(Account.password) + '</password>\n' +
+                    '  <rockets>\n';
+      client.forEach(r => {
+        request += '    <rocket>\n';
+        if (r.serverId)
+          request += '      <id>' + escapeHtml(r.serverId) + '</id>\n';
+        if (r.clientId > 0)
+          request += '      <client-id>' + r.clientId + '</client-id>\n';
+        if (r.name)
+          request += '      <name>' + escapeHtml(r.name) + '</name>\n';
+        if (r.bodyDiam > 0)
+          request += '      <body-diameter-m>' + r.bodyDiam + '</body-diameter-m>\n';
+        if (r.weight > 0)
+          request += '      <weight-kg>' + r.weight + '</weight-kg>\n';
+        if (r.mmtDiam > 0)
+          request += '      <mmt-diameter-mm>' + (r.mmtDiam * 1000) + '</mmt-diameter-mm>\n';
+        if (r.mmtLen > 0)
+          request += '      <mmt-length-mm>' + (r.mmtLen * 1000) + '</mmt-length-mm>\n';
+        if (r.cd > 0)
+          request += '      <cd>' + r.cd + '</cd>\n';
+        if (r.guideLen > 0)
+          request += '      <guide-length-m>' + r.guideLen + '</guide-length-m>\n';
+        request += '    </rocket>\n';
+      });
+      request += '  </rockets>\n' +
+                 '</saverockets-request>';
+      $.ajax({
+        type: 'POST',
+        data: request,
+        url: BASE_URL + 'saverockets.xml',
+        dataType: 'text',
+        success: function(data) {
+          console.debug(data);
+          var response = parseUploadResults(data);
+          mergeUploadResults(response);
+          response.results.forEach(r => {
+            if (r.status == 'created' || r.status == 'updated')
+              saved++;
+          });
+          // now re-download to merge changes
+          download();
+        },
+        error: function(xhr, msg) {
+          console.error('rocket upload failed' + (xhr ? ' status ' + xhr.status : ''));
+          var title = 'Upload Error',
+              error = parseResponseErrors(xhr);
+          if (error == null)
+            error = "Unable to upload rockets to ThrustCurve.org.";
+          doAlert(title, error);
+          if (window.analytics)
+            window.analytics.trackException('rocket upload failed: ' + error, false);
+        }
+      });
+    } else {
+      // just download
+      download();
+    }
+  }
+
+  function checkSetup() {
+    if (!Account.isSetup()) {
+      doAlert('Synchronize Rockets', 'Please enter your ThrustCurve.org account in Settings.');
+      return false;
+    }
+    return true;
+  }
 
   Object.defineProperty(Rockets, 'current', {
     get: function() { return current; },

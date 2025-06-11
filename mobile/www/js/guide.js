@@ -65,8 +65,7 @@
         rocketId, i;
 
     // make sure result is valid
-    if (result == null || typeof result.motorId != 'number' ||
-        isNaN(result.motorId) || result.motorId <= 0)
+    if (result == null || result.motorId == null)
       return false;
 
     // create entry if necessary
@@ -157,8 +156,7 @@
     n = 0;
     for (i = 0; i < results.length; i++) {
       result = results[i];
-      if (result == null || typeof result.motorId != 'number' ||
-          isNaN(result.motorId) || result.motorId <= 0)
+      if (result == null || result.motorId == null)
         continue;
 
       // remove prior result
@@ -331,7 +329,7 @@
     $.ajax({
       type: 'POST',
       data: request,
-      url: "http://www.thrustcurve.org/servlets/motorguide",
+      url: "https://www.thrustcurve.org/api/v1/motorguide.xml",
       dataType: 'text',
       success: function(data) {
         console.debug(data);

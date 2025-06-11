@@ -104,7 +104,7 @@
       $.ajax({
         type: 'POST',
         data: '<metadata-request><availability>available</availability></metadata-request>',
-        url: "http://www.thrustcurve.org/servlets/metadata",
+        url: "https://www.thrustcurve.org/api/v1/metadata.xml",
         dataType: 'text',
         success: function(data) {
           data = parseMetadata(data);

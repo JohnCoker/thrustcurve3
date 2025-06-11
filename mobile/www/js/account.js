@@ -59,7 +59,7 @@
             $.ajax({
               type: 'POST',
               data: request,
-              url: "http://www.thrustcurve.org/servlets/getrockets",
+              url: "http://www.thrustcurve.org/api/v1/getrockets.xml",
               dataType: 'text',
               success: function(data) {
                 current = { email: email, password: password };

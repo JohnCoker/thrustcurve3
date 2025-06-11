@@ -28,7 +28,7 @@
                '</li>');
         list.append(li);
       }
-  
+
       list.find('a.good-motors').kendoMobileButton();
       width = 0;
       list.find('a.good-motors').each(function() {
@@ -38,27 +38,29 @@
       });
       if (width > 0)
         list.find('a.good-motors').css('width', (Math.ceil(width) + 20) + 'px');
-  
+
       list.show();
     }
   };
 
   var initRocketsHome = function(e) {
   };
-  
+
   var showRocketsHome = function(e) {
     app.onShow(e);
 
-    var btn = e.view.footer.find('a.download');
-    if (btn)
-      btn.data("kendoMobileButton").enable(Account.isSetup());
+    ['download', 'sync'].forEach(cls => {
+      const btn = e.view.footer.find('a.' + cls);
+      if (btn.length > 0)
+        btn.data("kendoMobileButton").enable(Account.isSetup());
+    });
 
     updateRocketsList();
   };
 
   var hideRocketsHome = function(e) {
   };
-  
+
   var rocketsHomeSelect = function(e) {
     var id = e.item.data('id');
     if (id > 0)
@@ -82,7 +84,25 @@
       updateRocketsList();
     });
   };
-  
+
+  var rocketsHomeSync = function(e) {
+    Rockets.synchronize(function(response) {
+      var title = 'Synchronize Rockets';
+      if (response.uploaded < 1 && response.downloaded < 1) {
+        doAlert(title, 'Already up-to-date with ThrustCurve.org.');
+      } else if (response.uploaded < 1) {
+        doAlert(title, response.downloaded + ' rockets downloaded.');
+      } else if (response.downloaded < 1) {
+        doAlert(title, response.uploaded + ' rockets uploaded.');
+      } else {
+        doAlert(title,
+                response.uploaded + ' uploaded ' +
+                response.downloaded + ' rockets downloaded.');
+      }
+      updateRocketsList();
+    });
+  };
+
   var rocketsHomeSamples = function(e) {
     var samples = Rockets.samples(),
         i;
@@ -93,11 +113,12 @@
     $('#rockets-home').find('.placeholder').hide();
     updateRocketsList();
   };
-  
+
   global.initRocketsHome = initRocketsHome;
   global.showRocketsHome = showRocketsHome;
   global.hideRocketsHome = hideRocketsHome;
   global.rocketsHomeSelect = rocketsHomeSelect;
   global.rocketsHomeDownload = rocketsHomeDownload;
+  global.rocketsHomeSync = rocketsHomeSync;
   global.rocketsHomeSamples = rocketsHomeSamples;
 })(this);

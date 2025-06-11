@@ -50,6 +50,10 @@ ul[data-role=listview] a {
 .km-ios7 .km-list input, .km-ios7 form .km-list select {
   color: #8e8e93;
 }
+a.bold {
+  font-weight: bold;
+  text-decoration: none;
+}
 
 .km-android table {
   font-size: 1.1em;

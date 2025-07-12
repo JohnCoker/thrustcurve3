@@ -21,7 +21,7 @@ advanced search below to search by various attributes.
 {{/if}}
 
 {{#unless results}}
-<form role="form" class="form-horizontal" name="edit" action="{{submitLink}}" method="get" data-toggle="validator">
+<form id="search-form" role="form" class="form-horizontal" name="search" action="{{submitLink}}" method="get" data-toggle="validator">
   <div class="form-group manufacturer">
     <label for="manufacturer" class="col-sm-3 control-label">Manufacturer</label>
     <div class="col-sm-9">
@@ -242,8 +242,23 @@ advanced search below to search by various attributes.
       </label>
     </div>
   </div>
+  {{#if captcha}}
+  <div class="col-sm-offset-3 col-sm-9 form-submit">
+    <div class="g-recaptcha"
+      data-sitekey="6LcdXBQbAAAAAMHUJ_gBDjsS2Hn5f6MJFZbNflJo"
+      data-callback="onSubmit">
+    </div>
+  </div>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script>
+  function onSubmit(token) {
+    document.getElementById("search-form").submit();
+  }
+  </script>
+  {{/if}}
   <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <input type="email" name="email">
       <button type="submit" class="btn btn-primary">Submit</button>
       <button type="reset" class="btn btn-default">Reset</button>
       {{#if isNoneFound}}<a class="btn btn-default" href="/motors/search.html?restart">Start Over</a>{{/if}}

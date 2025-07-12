@@ -406,6 +406,7 @@ router.get('/motors/:mfr/:desig/compare.svg', function(req, res, next) {
  * the values are interpreted as a range.
  */
 function doSearch(req, res, params) {
+  const honeypot = params.email && params.email !== '';
   metadata.getPropellantInfo(req, function(propInfo) {
     metadata.getMotors(req, function(all, available) {
       var query = {},
@@ -670,7 +671,22 @@ function doSearch(req, res, params) {
       colors(flameColors, 'flame');
       colors(smokeColors, 'smoke');
 
-      if (failed) {
+      if (honeypot) {
+        // render search page without doing query
+        res.render('motors/search', locals(req, defaults, {
+          title: 'Attribute Search',
+          allMotors: all,
+          availableMotors: available,
+          flameColors,
+          smokeColors,
+          params: params,
+          multiParams: keys.length > 1,
+          paramNames: paramNames,
+          isFresh: isFresh,
+          isSearchDone: false,
+          captcha: true
+        }));
+      } else if (failed) {
         res.render('motors/search', locals(req, defaults, {
           title: 'Search Results',
           allMotors: all,

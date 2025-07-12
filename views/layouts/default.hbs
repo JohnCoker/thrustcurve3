@@ -113,9 +113,10 @@
             <li><a href="/mystuff/login.html">Log In</a></li>
             {{/noLogin}}
           </ul>
-          <form class="navbar-form navbar-right" method="get" action="/motors/search.html">
+          <form class="navbar-form navbar-right" name="search" method="get" action="/motors/search.html">
             <input type="hidden" name="availability" value="all">
             <input type="text" name="text" class="form-control" placeholder="motor">
+            <input type="email" name="email">
           </form>
         </div><!--/.nav-collapse -->
       </div>

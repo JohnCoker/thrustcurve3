@@ -309,3 +309,7 @@ a.disabled {
     z-index: -1;
   }
 }
+
+form[name=search] input[type=email] {
+  display: none;
+}

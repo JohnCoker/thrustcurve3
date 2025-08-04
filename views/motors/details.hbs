@@ -74,14 +74,19 @@
         </div>
       </div>
 
-      {{#if motor.delays}}
       <div class="form-group">
         <label class="col-sm-6 control-label">Delays</label>
         <div class="col-sm-6">
-          <p class="form-control-static">{{motor.delays}}</p>
+          <p class="form-control-static">{{motor.delays}}
+          {{#if motor.delayAdjustable}}
+          <span class="label label-as-badge label-success">adjustable</span>
+          {{/if}}
+          {{#unless motor.ejection}}
+          <span class="label label-as-badge label-warning">no ejection</span>
+          {{/unless}}
+          </p>
         </div>
       </div>
-      {{/if}}
 
       <div class="form-group">
         <label class="col-sm-6 control-label">Diameter</label>

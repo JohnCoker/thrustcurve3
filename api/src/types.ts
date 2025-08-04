@@ -60,6 +60,7 @@ export interface SearchResult {
   totalWeightG?: number;
   propWeightG?: number;
   delays?: string;
+  delayAdjustable?: boolean;
   caseInfo?: string;
   propInfo?: string;
   sparky: boolean;

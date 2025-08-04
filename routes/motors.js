@@ -1566,7 +1566,8 @@ function doSubmit(req, res, motor) {
   });
 
   // boolean values
-  [ 'sparky',
+  [ 'delayAdjustable',
+    'sparky',
     'hazmatExempt',
     'csfmApproved',
   ].forEach(function(p) {

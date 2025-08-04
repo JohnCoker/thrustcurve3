@@ -171,7 +171,9 @@ function makeMotorModel(mongoose) {
     altName: { type: String, uppercase: true, match: MotorNameRegex },
     impulseClass: { type: String, required: true, uppercase: true, match: /^[A-O]$/ },
     type: { type: String, required: true, enum: MotorTypeEnum },
-    delays: String,
+    delays: { type: String, required: true },
+    delayAdjustable: { type: Boolean, default: false },
+    ejection: Boolean,
     certDate: dateOnly(mongoose),
     certDesignation: String,
     diameter: { type: Number, required: true, min: 0.006 },
@@ -222,14 +224,24 @@ function makeMotorModel(mongoose) {
     return this.availability != null && MotorAvailableEnum.indexOf(this.availability) >= 0;
   });
 
-  // synthesize the searchDesignation field
-  schema.pre('save', function(next) {
-    if (!this.isModified('designation') && !this.isModified('altDesignation'))
-      return next();
+  // has ejection charge check
+  schema.virtual('hasEjection').get(function() {
+  });
 
-    this.searchDesignation = designationToSearch(this.designation);
-    if (this.altDesignation)
-      this.searchDesignation += ' ' + designationToSearch(this.altDesignation);
+  // synthesize derived fields
+  schema.pre('save', function(next) {
+    // searchDesignation field is derived from both designations
+    if (this.isModified('designation') || this.isModified('altDesignation')) {
+      this.searchDesignation = designationToSearch(this.designation);
+      if (this.altDesignation)
+        this.searchDesignation += ' ' + designationToSearch(this.altDesignation);
+    }
+
+    // ejection field is derived from delays
+    if (this.isModified('delays') || this.isModified('delayAdjustable')) {
+      this.ejection = this.delays != null && this.delays !== '' && !/^\s*P\s*$/i.test(this.delays)
+                      && !this.delayAdjustable;
+    }
 
     next();
   });

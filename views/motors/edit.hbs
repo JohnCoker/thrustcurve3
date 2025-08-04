@@ -107,6 +107,15 @@ No changes to save;
       <span class="help-block with-errors"></span>
     </div>
   </div>
+  <div class="form-group boolean">
+    <label for="delayAdjustable" class="col-sm-3 control-label">Delay Adjustable</label>
+    <div class="col-sm-9">
+      <input type="hidden" name="delayAdjustable-present" value="true" />
+      <input type="checkbox" class="form-check-input position-static" name="delayAdjustable"
+             {{#if motor.delayAdjustable}}checked="checked"{{/if}}>
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
 
   <div class="form-group">
     <label for="_certOrg" class="col-sm-3 control-label">Certified By</label>
@@ -249,7 +258,7 @@ No changes to save;
       <span class="help-block with-errors"></span>
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group boolean">
     <label for="sparky" class="col-sm-3 control-label">Sparky</label>
     <div class="col-sm-9">
       <input type="hidden" name="sparky-present" value="true" />
@@ -270,7 +279,7 @@ No changes to save;
       </select>
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group boolean">
     <label for="hazmatExempt" class="col-sm-3 control-label">HazMat Exempt</label>
     <div class="col-sm-9">
       <input type="hidden" name="hazmatExempt-present" value="true" />
@@ -279,7 +288,7 @@ No changes to save;
       <span class="help-block with-errors"></span>
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group boolean">
     <label for="csfmApproved" class="col-sm-3 control-label">CSFM Approved</label>
     <div class="col-sm-9">
       <input type="hidden" name="csfmApproved-present" value="true" />

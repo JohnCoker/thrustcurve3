@@ -503,6 +503,10 @@ definitions:
               description: available delays
               type: string
               example: '0,3,5,7'
+            delayAdjustable:
+              description: if this motor has an adjustable delay time
+              type: boolean
+              example: true
             caseInfo:
               description: case info if any
               type: string

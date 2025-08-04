@@ -256,7 +256,7 @@ function doSearch(req, res, format) {
   const request = api1.getRequest(req, 'search-request');
   const errs = new errors.Collector();
 
-  format.root('search-response', (req.isLegacy ? '2016' : '2020') + '/SearchResponse');
+  format.root('search-response', (req.isLegacy ? '2016' : '2025') + '/SearchResponse');
 
   const maxResults = api1.getMaxResults(request, errs);
 
@@ -349,6 +349,7 @@ function doSearch(req, res, format) {
           'total-weight-g': motor.totalWeight * 1000,
           'prop-weight-g': motor.propellantWeight * 1000,
           delays: motor.delays,
+          'delay-adjustable': motor.delayAdjustable,
           'case-info': motor.caseInfo,
           'prop-info': motor.propellantInfo,
           sparky: motor.sparky,

@@ -316,7 +316,7 @@ $(document).ready(function(e) {
      <th class="number hidden-xs">Avg Thr</th>
      <th class="number hidden-sm hidden-xs">Max Thr</th>
      <th class="number hidden-xs">Burn</th>
-     <th class="action hidden-xs"><input type="checkbox" id="select-all" title="select/deselect all"/></th>
+     <th class="action no-sort hidden-xs"><input type="checkbox" id="select-all" title="select/deselect all"/></th>
     </tr>
   </thead>
   <tbody>
@@ -337,36 +337,60 @@ $(document).ready(function(e) {
 </table>
 <p class="hidden-xs">Choose two or more motors from the list to
 <a id="compare" href="#">Compare</a> or
-<a id="merge" href="#">Merge</a>.
+<a id="merge" href="#">Merge</a>
+(<span class="chosen">none</span> chosen).
 </p>
 <script type="text/javascript">
+let dataTable;
 setupTable('#result-list', {
   order: [[4, 'asc']],
   expand: true
+}, dt => {
+  dataTable = dt;
 });
+function chosenIds() {
+  let ids = new Set();
+  dataTable.rows().every(function() {
+    const row = $(this.node())
+    const checkbox = row.find('td input[name=select]');
+    if (checkbox.is(':checked'))
+      ids.add(checkbox.closest('tr').data('id'));
+  });
+  return ids;
+}
+function updateChosen() {
+  const count = chosenIds().size;
+  let s;
+  if (count > 1)
+    s = count.toFixed();
+  else if (count === 1)
+    s = 'one';
+  else
+    s = 'none';
+  $('span.chosen').text(s);
+}
 $('#select-all').click(function(e) {
   let all = $(this);
   let state = all.is(':checked');
   $('#result-list td input[name=select]').each(function() {
     $(this).prop('checked', state);
   });
+  updateChosen();
 });
 $('#result-list td input[name=select]').click(function(e) {
   if (!$(this).is(':checked'))
     $('#select-all').prop('checked', false);
+  updateChosen();
 });
 $('#compare').click(function(e) {
   e.preventDefault();
   let motors = '', count = 0;
-  $('#result-list td input[name=select]').each(function() {
-    let checkbox = $(this);
-    if (checkbox.is(':checked')) {
-      if (motors !== '')
-        motors += '&';
-      motors += 'motors=' + checkbox.val();
-      count++;
-    }
-  });
+  for (let id of chosenIds()) {
+    if (count > 0)
+       motors += '&';
+    motors += 'motors=' + id;
+    count++;
+  }
   if (count < 2)
     window.alert('Choose two or more motors from the list above.');
   else
@@ -375,15 +399,12 @@ $('#compare').click(function(e) {
 $('#merge').click(function(e) {
   e.preventDefault();
   let query = '', count = 0;
-  $('#result-list td input[name=select]').each(function() {
-    let checkbox = $(this);
-    if (checkbox.is(':checked')) {
-      count++;
-      if (query !== '')
-        query += '&';
-      query += 'motor' + count.toFixed() + '=' + checkbox.val();
-    }
-  });
+  for (let id of chosenIds()) {
+    count++;
+    if (query !== '')
+      query += '&';
+    query += 'motor' + count.toFixed() + '=' + id;
+  }
   if (count < 1)
     window.alert('Choose one or more motors from the list above.');
   else

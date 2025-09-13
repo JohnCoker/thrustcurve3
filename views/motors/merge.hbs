@@ -77,7 +77,7 @@ td.actions a:not(:first-of-type) {
       <td>{{motor._manufacturer.abbrev}}</td>
       <td class="input count"><input type="number" min="1" name="count{{n}}" value="{{count}}"/></td>
       <td class="input offset"><input type="number" min="0" step="0.01" name="offset{{n}}" value="{{offset}}"/></td>
-      <td class="actions">
+      <td class="action">
         <input type="hidden" name="motor{{n}}" value="{{motorId}}"/>
         <a href="#" class="move-up" title="move up"><i class="fa fa-arrow-up"></i></a>
         <a href="#" class="move-down" title="move down"><i class="fa fa-arrow-down"></i></a>
@@ -186,7 +186,7 @@ $(document).ready(function() {
         <td>${mfr}</td>
         <td class="input count"><input type="number" min="1" name="" value="1"/></td>
         <td class="input offset"><input type="number" min="0" step="0.1" name="" value="0"/></td>
-        <td class="actions">
+        <td class="action">
           <input type="hidden" name="" value="${id}"/>
           <a href="#" class="move-up" title="move up"><i class="fa fa-arrow-up"></i></a>
           <a href="#" class="move-down" title="move down"><i class="fa fa-arrow-down"></i></a>

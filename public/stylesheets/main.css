@@ -147,7 +147,6 @@ th.action,
 td.action {
   text-align: center;
   padding: 5px 0.5em !important;
-  max-width: 1em;
 }
 th.action::after {
   display: none !important;

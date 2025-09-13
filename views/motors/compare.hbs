@@ -41,7 +41,9 @@ Use the <b>Add Motor</b> button to select more motors.
     <tr>
      <th>Designation</th>
      <th>Manufacturer</th>
-     <th>Actions</th>
+     <th class="number hidden-sm hidden-xs">Avg Thr</th>
+     <th class="number hidden-xs">Impulse</th>
+     <th class="action no-sort">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -49,7 +51,9 @@ Use the <b>Add Motor</b> button to select more motors.
     <tr>
       <td>{{motorDesignation this}}</td>
       <td>{{_manufacturer.abbrev}}</td>
-      <td class="actions">
+      <td class="number hidden-sm hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
+      <td class="number hidden-xs" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
+      <td class="action">
         <input type="hidden" name="motors" value="{{_id}}"/>
         <a href="#" class="delete" title="remove this motor"><i class="fa fa-trash"></i></a>
       </td>
@@ -89,7 +93,7 @@ $(document).ready(function() {
       const row = $(`<tr>
         <td>${desig}</td>
         <td>${mfr}</td>
-        <td class="actions">
+        <td class="action">
           <input type="hidden" name="motors" value="${id}"/>
           <a href="#" class="delete" title="remove this motor"><i class="fa fa-trash"></i></a>
         </td>
@@ -139,7 +143,7 @@ $(document).ready(function() {
      <th class="number">Impulse</th>
      <th class="number">Avg Thr</th>
      <th class="number">Burn</th>
-     <th class="action"><input type="checkbox" id="select-all" title="select/deselect all"/></th>
+     <th class="action no-sort"><input type="checkbox" id="select-all" title="select/deselect all"/></th>
     </tr>
   </thead>
   <tbody>
@@ -252,7 +256,7 @@ inlineSVG('#impulseBurnTime, #impulseAvgThrust, #thrustCurve', function(svg) {
 });
 
 setupTable('#motor-list', {
-  order: [[4, 'asc']]
+  order: [[3, 'asc']]
 });
 $('#select-all').click(function(e) {
   let all = $(this);

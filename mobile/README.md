@@ -15,3 +15,9 @@ Then add the two platforms:
 cordova platform add ios
 cordova platform add android
 ```
+
+## Status
+
+This was originally written in 2015 and no longer works with the current version of Cordova.
+
+In 2025 the existing apps were removed from the stores in the face of "app store accountability" legislation.

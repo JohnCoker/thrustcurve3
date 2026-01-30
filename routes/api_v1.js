@@ -181,6 +181,7 @@ function sendMetadata(res, format, metadata, errs) {
   format.lengthList('diameters', metadata.diameters);
   format.elementList('impulse-classes', metadata.impulseClasses);
   format.error(errs);
+  format.sourceURL(fullURL(req, '/'));
   format.send(res, errs.hasErrors());
 }
 
@@ -329,7 +330,7 @@ function doSearch(req, res, format) {
       format.elementListFull('results', results.map(motor => {
         let mfr = cache.manufacturers.byId(motor._manufacturer, true);
         let org = cache.certOrgs.byId(motor._certOrg, true);
-        return {
+        const info = {
           "motor-id": motor.externalId,
           'manufacturer': mfr.name,
           'manufacturer-abbrev': mfr.abbrev,
@@ -356,8 +357,12 @@ function doSearch(req, res, format) {
           'updated-on': motor.updatedAt,
           availability: motor.availability,
         };
+        if (format.isJSON())
+          info.source_url = fullURL(req, req.helpers.motorLink(mfr, motor));
+        return info;
       }));
       format.error(errs);
+      format.sourceURL(fullURL(req, '/motors/search.html'));
       format.send(res, errs.hasErrors());
     }
 
@@ -438,6 +443,8 @@ function doDownload(req, res, format) {
         }
         result["info-url"] = req.helpers.simfileLink(simfile);
         result["data-url"] = req.helpers.simfileDownloadLink(simfile);
+        if (format.isJSON())
+          result.source_url = fullURL(req, result["info-url"]);
         return result;
       }));
       format.error(errs);
@@ -786,6 +793,7 @@ function doMotorGuide(req, res, format) {
     format.elementListFull('results', results,
                            { 'ok-count': okCount, 'failed-count': failedCount }, true);
     format.error(errs);
+    format.sourceURL(fullURL(req, '/motors/guide.html'));
     format.send(res, errs.hasErrors());
   }
 
@@ -868,8 +876,9 @@ function doMotorGuide(req, res, format) {
               }
 
               // set up motor info
+              const mfr = cache.manufacturers.byId(motor._manufacturer);
               result['motor-id'] = motor._id.toString();
-              result.manufacturer = cache.manufacturers.byId(motor._manufacturer).name;
+              result.manufacturer = mfr.name;
               result['manufacturer-abbrev'] = cache.manufacturers.byId(motor._manufacturer).abbrev;
               result.designation = motor.designation;
               result['common-name'] = motor.commonName;
@@ -892,6 +901,9 @@ function doMotorGuide(req, res, format) {
                 if (simulation.apogeeTime > simulation.burnoutTime)
                   result['optimal-delay'] = simulation.apogeeTime - simulation.burnoutTime;
               }
+
+              if (format.isJSON())
+                result.source_url = fullURL(req, req.helpers.motorLink(mfr, motor));
 
               results.push(result);
             });
@@ -934,5 +946,14 @@ router.post([APIPrefix + 'motorguide.xml', LegacyPrefix + 'motorguide'], xmlPars
   doMotorGuide(req, res, new data.XMLFormat());
 });
 
+function fullURL(req, path) {
+  if (path == null || path === '')
+    path = '/';
+  if (!/^http?:/.test(path)) {
+    let origin = (req.protocol ?? 'https') + '://' + (process.env.DOMAIN ?? 'www.thrustcurve.org');
+    path = origin + path;
+  }
+  return path;
+}
 
 module.exports = router;

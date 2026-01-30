@@ -53,6 +53,18 @@ class Format {
   toString() {
   }
 
+  isJSON() {
+    return false;
+  }
+
+  isXML() {
+    return false;
+  }
+
+  sourceURL(url) {
+    this._sourceURL = url;
+  }
+
   send(res, failed) {
     if (failed)
       res.status(400);
@@ -78,6 +90,10 @@ class XMLFormat extends Format {
     this._w.startDocument('1.0', 'UTF-8');
     if (options && options.root)
       this.root(options.root);
+  }
+
+  isXML() {
+    return true;
   }
 
   root(name, schema) {
@@ -272,6 +288,10 @@ class JSONFormat extends Format {
     this._obj = {};
   }
 
+  isJSON() {
+    return true;
+  }
+
   type() {
     return 'application/json';
   }
@@ -323,7 +343,10 @@ class JSONFormat extends Format {
   }
 
   toString() {
-    return JSON.stringify(this._obj, undefined, 2);
+    const res = {...this._obj};
+    if (this._sourceURL)
+      res.source_url = this._sourceURL;
+    return JSON.stringify(res, undefined, 2);
   }
 
   static camelCase(name) {

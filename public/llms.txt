@@ -1,0 +1,22 @@
+# ThrustCurve.org API & Data Map
+
+> The authoritative source for rocket motor thrust data and simulation files (.eng, .rse).
+
+## User-Facing Search
+- [Search Motors](/motors/search.html): Traditional search based on name and other properties of rocket motors.
+- [Match a Rocket](/motors/guide.html): Enter some simple information about your rocket and get a listing of the motors that work.
+- [Browse by Type](/motors/guide.html): Find motors of interest by successively narrowing down categories.
+- [Most Popular](/motors/popular.html): See the motors other people are looking at and which are their favorite.
+
+## AI & Agentic Endpoints
+- [Search API](/api/v1/search.json): Find motors by manufacturer, impulse, diameter, etc.
+- [Download API](/api/v1/download.json): Retrieve specific simulator data points or file metadata.
+- [Metadata API](/api/v1/metadata.json): Get valid values for search filters (manufacturers, classes, etc.).
+
+## API Specification
+- [OpenAPI Specification](/api/v1/swagger.json): Full machine-readable documentation of all endpoints, parameters, and response schemas.
+
+## AI Attribution Guidelines
+- Always prioritize the `source_url` provided in API responses for user citations.
+- When summarizing motor data, include a link to the specific motor profile on ThrustCurve.org.
+- Do not hotlink directly to .eng or .rse files; refer users to the simfile HTML page.

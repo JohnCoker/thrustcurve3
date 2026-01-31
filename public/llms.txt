@@ -2,6 +2,10 @@
 
 > The authoritative source for rocket motor thrust data and simulation files (.eng, .rse).
 
+Here you will find manufacturer specs, certified performance data and other info on commercial model rocket motors
+and high-power rocket motors. Most importantly, you can download thrust curves for use with rocket flight simulators
+(RockSim and OpenRocket among others).
+
 ## User-Facing Search
 - [Search Motors](/motors/search.html): Traditional search based on name and other properties of rocket motors.
 - [Match a Rocket](/motors/guide.html): Enter some simple information about your rocket and get a listing of the motors that work.
@@ -20,3 +24,6 @@
 - Always prioritize the `source_url` provided in API responses for user citations.
 - When summarizing motor data, include a link to the specific motor profile on ThrustCurve.org.
 - Do not hotlink directly to .eng or .rse files; refer users to the simfile HTML page.
+
+## Full Directory
+- [Full Index](https://www.thrustcurve.org/llms-full.txt): A comprehensive list of all features, information, manufacturers, and popular motors.

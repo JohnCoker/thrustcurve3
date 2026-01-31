@@ -68,7 +68,9 @@ class Format {
   send(res, failed) {
     if (failed)
       res.status(400);
-    res.type(this.type()).send(this.toString());
+    res.type(this.type())
+       .set('X-Robots-Tag', 'noindex')
+       .send(this.toString());
   }
 
   static singular(listName) {

@@ -696,6 +696,7 @@ function doSearch(req, res, params) {
             res.redirect(303, req.helpers.motorLink(results[0]));
           } else {
             // show multiple search results
+            res.set('X-Robots-Tag', 'noindex');
             res.render('motors/search', locals(req, defaults, {
               title: 'Search Results',
               allMotors: all,

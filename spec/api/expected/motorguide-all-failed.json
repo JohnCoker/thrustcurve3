@@ -19,7 +19,8 @@
       "maxVelocity": 1.6338879107294926,
       "burnoutAltitude": 0.1979644285305648,
       "maxAltitude": 0.25666925849243205,
-      "optimalDelay": 0.10000000000000042
+      "optimalDelay": 0.10000000000000042,
+      "source_url": "http://localhost:3000/motors/Estes/1%2F2A6/"
     },
     {
       "status": "guide-vel",
@@ -38,7 +39,8 @@
       "maxVelocity": 2.378131342650733,
       "burnoutAltitude": 1.1504077045373946,
       "maxAltitude": 1.2157193556323307,
-      "optimalDelay": 0.1072999999999984
+      "optimalDelay": 0.1072999999999984,
+      "source_url": "http://localhost:3000/motors/Estes/A8/"
     },
     {
       "status": "guide-vel",
@@ -57,7 +59,8 @@
       "maxVelocity": 4.840995160899556,
       "burnoutAltitude": 3.7006301261021606,
       "maxAltitude": 4.709710616086023,
-      "optimalDelay": 0.45000000000000107
+      "optimalDelay": 0.45000000000000107,
+      "source_url": "http://localhost:3000/motors/Estes/B4/"
     },
     {
       "status": "guide-vel",
@@ -76,7 +79,8 @@
       "maxVelocity": 6.626151811966884,
       "burnoutAltitude": 3.523657025885985,
       "maxAltitude": 5.429026317521467,
-      "optimalDelay": 0.6000000000000024
+      "optimalDelay": 0.6000000000000024,
+      "source_url": "http://localhost:3000/motors/Estes/B6/"
     },
     {
       "status": "guide-vel",
@@ -95,7 +99,8 @@
       "maxVelocity": 10.71852471376572,
       "burnoutAltitude": 12.326967035083964,
       "maxAltitude": 17.805259366385204,
-      "optimalDelay": 1.0499999999999983
+      "optimalDelay": 1.0499999999999983,
+      "source_url": "http://localhost:3000/motors/Estes/C6/"
     },
     {
       "status": "guide-vel",
@@ -114,7 +119,8 @@
       "maxVelocity": 9.015185572343194,
       "burnoutAltitude": 15.787027793056884,
       "maxAltitude": 15.813843149144311,
-      "optimalDelay": 0.10999999999998256
+      "optimalDelay": 0.10999999999998256,
+      "source_url": "http://localhost:3000/motors/AeroTech/C3.4T/"
     },
     {
       "status": "guide-vel",
@@ -133,7 +139,8 @@
       "maxVelocity": 12.77973134493606,
       "burnoutAltitude": 16.379535166739085,
       "maxAltitude": 24.178836221261772,
-      "optimalDelay": 1.2499999999999982
+      "optimalDelay": 1.2499999999999982,
+      "source_url": "http://localhost:3000/motors/Estes/C5/"
     },
     {
       "status": "guide-vel",
@@ -152,7 +159,8 @@
       "maxVelocity": 9.507304365903398,
       "burnoutAltitude": -42.99952793412202,
       "maxAltitude": 17.20426358680131,
-      "optimalDelay": 0.009999999999870113
+      "optimalDelay": 0.009999999999870113,
+      "source_url": "http://localhost:3000/motors/AeroTech/D2.3T/"
     },
     {
       "status": "guide-vel",
@@ -171,7 +179,8 @@
       "maxVelocity": 53.33514619023415,
       "burnoutAltitude": 31.74112800710912,
       "maxAltitude": 163.48582568993365,
-      "optimalDelay": 5.149999999999987
+      "optimalDelay": 5.149999999999987,
+      "source_url": "http://localhost:3000/motors/AeroTech/D24T/"
     },
     {
       "status": "guide-vel",
@@ -190,7 +199,8 @@
       "maxVelocity": 46.44196729806405,
       "burnoutAltitude": 43.842922019026844,
       "maxAltitude": 144.23919590807313,
-      "optimalDelay": 4.504999999999988
+      "optimalDelay": 4.504999999999988,
+      "source_url": "http://localhost:3000/motors/AeroTech/D10W/"
     },
     {
       "status": "guide-vel",
@@ -209,7 +219,8 @@
       "maxVelocity": 48.152906444424595,
       "burnoutAltitude": 60.21337348609914,
       "maxAltitude": 159.69189426312198,
-      "optimalDelay": 4.499999999999987
+      "optimalDelay": 4.499999999999987,
+      "source_url": "http://localhost:3000/motors/AeroTech/D13W/"
     },
     {
       "status": "guide-vel",
@@ -228,9 +239,11 @@
       "maxVelocity": 54.88232564368442,
       "burnoutAltitude": 32.84756934842985,
       "maxAltitude": 174.03918556869613,
-      "optimalDelay": 5.309399999999984
+      "optimalDelay": 5.309399999999984,
+      "source_url": "http://localhost:3000/motors/AeroTech/D21T/"
     }
   ],
   "okCount": 0,
-  "failedCount": 12
+  "failedCount": 12,
+  "source_url": "http://localhost:3000/motors/guide.html"
 }

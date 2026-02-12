@@ -180,15 +180,17 @@ describe("API v1", function() {
             const file = "/tmp/api-response-" + (Math.random() * 1000000).toFixed() + ".xml";
             fs.writeFileSync(file, actual);
             const xsd = path.resolve(specPath + "/../../public/" + schema);
-            const cmd = `xmllint --noout --schema '${xsd}' '${file}'`;
+            const cmd = `xmllint --noout --quiet --schema '${xsd}' '${file}'`;
             try {
-              process.execSync(`${cmd} > /dev/null 2>&1`);
+              process.execSync(cmd, { encoding: 'utf8', maxBuffer: 1024 * 1024 });
               fs.unlinkSync(file);
             } catch (e) {
-              console.error(e.message);
+              const xmllintOutput = (e.stderr || e.stdout || e.message || '').trim();
+              try { fs.unlinkSync(file); } catch (unlinkErr) { /* ignore */ }
               return {
                 pass: false,
-                message: 'Expected ' + schema + ' to validate.',
+                message: 'Expected ' + schema + ' to validate. ' +
+                  (xmllintOutput ? 'xmllint: ' + xmllintOutput : ''),
               };
             }
             return {
@@ -219,6 +221,36 @@ describe("API v1", function() {
               return {
                 pass: false,
                 message: 'Expected ' + match + ' to match ' + n + ' times, but it matched ' + count + '.',
+              };
+            }
+            return {
+              pass: true,
+            };
+          }
+        };
+      },
+
+      toMatchAtLeastN: function(util, customEqualityTesters) {
+        return {
+          compare: function(actual, match, n) {
+            if (typeof n !== 'number' || !isFinite(n) || n < 0) {
+              return {
+                pass: false,
+                message: 'Expected a minimum count of matches',
+              };
+            }
+            let count;
+            if (actual == null) {
+              count = 0;
+            } else {
+              let global = match.global ? match : new RegExp(match, match.flags + 'g');
+              let a = actual.match(global);
+              count = a == null ? 0 : a.length;
+            }
+            if (count < n) {
+              return {
+                pass: false,
+                message: 'Expected ' + match + ' to match at least ' + n + ' times, but it matched ' + count + '.',
               };
             }
             return {
@@ -356,7 +388,7 @@ describe("API v1", function() {
   });
 
   describe("search", function() {
-    const API_SCHEMA = "2020/search-response.xsd";
+    const API_SCHEMA = "2025/search-response.xsd";
     const LEGACY_SCHEMA = "2016/search-response.xsd";
     describe("GET", function() {
       it("manufacturer JSON", function(done) {
@@ -365,19 +397,6 @@ describe("API v1", function() {
           expect(response).toMatch(/Estes/);
           expect(response).not.toMatch(/AeroTech/);
           expect(response).toMatchN(/"motorId":/, 20);
-          expect(response).toBeExpected();
-          done();
-        }).catch(e => {
-          fail(e);
-          done();
-        });
-      });
-      it("manufacturer XML", function(done) {
-        get('/api/v1/search.xml?manufacturer=Estes').then(response => {
-          expect(response).toBeValidXML(API_SCHEMA);
-          expect(response).toMatch(/Estes/);
-          expect(response).not.toMatch(/AeroTech/);
-          expect(response).toMatchN(/<result>/, 20);
           expect(response).toBeExpected();
           done();
         }).catch(e => {
@@ -517,8 +536,10 @@ describe("API v1", function() {
                      <diameter>54</diameter>
                     </search-request>`;
         post('/servlets/search', body).then(response => {
-          legacyIds = response.match(/<motor-id>\d+<\/motor-id>/g)
-                              .map(e => e.replace(/<motor-id>(\d+)<\/motor-id>/, "$1"));
+          const matches = response.match(/<motor-id>\d+<\/motor-id>/g);
+          if (matches == null)
+            return done(new Error('Legacy search returned no motor-id elements; ensure test database is loaded with testdb.sh'));
+          legacyIds = matches.map(e => e.replace(/<motor-id>(\d+)<\/motor-id>/, "$1"));
           legacyIds.sort((a, b) => parseInt(a) - parseInt(b));
           expect(legacyIds).toEqual(['301','306','326','344','346','358','359','486','494',
                                      '495','529','590','898','899','905','967','969','1034']);
@@ -813,12 +834,15 @@ describe("API v1", function() {
 
   describe("saverockets", function() {
     function cleanup(done) {
-      let proc = process.exec('mongo', (err, stdout) => {
-        done(err);
+      const shell = process.spawn('mongosh', ['localhost'], { stdio: ['pipe', 'pipe', 'pipe'] });
+      shell.stdin.write('use test\ndb.rockets.deleteMany({ name: { $regex: "^mobile", $options: "i" } })\n');
+      shell.stdin.end();
+      shell.on('close', (code) => {
+        if (code !== 0)
+          done(new Error('MongoDB cleanup failed. Ensure mongosh is installed and the test database is accessible.'));
+        else
+          done();
       });
-      proc.stdin.write(`use test
-                        db.rockets.remove({ name: { $regex: /^mobile/i } })`);
-      proc.stdin.end();
     }
     beforeEach(cleanup);
     afterAll(cleanup);

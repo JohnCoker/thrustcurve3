@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<search-response xmlns="http://www.thrustcurve.org/2020/SearchResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2020/SearchResponse http://www.thrustcurve.org/2020/search-response.xsd">
+<search-response xmlns="http://www.thrustcurve.org/2025/SearchResponse" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thrustcurve.org/2025/SearchResponse http://www.thrustcurve.org/2025/search-response.xsd">
     <criteria>
         <criterion>
             <name>manufacturer</name>
@@ -28,6 +28,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/qtrA3.pdf</info-url>
             <prop-weight-g>0.83</prop-weight-g>
             <delays>3</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -52,6 +53,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/halfA3T.pdf</info-url>
             <prop-weight-g>2</prop-weight-g>
             <delays>2,4</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -76,6 +78,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/halfA6.pdf</info-url>
             <prop-weight-g>2.6</prop-weight-g>
             <delays>2</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -100,6 +103,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/A10T.pdf</info-url>
             <prop-weight-g>3.8</prop-weight-g>
             <delays>0,3,P</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -124,6 +128,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/A3T.pdf</info-url>
             <prop-weight-g>3.3</prop-weight-g>
             <delays>4</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -148,6 +153,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/A8.pdf</info-url>
             <prop-weight-g>3.3</prop-weight-g>
             <delays>0,3,5</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -172,6 +178,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/B4.pdf</info-url>
             <prop-weight-g>6</prop-weight-g>
             <delays>2,4</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -197,6 +204,7 @@
             <total-weight-g>15</total-weight-g>
             <prop-weight-g>5.6</prop-weight-g>
             <delays>0,2,4,6</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -221,6 +229,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/C11.pdf</info-url>
             <prop-weight-g>12</prop-weight-g>
             <delays>0,3,5,7</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -245,6 +254,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/C6.pdf</info-url>
             <prop-weight-g>10.8</prop-weight-g>
             <delays>0,3,5,7</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -268,6 +278,7 @@
             <data-files>2</data-files>
             <info-url>http://nar.org/SandT/pdf/Estes/C5.pdf</info-url>
             <prop-weight-g>11.3</prop-weight-g>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -292,6 +303,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/D12.pdf</info-url>
             <prop-weight-g>21.1</prop-weight-g>
             <delays>0,3,5,7</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -316,6 +328,7 @@
             <info-url>http://nar.org/SandT/pdf/Estes/D11.pdf</info-url>
             <total-weight-g>44.8</total-weight-g>
             <prop-weight-g>24.5</prop-weight-g>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-18</updated-on>
@@ -340,6 +353,7 @@
             <info-url>http://www.nar.org/SandT/pdf/Estes/E12.pdf</info-url>
             <prop-weight-g>35.9</prop-weight-g>
             <delays>0,4,6,8</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -365,6 +379,7 @@
             <total-weight-g>58</total-weight-g>
             <prop-weight-g>35.8</prop-weight-g>
             <delays>4,6,8</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -390,6 +405,7 @@
             <total-weight-g>84</total-weight-g>
             <prop-weight-g>40</prop-weight-g>
             <delays>0,4,6,8</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2015-06-03</updated-on>
@@ -414,6 +430,7 @@
             <info-url>http://www.nar.org/SandT/pdf/Estes/E30.pdf</info-url>
             <prop-weight-g>17.8</prop-weight-g>
             <delays>4,7</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -439,6 +456,7 @@
             <total-weight-g>102</total-weight-g>
             <prop-weight-g>60</prop-weight-g>
             <delays>0, 4, 6, 8</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>black powder</prop-info>
             <sparky>false</sparky>
             <updated-on>2015-06-03</updated-on>
@@ -463,6 +481,7 @@
             <info-url>http://www.nar.org/SandT/pdf/Estes/F26FJ.pdf</info-url>
             <prop-weight-g>43.1</prop-weight-g>
             <delays>6</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>composite</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>
@@ -487,6 +506,7 @@
             <info-url>http://www.nar.org/SandT/pdf/Estes/F50T.pdf</info-url>
             <prop-weight-g>37.9</prop-weight-g>
             <delays>4,6</delays>
+            <delay-adjustable>false</delay-adjustable>
             <prop-info>composite</prop-info>
             <sparky>false</sparky>
             <updated-on>2014-07-05</updated-on>

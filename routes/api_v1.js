@@ -350,7 +350,7 @@ function doSearch(req, res, format) {
           'total-weight-g': motor.totalWeight * 1000,
           'prop-weight-g': motor.propellantWeight * 1000,
           delays: motor.delays,
-          'delay-adjustable': motor.delayAdjustable,
+          ...(req.isLegacy ? {} : { 'delay-adjustable': motor.delayAdjustable }),
           'case-info': motor.caseInfo,
           'prop-info': motor.propellantInfo,
           sparky: motor.sparky,

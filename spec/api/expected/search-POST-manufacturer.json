@@ -27,10 +27,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/qtrA3.pdf",
       "propWeightG": 0.83,
       "delays": "3",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/1%2F4A3/"
     },
     {
       "motorId": "56a409280002310000000006",
@@ -51,10 +53,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/halfA3T.pdf",
       "propWeightG": 2,
       "delays": "2,4",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/1%2F2A3/"
     },
     {
       "motorId": "56a409280002310000000007",
@@ -75,10 +79,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/halfA6.pdf",
       "propWeightG": 2.6,
       "delays": "2",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/1%2F2A6/"
     },
     {
       "motorId": "56a40928000231000000000c",
@@ -99,10 +105,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/A10T.pdf",
       "propWeightG": 3.8,
       "delays": "0,3,P",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/A10/"
     },
     {
       "motorId": "56a409280002310000000009",
@@ -123,10 +131,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/A3T.pdf",
       "propWeightG": 3.3,
       "delays": "4",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/A3/"
     },
     {
       "motorId": "56a40928000231000000000b",
@@ -147,10 +157,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/A8.pdf",
       "propWeightG": 3.3,
       "delays": "0,3,5",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/A8/"
     },
     {
       "motorId": "56a40928000231000000000e",
@@ -171,10 +183,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/B4.pdf",
       "propWeightG": 6,
       "delays": "2,4",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/B4/"
     },
     {
       "motorId": "56a409280002310000000010",
@@ -196,10 +210,12 @@
       "totalWeightG": 15,
       "propWeightG": 5.6,
       "delays": "0,2,4,6",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/B6/"
     },
     {
       "motorId": "56a40928000231000000001a",
@@ -220,10 +236,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/C11.pdf",
       "propWeightG": 12,
       "delays": "0,3,5,7",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/C11/"
     },
     {
       "motorId": "56a409280002310000000015",
@@ -244,10 +262,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/C6.pdf",
       "propWeightG": 10.8,
       "delays": "0,3,5,7",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/C6/"
     },
     {
       "motorId": "56a409280002310000000014",
@@ -267,10 +287,12 @@
       "dataFiles": 2,
       "infoUrl": "http://nar.org/SandT/pdf/Estes/C5.pdf",
       "propWeightG": 11.3,
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/C5/"
     },
     {
       "motorId": "56a409280002310000000020",
@@ -291,10 +313,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/D12.pdf",
       "propWeightG": 21.1,
       "delays": "0,3,5,7",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/D12/"
     },
     {
       "motorId": "56a40928000231000000001f",
@@ -315,10 +339,12 @@
       "infoUrl": "http://nar.org/SandT/pdf/Estes/D11.pdf",
       "totalWeightG": 44.8,
       "propWeightG": 24.5,
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-18",
-      "availability": "occasional"
+      "availability": "occasional",
+      "source_url": "http://localhost:3000/motors/Estes/D11/"
     },
     {
       "motorId": "56a4092800023100000003e3",
@@ -339,10 +365,12 @@
       "infoUrl": "http://www.nar.org/SandT/pdf/Estes/E12.pdf",
       "propWeightG": 35.9,
       "delays": "0,4,6,8",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/E12/"
     },
     {
       "motorId": "56a409280002310000000028",
@@ -364,10 +392,12 @@
       "totalWeightG": 58,
       "propWeightG": 35.8,
       "delays": "4,6,8",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/E9/"
     },
     {
       "motorId": "56a4092800023100000003f8",
@@ -389,10 +419,12 @@
       "totalWeightG": 84,
       "propWeightG": 40,
       "delays": "0,4,6,8",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2015-06-03",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/E16/"
     },
     {
       "motorId": "56a4092800023100000003e4",
@@ -413,10 +445,12 @@
       "infoUrl": "http://www.nar.org/SandT/pdf/Estes/E30.pdf",
       "propWeightG": 17.8,
       "delays": "4,7",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/E30/"
     },
     {
       "motorId": "56a4092800023100000003f2",
@@ -438,10 +472,12 @@
       "totalWeightG": 102,
       "propWeightG": 60,
       "delays": "0, 4, 6, 8",
+      "delayAdjustable": false,
       "propInfo": "black powder",
       "sparky": false,
       "updatedOn": "2015-06-03",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/F15/"
     },
     {
       "motorId": "56a4092800023100000003e5",
@@ -462,10 +498,12 @@
       "infoUrl": "http://www.nar.org/SandT/pdf/Estes/F26FJ.pdf",
       "propWeightG": 43.1,
       "delays": "6",
+      "delayAdjustable": false,
       "propInfo": "composite",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/F26/"
     },
     {
       "motorId": "56a4092800023100000003e6",
@@ -486,10 +524,13 @@
       "infoUrl": "http://www.nar.org/SandT/pdf/Estes/F50T.pdf",
       "propWeightG": 37.9,
       "delays": "4,6",
+      "delayAdjustable": false,
       "propInfo": "composite",
       "sparky": false,
       "updatedOn": "2014-07-05",
-      "availability": "regular"
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/F50/"
     }
-  ]
+  ],
+  "source_url": "http://localhost:3000/motors/search.html"
 }

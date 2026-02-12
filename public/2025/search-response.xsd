@@ -2,8 +2,8 @@
 <?xml-stylesheet type="text/xsl" href="/xs3p.xsl"?>
 <xs:schema version="2020.1"
  xmlns:xs="http://www.w3.org/2001/XMLSchema"
- targetNamespace="http://www.thrustcurve.org/2020/SearchResponse"
- xmlns="http://www.thrustcurve.org/2020/SearchResponse"
+ targetNamespace="http://www.thrustcurve.org/2025/SearchResponse"
+ xmlns="http://www.thrustcurve.org/2025/SearchResponse"
  elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation xml:lang="en">
@@ -25,8 +25,8 @@
                   <xs:sequence>
                     <xs:element name="name" type="xs:string"/>
                     <xs:element name="value" type="xs:string"/>
-                    <xs:element name="matches" type="xs:integer"/>
                     <xs:element name="error" type="xs:string" minOccurs="0"/>
+                    <xs:element name="matches" type="xs:integer"/>
                   </xs:sequence>
                 </xs:complexType>
 	      </xs:element>

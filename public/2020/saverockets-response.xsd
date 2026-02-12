@@ -15,8 +15,8 @@
   <xs:element name="saverockets-response">
     <xs:complexType>
       <xs:sequence>
-        <!-- the list of results is always present, but may be empty -->
-	<xs:element name="results">
+        <!-- the list of results when successful; omitted when error occurs (e.g. auth failure) -->
+	<xs:element name="results" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="result" minOccurs="0" maxOccurs="unbounded">

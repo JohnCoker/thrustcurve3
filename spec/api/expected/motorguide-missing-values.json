@@ -4,5 +4,6 @@
   "results": [],
   "okCount": 0,
   "failedCount": 0,
-  "error": "Invalid rocket bodyDiameterM value.\nInvalid rocket mmtDiameterMm value.\nInvalid rocket mmtLengthMm value.\nInvalid rocket weightKg value.\nInvalid rocket cd value.\nInvalid rocket guideLengthM value."
+  "error": "Invalid rocket bodyDiameterM value.\nInvalid rocket mmtDiameterMm value.\nInvalid rocket mmtLengthMm value.\nInvalid rocket weightKg value.\nInvalid rocket cd value.\nInvalid rocket guideLengthM value.",
+  "source_url": "http://localhost:3000/motors/guide.html"
 }

@@ -163,7 +163,7 @@ router.get(APIPrefix + 'swagger.json', function(req, res, _next) {
  * /api/v1/metadata
  * Possible motor search criteria, either as XML or JSON.
  */
-function sendMetadata(res, format, metadata, errs) {
+function sendMetadata(req, res, format, metadata, errs) {
   format.root('metadata-response', '2008/MetadataResponse');
   format.elementList('manufacturers', _.map(metadata.manufacturers, function(m) {
     return {
@@ -194,15 +194,15 @@ function doMetadata(req, res, format) {
     let keys = Object.keys(query);
     if (keys.length == 1 && query.availability == 'available') {
       // available motors
-      sendMetadata(res, format, cache.availableMotors, errs);
+      sendMetadata(req, res, format, cache.availableMotors, errs);
     } else if (keys.length > 0) {
       // specific motor query
       metadata.getMatchingMotors(req, query, function(metadata) {
-        sendMetadata(res, format, metadata, errs);
+        sendMetadata(req, res, format, metadata, errs);
       });
     } else {
       // all motors
-      sendMetadata(res, format, cache.allMotors, errs);
+      sendMetadata(req, res, format, cache.allMotors, errs);
     }
   });
 }

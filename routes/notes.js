@@ -15,9 +15,6 @@ const defaults = {
   layout: 'admin',
 };
 
-// must be authenticated for all requests
-router.use(authenticated);
-
 function isInvalid(note) {
   return note.subject == null || note.subject === '' || note.content == null || note.content === '';
 }
@@ -70,7 +67,7 @@ function doEditMotorNote(req, res, note) {
   });
 }
 
-router.get('/notes/motor/:motorId/add.html', function(req, res, next) {
+router.get('/notes/motor/:motorId/add.html', authenticated, function(req, res, next) {
   getMotor(req, res, motor => {
     let note = new req.db.MotorNote({ _motor: motor, _contributor: req.user });
     doEditMotorNote(req, res, note);
@@ -84,7 +81,7 @@ function redirectToMotor(req, res, motor) {
   });
 }
 
-router.post('/notes/motor/:motorId/add.html', verified, function(req, res, next) {
+router.post('/notes/motor/:motorId/add.html', authenticated, verified, function(req, res, next) {
   getMotor(req, res, motor => {
     let subject = req.body.subject,
         content = req.body.content;
@@ -136,11 +133,11 @@ function getMotorNote(req, res, submit, cb) {
   }));
 }
 
-router.get('/notes/motor/:id/edit.html', function(req, res, next) {
+router.get('/notes/motor/:id/edit.html', authenticated, function(req, res, next) {
   getMotorNote(req, res, false, note => doEditMotorNote(req, res, note));
 });
 
-router.post('/notes/motor/:id/edit.html', verified, function(req, res, next) {
+router.post('/notes/motor/:id/edit.html', authenticated, verified, function(req, res, next) {
   getMotorNote(req, res, true, note => {
     let subject = req.body.subject,
         content = req.body.content;
@@ -166,7 +163,7 @@ router.post('/notes/motor/:id/edit.html', verified, function(req, res, next) {
  * /notes/motor/:id/delete.html
  * Delete a motor note.
  */
-router.get('/notes/motor/:id/delete.html', function(req, res, next) {
+router.get('/notes/motor/:id/delete.html', authenticated, function(req, res, next) {
   getMotorNote(req, res, true, note => {
     req.db.MotorNote.deleteOne({ _id: note._id }, req.success(() => {
       redirectToMotor(req, res, note._motor);
@@ -213,7 +210,7 @@ function doEditSimfileNote(req, res, note) {
   });
 }
 
-router.get('/notes/simfile/:fileId/add.html', function(req, res, next) {
+router.get('/notes/simfile/:fileId/add.html', authenticated, function(req, res, next) {
   getSimfile(req, res, simfile => {
     let note = new req.db.SimFileNote({ _simFile: simfile, _contributor: req.user });
     doEditSimfileNote(req, res, note);
@@ -224,7 +221,7 @@ function redirectToSimfile(req, res, simfile) {
   res.redirect(303, '/simfiles/' + simfile._id + '/#notes');
 }
 
-router.post('/notes/simfile/:fileId/add.html', verified, function(req, res, next) {
+router.post('/notes/simfile/:fileId/add.html', authenticated, verified, function(req, res, next) {
   getSimfile(req, res, simfile => {
     let subject = req.body.subject,
         content = req.body.content;
@@ -275,11 +272,11 @@ function getSimfileNote(req, res, submit, cb) {
   }));
 }
 
-router.get('/notes/simfile/:id/edit.html', function(req, res, next) {
+router.get('/notes/simfile/:id/edit.html', authenticated, function(req, res, next) {
   getSimfileNote(req, res, false, note => doEditSimfileNote(req, res, note));
 });
 
-router.post('/notes/simfile/:id/edit.html', function(req, res, next) {
+router.post('/notes/simfile/:id/edit.html', authenticated, function(req, res, next) {
   getSimfileNote(req, res, true, note => {
     let subject = req.body.subject,
         content = req.body.content;
@@ -305,7 +302,7 @@ router.post('/notes/simfile/:id/edit.html', function(req, res, next) {
  * /notes/simfile/:id/delete.html
  * Delete a simfile note.
  */
-router.get('/notes/simfile/:id/delete.html', function(req, res, next) {
+router.get('/notes/simfile/:id/delete.html', authenticated, function(req, res, next) {
   getSimfileNote(req, res, true, note => {
     req.db.SimFileNote.deleteOne({ _id: note._id }, req.success(() => {
       redirectToSimfile(req, res, note._simFile);

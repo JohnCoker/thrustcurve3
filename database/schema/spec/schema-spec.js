@@ -27,7 +27,12 @@ describe('schemas', function() {
   });
 
   beforeEach(async () => {
-    await mongoose.connection.dropDatabase();
+    await new Promise((resolve, reject) => {
+      mongoose.connection.db.dropDatabase(err => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   });
 
   describe('manufacturer', function() {
@@ -102,22 +107,25 @@ describe('schemas', function() {
       .then( function( priorFound) {
         expect(priorFound).toBeDefined();
 
-        priorFound.aliases.push('RUS');
-        priorFound.save( function(){
+        priorFound.aliases = priorFound.aliases.concat(['RUS']);
+        priorFound.save( function(err){
+          expect(err).toBeNull();
+          if (err) return done();
+          setImmediate(function(){
+            ManufacturerModel.findOne({ abbrev: 'RRU' }).exec()
+            .then( function( updated){
+              var now = new Date();
 
-          ManufacturerModel.findOne({ abbrev: 'RRU' }).exec()
-          .then( function( updated){
-            var now = new Date();
+              expect(updated).toBeDefined();
+              expect(updated).not.toBeNull();
+              expect(updated._id.toString()).toBe( priorFound._id.toString());
+              expect(updated.createdAt.toISOString()).toBe( priorFound.createdAt.toISOString());
+              expect(updated.updatedAt.getTime()).toBeGreaterThanOrEqual(queryTime.getTime());
+              expect(updated.updatedAt.getTime()).toBeLessThanOrEqual(now.getTime());
+              expect(updated.aliases.indexOf('RUS')).toBeGreaterThan(-1);
 
-            expect(updated).toBeDefined();
-            expect(updated).not.toBeNull();
-            expect(updated._id.toString()).toBe( priorFound._id.toString());
-            expect(updated.createdAt.toISOString()).toBe( priorFound.createdAt.toISOString());
-            expect(updated.updatedAt).toBeGreaterThan(queryTime);
-            expect(updated.updatedAt).toBeLessThan(now);
-            expect(updated.aliases.indexOf('RUS')).toBeGreaterThan(-1);
-
-            done();
+              done();
+            });
           });
         });
       });

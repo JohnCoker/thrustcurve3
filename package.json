@@ -6,7 +6,9 @@
   "license": "ISC",
   "scripts": {
     "start": "node ./bin/www",
-    "test": "node_modules/jasmine/bin/jasmine.js",
+    "test:lib": "node_modules/jasmine/bin/jasmine.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "lint": "jshint `find . -name mobile -prune -o -name node_modules -prune -o -name out -prune -o -name tmp -prune -o -name public -prune -o -name '*.js' -print` public/javascripts/main.js"
   },
   "dependencies": {
@@ -45,6 +47,7 @@
     "yamljs": "^0.2.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "jasmine": "^2.5.2",
     "mongodb-memory-server": "^8.15.1"
   }

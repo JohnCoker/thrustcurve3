@@ -134,8 +134,10 @@ thrustcurve3
 
 Jasmine 2 tests are located within each module and can be run at any level with the
 [jasmine](https://www.npmjs.com/package/jasmine) command.
-`npm test` at the root level can be run without a global installation of jasmine
+`npm run test:lib` at the root level can be run without a global installation of jasmine
 (as long as the devDependencies are installed).
+
+UI tests can be run using `npm run test:e2e`; see [spec/web](spec/web/).
 
 ## License
 

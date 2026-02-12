@@ -56,17 +56,18 @@ describe("ranking", function() {
     var motorIds = [];
     var promises = [];
     const impulseClassCount = 15;
-    var avg = 0.5;
+    var avg = 1.5;
     // Impulse numbers here match NAR motor code impulse limits:
     //   http://www.nar.org/standards-and-testing-committee/standard-motor-codes/
     for (var i = 0; i < impulseClassCount; i++) {
       var cls = String.fromCharCode('A'.charCodeAt(0) + i).toUpperCase();
-      var desig = cls + avg.toFixed();
+      var desig = cls + Math.round(avg).toFixed();
 
       promises.push( db.Motor.create({
         _manufacturer: manufacturer,
         designation: desig,
         commonName: desig,
+        delays: 'P',
         type: 'SU',
         impulseClass: cls,
         diameter: 18,
@@ -114,6 +115,15 @@ describe("ranking", function() {
         );
       }
       return Promise.all( promises);
+    })
+    .then( function(){
+      // Use native driver - drop collection to avoid MongoMemoryServer/Mongoose quirks
+      return new Promise((resolve, reject) => {
+        mongoose.connection.db.dropCollection('motorrankings', err => {
+          if (err && err.codeName !== 'NamespaceNotFound') reject(err);
+          else resolve();
+        });
+      });
     })
     .then( function(){
       ranking.build(db, function(err, result) {

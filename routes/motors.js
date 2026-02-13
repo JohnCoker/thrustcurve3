@@ -196,6 +196,10 @@ router.get('/motors/:mfr/:desig/', function(req, res, next) {
           addCertLink: req.helpers.motorLink(manufacturer, motor) + 'addcert.html',
           addNoteLink: '/notes/motor/' + motor._id + '/add.html',
         });
+        if (!motor.isp && motor.totalImpulse > 0 && motor.propellantWeight > 0)
+          details.ispEst = motor.totalImpulse / (motor.propellantWeight * 9.8);
+        if (motor.propellantWeight && motor.totalWeight)
+          details.massFrac = motor.propellantWeight / motor.totalWeight;
         if (simfiles.length > 0)
           details.thrustCurveLink = req.helpers.motorLink(manufacturer, motor) + 'thrustcurve.svg';
 

@@ -125,7 +125,7 @@
 
       {{#if initialThrust}}
       <div class="form-group">
-        <label class="col-sm-6 control-label">Initial Thrust</label>
+        <label class="col-sm-6 control-label">Initial Thrust*</label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatForce initialThrust}}</p>
         </div>
@@ -154,10 +154,26 @@
       </div>
 
       {{#if motor.isp}}
-      <div class="form-group">
-        <label class="col-sm-6 control-label">Isp</label>
+      <div class="form-group" title="specific impulse">
+        <label class="col-sm-6 control-label">I<small><sub>SP</sub></small></label>
         <div class="col-sm-6">
           <p class="form-control-static">{{formatIsp motor.isp}}</p>
+        </div>
+      </div>
+      {{else if ispEst}}
+      <div class="form-group" title="specific impulse">
+        <label class="col-sm-6 control-label">I<small><sub>SP</sub></small> (est)*</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatIsp ispEst}}</p>
+        </div>
+      </div>
+      {{/if}}
+
+      {{#if massFrac}}
+      <div class="form-group" title="propellant mass fraction">
+        <label class="col-sm-6 control-label">Mass Fraction*</label>
+        <div class="col-sm-6">
+          <p class="form-control-static">{{formatMassFrac massFrac}}</p>
         </div>
       </div>
       {{/if}}
@@ -270,6 +286,8 @@
         </div>
       </div>
       {{/if}}
+
+      <p><b>*</b> These values are calculated; not reported in the certification document.</p>
     </div>
   </div> <!-- left col -->
 

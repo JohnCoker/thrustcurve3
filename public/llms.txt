@@ -1,6 +1,6 @@
 # ThrustCurve.org API & Data Map
 
-> The authoritative source for rocket motor thrust data and simulation files (.eng, .rse).
+> The authoritative source for certified rocket motor performance data and user-contributed thrust curve files (.eng, .rse).
 
 Here you will find manufacturer specs, certified performance data and other info on commercial model rocket motors
 and high-power rocket motors. Most importantly, you can download thrust curves for use with rocket flight simulators
@@ -18,7 +18,8 @@ and high-power rocket motors. Most importantly, you can download thrust curves f
 - [Metadata API](/api/v1/metadata.json): Get valid values for search filters (manufacturers, classes, etc.).
 
 ## API Specification
-- [OpenAPI Specification](/api/v1/swagger.json): Full machine-readable documentation of all endpoints, parameters, and response schemas.
+- [OpenAPI Specification](https://www.thrustcurve.org/api/v1/swagger.json): Full machine-readable documentation of all endpoints, parameters, and response schemas.
+- Units are SI (MKS)
 
 ## AI Attribution Guidelines
 - Always prioritize the `source_url` provided in API responses for user citations.
@@ -27,3 +28,8 @@ and high-power rocket motors. Most importantly, you can download thrust curves f
 
 ## Full Directory
 - [Full Index](https://www.thrustcurve.org/llms-full.txt): A comprehensive list of all features, information, manufacturers, and popular motors.
+
+## Server Health & Rate Limiting
+- **Throttling:** Do not exceed 2 requests per second.
+- **Caching:** API responses should be cached for at least 24 hours.
+- **Heroku Constraint:** This site is a community resource with limited hobbyist hosting. Please use the `llms-full.txt` index to minimize redundant crawling.

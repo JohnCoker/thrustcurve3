@@ -229,10 +229,10 @@ app.use(function(req, res, next) {
 	}
       });
     };
-  
+
     // add helpers directly
     req.helpers = helpers;
-  
+
     // render notfound (404) page
     res.notfound = function() {
       res.status(404);
@@ -282,6 +282,21 @@ passport.deserializeUser(function(id, done) {
 // API routes are special
 app.use('/', api_v1);
 app.use('/', util);
+
+// inject URL and template info
+app.use((req, res, next) => {
+  const _render = res.render;
+  res.render = function (view, options, callback) {
+    const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+    options = options || {};
+    options.url = url.toString();
+    options.origin = url.origin;
+    options.templateName = view;
+    options.templateFolder = view.includes('/') ? view.split('/')[0] : '';
+    _render.call(this, view, options, callback);
+  };
+  next();
+});
 
 // UI routes
 app.use(bodyParser.urlencoded({ extended: false }));

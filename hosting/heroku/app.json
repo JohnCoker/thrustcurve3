@@ -7,5 +7,5 @@
   "logo": "http://node-js-sample.herokuapp.com/node.svg",
   "keywords": ["rocketry", "rockets", "motors", "thrust curve", "motor data", "engine data"],
   "image": "heroku/nodejs",
-  "stack": "heroku-26"
+  "stack": "heroku-24"
 }

@@ -22,6 +22,37 @@ const certOrgList = '/admin/certorgs/';
 const noteReview = '/admin/notes/';
 
 /*
+ * /health/
+ * Report whether the site is live and database is available.
+ */
+router.get('/health', async function(req, res, next) {
+  const healthInfo = {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(), // seconds
+    version: process.env.APP_VERSION || '1.0.0',
+  };
+
+  // MongoDB Check (Run a lightweight query, don't just check connection state)
+  // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+  let httpStatus = 200;
+  try {
+    const dbState = req.db.mongoose.connection.readyState;
+    if (dbState === 1) {
+      // Execute a trivial admin command to ensure the DB is actually responding
+      await req.db.mongoose.connection.db.admin().ping();
+    } else {
+      throw new Error(`Database in state ${dbState}`);
+    }
+  } catch (e) {
+    healthInfo.status = 'unhealthy';
+    httpStatus = 503;
+  }
+
+  return res.status(httpStatus).json(healthInfo);
+});
+
+/*
  * /admin/certorgs/
  * List the certification organizations, renders with admin/certorglist.hbs template
  */

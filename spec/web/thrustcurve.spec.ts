@@ -111,6 +111,27 @@ test.describe('search', () => {
     await expect(page.locator('#result-list_info')).toContainText(/20 entries/);
     await expect(page.locator('.odd').first().locator('td').first()).toHaveText('E11J');
   });
+
+  test('search by maximum length', async ({ page }) => {
+    await page.goto('/motors/search.html');
+    const searchForm = page.locator('form[name="edit"]');
+    await searchForm.locator('input[name="length"]').first().fill('45');
+    await searchForm.locator('button[type="submit"]').click();
+
+    await expect(page).toHaveTitle(/Search Results • ThrustCurve/);
+    await expect(page.locator('#result-list tbody tr')).toHaveCount(4);
+  });
+
+  test('search by length range', async ({ page }) => {
+    await page.goto('/motors/search.html');
+    const searchForm = page.locator('form[name="edit"]');
+    await searchForm.locator('input[name="length"]').first().fill('300');
+    await searchForm.locator('input[name="length"]').nth(1).fill('400');
+    await searchForm.locator('button[type="submit"]').click();
+
+    await expect(page).toHaveTitle(/Search Results • ThrustCurve/);
+    await expect(page.locator('#result-list_info')).toContainText(/of 35 entries/);
+  });
 });
 
 test.describe('guide', () => {

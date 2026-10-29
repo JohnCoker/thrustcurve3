@@ -21,7 +21,7 @@ describe("ranking", function() {
 
     db = {
       mongoose: mongoose,
-      Manufacturer: schema.ManufacturerModel(mongoose),
+      Manufacturer: mongoose.models.Manufacturer || schema.ManufacturerModel(mongoose),
       Motor: schema.MotorModel(mongoose),
       MotorView: schema.MotorViewModel(mongoose),
       MotorRanking: schema.MotorRankingModel(mongoose),
@@ -34,11 +34,8 @@ describe("ranking", function() {
       aliases: ['RocketsRUs', 'RRUS'],
       website: 'http://rocketsrus.com/'
     });
-    mfr.save()
-    .then( function( saved) {
-      expect( saved).toBeTruthy();
-      manufacturer = saved;
-    });
+    manufacturer = await mfr.save();
+    expect(manufacturer).toBeTruthy();
   });
 
   afterAll(async () => {

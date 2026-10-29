@@ -73,7 +73,8 @@ router.get('login.jsp', function(req, res, next) {
 });
 
 router.post(loginLink, passport.authenticate('local', {
-  failureRedirect: loginLink
+  failureRedirect: loginLink,
+  keepSessionInfo: true
 }), function(req, res, next) {
   var redirect = req.body.redirect || req.query.redirect || profileLink;
   res.redirect(redirect);
@@ -187,7 +188,7 @@ router.post(registerLink, function(req, res, next) {
           info.lastLogin = new Date();
           var model = new req.db.Contributor(info);
           model.save(req.success(function(updated) {
-            req.login(updated, function(err) {
+            req.login(updated, { keepSessionInfo: true }, function(err) {
               if (err)
                 return next(err);
 
@@ -350,7 +351,7 @@ router.post(resetLink, function(req, res, next) {
       user.lastLogin = new Date();
       user.password = password;
       user.save(req.success(function(updated) {
-        req.login(updated, function(err) {
+        req.login(updated, { keepSessionInfo: true }, function(err) {
           if (err)
             return next(err);
 
@@ -1360,8 +1361,11 @@ router.post(profileLink, authenticated, function(req, res, next) {
  * Log the current user out, redirects to index.
  */
 router.get('/mystuff/logout.html', function(req, res, next) {
-  req.logout();
-  res.redirect('/');
+  req.logout({ keepSessionInfo: true }, function(err) {
+    if (err)
+      return next(err);
+    res.redirect('/');
+  });
 });
 
 

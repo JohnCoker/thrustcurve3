@@ -126,9 +126,16 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: new SessionMongoStore({
-    mongooseConnection: mongoose.connection
+    mongooseConnection: mongoose.connection,
+    autoRemove: 'disabled'
   })
 }));
+mongoose.connection.once('open', function() {
+  // TTL index that connect-mongo would otherwise create with deprecated ensureIndex
+  mongoose.connection.collection('sessions')
+    .createIndex({ expires: 1 }, { expireAfterSeconds: 0 })
+    .catch(err => console.error('unable to create sessions index', err));
+});
 app.use(passport.initialize());
 app.use(passport.session());
 

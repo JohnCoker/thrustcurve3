@@ -39,7 +39,7 @@ describe('schemas', function() {
     var ManufacturerModel = null;
 
     beforeAll(function(done) {
-      ManufacturerModel = schema.ManufacturerModel(mongoose);
+      ManufacturerModel = mongoose.models.Manufacturer || schema.ManufacturerModel(mongoose);
       done();
     });
 

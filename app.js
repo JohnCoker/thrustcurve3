@@ -5,6 +5,7 @@
 'use strict';
 
 const process = require('process'),
+      crypto = require('crypto'),
       mongoose = require('mongoose'),
       cls = require('continuation-local-storage'),
       express = require('express'),
@@ -83,6 +84,17 @@ const index = require('./routes/index'),
       api_v1 = require('./routes/api_v1');
 
 const app = express();
+if (config.originVerifySecret) {
+  // reject requests that didn't come through Cloudflare (which adds this header)
+  const expected = Buffer.from(config.originVerifySecret);
+  app.use((req, res, next) => {
+    const actual = Buffer.from(req.header('x-origin-verify') || '');
+    if (actual.length === expected.length && crypto.timingSafeEqual(actual, expected))
+      next();
+    else
+      res.status(403).type('text').send('Forbidden');
+  });
+}
 if (process.env.NODE_ENV === 'production' && process.env.DOMAIN) {
   // force SSL and canonical domain in production (except for API)
   app.use((req, res, next) => {

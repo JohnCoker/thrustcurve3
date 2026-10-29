@@ -3,7 +3,7 @@
 const fs = require('fs'),
       path = require('path'),
       http = require('http'),
-      process = require('child_process');
+      childProcess = require('child_process');
 
 /*
  * Set to true to update response expectations.
@@ -11,13 +11,12 @@ const fs = require('fs'),
  */
 const updateExpected = false;
 
-function get(path, headers) {
+function get(path) {
   return new Promise((resolve, reject) => {
     let req = http.request({
       host: 'localhost',
-      port: 3000,
+      port: process.env.PORT || 3000,
       path,
-      headers,
     }, rsp => {
       let body = '';
       rsp.on('data', chunk => body += chunk);
@@ -32,7 +31,7 @@ function post(path, body) {
   return new Promise((resolve, reject) => {
     let req = http.request({
       host: 'localhost',
-      port: 3000,
+      port: process.env.PORT || 3000,
       method: 'POST',
       path,
     }, rsp => {
@@ -182,7 +181,7 @@ describe("API v1", function() {
             const xsd = path.resolve(specPath + "/../../public/" + schema);
             const cmd = `xmllint --noout --quiet --schema '${xsd}' '${file}'`;
             try {
-              process.execSync(cmd, { encoding: 'utf8', maxBuffer: 1024 * 1024 });
+              childProcess.execSync(cmd, { encoding: 'utf8', maxBuffer: 1024 * 1024 });
               fs.unlinkSync(file);
             } catch (e) {
               const xmllintOutput = (e.stderr || e.stdout || e.message || '').trim();
@@ -661,31 +660,6 @@ describe("API v1", function() {
     const API_SCHEMA = "2020/getrockets-response.xsd";
     const LEGACY_SCHEMA = "2015/getrockets-response.xsd";
     describe("GET", function() {
-      let headers = {
-        'Authorization': 'Basic ZmxpZXIuZnJlZEBnbWFpbC5jb206c2VjcmV0',
-      };
-      xit("mine JSON", function(done) {
-        get('/api/v1/getrockets.json', headers).then(response => {
-          expect(response).toBeValidJSON();
-          expect(response).not.toMatchN(/"rocket":/, 3);
-          expect(response).toBeExpected();
-          done();
-        }).catch(e => {
-          fail(e);
-          done();
-        });
-      });
-      xit("mine XML", function(done) {
-        get('/api/v1/getrockets.xml', headers).then(response => {
-          expect(response).toBeValidXML(API_SCHEMA);
-          expect(response).toMatchN(/<rocket>/, 3);
-          expect(response).toBeExpected();
-          done();
-        }).catch(e => {
-          fail(e);
-          done();
-        });
-      });
       it("others JSON", function(done) {
         get('/api/v1/getrockets.json?username=flier.fred@gmail.com').then(response => {
           expect(response).toBeValidJSON();
@@ -834,7 +808,7 @@ describe("API v1", function() {
 
   describe("saverockets", function() {
     function cleanup(done) {
-      const shell = process.spawn('mongosh', ['localhost'], { stdio: ['pipe', 'pipe', 'pipe'] });
+      const shell = childProcess.spawn('mongosh', ['localhost'], { stdio: ['pipe', 'pipe', 'pipe'] });
       shell.stdin.write('use test\ndb.rockets.deleteMany({ name: { $regex: "^mobile", $options: "i" } })\n');
       shell.stdin.end();
       shell.on('close', (code) => {

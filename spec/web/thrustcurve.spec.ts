@@ -1,9 +1,30 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 /**
  * E2E tests for ThrustCurve, translated from Selenium IDE (ThrustCurve.side).
  * Start the server with `bin/www-test` before running: npm run test:e2e
  */
+
+async function login(page: Page, email: string) {
+  await page.goto('/mystuff/login.html');
+  const loginForm = page.locator('form[name="login"]');
+  await loginForm.locator('input[name="username"]').fill(email);
+  await loginForm.locator('input[name="password"]').fill('secret');
+  await loginForm.locator('button[type="submit"]').click();
+  await page.waitForURL((url) => !url.pathname.includes('login'), { timeout: 15000 });
+  await expect(page.getByRole('button', { name: /My Stuff/ })).toBeVisible();
+}
+
+/*
+ * Tests that modify data run concurrently in each browser project,
+ * so each project needs its own records to avoid colliding.
+ */
+function perProject<T>(byProject: Record<string, T>): T {
+  const value = byProject[test.info().project.name];
+  if (value === undefined)
+    throw new Error(`no test data for project ${test.info().project.name}`);
+  return value;
+}
 
 test.describe('index', () => {
   test.beforeEach(async ({ page }) => {
@@ -296,5 +317,155 @@ test.describe('browser', () => {
     await page.goBack();
     await expect(page).toHaveTitle(/Motor Browser • ThrustCurve/);
     await expect(page.locator('.trail .current')).toContainText(/3\s*s burn time/);
+  });
+});
+
+function labeledValue(page: Page, label: string) {
+  return page.locator('.form-group', { has: page.locator('label', { hasText: new RegExp(`^${label}$`) }) })
+             .locator('.form-control-static');
+}
+
+test.describe('mystuff', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1233, height: 872 });
+    await login(page, 'flier.fred@gmail.com');
+  });
+
+  test('add and remove favorite motor', async ({ page }) => {
+    const { path, designation } = perProject({
+      chromium: { path: '/motors/Estes/C6/', designation: 'C6' },
+      webkit: { path: '/motors/AeroTech/F25W/', designation: 'F25W' },
+    });
+    const favorites = page.locator('#favorite-list');
+    try {
+      await page.goto(path);
+      await page.locator('a.favorite[title="add favorite"]').click();
+      await expect(page).toHaveTitle(/Favorite Motors • ThrustCurve/);
+      await expect(favorites.getByRole('link', { name: designation, exact: true })).toBeVisible();
+
+      await favorites.locator('tr', { has: page.getByRole('link', { name: designation, exact: true }) })
+                     .locator('a.favorite[title="remove favorite"]').click();
+      await expect(page).toHaveTitle(/Favorite Motors • ThrustCurve/);
+      await expect(favorites.getByRole('link', { name: designation, exact: true })).toHaveCount(0);
+    } finally {
+      await page.goto(path);
+      const remove = page.locator('a.favorite[title="remove favorite"]');
+      if (await remove.count() > 0)
+        await remove.click();
+    }
+  });
+
+  test('motor details use saved in/oz preferences', async ({ page }) => {
+    // Fred has defaultUnits in/oz in the test DB. Site defaults are mm/g.
+    await page.goto('/mystuff/logout.html');
+    await page.goto('/motors/Estes/C6/');
+    await expect(labeledValue(page, 'Diameter')).toHaveText(/18\s*mm/);
+    await expect(labeledValue(page, 'Length')).toHaveText(/70\s*mm/);
+    await expect(labeledValue(page, 'Prop. Weight')).toHaveText(/11\s*g/);
+
+    await login(page, 'flier.fred@gmail.com');
+
+    await page.goto('/mystuff/preferences.html');
+    await expect(page).toHaveTitle(/Preferences • ThrustCurve/);
+    const prefs = page.locator('form[name="prefs"]');
+    await expect(prefs.locator('select[name="defaultUnits"]')).toHaveValue('in/oz');
+    await expect(prefs.locator('select[name="lengthUnit"]')).toHaveValue('in');
+    await expect(prefs.locator('select[name="massUnit"]')).toHaveValue('oz');
+
+    await page.goto('/motors/Estes/C6/');
+    await expect(labeledValue(page, 'Diameter')).toHaveText(/18\s*mm/);
+    await expect(labeledValue(page, 'Length')).toHaveText(/2\.76\s*in/);
+    await expect(labeledValue(page, 'Prop. Weight')).toHaveText(/0\.4\s*oz/);
+
+    await page.goto('/mystuff/rocket/new/edit.html');
+    const form = page.locator('form[name="edit-rocket"]');
+    await expect(form.locator('select[name="bodyDiameterUnit"]')).toHaveValue('in');
+    await expect(form.locator('select[name="weightUnit"]')).toHaveValue('oz');
+  });
+
+  test('create and delete rocket', async ({ page }) => {
+    const name = perProject({
+      chromium: 'ZZ e2e rocket chromium',
+      webkit: 'ZZ e2e rocket webkit',
+    });
+    let rocketUrl: string | undefined;
+    try {
+      await page.goto('/mystuff/rocket/new/edit.html');
+      await expect(page).toHaveTitle(/Add Rocket • ThrustCurve/);
+      const form = page.locator('form[name="edit-rocket"]');
+      await form.locator('input[name="name"]').fill(name);
+      await form.locator('input[name="public"]').uncheck();
+      await form.locator('input[name="bodyDiameter"]').fill('1');
+      await form.locator('select[name="bodyDiameterUnit"]').selectOption('in');
+      await form.locator('input[name="weight"]').fill('3');
+      await form.locator('select[name="weightUnit"]').selectOption('oz');
+      await form.locator('select[name="mmtDiameter"]').selectOption('24');
+      await form.locator('input[name="mmtLength"]').fill('80');
+      await form.locator('select[name="mmtLengthUnit"]').selectOption('mm');
+      await form.locator('button[type="submit"]').click();
+
+      await expect(page).toHaveTitle(new RegExp(`${name} • ThrustCurve`));
+      rocketUrl = page.url();
+
+      page.once('dialog', (dialog) => dialog.accept());
+      await page.getByRole('link', { name: 'delete it entirely' }).click();
+      await expect(page).toHaveTitle(/My Rockets • ThrustCurve/);
+      await expect(page.getByRole('link', { name })).toHaveCount(0);
+      rocketUrl = undefined;
+    } finally {
+      if (rocketUrl)
+        await page.goto(rocketUrl.replace(/\/?$/, '/delete.html'));
+    }
+  });
+});
+
+test.describe('admin', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1233, height: 872 });
+    await login(page, 'admin.adam@gmail.com');
+  });
+
+  test('certification org and docs pages', async ({ page }) => {
+    await page.goto('/admin/certorgs/');
+    await expect(page).toHaveTitle(/Certification Organizations • ThrustCurve/);
+    await page.locator('#certorg-list').getByRole('link').first().click();
+    await expect(page).toHaveTitle(/Edit Certification Org • ThrustCurve/);
+    await expect(page.locator('.form-group', { has: page.locator('label[for="motors"]') })
+                     .locator('.form-control-static')).toHaveText(/^\d[\d,]*$/);
+
+    await page.goto('/admin/certdocs/');
+    await expect(page).toHaveTitle(/Certification Docs • ThrustCurve/);
+  });
+
+  test('set, change and clear propellant colors', async ({ page }) => {
+    // these propellants have no stored info, so clearing restores the original state
+    const { mfr, propellant } = perProject({
+      chromium: { mfr: 'Estes', propellant: 'composite' },
+      webkit: { mfr: 'AeroTech', propellant: 'White Thunder' },
+    });
+    const row = () => page.locator('tr.entry')
+      .filter({ has: page.locator('td').first().getByText(mfr, { exact: true }) })
+      .filter({ has: page.getByRole('link', { name: propellant, exact: true }) });
+    const flame = () => row().locator('input[name="flameColor"]');
+    const save = () => row().locator('button[type="submit"]');
+
+    try {
+      await page.goto('/admin/propellants/');
+      await expect(flame()).toHaveValue('');
+
+      await flame().fill('e2e-red');
+      await save().click();
+      await expect(flame()).toHaveValue('e2e-red');
+
+      await flame().fill('e2e-blue');
+      await save().click();
+      await expect(flame()).toHaveValue('e2e-blue');
+
+      await flame().fill('');
+      await save().click();
+      await expect(flame()).toHaveValue('');
+    } finally {
+      await page.request.post('/admin/propellants/', { form: { manufacturer: mfr, name: propellant } });
+    }
   });
 });

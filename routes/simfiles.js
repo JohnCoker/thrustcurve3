@@ -455,7 +455,7 @@ router.get('/simfiles/:id/delete.html', authenticated, function(req, res, next) 
       noUpdatePerm(req, res);
     } else {
       simfile._motor.populate('_manufacturer', req.success(function(motor) {
-        simfile.remove(req.success(function() {
+        simfile.deleteOne(req.success(function() {
           // return to motor page
           res.redirect(302, '/motors/' + motor._manufacturer.abbrev + '/' + motor.designation);
         }));

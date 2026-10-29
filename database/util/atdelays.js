@@ -4,10 +4,7 @@
  */
 'use strict';
 
-var process = require('process'),
-    async = require('async'),
-    mysql = require('mysql'),
-    mongoose = require('mongoose'),
+var mongoose = require('mongoose'),
     schema = require('../schema');
 
 function motorUpdates(motors) {

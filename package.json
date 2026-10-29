@@ -9,7 +9,7 @@
     "test:lib": "node_modules/jasmine/bin/jasmine.js",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "lint": "jshint `find . -name mobile -prune -o -name node_modules -prune -o -name out -prune -o -name tmp -prune -o -name public -prune -o -name '*.js' -print` public/javascripts/main.js"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.2",
@@ -20,7 +20,6 @@
     "body-parser-xml": "^2.0.1",
     "compression": "^1.7.4",
     "connect-mongo": "^1.1.0",
-    "continuation-local-storage": "^3.1.7",
     "cookie-parser": "^1.4.7",
     "debug": "~2.6.9",
     "exphbs": "^1.1.0",
@@ -47,7 +46,10 @@
     "yamljs": "^0.2.6"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "jasmine": "^2.5.2",
     "mongodb-memory-server": "^8.15.1"
   }

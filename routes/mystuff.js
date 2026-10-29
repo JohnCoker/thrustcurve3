@@ -99,7 +99,7 @@ router.get(['/register.jsp'], function(req, res, next) {
 
 router.post(registerLink, function(req, res, next) {
   // collect parameters
-  let info = {}, errors = [], captcha,
+  let info = {}, errors = [],
       v;
 
   v = req.body.name.trim();
@@ -383,7 +383,7 @@ router.get(verifyLink, authenticated, function(req, res, next) {
       }));
       return;
     }
-    errors.push['Email verification link expired.'];
+    errors.push('Email verification link expired.');
   }
 
   // generate a token and email it
@@ -524,7 +524,7 @@ function removeFavorite(req, res, motor) {
     // invalid motor ID
     res.redirect(favoritesLink);
   } else {
-    req.db.FavoriteMotor.remove({ _contributor: req.user._id, _motor: motor }, req.success(function() {
+    req.db.FavoriteMotor.deleteMany({ _contributor: req.user._id, _motor: motor }, req.success(function() {
       res.redirect(favoritesLink);
     }));
   }
@@ -1034,7 +1034,7 @@ router.post('/mystuff/rocket/:id/adapter.html', authenticated, function(req, res
 router.get('/mystuff/rocket/:id/delete.html', authenticated, function(req, res, next) {
   var id = req.params.id;
   if (req.db.isId(id)) {
-    req.db.Rocket.remove({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+    req.db.Rocket.deleteMany({ _contributor: req.user._id, _id: id }, req.success(function() {
       res.redirect(303, rocketsLink + '?result=deleted');
     }));
   } else {

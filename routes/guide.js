@@ -504,7 +504,7 @@ function doRunGuide(req, res, rocket) {
     }
     buildFilter((filter, filterCount) => {
       // count the number of motors that match the filter
-      req.db.Motor.count(filter, req.success(function(filterMatch) {
+      req.db.Motor.countDocuments(filter, req.success(function(filterMatch) {
         if (filterMatch < 1)
           errors.push('No motors match the filter criteria.');
   

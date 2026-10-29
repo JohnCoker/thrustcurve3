@@ -4,10 +4,7 @@
  */
 'use strict';
 
-var process = require('process'),
-    async = require('async'),
-    mysql = require('mysql'),
-    mongoose = require('mongoose'),
+var mongoose = require('mongoose'),
     schema = require('../schema');
 
 function motorUpdates(motors) {
@@ -72,7 +69,6 @@ function buildUpdates() {
                        return;
                      }
                      const motors = schema.MotorModel(mongoose);
-                     const ctiId = mongoose.Types.ObjectId('5f4294d200050d0000000004');
                      motors.find({
                        delays: { $ne: null },
                      }).exec(function(err, results) {

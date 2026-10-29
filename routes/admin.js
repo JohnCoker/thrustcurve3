@@ -86,10 +86,10 @@ router.get('/admin/certorgs/:id', authorized('metadata'), function(req, res, nex
 
   req.db.CertOrg.findOne({ _id: id }, req.success(function(certorg) {
     if (!certorg) {
-      res.redirect(certOrgList, 302);
+      res.redirect(302, certOrgList);
       return;
     }
-    req.db.Motor.count({ _certOrg: id }, req.success(function(motors) {
+    req.db.Motor.countDocuments({ _certOrg: id }, req.success(function(motors) {
       res.render('admin/certorgedit', locals(req, defaults, {
         title: 'Edit Certification Org',
         certorg: certorg,
@@ -297,7 +297,7 @@ router.post(propellantsLink, authorized('metadata'), function(req, res, next) {
     }
 
     function done() {
-      res.redirect(propellantsLink, 303);
+      res.redirect(303, propellantsLink);
     }
 
     if (flameColor == null && smokeColor == null && !sparky) {
@@ -463,7 +463,7 @@ router.get('/admin/cases/', function(req, res, next) {
  * Overall summary of certification documents.
  */
 router.get('/admin/certdocs/', authorized('motors'), function(req, res, next) {
-  req.db.MotorCert.count(req.success(function(count) {
+  req.db.MotorCert.countDocuments(req.success(function(count) {
     res.render('admin/certdocs', locals(req, defaults, {
       title: 'Certification Docs',
       totalCount: count,
@@ -491,8 +491,8 @@ function download(url, cb, forward) {
     if (res.statusCode >= 300 && res.statusCode < 400) {
       if (forward == null)
         forward = 0;
-      if (forward < 3 && res.headers['location'])
-        download(res.headers['location'], cb, forward + 1);
+      if (forward < 3 && res.headers.location)
+        download(res.headers.location, cb, forward + 1);
       else
         cb(null);
       res.destroy();

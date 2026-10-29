@@ -101,7 +101,7 @@ if (process.env.NODE_ENV === 'production' && process.env.DOMAIN) {
     let host = req.header('host');
     if (!/^\/(servlets|api)\//.test(req.url) &&
         (host != null && host != process.env.DOMAIN || req.header('x-forwarded-proto') !== 'https'))
-      res.redirect(`https://${process.env.DOMAIN}${req.url}`);
+      res.redirect(301, `https://${process.env.DOMAIN}${req.url}`);
     else
       next();
   });

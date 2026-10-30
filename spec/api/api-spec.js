@@ -808,12 +808,12 @@ describe("API v1", function() {
 
   describe("saverockets", function() {
     function cleanup(done) {
-      const shell = childProcess.spawn('mongosh', ['localhost'], { stdio: ['pipe', 'pipe', 'pipe'] });
+      const shell = childProcess.spawn('mongosh', ['127.0.0.1'], { stdio: ['pipe', 'pipe', 'pipe'] });
       shell.stdin.write('use test\ndb.rockets.deleteMany({ name: { $regex: "^mobile", $options: "i" } })\n');
       shell.stdin.end();
       shell.on('close', (code) => {
         if (code !== 0)
-          done(new Error('MongoDB cleanup failed. Ensure mongosh is installed and the test database is accessible.'));
+          done(new Error('MongoDB cleanup failed. Ensure mongosh is installed and the test database is accessible at 127.0.0.1.'));
         else
           done();
       });

@@ -4,9 +4,15 @@
   "private": true,
   "author": "John Coker",
   "license": "ISC",
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "7.0.35"
+    }
+  },
   "scripts": {
     "start": "node ./bin/www",
     "test:lib": "node_modules/jasmine/bin/jasmine.js",
+    "test:api": "node_modules/jasmine/bin/jasmine.js spec/api/api-spec.js",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "lint": "eslint ."

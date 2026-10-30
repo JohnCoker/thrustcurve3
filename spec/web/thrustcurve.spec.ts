@@ -387,7 +387,7 @@ test.describe('mystuff', () => {
     await page.goto('/mystuff/profile.html');
     await page.getByRole('link', { name: 'delete this account' }).click();
     await expect(page).toHaveTitle(/Delete Account • ThrustCurve/);
-    await expect(page.getByText('Deleted User')).toBeVisible();
+    await expect(page.getByText('Deleted User', { exact: true })).toBeVisible();
     await expect(page.getByText(/rockets will be deleted/)).toBeVisible();
     await expect(page.locator('form[name="delete"] input[name="password"]')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Delete My Account' })).toBeVisible();

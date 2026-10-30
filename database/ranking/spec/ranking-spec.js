@@ -11,7 +11,10 @@ describe("ranking", function() {
   let manufacturer = null;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    // WiredTiger is the MongoDB 7 storage engine. mongodb-memory-server defaults to ephemeralForTest.
+    mongoServer = await MongoMemoryServer.create({
+      instance: { storageEngine: "wiredTiger" },
+    });
     const mongoUri = mongoServer.getUri();
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,

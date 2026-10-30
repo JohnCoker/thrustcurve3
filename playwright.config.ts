@@ -6,10 +6,12 @@ import path from 'path';
  * Start the server with `bin/www-test` before running: npm run test:e2e
  */
 export default defineConfig({
-  // Use user's browser cache (avoids sandbox cache when run from Cursor)
-  env: process.env.HOME
-    ? { PLAYWRIGHT_BROWSERS_PATH: path.join(process.env.HOME, 'Library/Caches/ms-playwright') }
-    : undefined,
+  // On a Mac, use the user browser cache so Cursor's sandbox can find Chromium.
+  // Linux CI installs browsers into Playwright's default cache.
+  env:
+    process.platform === 'darwin' && !process.env.CI && process.env.HOME
+      ? { PLAYWRIGHT_BROWSERS_PATH: path.join(process.env.HOME, 'Library/Caches/ms-playwright') }
+      : undefined,
   testDir: './spec/web',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

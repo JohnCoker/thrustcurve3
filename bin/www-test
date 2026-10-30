@@ -1,5 +1,5 @@
 #!/bin/sh
 
-export MONGODB_URI='mongodb://localhost/test'
+export MONGODB_URI='mongodb://127.0.0.1/test'
 export NODE_ENV="test"
 exec $(dirname $0)/www

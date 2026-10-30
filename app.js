@@ -5,8 +5,8 @@
 'use strict';
 
 const process = require('process'),
+      crypto = require('crypto'),
       mongoose = require('mongoose'),
-      cls = require('continuation-local-storage'),
       express = require('express'),
       exphbs = require('exphbs'),
       path = require('path'),
@@ -23,14 +23,16 @@ const process = require('process'),
       config = require('./config/server.js'),
       schema = require('./database/schema'),
       crawlers = require('./lib/crawlers'),
-      helpers = require('./lib/helpers');
+      helpers = require('./lib/helpers'),
+      context = require('./lib/context');
 
 // fail if initial connection is impossible
 mongoose.Promise = global.Promise;
 mongoose.connect(config.mongoUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true // This replaces the ensureIndex warning
+  useCreateIndex: true,
+  useFindAndModify: false
 }, function(err) {
   if (err) {
     console.error('unable to connect to MongoDB');
@@ -83,13 +85,24 @@ const index = require('./routes/index'),
       api_v1 = require('./routes/api_v1');
 
 const app = express();
+if (config.originVerifySecret) {
+  // reject requests that didn't come through Cloudflare (which adds this header)
+  const expected = Buffer.from(config.originVerifySecret);
+  app.use((req, res, next) => {
+    const actual = Buffer.from(req.header('x-origin-verify') || '');
+    if (actual.length === expected.length && crypto.timingSafeEqual(actual, expected))
+      next();
+    else
+      res.status(403).type('text').send('Forbidden');
+  });
+}
 if (process.env.NODE_ENV === 'production' && process.env.DOMAIN) {
   // force SSL and canonical domain in production (except for API)
   app.use((req, res, next) => {
     let host = req.header('host');
     if (!/^\/(servlets|api)\//.test(req.url) &&
         (host != null && host != process.env.DOMAIN || req.header('x-forwarded-proto') !== 'https'))
-      res.redirect(`https://${process.env.DOMAIN}${req.url}`);
+      res.redirect(301, `https://${process.env.DOMAIN}${req.url}`);
     else
       next();
   });
@@ -102,6 +115,7 @@ app.use(compression());
 app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', exphbs);
 app.set('view engine', 'hbs');
+app.locals.operatorEmail = config.operatorEmail;
 
 // other Express configuration
 app.use(logger('dev'));
@@ -109,14 +123,23 @@ app.use(morgan('combined'));
 app.use(cookieParser());
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(path.join(__dirname, 'public')));
+if (!config.sessionSecret && process.env.NODE_ENV === 'production')
+  console.error('SESSION_SECRET is not set; using insecure default');
 app.use(session({
-  secret: 'ThrustCurve.org',
+  secret: config.sessionSecret || 'ThrustCurve.org',
   resave: false,
   saveUninitialized: false,
   store: new SessionMongoStore({
-    mongooseConnection: mongoose.connection
+    mongooseConnection: mongoose.connection,
+    autoRemove: 'disabled'
   })
 }));
+mongoose.connection.once('open', function() {
+  // TTL index that connect-mongo would otherwise create with deprecated ensureIndex
+  mongoose.connection.collection('sessions')
+    .createIndex({ expires: 1 }, { expireAfterSeconds: 0 })
+    .catch(err => console.error('unable to create sessions index', err));
+});
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -165,7 +188,6 @@ const db = Object.create(null, {
     return schema.IdRegex.test(v);
   } }
 });
-const clsNamespace = cls.createNamespace('session');
 app.use(function(req, res, next) {
   // determine if this is a robot/crawler/spider
   req.isBot = function() {
@@ -190,44 +212,53 @@ app.use(function(req, res, next) {
     return this.params != null && Object.prototype.hasOwnProperty.call(this.params, p);
   };
 
-  // make request and prefs available throughout processing
-  clsNamespace.bindEmitter(req);
-  clsNamespace.bindEmitter(res);
-  clsNamespace.run(function() {
-    clsNamespace.set('req', req);
-    clsNamespace.set('prefs', req.user ? req.user.preferences : {});
-    clsNamespace.set('perms', req.user ? req.user.permissions : {});
+  // request-scoped context for Handlebars helpers and unit prefs
+  const store = {
+    req,
+    prefs: req.user ? req.user.preferences : {},
+    perms: req.user ? req.user.permissions : {},
+  };
+  context.run(store, function() {
+    const origRender = res.render.bind(res);
+    res.render = function() {
+      const args = arguments;
+      if (context.getStore() === store)
+        return origRender.apply(res, args);
+      return context.run(store, () => origRender.apply(res, args));
+    };
 
     // easy access to database state
     req.db = db;
     req.success = function(cb) {
-      return clsNamespace.bind(function(err, result) {
-	if (err) {
-	  res.status(err.status || 500);
-	  res.render('error', {
-	    title: 'Database Error',
-	    layout: 'home',
-	    url: req.url,
-	    status: err.status,
-	    message: err.message,
-	    error: err
-	  });
-	} else {
-	  try {
-	    cb(result);
-	  } catch (e) {
-	    res.status(500);
+      return function(err, result) {
+        context.run(store, function() {
+	  if (err) {
+	    res.status(err.status || 500);
 	    res.render('error', {
-	      title: 'Server Error',
+	      title: 'Database Error',
 	      layout: 'home',
 	      url: req.url,
-	      status: 500,
-	      message: e.message,
-	      error: e
+	      status: err.status,
+	      message: err.message,
+	      error: err
 	    });
+	  } else {
+	    try {
+	      cb(result);
+	    } catch (e) {
+	      res.status(500);
+	      res.render('error', {
+		title: 'Server Error',
+		layout: 'home',
+		url: req.url,
+		status: 500,
+		message: e.message,
+		error: e
+	      });
+	    }
 	  }
-	}
-      });
+        });
+      };
     };
 
     // add helpers directly

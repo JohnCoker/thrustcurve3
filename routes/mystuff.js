@@ -15,7 +15,8 @@ const express = require('express'),
       units = require('../lib/units'),
       metadata = require('../lib/metadata'),
       locals = require('./locals.js'),
-      authenticated = require('./authenticated.js');
+      authenticated = require('./authenticated.js'),
+      contributors = require('../lib/contributors');
 
 const loginLink = '/mystuff/login.html',
       registerLink = '/mystuff/register.html',
@@ -26,7 +27,9 @@ const loginLink = '/mystuff/login.html',
       rocketsLink = '/mystuff/rockets.html',
       searchLink = '/mystuff/publicrockets.html',
       preferencesLink = '/mystuff/preferences.html',
-      profileLink = '/mystuff/profile.html';
+      profileLink = '/mystuff/profile.html',
+      deleteLink = '/mystuff/delete.html',
+      deletedLink = '/mystuff/deleted.html';
 
 const defaults = {
   layout: 'mystuff',
@@ -73,7 +76,8 @@ router.get('login.jsp', function(req, res, next) {
 });
 
 router.post(loginLink, passport.authenticate('local', {
-  failureRedirect: loginLink
+  failureRedirect: loginLink,
+  keepSessionInfo: true
 }), function(req, res, next) {
   var redirect = req.body.redirect || req.query.redirect || profileLink;
   res.redirect(redirect);
@@ -98,7 +102,7 @@ router.get(['/register.jsp'], function(req, res, next) {
 
 router.post(registerLink, function(req, res, next) {
   // collect parameters
-  let info = {}, errors = [], captcha,
+  let info = {}, errors = [],
       v;
 
   v = req.body.name.trim();
@@ -111,6 +115,8 @@ router.post(registerLink, function(req, res, next) {
   v = req.body.email.trim();
   if (v == null || v === '' || !schema.EmailRegex.test(v)) {
     errors.push('Please enter your email address as your login name.');
+  } else if (contributors.isDeletedEmail(v)) {
+    errors.push('That email address is reserved.');
   } else {
     info.email = v;
   }
@@ -187,7 +193,7 @@ router.post(registerLink, function(req, res, next) {
           info.lastLogin = new Date();
           var model = new req.db.Contributor(info);
           model.save(req.success(function(updated) {
-            req.login(updated, function(err) {
+            req.login(updated, { keepSessionInfo: true }, function(err) {
               if (err)
                 return next(err);
 
@@ -350,7 +356,7 @@ router.post(resetLink, function(req, res, next) {
       user.lastLogin = new Date();
       user.password = password;
       user.save(req.success(function(updated) {
-        req.login(updated, function(err) {
+        req.login(updated, { keepSessionInfo: true }, function(err) {
           if (err)
             return next(err);
 
@@ -382,7 +388,7 @@ router.get(verifyLink, authenticated, function(req, res, next) {
       }));
       return;
     }
-    errors.push['Email verification link expired.'];
+    errors.push('Email verification link expired.');
   }
 
   // generate a token and email it
@@ -523,7 +529,7 @@ function removeFavorite(req, res, motor) {
     // invalid motor ID
     res.redirect(favoritesLink);
   } else {
-    req.db.FavoriteMotor.remove({ _contributor: req.user._id, _motor: motor }, req.success(function() {
+    req.db.FavoriteMotor.deleteMany({ _contributor: req.user._id, _motor: motor }, req.success(function() {
       res.redirect(favoritesLink);
     }));
   }
@@ -1033,7 +1039,7 @@ router.post('/mystuff/rocket/:id/adapter.html', authenticated, function(req, res
 router.get('/mystuff/rocket/:id/delete.html', authenticated, function(req, res, next) {
   var id = req.params.id;
   if (req.db.isId(id)) {
-    req.db.Rocket.remove({ _contributor: req.user._id, _id: id }, req.success(function(rocket) {
+    req.db.Rocket.deleteMany({ _contributor: req.user._id, _id: id }, req.success(function() {
       res.redirect(303, rocketsLink + '?result=deleted');
     }));
   } else {
@@ -1249,6 +1255,8 @@ router.post(profileLink, authenticated, function(req, res, next) {
     v = req.body.email.trim();
     if (v === '' || !schema.EmailRegex.test(v)) {
       errors.push('Please enter your email address as your login name.');
+    } else if (contributors.isDeletedEmail(v)) {
+      errors.push('That email address is reserved.');
     } else {
       if (v != info.email) {
         info.email = v;
@@ -1356,12 +1364,76 @@ router.post(profileLink, authenticated, function(req, res, next) {
 });
 
 /*
+ * /mystuff/delete.html
+ * Permanently delete the logged-in account.
+ */
+router.get(deleteLink, authenticated, function(req, res, next) {
+  contributors.accountSummary(req.db, req.user, req.success(function(summary) {
+    res.render('mystuff/delete', locals(req, defaults, {
+      title: 'Delete Account',
+      summary: summary,
+      submitLink: deleteLink,
+    }));
+  }));
+});
+
+router.post(deleteLink, authenticated, function(req, res, next) {
+  function showError(message) {
+    contributors.accountSummary(req.db, req.user, req.success(function(summary) {
+      res.render('mystuff/delete', locals(req, defaults, {
+        title: 'Delete Account',
+        summary: summary,
+        submitLink: deleteLink,
+        errors: [message],
+      }));
+    }));
+  }
+
+  const password = req.body.password;
+  if (password == null || password === '') {
+    showError('Enter your password to delete your account.');
+    return;
+  }
+
+  req.user.comparePassword(password, function(err, isMatch) {
+    if (err)
+      return next(err);
+    if (!isMatch) {
+      showError('Password is incorrect.');
+      return;
+    }
+
+    contributors.deleteAccount(req.db, req.user, req.success(function() {
+      req.logout({ keepSessionInfo: true }, function(err) {
+        if (err)
+          return next(err);
+        res.redirect(deletedLink);
+      });
+    }));
+  });
+});
+
+/*
+ * /mystuff/deleted.html
+ * Shown after an account has been deleted and the session ended.
+ */
+router.get(deletedLink, function(req, res, next) {
+  res.render('mystuff/deleted', locals(req, defaults, {
+    title: 'Account Deleted',
+    layout: 'info',
+  }));
+});
+
+/*
  * /mystuff/logout.html
  * Log the current user out, redirects to index.
  */
 router.get('/mystuff/logout.html', function(req, res, next) {
-  req.logout();
-  res.redirect('/');
+  req.logout({ keepSessionInfo: true }, function(err) {
+    if (err)
+      return next(err);
+    res.redirect('/');
+  });
 });
 
 

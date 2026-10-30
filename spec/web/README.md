@@ -32,6 +32,8 @@ installed browsers in `~/Library/Caches/ms-playwright`.
 - **search** – Attribute search form, filters (manufacturer, type, impulse class, flame/smoke color)
 - **guide** – Motor guide with rocket dimensions, saved rocket matching (requires test user)
 - **browser** – Motor browser navigation by category, class, propellant, burn time
+- **mystuff** – Add/remove a favorite motor; create and delete a rocket; in/oz display prefs (logs in as `flier.fred@gmail.com`)
+- **admin** – Certification org/docs pages; set, change, and clear a propellant color (logs in as `admin.adam@gmail.com`)
 
 **Note:** The guide test with saved rocket requires a test user `flier.fred@gmail.com` / `secret` in the
 test database. The Selenium IDE project assumed this user and "Alpha III" rocket exist.

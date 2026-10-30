@@ -11,12 +11,16 @@ describe('schemas', function() {
   let mongoServer;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    // WiredTiger is the MongoDB 7 storage engine. mongodb-memory-server defaults to ephemeralForTest.
+    mongoServer = await MongoMemoryServer.create({
+      instance: { storageEngine: 'wiredTiger' },
+    });
     const mongoUri = mongoServer.getUri();
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useCreateIndex: true
+      useCreateIndex: true,
+      useFindAndModify: false
     });
     startTime = new Date();
   });
@@ -39,7 +43,7 @@ describe('schemas', function() {
     var ManufacturerModel = null;
 
     beforeAll(function(done) {
-      ManufacturerModel = schema.ManufacturerModel(mongoose);
+      ManufacturerModel = mongoose.models.Manufacturer || schema.ManufacturerModel(mongoose);
       done();
     });
 
@@ -56,7 +60,7 @@ describe('schemas', function() {
     });
 
     it('manufacturers may be saved to the database.', function( done) {
-      ManufacturerModel.count().exec().then( function( cnt ){
+      ManufacturerModel.countDocuments().exec().then( function( cnt ){
           expect(cnt).toBeGreaterThan( 0);
           done();
       });
@@ -91,7 +95,7 @@ describe('schemas', function() {
     });
 
     it('can find active manufacturers', function( done) {
-      ManufacturerModel.find({ active: true }).count().exec()
+      ManufacturerModel.find({ active: true }).countDocuments().exec()
       .then( function(count) {
         expect( count).toBeDefined();
         expect( count).toBeGreaterThan(0);
@@ -154,7 +158,7 @@ describe('schemas', function() {
     });
 
     it('certorgs may be saved to the database', function( done) {
-      CertOrgModel.count().exec()
+      CertOrgModel.countDocuments().exec()
       .then( function( cnt ){
         expect(cnt).toBeGreaterThan( 0);
         done();
@@ -180,7 +184,7 @@ describe('schemas', function() {
     });
 
     it('find active', function( done) {
-      CertOrgModel.findOne({ active: true }).count().exec()
+      CertOrgModel.findOne({ active: true }).countDocuments().exec()
       .then( function( orgCount ) {
         expect( orgCount).toBeDefined();
         expect( orgCount).toBeGreaterThan(0);
@@ -212,7 +216,7 @@ describe('schemas', function() {
     });
 
     it('certorgs may be saved to the database', function( done) {
-      ContributorModel.count().exec()
+      ContributorModel.countDocuments().exec()
       .then( function( cnt ){
         expect(cnt).toBeGreaterThan( 0);
         done();
@@ -340,7 +344,7 @@ describe('schemas', function() {
             }
             mapped = ints;
 
-            IntIdMapModel.count().exec().then(function(count) {
+            IntIdMapModel.countDocuments().exec().then(function(count) {
               expect(count).toBe(3);
               cb();
             });
@@ -353,7 +357,7 @@ describe('schemas', function() {
     });
 
     it("count", function(done) {
-      IntIdMapModel.count(function(err, count) {
+      IntIdMapModel.countDocuments(function(err, count) {
         expect(err).toBe(null);
         expect(count).toBe(3);
         done();

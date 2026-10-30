@@ -4,12 +4,18 @@
   "private": true,
   "author": "John Coker",
   "license": "ISC",
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "7.0.35"
+    }
+  },
   "scripts": {
     "start": "node ./bin/www",
     "test:lib": "node_modules/jasmine/bin/jasmine.js",
+    "test:api": "node_modules/jasmine/bin/jasmine.js spec/api/api-spec.js",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "lint": "jshint `find . -name mobile -prune -o -name node_modules -prune -o -name out -prune -o -name tmp -prune -o -name public -prune -o -name '*.js' -print` public/javascripts/main.js"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@sendgrid/mail": "^7.4.2",
@@ -20,8 +26,7 @@
     "body-parser-xml": "^2.0.1",
     "compression": "^1.7.4",
     "connect-mongo": "^1.1.0",
-    "continuation-local-storage": "^3.1.7",
-    "cookie-parser": "~1.3.5",
+    "cookie-parser": "^1.4.7",
     "debug": "~2.6.9",
     "exphbs": "^1.1.0",
     "express": "^4.17.1",
@@ -35,7 +40,7 @@
     "mongoose-dateonly": "^1.0.3",
     "morgan": "^1.6.1",
     "mysql": "^2.10.0",
-    "passport": "^0.3.2",
+    "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "serve-favicon": "^2.5.0",
     "strformat": "0.0.7",
@@ -47,7 +52,10 @@
     "yamljs": "^0.2.6"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "jasmine": "^2.5.2",
     "mongodb-memory-server": "^8.15.1"
   }

@@ -1,0 +1,75 @@
+<h1>{{title}}</h1>
+
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+{{#if deleted}}
+<div class="alert alert-success" role="alert">
+Deleted the account for {{name}} ({{email}}).
+</div>
+{{/if}}
+
+<p>
+Look up an account by the email address from a deletion request.
+The login, profile, rockets, and favorites are removed.
+Data files and notes stay on the site as Deleted User.
+</p>
+
+{{#unless contributor}}
+<form role="form" class="form-horizontal" name="lookup" action="{{submitLink}}" method="post">
+  <div class="form-group">
+    <label for="email" class="col-sm-3 control-label">Email</label>
+    <div class="col-sm-9">
+      <input type="email" name="email" id="email" class="form-control" value="{{email}}" required />
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-primary">Look Up</button>
+    </div>
+  </div>
+</form>
+{{/unless}}
+
+{{#if contributor}}
+<div role="form" class="form-horizontal form-condensed">
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Name</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{contributor.name}}</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Email</label>
+    <div class="col-sm-9">
+      <p class="form-control-static">{{contributor.email}}</p>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li>{{summary.rockets}} rockets will be deleted.</li>
+<li>{{summary.simfiles}} data files will be kept as Deleted User.</li>
+<li>{{summary.notes}} notes will be kept as Deleted User.</li>
+</ul>
+
+<form role="form" class="form-horizontal" name="confirm" action="{{submitLink}}" method="post">
+  <input type="hidden" name="email" value="{{contributor.email}}" />
+  <div class="form-group">
+    <label for="confirmEmail" class="col-sm-3 control-label">Confirm email</label>
+    <div class="col-sm-9">
+      <input type="email" name="confirmEmail" id="confirmEmail" class="form-control" required />
+      <span class="help-block">Type the email address again to delete this account.</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-9 form-submit">
+      <button type="submit" class="btn btn-danger">Delete Account</button>
+      <a class="btn btn-default" href="{{submitLink}}">Cancel</a>
+    </div>
+  </div>
+</form>
+{{/if}}

@@ -8,7 +8,8 @@ var process = require('process'),
     async = require('async'),
     mysql = require('mysql'),
     mongoose = require('mongoose'),
-    schema = require('../schema');
+    schema = require('../schema'),
+    config = require('../../config/server');
 
 /**
  * <p>The <b>migrate</b> module is a main program for transferring the ThrustCurve.org
@@ -341,7 +342,7 @@ var tables = [
       }
 
       // new admin new permissions
-      if (output.email == 'john@jcsw.com') {
+      if (output.email == config.operatorEmail) {
         output["permissions.editMetadata"] = true;
         output["permissions.editPermissions"] = true;
       }

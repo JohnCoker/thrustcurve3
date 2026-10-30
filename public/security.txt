@@ -1,0 +1,4 @@
+Contact: mailto:john@jcsw.com
+Expires: 3000-01-01T08:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.thrustcurve.org/security.txt

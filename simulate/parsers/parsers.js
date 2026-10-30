@@ -67,7 +67,7 @@ function printData(format, parsed, error) {
     error(errors.DATA_FILE_FORMAT, 'missing data file format to write');
     return;
   }
-  if (parsed == null || parsed.info == null || typeof parsed.points == null) {
+  if (parsed == null || parsed.info == null || parsed.points == null) {
     error(errors.DATA_FILE_EMPTY, 'missing parsed data to write');
     return;
   }
@@ -123,10 +123,10 @@ function computeInfo(points, error) {
     name = String.fromCharCode(65 + letter) + name;
     if (avgThrust < 2)
       name += avgThrust.toFixed(1);
-    else if (avgThrust < 10_000)
+    else if (avgThrust < 10000)
       name += Math.round(avgThrust).toFixed();
     else
-      name += new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(avgThrust)
+      name += new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(avgThrust);
   }
 
   return { name, totalImpulse, avgThrust, maxThrust, burnTime };
@@ -183,7 +183,6 @@ function mergeData(inputs, error) {
         time: 0.49,
         thrust: 0,
       });
-      i++;
     }
 
     // other points are spaced evenly through the burn

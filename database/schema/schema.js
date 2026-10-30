@@ -235,8 +235,8 @@ function makeMotorModel(mongoose) {
 
     // ejection field is derived from delays
     if (this.isModified('delays') || this.isModified('delayAdjustable')) {
-      this.ejection = this.delays != null && this.delays !== '' && !/^\s*P\s*$/i.test(this.delays)
-                      || this.delayAdjustable;
+      this.ejection = this.delays != null && this.delays !== '' && !/^\s*P\s*$/i.test(this.delays) ||
+                      this.delayAdjustable;
     }
 
     next();

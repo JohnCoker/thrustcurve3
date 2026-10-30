@@ -12,7 +12,8 @@ const express = require('express'),
       locals = require('./locals.js'),
       authorized = require('./authorized.js'),
       csv = require('../render/csv'),
-      helpers = require('../lib/helpers');
+      helpers = require('../lib/helpers'),
+      contributors = require('../lib/contributors');
 
 const defaults = {
   layout: 'admin',
@@ -20,6 +21,7 @@ const defaults = {
 
 const certOrgList = '/admin/certorgs/';
 const noteReview = '/admin/notes/';
+const deleteContributorLink = '/admin/contributors/delete.html';
 
 /*
  * /health/
@@ -86,10 +88,10 @@ router.get('/admin/certorgs/:id', authorized('metadata'), function(req, res, nex
 
   req.db.CertOrg.findOne({ _id: id }, req.success(function(certorg) {
     if (!certorg) {
-      res.redirect(certOrgList, 302);
+      res.redirect(302, certOrgList);
       return;
     }
-    req.db.Motor.count({ _certOrg: id }, req.success(function(motors) {
+    req.db.Motor.countDocuments({ _certOrg: id }, req.success(function(motors) {
       res.render('admin/certorgedit', locals(req, defaults, {
         title: 'Edit Certification Org',
         certorg: certorg,
@@ -297,7 +299,7 @@ router.post(propellantsLink, authorized('metadata'), function(req, res, next) {
     }
 
     function done() {
-      res.redirect(propellantsLink, 303);
+      res.redirect(303, propellantsLink);
     }
 
     if (flameColor == null && smokeColor == null && !sparky) {
@@ -463,7 +465,7 @@ router.get('/admin/cases/', function(req, res, next) {
  * Overall summary of certification documents.
  */
 router.get('/admin/certdocs/', authorized('motors'), function(req, res, next) {
-  req.db.MotorCert.count(req.success(function(count) {
+  req.db.MotorCert.countDocuments(req.success(function(count) {
     res.render('admin/certdocs', locals(req, defaults, {
       title: 'Certification Docs',
       totalCount: count,
@@ -491,8 +493,8 @@ function download(url, cb, forward) {
     if (res.statusCode >= 300 && res.statusCode < 400) {
       if (forward == null)
         forward = 0;
-      if (forward < 3 && res.headers['location'])
-        download(res.headers['location'], cb, forward + 1);
+      if (forward < 3 && res.headers.location)
+        download(res.headers.location, cb, forward + 1);
       else
         cb(null);
       res.destroy();
@@ -622,6 +624,71 @@ router.post(noteReview + ':kind/:id/spam', authorized('motors'), function(req, r
     req.db.Contributor.deleteOne({ _id: note._contributor }, req.success(function(info) {
       model.deleteOne({ _id: note.id }, req.success(function() {
         res.sendStatus(200);
+      }));
+    }));
+  }));
+});
+
+/*
+ * /admin/contributors/delete.html
+ * Delete an account by email, for requests from people who cannot log in.
+ * Requires the editContributors permission.
+ */
+router.get(deleteContributorLink, authorized('contributors'), function(req, res, next) {
+  res.render('admin/deletecontributor', locals(req, defaults, {
+    title: 'Delete Account',
+    submitLink: deleteContributorLink,
+  }));
+});
+
+router.post(deleteContributorLink, authorized('contributors'), function(req, res, next) {
+  const email = (req.body.email || '').trim();
+  const confirming = req.hasBodyProperty('confirmEmail');
+  const confirmEmail = (req.body.confirmEmail || '').trim();
+
+  function show(extra) {
+    res.render('admin/deletecontributor', locals(req, defaults, Object.assign({
+      title: 'Delete Account',
+      submitLink: deleteContributorLink,
+      email: email,
+    }, extra)));
+  }
+
+  if (!req.db.schema.EmailRegex.test(email)) {
+    show({ errors: ['Please enter the account email address.'] });
+    return;
+  }
+  if (contributors.isDeletedEmail(email)) {
+    show({ errors: ['The Deleted User account cannot be deleted.'] });
+    return;
+  }
+
+  req.db.Contributor.findOne({ email: email }, req.success(function(contributor) {
+    if (contributor == null) {
+      show({ errors: ['No account with that email address.'] });
+      return;
+    }
+    if (contributor._id.toString() === req.user._id.toString()) {
+      show({ errors: ['Use My Profile to delete the account you are logged in as.'] });
+      return;
+    }
+
+    contributors.accountSummary(req.db, contributor, req.success(function(summary) {
+      if (!confirming || confirmEmail.toLowerCase() !== email.toLowerCase()) {
+        const errors = confirming ? ['Type the email address exactly to confirm.'] : undefined;
+        show({
+          contributor: contributor,
+          summary: summary,
+          errors: errors,
+        });
+        return;
+      }
+
+      contributors.deleteAccount(req.db, contributor, req.success(function() {
+        show({
+          deleted: true,
+          name: contributor.name,
+        });
       }));
     }));
   }));

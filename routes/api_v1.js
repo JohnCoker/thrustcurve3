@@ -241,7 +241,7 @@ function criteriaQueries(req, cache, criteria, criteriaInfo, queries) {
       info.matches = 0;
     } else {
       queries.push(function(cb) {
-        req.db.Motor.count(query, function(err, count) {
+        req.db.Motor.countDocuments(query, function(err, count) {
           if (err)
             return cb(err);
           info.matches = count;
@@ -718,12 +718,12 @@ function doSaveRockets(req, res, format) {
                 result.id = updated._id.toString();
                 result.status = wasNew ? 'created' : 'updated';
               }
-              results.push(result);
               cb(null, result);
             });
           });
         });
-        async.parallel(saves, success(req, res, _results => {
+        async.parallel(saves, success(req, res, saved => {
+          saved.forEach(r => results.push(r));
           send();
         }));
       } else {
@@ -816,7 +816,7 @@ function doMotorGuide(req, res, format) {
     let queries = [];
     criteriaQueries(req, cache, criteria, criteriaInfo, queries);
     async.parallel(queries, success(req, res, _results => {
-      req.db.Motor.count(search).exec(success(req, res, function(matchCount) {
+      req.db.Motor.countDocuments(search).exec(success(req, res, function(matchCount) {
         criteriaMatches = matchCount;
         if (matchCount < 1) {
           send();

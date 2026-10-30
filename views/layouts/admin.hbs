@@ -14,6 +14,9 @@
       <li><a href="/simfiles/*/dataerrors.html">Data with Errors</a></li>
       <li><a href="/admin/certdocs/">Certification Docs</a></li>
       <li><a href="/admin/notes/">Review Notes</a></li>
+      {{#hasPerm 'contributors'}}
+      <li><a href="/admin/contributors/delete.html">Delete Account</a></li>
+      {{/hasPerm}}
     </ul>
     {{#block "sidebar-extra"}}
     {{/block}}

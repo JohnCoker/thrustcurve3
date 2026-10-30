@@ -11,17 +11,21 @@ describe("ranking", function() {
   let manufacturer = null;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    // WiredTiger is the MongoDB 7 storage engine. mongodb-memory-server defaults to ephemeralForTest.
+    mongoServer = await MongoMemoryServer.create({
+      instance: { storageEngine: "wiredTiger" },
+    });
     const mongoUri = mongoServer.getUri();
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useCreateIndex: true
+      useCreateIndex: true,
+      useFindAndModify: false
     });
 
     db = {
       mongoose: mongoose,
-      Manufacturer: schema.ManufacturerModel(mongoose),
+      Manufacturer: mongoose.models.Manufacturer || schema.ManufacturerModel(mongoose),
       Motor: schema.MotorModel(mongoose),
       MotorView: schema.MotorViewModel(mongoose),
       MotorRanking: schema.MotorRankingModel(mongoose),
@@ -34,11 +38,8 @@ describe("ranking", function() {
       aliases: ['RocketsRUs', 'RRUS'],
       website: 'http://rocketsrus.com/'
     });
-    mfr.save()
-    .then( function( saved) {
-      expect( saved).toBeTruthy();
-      manufacturer = saved;
-    });
+    manufacturer = await mfr.save();
+    expect(manufacturer).toBeTruthy();
   });
 
   afterAll(async () => {

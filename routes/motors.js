@@ -43,7 +43,7 @@ function getClassCount(req, cls, cb) {
     return;
   }
 
-  req.db.Motor.count({ impulseClass: cls }, req.success(function(count) {
+  req.db.Motor.countDocuments({ impulseClass: cls }, req.success(function(count) {
     classCounts[cls] = count;
     cb(count);
   }));
@@ -75,7 +75,7 @@ function getMotor(req, res, parents, redirect, cb) {
         } else {
           // count all the motors in this class
           getClassCount(req, motor.impulseClass, function(classCount) {
-            req.db.MotorCert.count({ _motor: motor._id }, req.success(function(certCount) {
+            req.db.MotorCert.countDocuments({ _motor: motor._id }, req.success(function(certCount) {
               cb(motor, manufacturer, { classCount, certCount });
             }));
           });
@@ -414,7 +414,6 @@ function doSearch(req, res, params) {
     metadata.getMotors(req, function(all, available) {
       var query = {},
           sort = { totalImpulse: 1, designation: 1 },
-          options,
           hasParams, failed, isFresh, paramNames,
           keys, m, i;
 
@@ -702,7 +701,7 @@ function doSearch(req, res, params) {
         }));
       } else if (hasParams) {
         // perform search
-        req.db.Motor.find(query, options).sort(sort).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
+        req.db.Motor.find(query).sort(sort).populate('_manufacturer _relatedMfr').exec(req.success(function(results) {
           if (results.length == 1) {
             // record this as a search view
             recordView(req, results[0], 'search');
@@ -1206,7 +1205,7 @@ function merge(req, res, params, submit) {
       }
     }
   }
-  inputs.forEach((input, i) => input.n = i + 1)
+  inputs.forEach((input, i) => input.n = i + 1);
 
   // query the motors
   let q = { _id: { $in: inputs.map(i => i.motorId) } };
@@ -1250,9 +1249,9 @@ function merge(req, res, params, submit) {
           }
         });
         if (allErrors.length === 0) {
-          function e(code, msg) {
+          const e = function(code, msg) {
             allErrors.push('Merge error: ' + msg + '.');
-          }
+          };
           outputs.merged = parsers.mergeData(inputs, e);
           if (outputs.merged) {
             let graph = graphs.thrustCurve({
@@ -1525,7 +1524,7 @@ function doSubmit(req, res, motor) {
           isChanged = true;
         }
       } else {
-        let d = new Date(s + 'Z')
+        let d = new Date(s + 'Z');
         if (motor[p] == null || motor[p].toISOString() != d.toISOString().replace(/T.*$/, '')) {
           motor[p] = d;
           isChanged = true;

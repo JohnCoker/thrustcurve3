@@ -1,5 +1,14 @@
 <h1>{{title}}</h1>
 
+<style type="text/css">
+/* the "to" field shows the max hint when it is visible */
+@media (min-width: 992px) {
+  input.length-first::placeholder {
+    color: transparent;
+  }
+}
+</style>
+
 {{#if isNoneFound}}
 <div class="alert alert-warning" role="alert">
 No motors matched the search criteria.
@@ -95,8 +104,8 @@ advanced search below to search by various attributes.
   <div class="form-group length">
     <label for="length" class="col-sm-3 control-label">Length (mm)</label>
     <div class="col-sm-9 col-md-4">
-      <input type="number" step="any" min="1" class="form-control" name="length"
-             value="{{params.length}}">
+      <input type="number" step="any" min="1" class="form-control length-first" name="length"
+             placeholder="max 95" value="{{params.length}}">
       <span class="help-block with-errors"></span>
     </div>
     <label for="length" class="col-md-1 hidden-sm hidden-xs control-label">to</label>

@@ -2,6 +2,10 @@
 
 This directory contains shared utility code used by various other modules.
 
+## Contributors
+
+The __contributors__ module contains helpers for user managment.
+
 ## Crawlers
 
 The __crawlers__ module contains a small database of robot user agents which is

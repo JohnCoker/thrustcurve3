@@ -1,0 +1,7 @@
+{
+  "name": "contributors",
+  "version": "1.0.0",
+  "description": "contributor accounts, including deletion",
+  "main": "contributors.js",
+  "license": "ISC"
+}

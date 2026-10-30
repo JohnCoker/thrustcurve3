@@ -9,7 +9,8 @@ const express = require('express'),
       units = require('../lib/units'),
       metadata = require('../lib/metadata'),
       number = require('../lib/number'),
-      locals = require('./locals.js');
+      locals = require('./locals.js'),
+      contributors = require('../lib/contributors');
 
 const defaults = {
   layout: 'info',
@@ -32,11 +33,12 @@ router.get(listLink, function(req, res, next) {
       } else
         map[id]++;
     });
-    req.db.Contributor.find({ _id: { $in: ids } }).exec(req.success(function(contributors) {
+    req.db.Contributor.find({ _id: { $in: ids } }).exec(req.success(function(found) {
       var i;
-      for (i = 0; i < contributors.length; i++)
-        contributors[i].count = map[contributors[i]._id.toString()];
-      contributors.sort(function(a, b) {
+      found = found.filter(c => !contributors.isDeletedUser(c));
+      for (i = 0; i < found.length; i++)
+        found[i].count = map[found[i]._id.toString()];
+      found.sort(function(a, b) {
         if (a.count > b.count)
           return -1;
         if (a.count < b.count)
@@ -49,7 +51,7 @@ router.get(listLink, function(req, res, next) {
       });
       res.render('contributors/list', locals(req, defaults, {
         title: 'Data Contributors',
-        contributors: contributors,
+        contributors: found,
         total: total
       }));
     }));
@@ -74,6 +76,12 @@ router.get(listLink + ':id/', function(req, res, next) {
 
   metadata.getManufacturers(req, function(mfrs) {
     req.db.Contributor.findOne({ _id: id }, req.success(function(contributor) {
+      if (contributor && contributors.isDeletedUser(contributor)) {
+        res.render('contributors/deleted', locals(req, defaults, {
+          title: 'Deleted User',
+        }));
+        return;
+      }
       if (contributor) {
         req.db.SimFile.find({ _contributor: contributor._id }).populate('_motor').exec(req.success(function(simfiles) {
           var m, i;

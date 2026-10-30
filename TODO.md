@@ -27,19 +27,6 @@ This page lists the things supported in the old site which haven't yet been reim
 
  * search other contributors
 
-## Administration
-
- * user administration
-
-## Mobile App
-
- * update TCTG to latest Cordova
- * switch to updated (JSON) API
- * add support for saving rockets entered into the app
- * custom min. stable velocity in guide
- * support compare motors
-
-
 # Old Site Pages
 
 Previous non-internal, non-admin pages should all redirect to ones on the new site.

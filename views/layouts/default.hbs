@@ -92,6 +92,9 @@
                 <li><a href="/admin/cases/">Motor Cases</a></li>
                 <li><a href="/admin/certdocs/">Certification Docs</a></li>
                 <li><a href="/admin/notes/">Review Notes</a></li>
+                {{#hasPerm 'contributors'}}
+                <li><a href="/admin/contributors/delete.html">Delete Account</a></li>
+                {{/hasPerm}}
               </ul>
             </li>
             {{/hasPerm}}

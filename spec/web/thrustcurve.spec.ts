@@ -383,6 +383,16 @@ test.describe('mystuff', () => {
     await expect(form.locator('select[name="weightUnit"]')).toHaveValue('oz');
   });
 
+  test('delete account page explains what is kept', async ({ page }) => {
+    await page.goto('/mystuff/profile.html');
+    await page.getByRole('link', { name: 'delete this account' }).click();
+    await expect(page).toHaveTitle(/Delete Account • ThrustCurve/);
+    await expect(page.getByText('Deleted User')).toBeVisible();
+    await expect(page.getByText(/rockets will be deleted/)).toBeVisible();
+    await expect(page.locator('form[name="delete"] input[name="password"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Delete My Account' })).toBeVisible();
+  });
+
   test('create and delete rocket', async ({ page }) => {
     const name = perProject({
       chromium: 'ZZ e2e rocket chromium',
@@ -423,6 +433,14 @@ test.describe('admin', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1233, height: 872 });
     await login(page, 'admin.adam@gmail.com');
+  });
+
+  test('delete account lookup rejects an unknown email', async ({ page }) => {
+    await page.goto('/admin/contributors/delete.html');
+    await expect(page).toHaveTitle(/Delete Account • ThrustCurve/);
+    await page.locator('form[name="lookup"] input[name="email"]').fill('nobody-e2e@example.com');
+    await page.getByRole('button', { name: 'Look Up' }).click();
+    await expect(page.getByText('No account with that email address.')).toBeVisible();
   });
 
   test('certification org and docs pages', async ({ page }) => {

@@ -15,7 +15,8 @@ const express = require('express'),
       units = require('../lib/units'),
       metadata = require('../lib/metadata'),
       locals = require('./locals.js'),
-      authenticated = require('./authenticated.js');
+      authenticated = require('./authenticated.js'),
+      contributors = require('../lib/contributors');
 
 const loginLink = '/mystuff/login.html',
       registerLink = '/mystuff/register.html',
@@ -26,7 +27,9 @@ const loginLink = '/mystuff/login.html',
       rocketsLink = '/mystuff/rockets.html',
       searchLink = '/mystuff/publicrockets.html',
       preferencesLink = '/mystuff/preferences.html',
-      profileLink = '/mystuff/profile.html';
+      profileLink = '/mystuff/profile.html',
+      deleteLink = '/mystuff/delete.html',
+      deletedLink = '/mystuff/deleted.html';
 
 const defaults = {
   layout: 'mystuff',
@@ -112,6 +115,8 @@ router.post(registerLink, function(req, res, next) {
   v = req.body.email.trim();
   if (v == null || v === '' || !schema.EmailRegex.test(v)) {
     errors.push('Please enter your email address as your login name.');
+  } else if (contributors.isDeletedEmail(v)) {
+    errors.push('That email address is reserved.');
   } else {
     info.email = v;
   }
@@ -1250,6 +1255,8 @@ router.post(profileLink, authenticated, function(req, res, next) {
     v = req.body.email.trim();
     if (v === '' || !schema.EmailRegex.test(v)) {
       errors.push('Please enter your email address as your login name.');
+    } else if (contributors.isDeletedEmail(v)) {
+      errors.push('That email address is reserved.');
     } else {
       if (v != info.email) {
         info.email = v;
@@ -1354,6 +1361,67 @@ router.post(profileLink, authenticated, function(req, res, next) {
   } else {
     submit();
   }
+});
+
+/*
+ * /mystuff/delete.html
+ * Permanently delete the logged-in account.
+ */
+router.get(deleteLink, authenticated, function(req, res, next) {
+  contributors.accountSummary(req.db, req.user, req.success(function(summary) {
+    res.render('mystuff/delete', locals(req, defaults, {
+      title: 'Delete Account',
+      summary: summary,
+      submitLink: deleteLink,
+    }));
+  }));
+});
+
+router.post(deleteLink, authenticated, function(req, res, next) {
+  function showError(message) {
+    contributors.accountSummary(req.db, req.user, req.success(function(summary) {
+      res.render('mystuff/delete', locals(req, defaults, {
+        title: 'Delete Account',
+        summary: summary,
+        submitLink: deleteLink,
+        errors: [message],
+      }));
+    }));
+  }
+
+  const password = req.body.password;
+  if (password == null || password === '') {
+    showError('Enter your password to delete your account.');
+    return;
+  }
+
+  req.user.comparePassword(password, function(err, isMatch) {
+    if (err)
+      return next(err);
+    if (!isMatch) {
+      showError('Password is incorrect.');
+      return;
+    }
+
+    contributors.deleteAccount(req.db, req.user, req.success(function() {
+      req.logout({ keepSessionInfo: true }, function(err) {
+        if (err)
+          return next(err);
+        res.redirect(deletedLink);
+      });
+    }));
+  });
+});
+
+/*
+ * /mystuff/deleted.html
+ * Shown after an account has been deleted and the session ended.
+ */
+router.get(deletedLink, function(req, res, next) {
+  res.render('mystuff/deleted', locals(req, defaults, {
+    title: 'Account Deleted',
+    layout: 'info',
+  }));
 });
 
 /*

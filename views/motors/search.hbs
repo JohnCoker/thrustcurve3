@@ -96,12 +96,13 @@ advanced search below to search by various attributes.
     <label for="length" class="col-sm-3 control-label">Length (mm)</label>
     <div class="col-sm-9 col-md-4">
       <input type="number" step="any" min="1" class="form-control" name="length"
-             placeholder="max 95" value="{{params.length}}">
+             value="{{params.length}}">
       <span class="help-block with-errors"></span>
     </div>
     <label for="length" class="col-md-1 hidden-sm hidden-xs control-label">to</label>
     <div class="col-md-4 hidden-sm hidden-xs">
-      <input type="number" step="any" min="1" class="form-control" name="length">
+      <input type="number" step="any" min="1" class="form-control" name="length"
+             placeholder="max 95">
       <span class="help-block with-errors"></span>
     </div>
   </div>
@@ -325,7 +326,7 @@ $(document).ready(function(e) {
      <th>Manufacturer</th>
      <th>Type</th>
      <th class="number">Diam</th>
-     <th class="number hidden-xs">Len</th>
+     <th class="number hidden-md hidden-sm hidden-xs">Len</th>
      <th class="number">Impulse</th>
      <th class="number hidden-xs">Avg Thr</th>
      <th class="number hidden-sm hidden-xs">Max Thr</th>
@@ -340,7 +341,7 @@ $(document).ready(function(e) {
     <td>{{_manufacturer.abbrev}}</td>
     <td>{{formatType type}}</td>
     <td class="number" data-sort="{{formatSort diameter}}">{{formatMMT diameter}}</td>
-    <td class="number hidden-xs" data-sort="{{formatSort length}}">{{formatLength length}}</td>
+    <td class="number hidden-md hidden-sm hidden-xs" data-sort="{{formatSort length}}">{{formatLength length}}</td>
     <td class="number" data-sort="{{formatSort totalImpulse}}">{{formatImpulse totalImpulse}}</td>
     <td class="number hidden-xs" data-sort="{{formatSort avgThrust}}">{{formatForce avgThrust}}</td>
     <td class="number hidden-sm hidden-xs" data-sort="{{formatSort maxThrust}}">{{formatForce maxThrust}}</td>

@@ -514,11 +514,22 @@ function doSearch(req, res, params) {
           query.impulseClass = v;
 
         } else if (k == 'length') {
-          v = parseFloat(v);
-          if (v > 0)
-            query.length = { $lt: v + metadata.MotorDiameterTolerance };
+          // values over 10 are taken as millimeters (no motor is 10m long)
+          let min = 9e9, max = 0;
+          (a || [v]).forEach(function(v) {
+            v = parseFloat(v);
+            if (v > 0) {
+              if (v > 10)
+                v /= 1000;
+              min = Math.min(v, min);
+              max = Math.max(v, max);
+            } else
+              failed = true;
+          });
+          if (a)
+            query.length = { $gt: min - metadata.MotorDiameterTolerance, $lt: max + metadata.MotorDiameterTolerance };
           else
-            failed = true;
+            query.length = { $lt: max + metadata.MotorDiameterTolerance };
 
         } else if (k == 'text') {
           let cn = v.toUpperCase();

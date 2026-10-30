@@ -45,6 +45,8 @@ Details are in [spec/web](spec/web/) and [spec/api](spec/api/).
 
 GitHub Actions runs the unit tests, and the API and UI tests against that database.
 
+Reviewed dependency advisories are in [AUDIT.md](AUDIT.md).
+
 ## License
 
 This software is licensed under the [ISC license](https://opensource.org/licenses/ISC); see [LICENSE](LICENSE) for more info.

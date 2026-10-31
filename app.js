@@ -85,6 +85,18 @@ const index = require('./routes/index'),
       api_v1 = require('./routes/api_v1');
 
 const app = express();
+
+// make sure Cloudflare can cache permanent redirects
+app.use((req, res, next) => {
+  const redirect = res.redirect;
+  res.redirect = function(status) {
+    if (status === 301)
+      res.set('Cache-Control', 'public, max-age=604800');
+    return redirect.apply(this, arguments);
+  };
+  next();
+});
+
 if (config.originVerifySecret) {
   // reject requests that didn't come through Cloudflare (which adds this header)
   const expected = Buffer.from(config.originVerifySecret);
@@ -96,6 +108,7 @@ if (config.originVerifySecret) {
       res.status(403).type('text').send('Forbidden');
   });
 }
+
 if (process.env.NODE_ENV === 'production' && process.env.DOMAIN) {
   // force SSL and canonical domain in production (except for API)
   app.use((req, res, next) => {

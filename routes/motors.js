@@ -1726,7 +1726,7 @@ router.post('/motors/:mfr/:desig/addcert.html', authorized('motors'), upload(), 
           content: file.data,
         });
         cert.save(req.success(function(updated) {
-          res.redirect(301, req.helpers.motorLink(manufacturer, motor) + 'cert.html?added=' + updated._id);
+          res.redirect(302, req.helpers.motorLink(manufacturer, motor) + 'cert.html?added=' + updated._id);
         }));
       }
     });

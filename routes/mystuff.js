@@ -71,7 +71,7 @@ router.get(loginLink, function(req, res, next) {
     redirect: getRedirect(req),
   }));
 });
-router.get('login.jsp', function(req, res, next) {
+router.get('/login.jsp', function(req, res, next) {
   res.redirect(301, loginLink);
 });
 
@@ -215,11 +215,14 @@ router.post(registerLink, function(req, res, next) {
  * /mystuff/forgotpasswd.html
  * Renders with mystuff/forgotpasswd.hbs template.
  */
-router.get([forgotLink, '/forgotpasswd.jsp'], function(req, res, next) {
+router.get(forgotLink, function(req, res, next) {
   res.render('mystuff/forgotpasswd', locals(req, defaults, {
     title: 'Forgot Password',
     submitLink: forgotLink,
   }));
+});
+router.get('/forgotpasswd.jsp', function(req, res, next) {
+  res.redirect(301, forgotLink);
 });
 
 router.post(forgotLink, function(req, res, next) {

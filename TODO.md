@@ -6,7 +6,6 @@ This page lists ideas for new features.
 
  * flag motors favorited by other users
  * add "inserted length" field on motors
- * combined RASP file for multiple motors
 
 ## Search
 
@@ -26,3 +25,7 @@ This page lists ideas for new features.
 ## Account
 
  * search other contributors
+
+## API
+
+ * v2 API fully modern RESTFUL

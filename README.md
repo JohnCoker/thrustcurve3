@@ -40,10 +40,11 @@ The other directories are small modules next to that:
 ## Tests
 
 `npm run test:lib` runs the unit tests.
+`npm run test:client` runs the `@thrustcurve/api1` client tests in `api/`. Those talk to the live site.
 `npm run test:e2e` and `npm run test:api` need the database from [database/testdb.sh](database/testdb.sh).
 Details are in [spec/web](spec/web/) and [spec/api](spec/api/).
 
-GitHub Actions runs the unit tests, and the API and UI tests against that database.
+GitHub Actions runs the unit tests, the client tests against the live site, and the API and UI tests against that database.
 
 Reviewed dependency advisories are in [AUDIT.md](AUDIT.md).
 

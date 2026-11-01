@@ -50,6 +50,28 @@ jobs:
       - run: npm ci
       - run: npm run test:lib
 
+  clients:
+    name: Client tests
+    runs-on: *runner
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - run: npm ci
+        working-directory: api
+
+      # www.thrustcurve.org publishes Cloudflare AAAA records. GitHub-hosted
+      # runners have no IPv6 route, and Node fetch may wait on that address.
+      - run: npm run test:client
+        env:
+          NODE_OPTIONS: --dns-result-order=ipv4first
+
   api:
     name: API tests
     runs-on: *runner

@@ -74,14 +74,6 @@ so it does not require being called from a browser nor does it require any heade
 </p>
 
 <p>
-For those updating their code from the compatible (<code>/servlets</code>) to the newer
-(<code>/api/v1</code>) endpoints, the main difference is that IDs are not integers.
-In the newer APIs they are 24-digit hexadecimal numbers (such as "5f81c94736f9725a10f26a56"),
-but if your code treats the IDs as strings there is no real difference.
-Note that there are often more fields in the newer responses.
-</p>
-
-<p>
 Finally, all measurements in this API use
 <a href="https://en.wikipedia.org/wiki/International_System_of_Units" target="_blank">SI (MKS) units</a>,
 except for motor mount tubes which are in millimeters.
@@ -107,6 +99,14 @@ compatible endpoints support only POST (and only XML).
 <p>
 For an example of using the API, see <a href="apidemo.html">the API demo page</a>.
 </p>
+
+<blockquote class="important">
+<i class="fa fa-check-circle"></i>
+<p>
+The site enforces a rate limit to avoid being crushed by automated traffic. If your client is hitting the server
+more frequenly than 1Hz over a sustained period, handle 429 errors as back-off signals.
+</p>
+</blockquote>
 
 
 <a name="metadata"></a>

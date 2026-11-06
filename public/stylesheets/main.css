@@ -229,6 +229,25 @@ a.disabled {
   color: #999;
 }
 
+blockquote.note {
+  border-color: rgb(9, 105, 218);
+}
+blockquote.note > i.fa {
+  color: rgb(9, 105, 218);
+}
+blockquote.tip {
+  border-color: rgb(26, 127, 55);
+}
+blockquote.tip > i.fa {
+  color: rgb(26, 127, 55);
+}
+blockquote.important {
+  border-color: #8a3ffc;
+}
+blockquote.important > i.fa {
+  color: #8a3ffc;
+}
+
 @media print {
   @page {
     size: letter;

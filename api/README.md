@@ -114,6 +114,12 @@ try {
 }
 ```
 
+## Rate Limiting
+
+The server enforces a rate limit to avoid being crushed by automated traffic. If you exceed 1Hz for a sustained
+period, you may start getting 429 status codes. The client implements back-off behavior by default which can be disabled
+by passing `rateLimit: 'error'` in the options object passed to the constructor.
+
 ## API Reference
 
 The client provides the following methods:

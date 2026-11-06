@@ -66,11 +66,7 @@ jobs:
       - run: npm ci
         working-directory: api
 
-      # www.thrustcurve.org publishes Cloudflare AAAA records. GitHub-hosted
-      # runners have no IPv6 route, and Node fetch may wait on that address.
       - run: npm run test:client
-        env:
-          NODE_OPTIONS: --dns-result-order=ipv4first
 
   api:
     name: API tests

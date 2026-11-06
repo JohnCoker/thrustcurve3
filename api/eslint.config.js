@@ -17,6 +17,7 @@ export default [
       globals: {
         Buffer: 'readonly',
         fetch: 'readonly',
+        setTimeout: 'readonly',
         TextDecoder: 'readonly',
         atob: 'readonly',
         URLSearchParams: 'readonly'
@@ -38,7 +39,7 @@ export default [
       'no-console': ['error', {
         allow: ['warn', 'error']
       }],
-      'eqeqeq': ['error', 'always'],
+      'eqeqeq': ['error', 'always', { "null": "ignore" }],
       'prefer-const': 'error'
     }
   },

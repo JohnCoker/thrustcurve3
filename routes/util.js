@@ -7,7 +7,8 @@
 const express = require('express'),
       router = express.Router(),
       metadata = require('../lib/metadata'),
-      ranking = require('../database/ranking');
+      ranking = require('../database/ranking'),
+      cache = require('../lib/cache');
 
 /*
  * /sitemap.xml
@@ -195,8 +196,9 @@ router.get('/sitemap.xml', function(req, res, next) {
 
       s += '</urlset>';
 
-      res.type('application/xml');
-      res.send(s);
+      res.type('application/xml')
+         .set('Cache-Control', cache.sitemap)
+         .send(s);
     }));
   });
 });
@@ -261,6 +263,7 @@ router.get('/llms-full.txt', function(req, res, next) {
           s += `\nSee more at the [Popular Motors page](${origin}/motors/popular.html).\n`;
 
           res.type('text/plain')
+             .set('Cache-Control', cache.sitemap)
              .set('X-Robots-Tag', 'noindex')
              .send(s);
         }));

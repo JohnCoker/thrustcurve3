@@ -24,7 +24,8 @@ const process = require('process'),
       schema = require('./database/schema'),
       crawlers = require('./lib/crawlers'),
       helpers = require('./lib/helpers'),
-      context = require('./lib/context');
+      context = require('./lib/context'),
+      cache = require('./lib/cache');
 
 // fail if initial connection is impossible
 mongoose.Promise = global.Promise;
@@ -91,7 +92,7 @@ app.use((req, res, next) => {
   const redirect = res.redirect;
   res.redirect = function(status) {
     if (status === 301)
-      res.set('Cache-Control', 'public, max-age=604800');
+      res.set('Cache-Control', cache['301']);
     return redirect.apply(this, arguments);
   };
 
@@ -142,8 +143,8 @@ app.locals.operatorEmail = config.operatorEmail;
 app.use(logger('dev'));
 app.use(morgan('combined'));
 app.use(cookieParser());
-app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(favicon(__dirname + '/public/favicon.ico', { maxAge: cache.public_ms }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: cache.public_ms }));
 if (!config.sessionSecret && process.env.NODE_ENV === 'production')
   console.error('SESSION_SECRET is not set; using insecure default');
 app.use(session({

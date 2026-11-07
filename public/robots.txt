@@ -1,5 +1,5 @@
 User-agent: *
-Crawl-delay: 3
+Crawl-delay: 1
 Allow: /llms.txt
 Allow: /llms-full.txt
 Disallow: /mystuff/

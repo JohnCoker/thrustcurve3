@@ -14,7 +14,7 @@ permissions:
 
 # Steps read env. runs-on and services cannot, so the runner and MongoDB service are anchors.
 env:
-  NODE_VERSION: "26"
+  NODE_VERSION: "24"
   UBUNTU_CODENAME: noble
   # MongoDB 7.0.35, same release as local and Atlas.
   # The service image is the same release; services cannot read env.

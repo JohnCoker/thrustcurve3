@@ -4,6 +4,9 @@
   "private": true,
   "author": "John Coker",
   "license": "ISC",
+  "engines": {
+    "node": "24.x"
+  },
   "config": {
     "mongodbMemoryServer": {
       "version": "7.0.35"

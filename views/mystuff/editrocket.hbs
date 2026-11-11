@@ -6,9 +6,36 @@
 </div>
 {{/each}}
 
+{{#if isNew}}
+<div class="droptarget" id="design-drop">
+<p>Enter the info into the form or <label for="design-file" class="design-file">drop a design file here</label>.</p>
+{{/if}}
+
+{{#if designNote}}
+<div class="alert alert-info" role="alert">
+{{designNote}}
+</div>
+{{/if}}
+
 <form role="form" class="form-horizontal" name="edit-rocket" action="{{submitLink}}" method="post" data-toggle="validator">
+  {{#if designImport}}
+  <input type="hidden" name="designImport" value="{{designImport}}">
+  {{/if}}
+  {{#if isNew}}
   <div class="form-group">
-    <label for="name" class="col-sm-3 control-label">Name</label>
+    <label for="design-file" class="col-sm-3 control-label">Design File</label>
+    <div class="col-sm-9">
+      {{#if designFileName}}
+      <p class="form-control-static">{{designFileName}}</p>
+      {{/if}}
+      <input id="design-file" type="file" name="file" form="design-upload" class="form-control-static"
+             accept=".ork,.rkt,.cdx1,.ORK,.RKT,.CDX1">
+      <span class="help-block with-errors"></span>
+    </div>
+  </div>
+  {{/if}}
+  <div class="form-group">
+    <label for="name" class="col-sm-3 control-label">Rocket Name</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" name="name" required
              placeholder="" value="{{rocket.name}}">
@@ -173,6 +200,14 @@
     </div>
   </div>
 </form>
+
+{{#if isNew}}
+<form id="design-upload" action="/mystuff/rockets.html" method="post" enctype="multipart/form-data" hidden></form>
+</div>
+<script type="text/javascript">
+setupDesignDrop('#design-drop', '#design-upload');
+</script>
+{{/if}}
 
 {{#if adapterLink}}
 <h2>Motor Adapters</h2>

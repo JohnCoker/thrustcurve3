@@ -341,6 +341,48 @@ test.describe('browser', () => {
   });
 });
 
+async function expectDesignDownload(page: Page, fileName: string) {
+  const href = await page.getByRole('link', { name: fileName }).getAttribute('href');
+  const response = await page.request.get(href!);
+  expect(response.ok()).toBeTruthy();
+  expect(response.headers()['content-disposition']).toContain(fileName);
+  expect(await response.text()).toContain('<openrocket');
+}
+
+// A single stage with every measurement the guide needs. Fred's in/oz prefs show 1.00 in and 3.0 oz.
+function openRocketComplete(name: string) {
+  return [
+    '<openrocket version="1.10"><rocket>',
+    `<name>${name}</name>`,
+    '<stage><name>Sustainer</name>',
+    '<overridemass>0.085</overridemass><overridesubcomponentsmass>true</overridesubcomponentsmass>',
+    '<overridecd>0.5</overridecd><overridesubcomponentscd>true</overridesubcomponentscd>',
+    '<bodytube><outerradius>0.0127</outerradius>',
+    '<innertube><length>0.07</length><outerradius>0.0095</outerradius><thickness>0.0005</thickness>',
+    '<motormount><overhang>0</overhang></motormount></innertube></bodytube>',
+    '</stage></rocket>',
+    '<simulations><simulation><conditions><launchrodlength>0.9144</launchrodlength></conditions></simulation></simulations>',
+    '</openrocket>',
+  ].join('');
+}
+
+// The OpenRocket sample that states no dry weight. The mount is a two-motor cluster.
+function openRocketPartial(name: string) {
+  return [
+    '<openrocket version="1.10"><rocket>',
+    `<name>${name}</name>`,
+    '<stage><name>Sustainer</name>',
+    '<nosecone><finish>normal</finish><aftradius>0.0124</aftradius></nosecone>',
+    '<bodytube><outerradius>0.0124</outerradius>',
+    '<innertube><length>0.07</length><outerradius>0.0095</outerradius><thickness>0.0005</thickness>',
+    '<clusterconfiguration>double</clusterconfiguration>',
+    '<motormount><overhang>0.003</overhang></motormount>',
+    '</innertube></bodytube></stage></rocket>',
+    '<simulations><simulation><conditions><launchrodlength>0.9144</launchrodlength></conditions></simulation></simulations>',
+    '</openrocket>',
+  ].join('');
+}
+
 function labeledValue(page: Page, label: string) {
   return page.locator('.form-group', { has: page.locator('label', { hasText: new RegExp(`^${label}$`) }) })
              .locator('.form-control-static');
@@ -446,6 +488,89 @@ test.describe('mystuff', () => {
     } finally {
       if (rocketUrl)
         await page.goto(rocketUrl.replace(/\/?$/, '/delete.html'));
+    }
+  });
+
+  test('a complete design file saves the rocket and can be downloaded', async ({ page }) => {
+    const { name, fileName } = perProject({
+      chromium: { name: 'ZZ e2e complete chromium', fileName: 'zz-e2e-complete-chromium.ork' },
+      webkit: { name: 'ZZ e2e complete webkit', fileName: 'zz-e2e-complete-webkit.ork' },
+    });
+    let rocketUrl: string | undefined;
+    try {
+      await page.goto('/mystuff/rockets.html');
+      await Promise.all([
+        page.waitForURL(/\/mystuff\/rocket\/[a-f0-9]+\/\?result=created/),
+        page.locator('#design-file').setInputFiles({
+          name: fileName,
+          mimeType: 'application/xml',
+          buffer: Buffer.from(openRocketComplete(name)),
+        }),
+      ]);
+
+      await expect(page).toHaveTitle(new RegExp(`${name} • ThrustCurve`));
+      rocketUrl = page.url();
+      await expect(page.locator('.alert-warning')).toHaveCount(0);
+      await expect(labeledValue(page, 'Body Diameter')).toHaveText(/1\.00\s*in/);
+      await expect(labeledValue(page, 'Dry Weight')).toHaveText(/3\.0\s*oz/);
+      await expect(labeledValue(page, 'Cluster')).toHaveText('single');
+      await expect(page.getByRole('link', { name: fileName })).toBeVisible();
+      await expectDesignDownload(page, fileName);
+
+      page.once('dialog', (dialog) => dialog.accept());
+      await page.getByRole('link', { name: 'delete it entirely' }).click();
+      await expect(page).toHaveTitle(/My Rockets • ThrustCurve/);
+      await expect(page.getByRole('link', { name })).toHaveCount(0);
+      rocketUrl = undefined;
+    } finally {
+      if (rocketUrl)
+        await page.goto(rocketUrl.replace(/\/?(?:\?.*)?$/, '/delete.html'));
+    }
+  });
+
+  test('a design file missing dry weight asks for it, then saves', async ({ page }) => {
+    const { name, fileName } = perProject({
+      chromium: { name: 'ZZ e2e partial chromium', fileName: 'zz-e2e-partial-chromium.ork' },
+      webkit: { name: 'ZZ e2e partial webkit', fileName: 'zz-e2e-partial-webkit.ork' },
+    });
+    let rocketUrl: string | undefined;
+    try {
+      await page.goto('/mystuff/rockets.html');
+      await Promise.all([
+        page.waitForResponse((response) =>
+          response.url().includes('/mystuff/rockets.html') && response.request().method() === 'POST'),
+        page.locator('#design-file').setInputFiles({
+          name: fileName,
+          mimeType: 'application/xml',
+          buffer: Buffer.from(openRocketPartial(name)),
+        }),
+      ]);
+
+      await expect(page).toHaveTitle(/Add Rocket • ThrustCurve/);
+      await expect(page.locator('.alert-info'))
+        .toContainText('The design file did not include the dry weight. Enter it to save the rocket.');
+      await expect(page.locator('p.form-control-static', { hasText: fileName })).toBeVisible();
+      const form = page.locator('form[name="edit-rocket"]');
+      await expect(form.locator('input[name="name"]')).toHaveValue(name);
+      await expect(form.locator('input[name="weight"]')).toHaveValue('');
+      await form.locator('input[name="weight"]').fill('4');
+      await form.locator('button[type="submit"]').click();
+
+      await expect(page).toHaveTitle(new RegExp(`${name} • ThrustCurve`));
+      rocketUrl = page.url();
+      await expect(labeledValue(page, 'Dry Weight')).toHaveText(/4\.0\s*oz/);
+      await expect(labeledValue(page, 'Cluster')).toHaveText('2');
+      await expect(page.getByRole('link', { name: fileName })).toBeVisible();
+      await expectDesignDownload(page, fileName);
+
+      page.once('dialog', (dialog) => dialog.accept());
+      await page.getByRole('link', { name: 'delete it entirely' }).click();
+      await expect(page).toHaveTitle(/My Rockets • ThrustCurve/);
+      await expect(page.getByRole('link', { name })).toHaveCount(0);
+      rocketUrl = undefined;
+    } finally {
+      if (rocketUrl)
+        await page.goto(rocketUrl.replace(/\/?(?:\?.*)?$/, '/delete.html'));
     }
   });
 });

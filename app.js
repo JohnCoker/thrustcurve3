@@ -244,10 +244,19 @@ app.use(function(req, res, next) {
   };
   context.run(store, function() {
     const origRender = res.render.bind(res);
-    res.render = function() {
-      const args = arguments;
-      if (context.getStore() === store)
-        return origRender.apply(res, args);
+    res.render = function(view, options, callback) {
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      } else if (options == null || typeof options !== 'object') {
+        options = {};
+      }
+      // Kept on the template data because drawing the layout can run outside
+      // this request's async context.
+      options._loggedIn = req.user != null;
+      if (req.user && req.user.email)
+        options._userEmail = req.user.email;
+      const args = typeof callback === 'function' ? [view, options, callback] : [view, options];
       return context.run(store, () => origRender.apply(res, args));
     };
 

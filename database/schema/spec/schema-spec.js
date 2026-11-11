@@ -424,6 +424,120 @@ describe('schemas', function() {
     });
   });
 
+  describe('rocket', function() {
+    var RocketModel;
+
+    beforeAll(function() {
+      RocketModel = mongoose.models.Rocket || schema.RocketModel(mongoose);
+    });
+
+    function baseRocket(extra) {
+      return Object.assign({
+        _contributor: new mongoose.Types.ObjectId(),
+        name: 'Alpha',
+        bodyDiameter: 1,
+        bodyDiameterUnit: 'in',
+        weight: 4,
+        weightUnit: 'oz',
+        cd: 0.5,
+        guideLength: 36,
+        guideLengthUnit: 'in',
+        mmtDiameter: 18,
+        mmtDiameterUnit: 'mm',
+        mmtLength: 3,
+        mmtLengthUnit: 'in',
+        mmtCount: 1,
+      }, extra);
+    }
+
+    it('keeps root mount fields when the rocket has no stages', function(done) {
+      new RocketModel(baseRocket()).save(function(err, rocket) {
+        expect(err).toBeNull();
+        expect(rocket.mmtDiameter).toBe(18);
+        expect(rocket.mmtDiameterUnit).toBe('mm');
+        expect(rocket.mmtDiameterMKS).toBeCloseTo(0.018);
+        expect(rocket.mmtLength).toBe(3);
+        expect(rocket.mmtLengthMKS).toBeCloseTo(0.0762);
+        expect(rocket.mmtCount).toBe(1);
+        expect(rocket.stages.length).toBe(0);
+        done();
+      });
+    });
+
+    it('copies the first stage mount onto the root', function(done) {
+      new RocketModel(baseRocket({
+        stages: [{
+          name: 'Booster',
+          mmts: [{
+            mmtDiameter: 29,
+            mmtDiameterUnit: 'mm',
+            mmtLength: 6,
+            mmtLengthUnit: 'in',
+            mmtCount: 2,
+            adapters: [{
+              mmtDiameter: 24,
+              mmtDiameterUnit: 'mm',
+              mmtLength: 70,
+              mmtLengthUnit: 'mm',
+              weight: 5,
+              weightUnit: 'g',
+            }],
+          }],
+        }],
+      })).save(function(err, rocket) {
+        expect(err).toBeNull();
+        RocketModel.findById(rocket._id).exec(function(err, found) {
+          expect(err).toBeNull();
+          expect(found.mmtDiameter).toBe(29);
+          expect(found.mmtDiameterUnit).toBe('mm');
+          expect(found.mmtDiameterMKS).toBeCloseTo(0.029);
+          expect(found.mmtLength).toBe(6);
+          expect(found.mmtLengthUnit).toBe('in');
+          expect(found.mmtLengthMKS).toBeCloseTo(0.1524);
+          expect(found.stages[0].name).toBe('Booster');
+          expect(found.mmtCount).toBe(2);
+          expect(found.adapters.length).toBe(1);
+          expect(found.adapters[0].mmtDiameter).toBe(24);
+          expect(found.adapters[0].mmtLength).toBe(70);
+          expect(found.adapters[0].weight).toBe(5);
+          expect(found.adapters[0].weightUnit).toBe('g');
+          expect(found.stages[0].mmts[0].mmtDiameterMKS).toBeCloseTo(0.029);
+          expect(found.stages[0].mmts[0].mmtLengthMKS).toBeCloseTo(0.1524);
+          done();
+        });
+      });
+    });
+
+    it('clears the root mount when the first stage has no tube', function(done) {
+      new RocketModel(baseRocket({
+        mmtCount: 3,
+        adapters: [{
+          mmtDiameter: 13,
+          mmtDiameterUnit: 'mm',
+          mmtLength: 1.75,
+          mmtLengthUnit: 'in',
+          weight: 0.1,
+          weightUnit: 'oz',
+        }],
+        stages: [{ name: 'Booster', mmts: [] }],
+      })).save(function(err, rocket) {
+        expect(err).toBeNull();
+        RocketModel.findById(rocket._id).exec(function(err, found) {
+          expect(err).toBeNull();
+          expect(found.mmtDiameter).toBeNull();
+          expect(found.mmtDiameterUnit).toBeNull();
+          expect(found.mmtDiameterMKS).toBeNull();
+          expect(found.mmtLength).toBeNull();
+          expect(found.mmtLengthUnit).toBeNull();
+          expect(found.mmtLengthMKS).toBeNull();
+          expect(found.mmtCount).toBeNull();
+          expect(found.adapters.length).toBe(0);
+          done();
+        });
+      });
+    });
+  });
+
   describe('permissions', function() {
     describe("getPermissionKey", function() {
       it("missing", function() {

@@ -39,6 +39,11 @@ Object.freeze(SimFileFormatEnum);
 Object.freeze(SimFileDataSourceEnum);
 Object.freeze(SimFileLicenseEnum);
 
+const DesignFileFormatEnum = ['OpenRocket', 'RockSim', 'RASAero II'];
+const DesignFileMimeEnum = ['application/x-openrocket', 'application/xml'];
+Object.freeze(DesignFileFormatEnum);
+Object.freeze(DesignFileMimeEnum);
+
 const MotorViewSourceEnum = ['manufacturer', 'search', 'guide', 'browser', 'popular', 'favorite', 'updates'];
 Object.freeze(MotorViewSourceEnum);
 
@@ -431,19 +436,8 @@ function makeSimFileNoteModel(mongoose) {
 }
 
 function makeRocketModel(mongoose) {
-  var schema = new mongoose.Schema({
-    createdAt: { type: Date, default: Date.now, required: true },
-    updatedAt: { type: Date, default: Date.now, required: true },
-    migratedId: Number,
-    _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', required: true },
-    name: { type: String, required: true },
-    public: Boolean,
-    bodyDiameter: Number,
-    bodyDiameterUnit: { type: String, enum: units.length.labels },
-    bodyDiameterMKS: Number,
-    weight: Number,
-    weightUnit: { type: String, enum: units.mass.labels },
-    weightMKS: Number,
+  // the MMT fields appear at the top level as a duplicate of the booster's first MMT
+  const MMT = {
     mmtDiameter: Number,
     mmtDiameterUnit: { type: String, enum: units.length.labels },
     mmtDiameterMKS: Number,
@@ -458,31 +452,93 @@ function makeRocketModel(mongoose) {
       mmtLengthUnit: { type: String, enum: units.length.labels },
       weight: Number,
       weightUnit: { type: String, enum: units.mass.labels },
+    }]
+  };
+
+  var schema = new mongoose.Schema({
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
+    migratedId: Number,
+    _contributor: { type: mongoose.Schema.Types.ObjectId, ref: 'Contributor', required: true },
+    name: { type: String, required: true },
+    public: Boolean,
+    bodyDiameter: Number,
+    bodyDiameterUnit: { type: String, enum: units.length.labels },
+    bodyDiameterMKS: Number,
+    weight: Number,
+    weightUnit: { type: String, enum: units.mass.labels },
+    weightMKS: Number,
+    ...MMT,
+    stages: [{
+      name: String,
+      mmts: [ MMT ],
     }],
     cd: { type: Number, min: 0.1 },
     guideLength: Number,
     guideLengthUnit: { type: String, enum: units.length.labels },
     guideLengthMKS: Number,
     website: { type: String, match: UrlRegex },
-    comments: String
+    comments: String,
+    designFile: {
+      type: new mongoose.Schema({
+        name: { type: String, required: true },
+        format: { type: String, enum: DesignFileFormatEnum, required: true },
+        mimeType: { type: String, enum: DesignFileMimeEnum, required: true },
+        content: { type: Buffer, required: true },
+      }, { _id: false }),
+      required: false
+    },
   }, stdOptions());
   stdHooks(schema);
+
+  function applyMKS(target, names, type) {
+    names.forEach(which => {
+      const unit = which + 'Unit', mks = which + 'MKS';
+      if (target[which] > 0 && target[unit] != null)
+        target[mks] = units.convertUnitToMKS(target[which], type, target[unit]);
+      else
+        target[mks] = null;
+    });
+  }
+
+  function adapterFields(adapter) {
+    return {
+      mmtDiameter: adapter.mmtDiameter,
+      mmtDiameterUnit: adapter.mmtDiameterUnit,
+      mmtLength: adapter.mmtLength,
+      mmtLengthUnit: adapter.mmtLengthUnit,
+      weight: adapter.weight,
+      weightUnit: adapter.weightUnit,
+    };
+  }
+
+  const LaunchMountFields = ['mmtDiameter', 'mmtDiameterUnit', 'mmtLength', 'mmtLengthUnit', 'mmtCount'];
+
+  // Root mount fields mirror stages[0].mmts[0]. A rocket with no stages keeps
+  // the mount fields entered at the root, which is every rocket saved today.
+  function copyLaunchMount(doc) {
+    if (!Array.isArray(doc.stages) || doc.stages.length < 1)
+      return;
+
+    doc.stages.forEach(stage => {
+      if (!Array.isArray(stage.mmts))
+        return;
+      stage.mmts.forEach(mmt => {
+        applyMKS(mmt, ['mmtDiameter', 'mmtLength'], 'length');
+      });
+    });
+
+    const mmt = Array.isArray(doc.stages[0].mmts) ? doc.stages[0].mmts[0] : null;
+    LaunchMountFields.forEach(name => {
+      doc[name] = mmt == null || mmt[name] == null ? null : mmt[name];
+    });
+    doc.adapters = mmt == null || mmt.adapters == null ? [] : mmt.adapters.map(adapterFields);
+  }
+
   schema.pre('save', function(next) {
-    // update the MKS value from the entered value and unit
-    ['bodyDiameter', 'mmtDiameter', 'mmtLength', 'guideLength'].forEach(which => {
-      const unit = which + 'Unit', mks = which + 'MKS';
-      if (this[which] > 0 && this[unit] != null)
-        this[mks] = units.convertUnitToMKS(this[which], 'length', this[unit]);
-      else
-        this[mks] = null;
-    });
-    ['weight'].forEach(which => {
-      const unit = which + 'Unit', mks = which + 'MKS';
-      if (this[which] > 0 && this[unit] != null)
-        this[mks] = units.convertUnitToMKS(this[which], 'mass', this[unit]);
-      else
-        this[mks] = null;
-    });
+    copyLaunchMount(this);
+    applyMKS(this, ['bodyDiameter', 'mmtDiameter', 'mmtLength', 'guideLength'], 'length');
+    applyMKS(this, ['weight'], 'mass');
     next();
   });
   return mongoose.model('Rocket', schema);

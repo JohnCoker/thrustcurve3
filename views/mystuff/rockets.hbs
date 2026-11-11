@@ -6,11 +6,18 @@ Rocket deleted.
 </div>
 {{/if}}
 
+{{#each errors}}
+<div class="alert alert-danger" role="alert">
+{{this}}
+</div>
+{{/each}}
+
+<div id="design-drop" class="filedrop">
 {{#unless rockets}}
 <p>
 You don't have any rockets defined.
 If you add rockets, you can easily find motors for them using the Motor Guide.
-<a href="/mystuff/rocket/new/edit.html">Add your first rocket</a>.
+<a href="/mystuff/rocket/new/edit.html">Add your first rocket</a> or <label for="design-file" class="design-file">drop a design file here</label>.
 </p>
 {{/unless}}
 {{#if rockets}}
@@ -44,9 +51,16 @@ setupTable('#rocket-list', {
 </script>
 
 <p>
-<a href="/mystuff/rocket/new/edit.html">Add another rocket</a>.
+<a href="/mystuff/rocket/new/edit.html">Add another rocket</a> or <label for="design-file" class="design-file">drop a design file here</label>.
 </p>
 {{/if}}
+</div>
+<form id="design-upload" action="/mystuff/rockets.html" method="post" enctype="multipart/form-data">
+  <input id="design-file" type="file" name="file" accept=".ork,.rkt,.cdx1,.ORK,.RKT,.CDX1" hidden>
+</form>
+<script type="text/javascript">
+setupDesignDrop('#design-drop', '#design-upload');
+</script>
 
 <h2>Others' Rockets</h2>
 <p>You can also search the public rockets for one to use as a starting point for your own.</p>

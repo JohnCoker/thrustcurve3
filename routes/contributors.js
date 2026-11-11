@@ -18,6 +18,13 @@ const defaults = {
 
 const listLink = '/contributors/';
 
+function designFileUrl(rocket) {
+  const file = rocket && rocket.designFile;
+  if (file == null || typeof file.name !== 'string' || file.name.trim() === '')
+    return;
+  return '/mystuff/rocket/' + rocket._id + '/design/' + encodeURIComponent(file.name);
+}
+
 /*
  * /contributors/list.html
  * List of all contributors, renders with contributors/list.hbs template.
@@ -158,6 +165,7 @@ router.get('/contributors/:cid/rockets/:rid', function(req, res, next) {
           manufacturerCount: fit.manufacturers.length,
           singleManufacturer: fit.manufacturers.length == 1 ? fit.manufacturers[0] : undefined,
 
+          designFileUrl: rocket.public ? designFileUrl(rocket) : undefined,
           guideLink: '/motors/guide.html'
         }));
       });

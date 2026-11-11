@@ -190,6 +190,30 @@ form p.form-control-static.id {
   top: 0.5em;
 }
 
+form.filedrop {
+  margin: 0;
+}
+/* Bootstrap sets input[type=file] { display: block }, which beats [hidden]. */
+input[type="file"][hidden] {
+  display: none;
+}
+.filedrop.dragover,
+.droptarget.dragover {
+  outline: 2px dashed #9e1a20;
+  outline-offset: 6px;
+  background-color: #fbf6f6;
+}
+label.design-file {
+  display: inline;
+  font-weight: inherit;
+  margin-bottom: 0;
+  cursor: pointer;
+  color: #2e448c;
+}
+label.design-file:hover {
+  text-decoration: underline;
+}
+
 a.favorite {
   color: #2e448c;
 }

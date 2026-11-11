@@ -14,6 +14,10 @@ const express = require('express'),
       schema = require('../database/schema'),
       units = require('../lib/units'),
       metadata = require('../lib/metadata'),
+      errors = require('../lib/errors'),
+      designfiles = require('../simulate/designfiles'),
+      rocketdesign = require('../lib/rocketdesign'),
+      fileUpload = require('express-fileupload'),
       locals = require('./locals.js'),
       authenticated = require('./authenticated.js'),
       contributors = require('../lib/contributors');
@@ -546,15 +550,19 @@ router.post('/mystuff/removefavorite.html', authenticated, function(req, res, ne
 });
 
 
+const MaxDesignFile = 5 * 1024 * 1024;
+
 /*
  * /mystuff/rockets.html
  * Renders with mystuff/rockets.hbs template.
+ * A dropped design file starts a rocket: save it when the file has every
+ * measurement the guide needs, otherwise the add form asks for the rest.
  */
-router.get(rocketsLink, authenticated, function(req, res, next) {
+function renderRockets(req, res, extra) {
   req.db.Rocket.find({ _contributor: req.user._id }, req.success(function(rockets) {
-    let lengthUnit = units.getUnitPref('length').label,
-        massUnit = units.getUnitPref('mass').label;
-    res.render('mystuff/rockets', locals(req, defaults, {
+    const lengthUnit = units.getUnitPref('length').label,
+          massUnit = units.getUnitPref('mass').label;
+    res.render('mystuff/rockets', locals(req, defaults, Object.assign({
       title: 'My Rockets',
       rockets: rockets,
       isDeleted: req.query.result == 'deleted',
@@ -564,7 +572,90 @@ router.get(rocketsLink, authenticated, function(req, res, next) {
       mmtDiameterUnit: 'mm',
       weightUnit: massUnit,
       searchLink,
-    }));
+    }, extra || {})));
+  }));
+}
+
+router.get(rocketsLink, authenticated, function(req, res, next) {
+  clearRocketImport(req);
+  renderRockets(req, res);
+});
+
+function designUpload() {
+  return fileUpload({
+    limits: { fileSize: MaxDesignFile },
+  });
+}
+
+router.post(rocketsLink, authenticated, designUpload(), function(req, res, next) {
+  let file = req.files && req.files.file;
+  if (Array.isArray(file)) {
+    if (file.length !== 1) {
+      renderRockets(req, res, { errors: ['Drop a single design file.'] });
+      return;
+    }
+    file = file[0];
+  }
+  if (file == null) {
+    renderRockets(req, res, { errors: ['Drop a single design file.'] });
+    return;
+  }
+  if (file.truncated) {
+    renderRockets(req, res, { errors: ['That design file is larger than 5 MB.'] });
+    return;
+  }
+
+  const read = readDesignFile(file);
+  if (read.extracted == null) {
+    renderRockets(req, res, { errors: read.errors });
+    return;
+  }
+
+  const built = rocketdesign.fromDesign(read.extracted, {
+    lengthUnit: units.getUnitPref('length').label,
+    massUnit: units.getUnitPref('mass').label,
+    guideUnit: units.defaultGuideLength().unit,
+    fileName: file.name,
+  });
+  const imported = {
+    token: crypto.randomBytes(16).toString('hex'),
+    note: rocketdesign.prompt(built.missing),
+    name: designFileName(file, read.extracted.format),
+    format: read.extracted.format,
+    mimeType: read.extracted.mimeType,
+    content: read.content.toString('base64'),
+    stages: built.rocket.stages,
+  };
+
+  if (built.missing.length > 0) {
+    req.session.rocketImport = imported;
+    showEditRocket(req, res, {
+      title: 'Add Rocket',
+      isNew: true,
+      rocket: built.rocket,
+      designImport: imported.token,
+      designNote: imported.note,
+      designFileName: imported.name,
+      submitLink: '/mystuff/rocket/new/edit.html',
+      cancelLink: rocketsLink,
+    });
+    return;
+  }
+
+  // The widest tube of the first stage is already first. Saving copies that
+  // tube back onto the root fields the motor guide already reads.
+  const rocket = Object.assign({
+    _contributor: req.user._id,
+    designFile: {
+      name: imported.name,
+      format: imported.format,
+      mimeType: imported.mimeType,
+      content: read.content,
+    },
+  }, built.rocket);
+  clearRocketImport(req);
+  req.db.Rocket.create(new req.db.Rocket(rocket), req.success(function(updated) {
+    res.redirect(303, '/mystuff/rocket/' + updated._id + '/?result=created');
   }));
 });
 
@@ -679,6 +770,7 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
             editLink: '/mystuff/rocket/' + id + '/edit.html',
             deleteLink: '/mystuff/rocket/' + id + '/delete.html',
             copyLink: '/mystuff/rocket/' + id + '/copy.html',
+            designFileUrl: designFileUrl(rocket),
             guideLink: '/motors/guide.html',
           }));
         } else {
@@ -693,6 +785,7 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
             editLink: '/mystuff/rocket/' + id + '/edit.html',
             deleteLink: '/mystuff/rocket/' + id + '/delete.html',
             copyLink: '/mystuff/rocket/' + id + '/copy.html',
+            designFileUrl: designFileUrl(rocket),
           }));
         }
       });
@@ -700,6 +793,47 @@ router.get('/mystuff/rocket/:id/', authenticated, function(req, res, next) {
   } else {
     res.redirect(303, rocketsLink);
   }
+});
+
+function designFileUrl(rocket) {
+  const file = rocket && rocket.designFile;
+  if (file == null || typeof file.name !== 'string' || file.name.trim() === '')
+    return;
+  return '/mystuff/rocket/' + rocket._id + '/design/' + encodeURIComponent(file.name);
+}
+
+function designAttachmentName(name) {
+  let file = typeof name === 'string' ? name.split(/[/\\]/).pop() : '';
+  file = file.replace(/["\r\n]/g, '').trim();
+  return file === '' ? 'design' : file;
+}
+
+/*
+ * /mystuff/rocket/:id/design/:file
+ * Download the design file stored on the rocket.
+ */
+router.get('/mystuff/rocket/:id/design/:file', function(req, res, next) {
+  const id = req.params.id;
+  if (!req.db.isId(id)) {
+    res.status(404).end();
+    return;
+  }
+  req.db.Rocket.findOne({ _id: id }, req.success(function(rocket) {
+    const file = rocket && rocket.designFile;
+    const isOwner = req.user != null && rocket != null &&
+                    req.user._id.toString() == rocket._contributor.toString();
+    if (file == null || file.content == null) {
+      res.status(404).end();
+      return;
+    }
+    if (!rocket.public && !isOwner) {
+      res.status(403).end();
+      return;
+    }
+    res.attachment(designAttachmentName(file.name))
+       .type(file.mimeType || 'application/octet-stream')
+       .send(file.content);
+  }));
 });
 
 /*
@@ -730,7 +864,8 @@ router.get('/mystuff/rocket/:id/edit.html', authenticated, function(req, res, ne
         }));
       }));
     } else {
-      // add new rocket
+      // add new rocket; a design file held for the prompt is no longer in play
+      clearRocketImport(req);
       var lengthUnit = units.getUnitPref('length').label,
           massUnit = units.getUnitPref('mass').label,
           guideDefault = units.defaultGuideLength();
@@ -775,6 +910,94 @@ router.get('/updaterocket.jsp', function(req, res, next) {
     res.redirect(301, rocketsLink);
   }
 });
+
+function showEditRocket(req, res, options) {
+  metadata.getAllMotors(req, function(info) {
+    const rocket = options.rocket;
+    const diameters = info.diametersMM();
+    res.render('mystuff/editrocket', locals(req, defaults, {
+      title: options.title,
+      isNew: options.isNew,
+      rocket: rocket,
+      lengthUnits: units.length,
+      massUnits: units.mass,
+      finishes: metadata.CdFinishes,
+      mmtDiametersMM: diameters,
+      mmtDiameterIsMM: mmtMenu(rocket, diameters),
+      errors: options.errors,
+      designImport: options.designImport,
+      designNote: options.designNote,
+      designFileName: options.designFileName,
+      submitLink: options.submitLink,
+      adapterLink: options.adapterLink,
+      cancelLink: options.cancelLink,
+    }));
+  });
+}
+
+// The diameter menu only lists motor diameters. Anything else is typed in.
+function mmtMenu(rocket, diameters) {
+  if (rocket == null || rocket.mmtDiameterUnit !== 'mm' || !(Number(rocket.mmtDiameter) > 0))
+    return false;
+  return diameters.some(d => Number(d) === Number(rocket.mmtDiameter));
+}
+
+function matchingImport(req) {
+  const pending = req.session && req.session.rocketImport;
+  const token = req.body && req.body.designImport;
+  if (pending == null || typeof token !== 'string' || token === '' || pending.token !== token)
+    return;
+  return pending;
+}
+
+function clearRocketImport(req) {
+  if (req.session && req.session.rocketImport)
+    delete req.session.rocketImport;
+}
+
+function readDesignFile(file) {
+  const content = fileContents(file);
+  const error = new errors.Collector();
+  let format = designfiles.guessFormat(content);
+  if (format == null)
+    format = formatFromName(file && file.name);
+  if (format == null)
+    return { errors: ['That file is not an OpenRocket, RockSim, or RASAero design.'] };
+
+  const data = format === 'OpenRocket' ? content : content.toString('utf8');
+  const extracted = designfiles.parseData(format, data, error);
+  if (extracted == null) {
+    const messages = error.errors.map(entry => entry.message);
+    return { errors: messages.length > 0 ? messages : ['Unable to read that design file.'] };
+  }
+  return { extracted, content };
+}
+
+function formatFromName(name) {
+  if (typeof name !== 'string')
+    return;
+  const match = /\.([^.]+)$/.exec(name.trim());
+  if (match == null)
+    return;
+  const info = designfiles.formatInfo(match[1]);
+  return info && info.format;
+}
+
+function designFileName(file, format) {
+  const name = file && typeof file.name === 'string' ? file.name.trim() : '';
+  if (name !== '')
+    return name;
+  const info = designfiles.formatInfo(format);
+  return 'design' + (info && info.extension ? info.extension : '');
+}
+
+function fileContents(file) {
+  if (file == null || file.data == null)
+    return Buffer.alloc(0);
+  if (Buffer.isBuffer(file.data))
+    return file.data;
+  return Buffer.from(file.data);
+}
 
 function doSubmitRocket(req, res, rocket) {
   var isNew = false, isChanged = false,
@@ -873,22 +1096,25 @@ function doSubmitRocket(req, res, rocket) {
     url = '/mystuff/rocket/' + rocket._id + '/edit.html';
 
   if (errors.length > 0) {
-    metadata.getAllMotors(req, function(metadata) {
-      res.render('mystuff/editrocket', locals(req, defaults, {
-        title: isNew ? 'Add Rocket' : 'Edit Rocket',
-        isNew: isNew,
-        rocket: rocket,
-        lengthUnits: units.length,
-        massUnits: units.mass,
-        finishes: metadata.CdFinishes,
-        mmtDiametersMM: metadata.diametersMM(),
-        mmtDiameterIsMM: rocket.mmtDiameterUnit === 'mm',
-        errors: errors,
-        submitLink: url
-      }));
+    const pending = matchingImport(req);
+    showEditRocket(req, res, {
+      title: isNew ? 'Add Rocket' : 'Edit Rocket',
+      isNew: isNew,
+      rocket: rocket,
+      errors: errors,
+      designImport: pending && pending.token,
+      designNote: pending && pending.note,
+      designFileName: pending && pending.name,
+      submitLink: url,
+      adapterLink: !isNew && rocket._id != null ? '/mystuff/rocket/' + rocket._id + '/adapter.html' : undefined,
+      cancelLink: !isNew && rocket._id != null ? '/mystuff/rocket/' + rocket._id + '/' : rocketsLink,
     });
   } else if (isNew) {
+    const pending = matchingImport(req);
+    if (pending)
+      rocketdesign.applyImport(rocket, pending);
     req.db.Rocket.create(new req.db.Rocket(rocket), req.success(function(updated) {
+      clearRocketImport(req);
       url = '/mystuff/rocket/' + updated._id + '/';
       res.redirect(303, url + '?result=created');
     }));

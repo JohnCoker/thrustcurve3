@@ -18,12 +18,14 @@ Search builds a new query from named fields (`searchQuery` in `lib/api/api1.js`,
 `populate()` is called with a fixed path such as `'_motor'` or `'_manufacturer'`.
 Updates are literal objects (`{ approved: true }`) or one schema field assigned after `.trim()`.
 `sanitizeFilter` is absent from Mongoose 5. The `$where` populate bug starts in 6.0.
+`countDocuments` is called with a filter built in code (`impulseClass`, `_motor`, `_certOrg` after an id check, a contributor id, or the `searchQuery` result), not with a request body.
 
 | CVE | Advisory | Trigger |
 | --- | --- | --- |
 | CVE-2025-23061 | [GHSA-vg7j-7cwx-8wgw](https://github.com/advisories/GHSA-vg7j-7cwx-8wgw) | Nested `$where` inside `populate({ match })` |
 | CVE-2026-42334 | [GHSA-wpg9-53fq-2r8h](https://github.com/advisories/GHSA-wpg9-53fq-2r8h) | `$nor` bypass of `sanitizeFilter` when a raw request body is the query |
 | CVE-2026-73562 | [GHSA-664h-wqgq-64gw](https://github.com/advisories/GHSA-664h-wqgq-64gw) | User-controlled update document with a `__proto__` dotted path |
+| CVE-2026-125120 | [GHSA-pcrw-h46h-c93h](https://github.com/advisories/GHSA-pcrw-h46h-c93h) | `countDocuments` skipping `sanitizeFilter` |
 
 ## qs 6.14.3 (Express 4.22.1)
 
@@ -140,10 +142,12 @@ They come from the standalone manifests under `database/`, which pin older packa
 `database/schema`, `database/ranking`, `database/migrate`, `database/accesslog`, and `database/util` declare mongoose 4.10.8.
 The running site resolves the root mongoose 5.13.23.
 None of these tools call `Schema.path` with request data.
+`sanitizeFilter` is absent here too, and these tools do not serve `countDocuments` from a request.
 
 | CVE | Advisory | Trigger |
 | --- | --- | --- |
 | CVE-2022-2564 | [GHSA-f825-f98c-gj3g](https://github.com/advisories/GHSA-f825-f98c-gj3g) | Prototype pollution via `Schema.path` |
+| CVE-2026-125120 | [GHSA-pcrw-h46h-c93h](https://github.com/advisories/GHSA-pcrw-h46h-c93h) | `countDocuments` skipping `sanitizeFilter` |
 
 ### lodash 4.17.20
 

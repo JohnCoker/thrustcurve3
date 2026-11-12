@@ -52,7 +52,7 @@ Use the <b>Add Motor</b> button to select more motors.
 td.input input {
   width: 5em;
 }
-td.actions a:not(:first-of-type) {
+td.action a:not(:first-of-type) {
   margin-left: 0.2em;
 }
 </style>
@@ -76,7 +76,7 @@ td.actions a:not(:first-of-type) {
       <td>{{motorDesignation motor}}</td>
       <td>{{motor._manufacturer.abbrev}}</td>
       <td class="input count"><input type="number" min="1" name="count{{n}}" value="{{count}}"/></td>
-      <td class="input offset"><input type="number" min="0" step="0.01" name="offset{{n}}" value="{{offset}}"/></td>
+      <td class="input offset"><input type="number" min="0" step="any" name="offset{{n}}" value="{{offset}}"/></td>
       <td class="action">
         <input type="hidden" name="motor{{n}}" value="{{motorId}}"/>
         <a href="#" class="move-up" title="move up"><i class="fa fa-arrow-up"></i></a>
@@ -130,7 +130,7 @@ function renumber() {
     const suffix = count.toFixed();
     tr.find('td.count input').attr('name', 'count' + suffix);
     tr.find('td.offset input').attr('name', 'offset' + suffix);
-    tr.find('td.actions input').attr('name', 'motor' + suffix);
+    tr.find('td.action input').attr('name', 'motor' + suffix);
   });
   form.find('input[name=count]').val(count.toFixed());
 }
@@ -185,7 +185,7 @@ $(document).ready(function() {
         <td>${desig}</td>
         <td>${mfr}</td>
         <td class="input count"><input type="number" min="1" name="" value="1"/></td>
-        <td class="input offset"><input type="number" min="0" step="0.1" name="" value="0"/></td>
+        <td class="input offset"><input type="number" min="0" step="any" name="" value="0"/></td>
         <td class="action">
           <input type="hidden" name="" value="${id}"/>
           <a href="#" class="move-up" title="move up"><i class="fa fa-arrow-up"></i></a>

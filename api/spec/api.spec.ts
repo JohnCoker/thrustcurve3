@@ -23,6 +23,11 @@ async function captureHeaders(api: ThrustCurveAPI): Promise<Record<string, strin
 describe('ThrustCurveAPI', () => {
   let api: ThrustCurveAPI;
 
+  // A 429 waits about 11s, then 21s. The 5s default expires during the first wait.
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 45_000;
+  });
+
   beforeEach(() => {
     api = new ThrustCurveAPI();
   });

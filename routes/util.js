@@ -272,4 +272,14 @@ router.get('/llms-full.txt', function(req, res, next) {
   });
 });
 
+/*
+ * /.well-known/change-password
+ * Password managers request this and follow the redirect to the signed-in
+ * profile page, which has the change-password form.
+ * https://w3c.github.io/webappsec-change-password-url/
+ */
+router.get('/.well-known/change-password', function(req, res) {
+  res.redirect(302, '/mystuff/profile.html');
+});
+
 module.exports = router;

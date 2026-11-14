@@ -144,6 +144,8 @@ app.use(logger('dev'));
 app.use(morgan('combined'));
 app.use(cookieParser());
 app.use(favicon(__dirname + '/public/favicon.ico', { maxAge: cache.public_ms }));
+// No dot in the filename, so mime treats "api-catalog" itself as the extension.
+express.static.mime.define({ 'application/linkset+json': ['api-catalog'] });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: cache.public_ms }));
 if (!config.sessionSecret && process.env.NODE_ENV === 'production')
   console.error('SESSION_SECRET is not set; using insecure default');

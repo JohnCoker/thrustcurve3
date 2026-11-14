@@ -1,0 +1,25 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://www.thrustcurve.org/",
+      "service-desc": [
+        {
+          "href": "https://www.thrustcurve.org/api/v1/swagger.json",
+          "type": "application/json"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://www.thrustcurve.org/info/api.html",
+          "type": "text/html"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://www.thrustcurve.org/health",
+          "type": "application/json"
+        }
+      ]
+    }
+  ]
+}

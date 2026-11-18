@@ -10,7 +10,7 @@ info:
   license:
     name: ISC license
     url: 'https://opensource.org/licenses/ISC'
-  version: 1.0.3
+  version: 1.0.4
 
 host: www.thrustcurve.org
 basePath: /api/v1
@@ -254,7 +254,7 @@ definitions:
 
   MetadataResponse:
     type: object
-    description: motor metadata
+    description: Motor metadata. Empty fields are omitted. A missing number is unknown, not zero.
     properties:
       manufacturers:
         type: array
@@ -300,6 +300,11 @@ definitions:
           - A
           - B
           - C
+      source_url:
+        description: page to cite for this response
+        type: string
+        format: url
+        example: 'https://www.thrustcurve.org/'
       error:
         description: errors in criteria specification
         type: string
@@ -318,27 +323,35 @@ definitions:
 
   SearchRequest:
     type: object
-    description: motor search query criteria
+    description: >
+      Motor search criteria. Every property is optional. Set at least one criterion
+      other than maxResults.
     properties:
       id:
-        description: motor unique identifer
+        description: motorId from an earlier SearchResponse result
         type: string
         example: 56a40928000231000000001f
       manufacturer:
-        description: manufacturer name or abbreviation
+        description: manufacturer name or abbrev from MetadataResponse, matched case-sensitive
         type: string
         example: Estes
       designation:
-        description: manufacturer designation of motor
+        description: >
+          Exact manufacturer designation, without a delay suffix. Fractional motors
+          use this field (1/2A6, 1/4A3, 1/8A), not commonName. The value may contain
+          a slash; send it as this JSON string and do not place the raw text in a URL path or query.
         type: string
         example: C6
       commonName:
-        description: standard name of motor
+        description: >
+          Letter then nominal average thrust (C6, D12). A delay or catalog prefix is
+          removed before matching (C6-5, G80W, 41F36-11A). Include manufacturer when
+          the brand is known; the name is shared.
         type: string
         pattern: '(1/8A|1/4A|1/2A|[A-O])[0-9]+'
         example: C6
       impulseClass:
-        description: letter class of motor
+        description: letter class from MetadataResponse impulseClasses. A fractional motor such as 1/2A uses that letter.
         type: string
         example: C
       diameter:
@@ -376,7 +389,7 @@ definitions:
         format: date
         example: 2020-01-01
       availability:
-        description: motor current availability
+        description: available (in production) or regular. Omit to include out-of-production motors.
         type: string
         enum:
           - regular
@@ -386,13 +399,15 @@ definitions:
           - all
         example: available
       maxResults:
-        description: maximum number of motors to return
+        description: maximum number of motors to return. Default 20; 0 returns every match. There is no page offset.
         type: integer
         example: 20
 
   SearchResponse:
     type: object
-    description: motor search results
+    description: >
+      Motor search results. Empty fields are omitted. A missing number is unknown, not zero.
+      An error means the query was rejected and the HTTP status is 400.
     properties:
       criteria:
         description: the search criteria with errors and matches
@@ -417,11 +432,16 @@ definitions:
               type: string
               example: Invalid commonName value "X6".
       matches:
-        description: number of matches of all criteria (and)
+        description: >
+          Full count of motors matching every criterion, before maxResults truncates results.
+          When this is greater than results.length, add a criterion to see more motors.
         type: integer
         example: 25
       results:
-        description: information on the motors matched
+        description: >
+          Motors matched, smallest total impulse first, then cut off at maxResults.
+          The last item is only the largest impulse on this page. Longest burn, longest case,
+          and heaviest motor are not at the end of the list.
         type: array
         items:
           type: object
@@ -443,7 +463,7 @@ definitions:
               type: string
               example: C6
             commonName:
-              description: common name of motor
+              description: common name of the motor. Its digits are nominal average thrust and often differ from avgThrustN.
               type: string
               example: C6
             impulseClass:
@@ -459,7 +479,7 @@ definitions:
               type: number
               example: 18
             length:
-              description: motor length in millimeters
+              description: motor length in millimeters. This measures the longest motor.
               type: number
               example: 70
             type:
@@ -467,7 +487,7 @@ definitions:
               type: string
               example: SU
             avgThrustN:
-              description: average thrust in Newtons
+              description: measured average thrust in Newtons. The digits in the motor name are nominal and often differ.
               type: number
               example: 4.7
             maxThrustN:
@@ -475,15 +495,15 @@ definitions:
               type: number
               example: 14.1
             totImpulseNs:
-              description: total impulse in Newton-seconds
+              description: total impulse in Newton-seconds. This measures the biggest motor.
               type: number
               example: 8.8
             burnTimeS:
-              description: burn time in seconds
+              description: propellant burn time in seconds, not the ejection delay. This measures the longest-burning motor.
               type: number
               example: 1.9
             dataFiles:
-              description: number of data files
+              description: number of simulator files. Greater than zero means a thrust curve can be downloaded.
               type: integer
               example: 3
             infoUrl:
@@ -492,7 +512,7 @@ definitions:
               format: url
               example: 'https://nar.org/SandT/pdf/Estes/C6.pdf'
             totalWeightG:
-              description: total weight in grams
+              description: total weight in grams. This measures the heaviest motor.
               type: number
               example: 24
             propWeightG:
@@ -500,7 +520,7 @@ definitions:
               type: number
               example: 11
             delays:
-              description: available delays
+              description: ejection delays in seconds, comma-separated. Match a whole entry. P means plugged, no ejection charge.
               type: string
               example: '0,3,5,7'
             delayAdjustable:
@@ -532,14 +552,32 @@ definitions:
                 - occasional
                 - OOP
               example: regular
+            source_url:
+              description: ThrustCurve.org motor page to cite for this motor
+              type: string
+              format: url
+              example: 'https://www.thrustcurve.org/motors/Estes/C6/'
+      source_url:
+        description: ThrustCurve.org search page to cite for this response
+        type: string
+        format: url
+        example: 'https://www.thrustcurve.org/motors/search.html'
+      error:
+        description: present when the query was rejected. The HTTP status is then 400.
+        type: string
+        example: Invalid commonName value "X6".
 
   DownloadRequest:
     type: object
     description: motor identifier list
     properties:
+      motorId:
+        description: unique identifier of one motor, from SearchResponse motorId. Do not send this together with motorIds.
+        type: string
+        example: 5f4294d20002310000000015
       motorIds:
         type: array
-        description: unique identifiers of motors to download data for
+        description: unique identifiers of motors to download data for. Do not send this together with motorId.
         items:
           type: string
           example: 5f4294d20002310000000015
@@ -559,7 +597,9 @@ definitions:
           - free
           - other
       data:
-        description: what data is desired
+        description: >
+          file returns the Base64 simulator file in results data. samples returns the
+          thrust curve in results samples. both returns both. Default is file.
         type: string
         example: both
         enum:
@@ -573,10 +613,13 @@ definitions:
 
   DownloadResponse:
     type: object
-    description: motor data downloads
+    description: >
+      Simulator files for the requested motors. Empty fields are omitted.
+      A missing number is unknown, not zero. An error means the query was rejected
+      and the HTTP status is 400.
     properties:
       results:
-        description: motor data files
+        description: simulator files, newest first. Use the first result.
         type: array
         items:
           type: object
@@ -613,11 +656,12 @@ definitions:
                 - free
                 - other
             data:
-              description: simulator file content, Base64 encoded
+              description: Base64-encoded simulator file. Omitted unless the request data is file or both.
               type: string
+              format: byte
               example: 'OyBDNi0wDQpDNi0wIDE4I...'
             samples:
-              description: extracted data points
+              description: thrust curve. Omitted unless the request data is samples or both.
               type: array
               items:
                 type: object
@@ -640,6 +684,11 @@ definitions:
               type: string
               format: url
               example: 'https://www.thrustcurve.org/simfiles/5f4294d20002e900000004e7/download/Estes_C6.eng'
+            source_url:
+              description: ThrustCurve.org simulator-file page to cite for this file
+              type: string
+              format: url
+              example: 'https://www.thrustcurve.org/simfiles/5f4294d20002e900000004e7/'
       error:
         description: any errors that occurred
         type: string
@@ -814,13 +863,22 @@ definitions:
   MotorGuideRequest:
     type: object
     description: rocket information and search criteria
+    required:
+      - rocket
     properties:
       rocket:
-        description: rocket to find motors for
+        description: Rocket to find motors for. Each required value must be greater than zero.
         type: object
+        required:
+          - bodyDiameterM
+          - mmtDiameterMm
+          - mmtLengthMm
+          - weightKg
+          - cd
+          - guideLengthM
         properties:
           name:
-            description: name of rocket (optional)
+            description: name of rocket
             type: string
             example: Alpha III
           bodyDiameterM:
@@ -879,7 +937,9 @@ definitions:
         example: 25
   MotorGuideResponse:
     type: object
-    description: motors for this rocket
+    description: >
+      Motors for this rocket. Empty fields are omitted. A missing number is unknown, not zero.
+      An error means the query was rejected and the HTTP status is 400.
     properties:
       criteria:
         description: the search criteria with errors and matches
@@ -896,7 +956,7 @@ definitions:
               type: string
               example: C6
             matches:
-              description: number of matches of this criterion
+              description: motors matching this criterion alone. This is not how many motors fit the rocket.
               type: integer
               example: 3
             error:
@@ -904,12 +964,12 @@ definitions:
               type: string
               example: 'Invalid commonName "X6".'
       matches:
-        description: number of matches of all criteria (and)
+        description: motors matching every search criterion, before the fit check. This is not how many motors fit the rocket.
         type: integer
         example: 25
       results:
         type: array
-        description: motors for this rocket
+        description: Motors that fit the rocket. When none fit, these are the failures and status says why.
         items:
           type: object
           properties:
@@ -978,7 +1038,7 @@ definitions:
               type: number
               example: 10.75
             status:
-              description: motor usability status
+              description: ok when the motor fits. Any other value is why it was rejected.
               type: string
               enum:
                 - ok
@@ -986,12 +1046,22 @@ definitions:
                 - guide-vel
                 - too-low
               example: ok
+            source_url:
+              description: ThrustCurve.org motor page to cite for this motor
+              type: string
+              format: url
+              example: 'https://www.thrustcurve.org/motors/Estes/D11/'
+      source_url:
+        description: ThrustCurve.org motor-guide page to cite for this response
+        type: string
+        format: url
+        example: 'https://www.thrustcurve.org/motors/guide.html'
       okCount:
-        description: number of motors that work
+        description: how many motors fit
         type: integer
         example: 16
       failedCount:
-        description: number of motors that didn't work
+        description: how many motors were dropped
         type: integer
         example: 9
       error:

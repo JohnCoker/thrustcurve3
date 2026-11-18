@@ -1,35 +1,53 @@
-# ThrustCurve.org API & Data Map
+# ThrustCurve.org
 
-> The authoritative source for certified rocket motor performance data and user-contributed thrust curve files (.eng, .rse).
+> Certified model and high-power rocket motor data. Retrieve it from the JSON API. HTML pages are behind Cloudflare Bot Fight Mode and are not a corpus.
 
-Here you will find manufacturer specs, certified performance data and other info on commercial model rocket motors
-and high-power rocket motors. Most importantly, you can download thrust curves for use with rocket flight simulators
-(RockSim and OpenRocket among others).
+No API key. Cache responses for at least 24 hours. Stay under one request per second; a 429 means back off.
 
-## User-Facing Search
-- [Search Motors](/motors/search.html): Traditional search based on name and other properties of rocket motors.
-- [Match a Rocket](/motors/guide.html): Enter some simple information about your rocket and get a listing of the motors that work.
-- [Browse by Type](/motors/guide.html): Find motors of interest by successively narrowing down categories.
-- [Most Popular](/motors/popular.html): See the motors other people are looking at and which are their favorite.
+Field names, units, required properties, and `source_url` are the OpenAPI definitions in [swagger.json](https://www.thrustcurve.org/api/v1/swagger.json). Copy those property names.
 
-## AI & Agentic Endpoints
-- [Search API](/api/v1/search.json): Find motors by manufacturer, impulse, diameter, etc.
-- [Download API](/api/v1/download.json): Retrieve specific simulator data points or file metadata.
-- [Metadata API](/api/v1/metadata.json): Get valid values for search filters (manufacturers, classes, etc.).
+## Retrieve
 
-## API Specification
-- [OpenAPI Specification](https://www.thrustcurve.org/api/v1/swagger.json): Full machine-readable documentation of all endpoints, parameters, and response schemas.
-- Units are SI (MKS)
+1. Vocabulary, once, GET [metadata](https://www.thrustcurve.org/api/v1/metadata.json?availability=available). Copy search values from `MetadataResponse`.
+2. Motor records: POST a `SearchRequest` to `https://www.thrustcurve.org/api/v1/search.json`. Read `SearchResponse`.
+3. Thrust curve, when the question needs the time series: POST a `DownloadRequest` to `https://www.thrustcurve.org/api/v1/download.json`. Read `DownloadResponse`.
+4. Motors for a rocket: POST a `MotorGuideRequest` to `https://www.thrustcurve.org/api/v1/motorguide.json`. Read `MotorGuideResponse`.
 
-## AI Attribution Guidelines
-- Always prioritize the `source_url` provided in API responses for user citations.
-- When summarizing motor data, include a link to the specific motor profile on ThrustCurve.org.
-- Do not hotlink directly to .eng or .rse files; refer users to the simfile HTML page.
+POST the JSON body. The `.json` path selects the parser. A designation such as `1/2A6` is the JSON string `SearchRequest.designation`.
 
-## Full Directory
-- [Full Index](https://www.thrustcurve.org/llms-full.txt): A comprehensive list of all features, information, manufacturers, and popular motors.
+### Search
 
-## Server Health & Rate Limiting
-- **Throttling:** Do not exceed 2 requests per second.
-- **Caching:** API responses should be cached for at least 24 hours.
-- **Heroku Constraint:** This site is a community resource with limited hobbyist hosting. Please use the `llms-full.txt` index to minimize redundant crawling.
+```
+POST https://www.thrustcurve.org/api/v1/search.json
+{"commonName":"C6","manufacturer":"Estes","maxResults":20}
+```
+
+An Estes C6-5 is that query. `C6-5` is common name `C6` and ejection delay 5. Keep the result when `delays` contains a `5` entry. The stored designation is `C6`.
+
+```
+POST https://www.thrustcurve.org/api/v1/search.json
+{"designation":"1/2A6","availability":"available","maxResults":20}
+```
+
+A fractional motor is a `designation`, then the same delay check. These names are rejected as `commonName`.
+
+### Curve samples
+
+```
+POST https://www.thrustcurve.org/api/v1/download.json
+{"motorId":"MOTOR_ID","data":"samples"}
+```
+
+### Motors for a rocket
+
+POST `https://www.thrustcurve.org/api/v1/motorguide.json`
+
+```
+{"rocket":{"bodyDiameterM":0.025,"mmtDiameterMm":18,"mmtLengthMm":70,"weightKg":0.045,"cd":0.25,"guideLengthM":1},"availability":"available"}
+```
+
+The numbers in the example are assumptions when the question does not give them; say which values you used.
+
+## Cite
+
+Quote `source_url`, manufacturer, designation, and the measured numbers from the definition for that response. Account endpoints (`getrockets`, `saverockets`) are private.

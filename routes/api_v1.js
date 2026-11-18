@@ -18,7 +18,8 @@ const express = require('express'),
       parsers = require('../simulate/parsers'),
       flightsim = require('../simulate/flightsim'),
       data = require('../render/data'),
-      api1 = require('../lib/api');
+      api1 = require('../lib/api'),
+      httpCache = require('../lib/cache');
 
 require('body-parser-xml')(bodyParser);
 
@@ -144,7 +145,9 @@ function xmlParser(req, res, next) {
 const specFile = path.resolve(__dirname + '/../config/api_v1.yml');
 
 router.get(APIPrefix + 'swagger.yml', function(req, res, _next) {
-  res.type('application/yaml').sendFile(specFile);
+  res.type('application/yaml')
+     .set('Cache-Control', httpCache.public)
+     .sendFile(specFile);
 });
 router.get(APIPrefix + 'swagger.json', function(req, res, _next) {
   let spec = yamljs.load(specFile),
@@ -155,7 +158,9 @@ router.get(APIPrefix + 'swagger.json', function(req, res, _next) {
     text = JSON.stringify(spec, undefined, 2);
   else
     text = JSON.stringify(spec);
-  res.type('application/json').send(text);
+  res.set('Cache-Control', httpCache.public)
+     .type('application/json')
+     .send(text);
 });
 
 
@@ -241,11 +246,15 @@ function criteriaQueries(req, cache, criteria, criteriaInfo, queries) {
       info.matches = 0;
     } else {
       queries.push(function(cb) {
-        req.db.Motor.countDocuments(query, function(err, count) {
+        metadata.resolveMotorQuery(req, query, function(err, motorQuery) {
           if (err)
             return cb(err);
-          info.matches = count;
-          cb(null, count);
+          req.db.Motor.countDocuments(motorQuery, function(err, count) {
+            if (err)
+              return cb(err);
+            info.matches = count;
+            cb(null, count);
+          });
         });
       });
     }
@@ -275,7 +284,16 @@ function doSearch(req, res, format) {
     let results = [];
     if (errs.errorCount() === 0) {
       queries.push(function(cb) {
-        req.db.Motor.find(query)
+        metadata.resolveMotorQuery(req, query, function(err, motorQuery) {
+          if (err)
+            return cb(err);
+          findMotors(motorQuery, cb);
+        });
+      });
+    }
+
+    function findMotors(motorQuery, cb) {
+        req.db.Motor.find(motorQuery)
           .sort({ totalImpulse: 1 })
           .exec(function(err, motors) {
             if (err)
@@ -322,7 +340,6 @@ function doSearch(req, res, format) {
               }
             });
           });
-      });
     }
 
     function send() {
@@ -949,11 +966,26 @@ router.post([APIPrefix + 'motorguide.xml', LegacyPrefix + 'motorguide'], xmlPars
 function fullURL(req, path) {
   if (path == null || path === '')
     path = '/';
-  if (!/^http?:/.test(path)) {
-    let origin = (req.protocol ?? 'https') + '://' + (process.env.DOMAIN ?? 'www.thrustcurve.org');
-    path = origin + path;
+  if (!/^https?:\/\//i.test(path)) {
+    const host = process.env.DOMAIN ?? 'www.thrustcurve.org';
+    path = publicProtocol(req) + '://' + host + path;
   }
   return path;
+}
+
+// The Node process is reached over HTTP; TLS stops at the proxy, so req.protocol
+// stays http on the live site. Citation URLs use the public https origin.
+function publicProtocol(req) {
+  const forwarded = req.header('x-forwarded-proto');
+  let proto;
+  if (forwarded) {
+    proto = forwarded.split(',')[0].trim().toLowerCase();
+    if (proto !== 'https' && proto !== 'http')
+      proto = null;
+  }
+  if (proto === 'https' || process.env.NODE_ENV === 'production')
+    return 'https';
+  return proto || req.protocol || 'http';
 }
 
 module.exports = router;

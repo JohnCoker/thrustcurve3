@@ -1,0 +1,49 @@
+{
+  "criteria": [
+    {
+      "name": "manufacturer",
+      "value": "Estes",
+      "matches": 22
+    },
+    {
+      "name": "designation",
+      "value": "F26",
+      "matches": 1
+    },
+    {
+      "name": "hasDataFiles",
+      "value": false,
+      "matches": 41
+    }
+  ],
+  "matches": 1,
+  "results": [
+    {
+      "motorId": "56a4092800023100000003e5",
+      "manufacturer": "Estes Industries",
+      "manufacturerAbbrev": "Estes",
+      "designation": "F26",
+      "commonName": "F26",
+      "impulseClass": "F",
+      "diameter": 29,
+      "length": 98,
+      "type": "SU",
+      "certOrg": "National Association of Rocketry",
+      "avgThrustN": 26.96,
+      "maxThrustN": 39.16,
+      "totImpulseNs": 62.19,
+      "burnTimeS": 2.31,
+      "dataFiles": 0,
+      "infoUrl": "http://www.nar.org/SandT/pdf/Estes/F26FJ.pdf",
+      "propWeightG": 43.1,
+      "delays": "6",
+      "delayAdjustable": false,
+      "propInfo": "composite",
+      "sparky": false,
+      "updatedOn": "2014-07-05",
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/F26/"
+    }
+  ],
+  "source_url": "http://localhost:3000/motors/search.html"
+}

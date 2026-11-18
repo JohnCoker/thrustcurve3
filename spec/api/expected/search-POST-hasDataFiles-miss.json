@@ -1,0 +1,22 @@
+{
+  "criteria": [
+    {
+      "name": "manufacturer",
+      "value": "Estes",
+      "matches": 22
+    },
+    {
+      "name": "designation",
+      "value": "F26",
+      "matches": 1
+    },
+    {
+      "name": "hasDataFiles",
+      "value": true,
+      "matches": 239
+    }
+  ],
+  "matches": 0,
+  "results": [],
+  "source_url": "http://localhost:3000/motors/search.html"
+}

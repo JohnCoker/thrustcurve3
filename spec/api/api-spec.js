@@ -489,6 +489,60 @@ describe("API v1", function() {
           done();
         });
       });
+      it("hasDataFiles JSON", function(done) {
+        let body = '{ "manufacturer": "Estes", "designation": "F50", "hasDataFiles": true }';
+        post('/api/v1/search.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"designation": *"F50"/);
+          expect(response).toMatch(/"dataFiles": *1/);
+          expect(response).toMatch(/"matches": *1/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("noDataFiles JSON", function(done) {
+        let body = '{ "manufacturer": "Estes", "designation": "F26", "hasDataFiles": false }';
+        post('/api/v1/search.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"designation": *"F26"/);
+          expect(response).toMatch(/"dataFiles": *0/);
+          expect(response).toMatch(/"matches": *1/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("hasDataFiles miss JSON", function(done) {
+        let body = '{ "manufacturer": "Estes", "designation": "F26", "hasDataFiles": true }';
+        post('/api/v1/search.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"matches": *0/);
+          expect(response).not.toMatch(/"motorId":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
+      it("noDataFiles miss JSON", function(done) {
+        let body = '{ "manufacturer": "Estes", "designation": "F50", "hasDataFiles": false }';
+        post('/api/v1/search.json', body).then(response => {
+          expect(response).toBeValidJSON();
+          expect(response).toMatch(/"matches": *0/);
+          expect(response).not.toMatch(/"motorId":/);
+          expect(response).toBeExpected();
+          done();
+        }).catch(e => {
+          fail(e);
+          done();
+        });
+      });
     });
   });
 

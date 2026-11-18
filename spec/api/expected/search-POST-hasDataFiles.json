@@ -1,0 +1,49 @@
+{
+  "criteria": [
+    {
+      "name": "manufacturer",
+      "value": "Estes",
+      "matches": 22
+    },
+    {
+      "name": "designation",
+      "value": "F50",
+      "matches": 1
+    },
+    {
+      "name": "hasDataFiles",
+      "value": true,
+      "matches": 239
+    }
+  ],
+  "matches": 1,
+  "results": [
+    {
+      "motorId": "56a4092800023100000003e6",
+      "manufacturer": "Estes Industries",
+      "manufacturerAbbrev": "Estes",
+      "designation": "F50",
+      "commonName": "F50",
+      "impulseClass": "F",
+      "diameter": 29,
+      "length": 98,
+      "type": "SU",
+      "certOrg": "National Association of Rocketry",
+      "avgThrustN": 53.73,
+      "maxThrustN": 79.59,
+      "totImpulseNs": 76.83,
+      "burnTimeS": 1.43,
+      "dataFiles": 1,
+      "infoUrl": "http://www.nar.org/SandT/pdf/Estes/F50T.pdf",
+      "propWeightG": 37.9,
+      "delays": "4,6",
+      "delayAdjustable": false,
+      "propInfo": "composite",
+      "sparky": false,
+      "updatedOn": "2014-07-05",
+      "availability": "regular",
+      "source_url": "http://localhost:3000/motors/Estes/F50/"
+    }
+  ],
+  "source_url": "http://localhost:3000/motors/search.html"
+}
